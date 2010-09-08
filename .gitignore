@@ -1,0 +1,9 @@
+*.bak
+*~
+*.o
+*.dc
+*.oc
+*.os
+*.tmp
+*.obj
+*.asm

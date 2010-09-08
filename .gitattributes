@@ -1,0 +1,4 @@
+*.exe binary
+*.out binary
+*.blob binary
+*.bin binary
