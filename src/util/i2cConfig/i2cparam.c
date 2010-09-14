@@ -39,9 +39,9 @@ void setupTable (void)
 
     ibl.pllConfig[ibl_MAIN_PLL].doEnable      = TRUE;
     ibl.pllConfig[ibl_MAIN_PLL].prediv        = 1;
-    ibl.pllConfig[ibl_MAIN_PLL].mult          = 25;
+    ibl.pllConfig[ibl_MAIN_PLL].mult          = 28;
     ibl.pllConfig[ibl_MAIN_PLL].postdiv       = 1;
-    ibl.pllConfig[ibl_MAIN_PLL].pllOutFreqMhz = 625;
+    ibl.pllConfig[ibl_MAIN_PLL].pllOutFreqMhz = 700;
 
     /* The DDR PLL. The multipliers/dividers are fixed, so are really dont cares */
     ibl.pllConfig[ibl_DDR_PLL].doEnable = TRUE;
@@ -68,9 +68,9 @@ void setupTable (void)
     ibl.ethConfig[0].useBootpFileName = FALSE;
     ibl.ethConfig[0].bootFormat       = ibl_BOOT_FORMAT_BBLOB;
 
-    SETIP(ibl.ethConfig[0].ethInfo.ipAddr,    10,218,109,21);
-    SETIP(ibl.ethConfig[0].ethInfo.serverIp,  10,218,109,196);
-    SETIP(ibl.ethConfig[0].ethInfo.gatewayIp, 10,218,109,1);
+    SETIP(ibl.ethConfig[0].ethInfo.ipAddr,    192,168,2,100);
+    SETIP(ibl.ethConfig[0].ethInfo.serverIp,  192,168,2,110);
+    SETIP(ibl.ethConfig[0].ethInfo.gatewayIp, 192,168,2,2);
     SETIP(ibl.ethConfig[0].ethInfo.netmask,   255,255,255,0);
 
     /* Leave the hardware address as 0 so the e-fuse value will be used */
