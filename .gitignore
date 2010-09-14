@@ -7,3 +7,17 @@
 *.tmp
 *.obj
 *.asm
+*.junk
+*.map
+*.yy.c
+*.log
+*.exe
+*.out
+*.b
+*.ccs
+cdefdep
+junk/
+logs/
+hacky-stuff/cgtools
+
+
