@@ -6,87 +6,95 @@
 #*
 #* DESCRIPTION:
 #*
-#* NOTE:        Written for Thompson Automation TAWK compiler
+#* NOTE:        Ported to gawk in 2010
 #*
-#* NOTE:	    Processes #includes even in false conditional compilation
+#* NOTE:        Processes #includes even in false conditional compilation
 #*
-#* (C) Copyright 1999, Telogy Networks, Inc.
+#* (C) Copyright 1999-2001, Telogy Networks, Inc.
+#* (C) Copyright 2010, Texas Instruments Incorperated
 #******************************************************************************
 
-local progname              = "makedep"
-local version_string        = "V1.01"
-local version_date          = "Aug 17, 2001"
+BEGIN \
+{
+progname              = "makedep"
+version_string        = "V1.80"
+version_date          = "Sept 8, 2010"
 
 #*******************************************************************************
 # Types & Constants
 #*******************************************************************************
-local true = 1
-local false = 0
+true = 1
+false = 0
 
-local c_re_include          =  /^[ \t]*#[ \t]*include[ \t]+/
-local s_re_include          =  /^[ \t]*\.(include|copy)[ \t]+/
-local re_include            = c_re_include
+c_re_include          =  "^[ \t]*#[ \t]*include[ \t]+"
+s_re_include          =  "^[ \t]*\\.(include|copy)[ \t]+"
+re_include            = c_re_include
 
 #*******************************************************************************
 # Command Line Options
 #*******************************************************************************
-local quiet                 = false
-local no_warn               = false
-local bracket_includes      = true
-local quote_includes        = true
-local abs_paths             = true
-local recurse               = true
-local depend_not_found      = false
-local stdout_format         = false
-local indent_string         = "    "
-local objext                = "obj"
-local outfile_spec          = ""
+quiet                 = false
+no_warn               = false
+bracket_includes      = true
+quote_includes        = true
+abs_paths             = true
+recurse               = true
+depend_not_found      = false
+stdout_format         = false
+include_full_report   = true
+indent_string         = "    "
+objext                = "obj"
+outfile_spec          = ""
 
-local outfile               = ""
-local infile                = ""
-local infile_basename
+outfile               = ""
+infile                = ""
+infile_basename       = ""
+cur_filename	      = ""
 
-local err_file
+err_file = ""
 
-local orig_argc
+orig_argc = 0
 
 
-local paths[]
-local depends[]             # actually [][]
-local processed_files[]
+# paths[]
+# depends[]             # actually [][]
+# processed_files[]
 
 #*******************************************************************************
 # Syntax
 #*******************************************************************************
-local comment_start         = "# "
-local comment_stop          = ""
-local eol_continue          = "\\"
+comment_start         = "# "
+comment_stop          = ""
+eol_continue          = "\\"
 
 #*******************************************************************************
 # File Processing
 #*******************************************************************************
-local file_error            = false
+file_error            = false
 
 #*******************************************************************************
 # Program Debug & Control
 #*******************************************************************************
-local trace_file            = "trace.out"
-local trace_classes[]
-local exit_code             = -1
-local banner_done           = false
+trace_file            = "trace.out"
+# trace_classes[]
+exit_code             = -1
+banner_done           = false
+any_traces	      = false
+
+}
 
 #*******************************************************************************
 # Top Level Functions
 #*******************************************************************************
 BEGIN \
 {
-    local i
-    local j
-    local option
-    local arg
-    local sub_option
-    local input_found = false
-    local any_gen = false
+    i = 0
+    j = 0
+    option = ""
+    arg = ""
+    sub_option = ""
+    input_found = false
+    any_gen = false
 
     trace_classes[ "includes" ] = 0
     trace_classes[ "flow" ]     = 0
@@ -99,7 +107,7 @@ BEGIN \
 
     trace( "flow", "BEGIN" )
 
-    err_file = stdout
+    err_file = "/dev/stdout"
 
     for ( i=1; i < ARGC; i++)
     {
@@ -208,8 +216,8 @@ BEGIN \
             fatal_error("can't specify both -p and -o")
         }
 
-        err_file = stderr
-        outfile  = stdout
+        err_file = "/dev/stderr"
+        outfile  = "/dev/stdout"
     }
 
     if (outfile_spec == "")
@@ -226,12 +234,19 @@ BEGIN \
     orig_argc = ARGC
 }
 
-match( $0, re_include ) != 0 \
+FILENAME != cur_filename \
 {
-    local num_depends
-    local filename
-    local abs_filename
-    local this_dir
+    cur_filename = FILENAME
+    depends[FILENAME] = ""
+    trace("flow", "Processing file: " FILENAME )
+}
+
+$0 ~ re_include \
+{
+    num_depends = 0
+    filename = ""
+    abs_filename = ""
+    this_dir = ""
 
     trace("includes", "#include line:" $0)
 
@@ -268,10 +283,10 @@ match( $0, re_include ) != 0 \
     }
 
     # strip off the quotes or brackets
-	if (filename ~ /^[<"]/)
-	{
+    if (filename ~ /^[<"]/)
+    {
        filename = substr(filename, 2, length(filename)-2)
-	}
+    }
 
     abs_filename = find_file(filename, paths);
     if (abs_filename == "")
@@ -287,13 +302,19 @@ match( $0, re_include ) != 0 \
             ARGV[ARGC] = abs_filename
             processed_files[abs_filename] = 1
             ARGC++
-            depends[abs_filename][0] = 0
+            depends_count[abs_filename] = 0
         }
     }
 
-    num_depends                     = depends[FILENAME][0]+1
-    depends[FILENAME][num_depends]  = abs_filename
-    depends[FILENAME][0]            = num_depends
+    cur_depends			    = depends[FILENAME]
+    if (cur_depends == "")
+    {
+        depends[FILENAME]           = abs_filename
+    }
+    else
+    {
+        depends[FILENAME]           = cur_depends "|" abs_filename
+    }
 
     next
 }
@@ -305,7 +326,7 @@ match( $0, re_include ) != 0 \
 
 END \
 {
-    local arg
+    arg = ""
 
     trace( "flow", "END" )
 
@@ -316,33 +337,43 @@ END \
 
     for (arg=1; arg < orig_argc; arg++)
     {
-        delete processed_files
         infile = ARGV[arg]
+	
+	if (infile == "")
+	    continue
 
-        if (infile != "" && !stdout_format)
+        if (!stdout_format)
         {
             file_done()
 
             infile_basename = basename(infile)
             infile_basename = strip_ext(infile_basename)
             outfile = outfile_spec
-            gsubs("$", infile_basename, outfile, 0)
+            gsub("\\$", infile_basename, outfile)
 
             gen_header()
             file_error = false
         }
 
+        delete processed_files
         process_depends(infile, 1)
+
+	if (include_full_report)
+	{
+	    gen_header(true)
+	    delete processed_files
+	    process_depends(infile, 1, true)
+	}
     }
 }
 
 #*******************************************************************************
 # Command Line Functions
 #*******************************************************************************
-function process_trace_option(arg)
+function process_trace_option(arg,  i, setting)
 {
-    local i
-    local setting
+    # local i
+    # local setting
 
     if ( arg ~ /^\+/ )
     {
@@ -379,6 +410,12 @@ function process_trace_option(arg)
         }
         fatal_error("unknown trace class " arg)
     }
+
+    any_traces = false
+    for (i in trace_classes)
+    {
+        any_traces = any_traces || trace_classes[i]
+    }
 }
 
 function banner()
@@ -389,8 +426,8 @@ function banner()
     }
 
     banner_done = true
-    print toupper(progname) " " version_string ": C include dependency generator/lister" >err_file
-    print "Last updated " version_date >err_file
+    print toupper(progname) " " version_string ": C include dependency generator/lister" > err_file
+    print "Last updated " version_date > err_file
 }
 
 function help()
@@ -431,9 +468,16 @@ function file_time( name )
     return ctime(filetime(name))
 }
 
-function file_exists( name )
+function file_exists(file,        dummy, ret)
 {
-    return ( filemode(name) != "" )
+    ret=0;
+    if ( (getline dummy < file) >=0 )
+    {
+        # file exists (possibly empty) and can be read
+        ret = 1;
+        close(file);
+    }
+    return ret;
 }
 
 function rename_file( old_name, new_name )
@@ -463,9 +507,9 @@ function delete_file( name )
 }
 
 # return filename without extension
-function strip_ext( filename )
+function strip_ext( filename,  new_name )
 {
-    local new_name
+    # local new_name
 
     # match the extension ( last dot and file component after it )
     if ( match( filename, /\.[^ \t/\\.]*$/ ) != 0 )
@@ -505,14 +549,14 @@ function file_ext( filename )
 }
 
 # return filename.ext w/o leading paths
-function basename( filename )
+function basename( filename,  new_name )
 {
-    local new_name
+    # local new_name
     
     new_name = filename
 
     # turn all backslashes to forward slashes
-    gsubs("\\", "/", new_name)
+    gsub("\\", "/", new_name)
 
     # match the basename (everything after the last slash)
     if ( match( new_name, /\/[^/]*$/ ) != 0 )
@@ -536,14 +580,14 @@ function basename( filename )
 }
 
 # return drive & directories of filename
-function file_path( filename )
+function file_path( filename,  new_name )
 {
-    local new_name
+    # local new_name
     
     new_name = filename
 
     # turn all backslashes to forward slashes
-    gsubs("\\", "/", new_name)
+    gsub("\\", "/", new_name)
 
     # match the basename (everything after the last slash)
     if ( match( new_name, /\/[^/]*$/ ) != 0 )
@@ -567,7 +611,7 @@ function file_path( filename )
         }
     }
 
-    trace( "file", "basename of " filename " gives " new_name )
+    trace( "file", "file_path of " filename " gives " new_name )
     return new_name
 }
 
@@ -577,11 +621,11 @@ function to_abs_path(filename)
     return filename
 }
 
-function find_file(filename, path_array)
+function find_file(filename, path_array,  i, test_file, num_paths)
 {
-    local i
-    local test_file
-    local num_paths
+    # local i
+    # local test_file
+    # local num_paths
 
     num_paths = path_array[0]
 
@@ -611,28 +655,50 @@ function find_file(filename, path_array)
 #*******************************************************************************
 # Output Processing
 #*******************************************************************************
-function process_depends(filename, level)
+function process_depends(filename, level,    report, i, j, abs_file, num_depends, these_depends, this_indent)
 {
-    local i
-    local j
-    local abs_file
-    local num_depends
+    # local i
+    # local j
+    # local abs_file
+    # local num_depends
+    # local this_indent
 
-    num_depends = depends[filename][0]
+    split(depends[filename], these_depends, "|")
+
+    # length(array) does not work on some older versions of awk/gawk
+    # also awk says that array enumeration can be in any random order
+    num_depends = 0 
+    for (i in these_depends) num_depends++  
+
+    if (report) 
+    {
+	this_indent = "#   "
+    }
+    else
+    {
+	this_indent = "    "
+    }
+
+    for (j=1; j < level; j++)
+    {
+        this_indent = this_indent indent_string
+    }
+
+    #trace("flow", "process_depends level=" level " : " filename " => (" num_depends ") " depends[filename] )
 
     for (i=1; i <= num_depends; i++)
     {
-        abs_file = depends[filename][i]
+        abs_file = these_depends[i]
 
-        for (j=0; j < level; j++)
-        {
-            printf("%s", indent_string) >outfile
-        }
+        trace("flow", this_indent "process_depends level=" level " report=" report " : " filename ".depends[" i "] => " these_depends[i] )
 
         if (abs_file in processed_files)
         {
-#            printf("%s %-40s already included %s %s\n", \
-#                comment_start, abs_file, comment_stop, eol_continue) >outfile
+	    if (report)
+	    {
+		printf("%s %-68s already included\n", \
+		    this_indent, abs_file) >outfile
+	    }
         }
         else
         {
@@ -640,46 +706,64 @@ function process_depends(filename, level)
 
             if (abs_file in depends)
             {
-                printf("%-40s %s\n", abs_file, eol_continue) >outfile
-#                printf("%-40s %s %s %s %s\n", \
-#                    abs_file, comment_start, file_time(abs_file), \
-#                    comment_stop, eol_continue)   >outfile
-                process_depends(abs_file, level+1)
+		if (report)
+		{
+		    printf("%s %-68s %s\n", \
+			this_indent, abs_file, file_time(abs_file)) >outfile
+		}
+		else
+		{
+		    printf("%s %-68s %s\n", this_indent, abs_file, eol_continue) >outfile
+		}
+
+                process_depends(abs_file, level+1, report)
             }
             else
             {
-                if (depend_not_found)
+                if (report)
                 {
-				    printf("%-40s %s\n", abs_file, eol_continue) >outfile
-#                    printf("%-40s %s not found %s %s\n", \
-#                        abs_file, comment_start, comment_stop, eol_continue) >outfile
+		    printf("%s %-68s not found\n", \
+			    this_indent, abs_file) >outfile
                 }
                 else
                 {
-#                    printf("%s %-40s not found %s %s\n", \
-#                        comment_start, abs_file, comment_stop, eol_continue) >outfile
+		    if (depend_not_found)
+		    {
+			printf("%s %-68s %s\n", this_indent, abs_file, eol_continue) >outfile
+		    }
                 }
             }
         }
     }
+
+    # ensure line continuation is terminated
+    if (level == 1)
+	print "" >outfile
 }
 
-function gen_header()
+function gen_header( report,    infile_ext, outfile_ext)
 {
     # print header
 
-    local   infile_ext
-    local   outfile_ext
+    # local   infile_ext
+    # local   outfile_ext
 
     infile_ext      = file_ext(infile)
     outfile_ext     = file_ext(outfile)
 
-    print comment_start "Dependency file for " infile comment_stop >outfile
-    print comment_start "Generated on " ctime() comment_stop >outfile 
-    print comment_start "From " infile " dated " ctime(filetime(infile)) comment_stop >outfile
-    print comment_start "This file was generated by " progname ", do not edit!!" comment_stop >outfile
-    print "" >outfile
-    print infile_basename "." objext, ":", infile, infile_basename outfile_ext, eol_continue >outfile
+    if (report)
+    {
+	print comment_start "Full include report for " infile comment_stop >outfile
+    }
+    else
+    {
+	print comment_start "Dependency file for " infile comment_stop >outfile
+	print comment_start "Generated on " ctime() comment_stop >outfile 
+	print comment_start "From " infile " dated " ctime(filetime(infile)) comment_stop >outfile
+	print comment_start "This file was generated by " progname ", do not edit!!" comment_stop >outfile
+	print "" >outfile
+	print infile_basename "." objext, ":", infile, infile_basename outfile_ext, eol_continue >outfile
+    }
 }
 
 #*******************************************************************************
@@ -691,9 +775,24 @@ function error( desc )
     file_error = true
 }
 
-function warn( desc, arg )
+function ctime(time)
 {
-    local err
+    if (time == 0)
+    {
+        time = systime()
+    }
+    return strftime("%a %b %d %H:%M:%S %Z %Y", systime())
+}
+
+function filetime(filename)
+{
+    # not implemented
+    return 1
+}
+
+function warn( desc, arg,  err )
+{
+    # local err
 
     if (no_warn)
     {
@@ -710,7 +809,7 @@ function warn( desc, arg )
 
 function fatal_error( desc )
 {
-    print "Error: " desc >err_file
+    print "Error: " desc > "/dev/stderr"
 
     exit_code = 3
     exit

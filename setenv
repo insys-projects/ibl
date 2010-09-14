@@ -9,6 +9,6 @@ rm hacky-stuff/cgtools; ln -sf $C6X_BASE_DIR hacky-stuff/cgtools
 
 export TOOLSC6X=$PWD/hacky-stuff
 export TOOLSC6XDOS=$TOOLSC6X
-export MAKEDEPPATH=$PWD/hacky-stuff/fakedep
+export MAKEDEPPATH="gawk -f $PWD/src/make/makedep/makedep.gawk "
 export TOOLSBIOSC6XDOS=$PWD/hacky-stuff/bios-stuff-qq
 
