@@ -1,0 +1,49 @@
+#****************************************************************************
+#* FILE NAME: makefile
+#*
+#* DESCRIPTION: Makes the data parsers for the IBL
+#*
+#****************************************************************************
+
+
+ifndef IBL_ROOT
+	export IBL_ROOT=../../..
+endif
+
+ECODIR= $(IBL_ROOT)/interp
+
+CSRC= bis.c cload.c osal.c btblpr.c btblwrap.c gem.c blob.c
+
+
+.PHONY: interp
+
+
+include $(IBL_ROOT)/make/$(ARCH)/makeeco.mk
+
+
+C6X_C_DIR=	 $(IBL_ROOT)
+C6X_C_DIR+= ;$(IBL_ROOT)/arch/$(ARCH)
+C6X_C_DIR+= ;$(ECODIR)
+C6X_C_DIR+= ;$(STDINC)
+C6X_C_DIR+= ;$(IBL_ROOT)/cfg/$(TARGET)
+export C6X_C_DIR
+
+
+vpath % $(ECODIR)/bis
+vpath % $(ECODIR)/coff
+vpath % $(ECODIR)/btbl
+vpath % $(ECODIR)/blob
+
+interp: gen_cdefdep makefile $(OBJS)
+
+
+$(OBJS): cdefdep
+
+
+
+gen_cdefdep:
+	@echo Checking command line dependencies
+	@echo $(ENDIAN) $(TARGET) $(ARCH) > cdefdep.tmp
+	@sh -c 'if diff -q cdefdep.tmp cdefdep ; then echo same ; else $(CP) cdefdep.tmp cdefdep ; fi '
+
+

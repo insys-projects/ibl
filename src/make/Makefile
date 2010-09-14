@@ -1,0 +1,40 @@
+#*******************************************************************************************
+#* FILE PURPOSE: Top level make for the IBL
+#*******************************************************************************************
+#* FILE NAME: Makefile
+#*
+#* DESCRIPTION: Builds the Intermediate Boot Loader (IBL)
+#*
+#*******************************************************************************************
+
+IBLS_C6X= c6455 c6472 
+
+
+all:
+	@echo must specify a target [ $(IBLS_C6X) ]
+
+
+# Default options that can be overridden on the command line
+ifndef ENDIAN
+ ENDIAN=little
+endif
+export ENDIAN
+
+
+$(IBLS_C6X):
+	make -f makestg2 ARCH=c64x TARGET=$@ $@ 
+
+
+# will need to add a line for each additional ARCH type added
+clean:
+	make -f makestg2 clean ARCH=c64x
+
+
+
+
+
+
+
+
+
+

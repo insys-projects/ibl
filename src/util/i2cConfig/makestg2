@@ -1,0 +1,70 @@
+#**************************************************************************
+#* FILE PURPOSE: 2nd stage makefile for the i2c parameter writer
+#**************************************************************************
+#* FILE NAME: makestg2
+#*
+#* DESCRIPTION: Builds the i2c parameter writer for a specific target
+#*
+#**************************************************************************
+
+ifndef IBL_ROOT
+ IBL_ROOT=../..
+endif
+
+ECODIR= $(IBL_ROOT)/util/i2cConfig
+
+MODULES= hw
+CLEAN_MODULES=$(addprefix clean_,$(MODULES))
+
+
+CSRC= i2cparam.c
+
+include $(IBL_ROOT)/make/$(ARCH)/makeeco.mk
+
+C6X_C_DIR=  $(IBL_ROOT)
+C6X_C_DIR+=;$(IBL_ROOT)/hw/i2c
+C6X_C_DIR+=;$(IBL_ROOT)/hw/plls
+C6X_C_DIR+=;$(STDINC)
+C6X_C_DIR+=;$(IBL_ROOT)/cfg/$(TARGET)
+C6X_C_DIR+=;$(IBL_ROOT)/device/$(TARGET)
+C6X_C_DIR+=;$(IBL_ROOT)/arch/$(ARCH)
+export C6X_C_DIR
+
+
+export ARCH
+export TARGET
+
+
+.PHONY: i2cparam.cmd
+
+c6472: gen_cdefdep $(MODULES) $(OBJS) i2cparam_$(TARGET).cmd
+	$(LD) -o i2cparam_$(TARGET).out -m i2cparam_$(TARGET).map i2cparam_$(TARGET).cmd $(RTLIBS)
+
+$(MODULES):
+	@echo making $@
+	make -C $(IBL_ROOT)/$@/$(ARCH)/make $@
+
+
+clean2: $(CLEAN_MODULES)
+	@rm -f $(OBJS)
+	
+
+$(CLEAN_MODULES):
+	@echo cleaning $(subst clean_, ,$@)
+	make -C $(IBL_ROOT)/$(subst clean_,,$@)/$(ARCH)/make clean
+
+
+$(OBJS): cdefdep
+
+
+gen_cdefdep:
+	@echo Checking command line dependencies
+	@echo $(ENDIAN) $(TARGET) $(ARCH) > cdefdep.tmp
+	@sh -c 'if diff -q cdefdep.tmp cdefdep ; then echo same ; else $(CP) cdefdep.tmp cdefdep ; fi '
+
+	
+
+
+
+
+

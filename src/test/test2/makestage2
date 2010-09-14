@@ -1,0 +1,51 @@
+# simple make file for test2
+
+
+CC= cl6x
+CFLAGS= -g -c -mv 6400+ $(OPT)
+
+.PHONY: test2
+
+test2: gen_cdefdep test2_$(ENDIAN).blob
+
+ifeq ($(ENDIAN),little)
+ LIB= $(TOOLSC6X)/cgtools/lib/rts64plus.lib
+ OPT=
+else
+ LIB= $(TOOLSC6X)/cgtools/lib/rts64pluse.lib
+ OPT= -me
+endif
+
+
+
+test2_$(ENDIAN).blob: test2_$(ENDIAN).bccs
+	..\util\ccs2bin $< $@
+
+test2_$(ENDIAN).bccs: test2_$(ENDIAN).b
+	..\util\b2ccs $< $@
+
+test2_$(ENDIAN).b: test2_$(ENDIAN).out test2.rmd
+	hex6x $< test2.rmd
+	copy test2im.hex $@
+
+test2_$(ENDIAN).out: cdefdep c0.obj test2.obj test2ini.obj test2.cmd
+	cl6x -z -o $@ -m test2.map -e _enter test2.cmd $(LIB)
+
+
+c0.obj: c0.c cdefdep
+	$(CC) $(CFLAGS) $<
+
+
+test2.obj: test2.c cdefdep
+	$(CC) $(CFLAGS) $<
+
+test2ini.obj: test2ini.s
+	$(CC) $(CFLAGS) $<
+
+gen_cdefdep:
+	@echo checking endian dependency
+	@echo $(ENDIAN) > cdefdep.tmp
+	@sh -c 'if diff -q cdefdep.tmp cdefdep ; then echo same ; else cp cdefdep.tmp cdefdep ; fi '
+
+	
+

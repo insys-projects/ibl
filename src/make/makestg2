@@ -1,0 +1,60 @@
+#*****************************************************************************
+#* FILE PURPOSE: 2nd stage makefile for the intermediate boot loader
+#*****************************************************************************
+#* FILE NAME: makestg2
+#*
+#* DESCRIPTION: This makefile is invoked with build specific options
+#*
+#******************************************************************************
+
+ifndef IBL_ROOT
+	IBL_ROOT=..
+endif
+
+MODULES= main device ethboot nandboot driver hw interp ecc
+CLEAN_MODULES=$(addprefix clean_,$(MODULES))
+
+
+include $(IBL_ROOT)/make/$(ARCH)/makedefs.mk
+
+export ARCH
+export TARGET
+
+
+c6455: $(MODULES)
+	$(LD) -o ibl_$@/ibl_$@.out -m ibl_$@/ibl_$@.map  ibl_$@/ibl.cmd $(RTLIBS)
+
+
+c6472: $(MODULES) utils
+	$(LD) -o ibl_$@/ibl_$@.out -m ibl_$@/ibl_$@.map  ibl_$@/ibl.cmd $(RTLIBS)
+	hex6x ibl_$@/ibl.rmd ibl_$@/ibl_$@.out
+	$(CP) ibl.b ibl_$@
+	../util/btoccs/b2i2c ibl_$@/ibl.b ibl_$@/ibl.i2c.b
+	../util/btoccs/b2ccs ibl_$@/ibl.i2c.b ibl_$@/ibl.i2c.ccs
+	../util/romparse_$@/romparse ibl_$@/i2crom.map
+	$(CP) i2crom.ccs ibl_$@
+	$(RM) -f i2crom.ccs ibl.b
+
+
+$(MODULES):
+	@echo making $@
+	make -C $(IBL_ROOT)/$@/$(ARCH)/make $@
+
+utils:
+	make -C $(IBL_ROOT)/util/btoccs
+	make -C $(IBL_ROOT)/util/romparse_$(TARGET)
+
+clean: $(CLEAN_MODULES)
+	
+
+$(CLEAN_MODULES):
+	@echo cleaning $(subst clean_, ,$@)
+	make -C $(IBL_ROOT)/$(subst clean_,,$@)/$(ARCH)/make clean
+	
+
+
+
+
+
+
+

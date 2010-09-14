@@ -1,0 +1,12 @@
+-a
+-boot
+-e _c_int00
+-order L
+
+ROMS
+{
+	ROM1:  org = 0x0400, length = 0x10000, memwidth = 32, romwidth = 32
+	files = { ibl.b }
+}
+
+

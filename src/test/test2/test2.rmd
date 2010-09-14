@@ -1,0 +1,10 @@
+-a
+-image
+
+ROMS
+{
+	ROM1: org = 0xe0000000, length = 0x1680, memwidth=32 romwidth=32
+		files= { test2im.hex }
+
+}
+
