@@ -6,7 +6,7 @@
 ROMS
 {
 	ROM1:  org = 0x0400, length = 0x10000, memwidth = 32, romwidth = 32
-	files = { ibl.b }
+	files = { ibl_le.b }
 }
 
 
