@@ -32,6 +32,14 @@ CP          = cp -f
 MV          = mv -f
 CPUDIR      = c64x
 
+ifeq ($(OS),Linux)
+    DIRSEP=/
+    PATHSEP=:
+else
+    DIRSEP=$(subst /,\,/)
+    PATHSEP=;
+endif
+
 
 # CPU Class flags
 CPUFLAGS   = -mv6400+
@@ -42,7 +50,7 @@ else
   ALLFARLIB       = $(TOOLSC6XDOS)/cgtools/lib/rts64plus.lib
 endif
 
-RTLIBS     = $(subst /,\,$(ALLFARLIB))
+RTLIBS     = $(subst /,$(DIRSEP),$(ALLFARLIB))
 
 # Common compilation flags
 # -c     : disable linker
@@ -90,12 +98,12 @@ FSTDINC  =$(TOOLSC6XDOS)/cgtools/include;$(TOOLSC6XDOS)/cgtools/lib
 FSTDINC +=;$(TOOLSC6XDOS)/rtdx/include;$(TOOLSC6XDOS)/rtdx/lib
 FSTDINC +=;$(TOOLSBIOSC6XDOS)/bios/include;$(TOOLSBIOSC6XDOS)/bios/lib
 FSTDINC +=;$(TOOLSBIOSC6XDOS)/xdais/include;;$(TOOLSBIOSC6XDOS)/xdais/src/api
-STDINC =$(subst /,\,$(FSTDINC))
+STDINC =$(subst /,$(DIRSEP),$(FSTDINC))
 
 # Include files for ASM in standard (non siu) modules
-STDAINC =$(subst /,\,$(TOOLSBIOSC6XDOS)/bios/include;$(GGROOT)/misc/$(CPUDIR))
+STDAINC =$(subst /,$(DIRSEP),$(TOOLSBIOSC6XDOS)/bios/include;$(GGROOT)/misc/$(CPUDIR))
 
 # Include files for this platform.  Change this for test code.
-PLATINC =$(subst /,\,$(GGROOT)/hw/$(CPUDIR);$(ECODIR)/gg/$(CPUDIR);$(ECODIR)/$(CPUDIR))
+PLATINC =$(subst /,$(DIRSEP),$(GGROOT)/hw/$(CPUDIR);$(ECODIR)/gg/$(CPUDIR);$(ECODIR)/$(CPUDIR))
 
 # Nothing past this point

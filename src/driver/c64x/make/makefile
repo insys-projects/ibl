@@ -48,7 +48,7 @@ C6X_C_DIR+= ;$(IBL_ROOT)/hw/timer
 C6X_C_DIR+= ;$(IBL_ROOT)/hw/nands
 export C6X_C_DIR
 
-vpath % $(ECODIR)/$(ETHDIR); $(ECODIR)/$(STRMDIR); $(ECODIR)/$(TIMDIR); $(ECODIR)/$(NANDDIR)
+vpath % $(subst ;,$(PATHSEP), $(ECODIR)/$(ETHDIR); $(ECODIR)/$(STRMDIR); $(ECODIR)/$(TIMDIR); $(ECODIR)/$(NANDDIR) )
 
 
 driver: gen_cdefdep makefile $(OBJS)

@@ -1,0 +1,14 @@
+export OS=Linux
+export C6X_BASE_DIR=/opt/CCSv4/ccsv4/tools/compiler/c6000
+export C6X_C_DIR="$C6X_BASE_DIR/include;$C6X_BASE_DIR/lib;"
+export C_DIR="$C6X_C_DIR"
+
+PATH=$C6X_BASE_DIR/bin:$PATH
+
+rm hacky-stuff/cgtools; ln -sf $C6X_BASE_DIR hacky-stuff/cgtools
+
+export TOOLSC6X=$PWD/hacky-stuff
+export TOOLSC6XDOS=$TOOLSC6X
+export MAKEDEPPATH=$PWD/hacky-stuff/fakedep
+export TOOLSBIOSC6XDOS=$PWD/hacky-stuff/bios-stuff-qq
+
