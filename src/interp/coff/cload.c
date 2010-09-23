@@ -1220,6 +1220,8 @@ int reloc_add(int index, SYMENT *sym)
    return TRUE;
 }
 
+
+
 /******************************************************************************/
 /*                                                                            */
 /* RELOCATE() - Perform a single relocation by patching the raw data.         */

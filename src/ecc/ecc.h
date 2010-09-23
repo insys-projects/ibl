@@ -19,3 +19,5 @@
 
 Int32 eccCorrectData(Uint8 *puchData, Uint8 *puchEccRead, Uint8 *puchEccCalc);
 Int32 eccComputeECC(const Uint8 *puchData, Uint8 *puchEccCode);
+Int32 eccNumBytes(void);
+Int32 eccBytesPerBlock (void);

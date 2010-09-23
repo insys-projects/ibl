@@ -1,1 +1,1 @@
-set MAKEDEPPATH=/ibl_0_5/ibl_0.5/src/make/makedep/makedep.exe
+set MAKEDEPPATH=/data/projects/ibl/git/ibl/src/make/makedep/makedep.exe

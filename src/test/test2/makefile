@@ -12,5 +12,6 @@ test2le:
 	make -f makestage2 test2 ENDIAN=little
 
 
-
+clean:
+	make -f makestage2 clean
 

@@ -17,6 +17,7 @@
 #include "gpio.h"
 #include "ecc.h"
 #include "target.h"
+#include "nandgpioloc.h"
 
 /* Pointer to the device configuration */
 nandDevInfo_t *hwDevInfo;
@@ -290,7 +291,7 @@ Int32 nandHwDriverReadPage(Uint32 block, Uint32 page, Uint8 *data)
     if (ret < 0)
         return (ret);
 
-    /* Perform ECC on 256 byte blocks. Three bytes of ecc per 512 byte block are used. The last
+    /* Perform ECC on 256 byte blocks. Three bytes of ecc per 256 byte block are used. The last
      * 3 bytes are used for the last block, the previous three for the block before that, etc */
     nblocks = hwDevInfo->pageSizeBytes >> 8;
 

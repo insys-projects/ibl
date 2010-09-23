@@ -29,6 +29,8 @@ sw_pll			  { yylval = SWPLL;				return (SWPLL);			    }
 
 \".*\"		return (STRING);
 
+[ \t]+		;
+[\n]		;
 
 %%
 

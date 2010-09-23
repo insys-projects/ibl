@@ -260,3 +260,20 @@ Int32 eccCorrectData(Uint8 *puchData, Uint8 *puchEccRead, Uint8 *puchEccCalc)
 		}
 	}
 }
+
+
+
+/* The number of bytes required for ecc */
+Int32 eccNumBytes(void)
+{
+    return (3);
+
+}
+
+
+/* The number of bytes each ECC covers */
+Int32 eccBytesPerBlock (void)
+{
+    return (256);
+
+}

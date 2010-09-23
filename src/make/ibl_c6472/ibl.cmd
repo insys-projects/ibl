@@ -41,7 +41,7 @@
 
 -c
 -stack 0x800
--heap  0x4800
+-heap  0x6000
 
 
 
@@ -49,10 +49,10 @@ MEMORY
 {
 	TEXT   :  origin = 0x801000, length = 0x10000
 	STACK  :  origin = 0x811000, length = 0x0800
-	HEAP   :  origin = 0x811800, length = 0x4800
-	DATA   :  origin = 0x816000, length = 0x3000
-	CFG    :  origin = 0x820000, length = 0x0300
-	STAT :    origin = 0x820300, length = 0x0200
+	HEAP   :  origin = 0x811800, length = 0x6000
+	DATA   :  origin = 0x817800, length = 0x3000
+	CFG    :  origin = 0x821800, length = 0x0300
+	STAT :    origin = 0x821b00, length = 0x0200
 }
 
 SECTIONS

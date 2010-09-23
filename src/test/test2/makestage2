@@ -6,7 +6,7 @@ CFLAGS= -g -c -mv 6400+ $(OPT)
 
 .PHONY: test2
 
-test2: gen_cdefdep test2_$(ENDIAN).blob
+test2: gen_cdefdep utils test2_$(ENDIAN).blob
 
 ifeq ($(ENDIAN),little)
  LIB= $(TOOLSC6X)/cgtools/lib/rts64plus.lib
@@ -19,10 +19,10 @@ endif
 
 
 test2_$(ENDIAN).blob: test2_$(ENDIAN).bccs
-	..\util\ccs2bin $< $@
+	..\..\util\btoccs\ccs2bin $< $@
 
 test2_$(ENDIAN).bccs: test2_$(ENDIAN).b
-	..\util\b2ccs $< $@
+	..\..\util\btoccs\b2ccs $< $@
 
 test2_$(ENDIAN).b: test2_$(ENDIAN).out test2.rmd
 	hex6x $< test2.rmd
@@ -39,7 +39,7 @@ c0.obj: c0.c cdefdep
 test2.obj: test2.c cdefdep
 	$(CC) $(CFLAGS) $<
 
-test2ini.obj: test2ini.s
+test2ini.obj: test2ini.s cdefdep
 	$(CC) $(CFLAGS) $<
 
 gen_cdefdep:
@@ -48,4 +48,17 @@ gen_cdefdep:
 	@sh -c 'if diff -q cdefdep.tmp cdefdep ; then echo same ; else cp cdefdep.tmp cdefdep ; fi '
 
 	
+utils:
+	make -C ../../util/btoccs
 
+
+clean:
+	rm -rf test2_little.blob test2_big.blob
+	rm -rf test2_little.bccs test2_big.bccs
+	rm -rf test2_little.b    test2_big.b
+	rm -rf test2_little.out  test2_big.out
+	rm -rf c0.obj
+	rm -rf test2.obj
+	rm -rf test2ini.obj
+	rm -rf test2im.hex
+	rm -rf test2.map

@@ -1,4 +1,4 @@
-all: b2ccs.exe b2i2c.exe ccs2b.exe bfaddsect.exe bfmerge.exe
+all: b2ccs.exe b2i2c.exe ccs2b.exe bfaddsect.exe bfmerge.exe ccs2bin.exe
 
 
 b2ccs.exe: b2ccs.c
@@ -15,3 +15,11 @@ bfaddsect.exe: bfaddsect.c
 
 bfmerge.exe: bfmerge.c
 	gcc -o bfmerge bfmerge.c
+
+
+ccs2bin.exe: ccs2bin.c
+	gcc -o ccs2bin ccs2bin.c
+
+
+clean:
+	-rm -f b2ccs.exe b2i2c.exe ccs2b.exe bfaddsect.exe bfmerge.exe ccs2bin.exe

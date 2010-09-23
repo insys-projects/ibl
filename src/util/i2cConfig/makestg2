@@ -47,6 +47,7 @@ $(MODULES):
 
 clean2: $(CLEAN_MODULES)
 	@rm -f $(OBJS)
+	@rm -f $(subst .c,.dc,$(CSRC))
 	
 
 $(CLEAN_MODULES):

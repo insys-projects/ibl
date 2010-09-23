@@ -76,6 +76,9 @@ Int32 nand_seek (Int32 loc, Int32 from)
     desiredBlock = desiredPage / nandmcb.devInfo.pagesPerBlock;
     desiredPage  = desiredPage % nandmcb.devInfo.pagesPerBlock;
 
+    /* Update the current position */
+    nandmcb.fpos = desiredPos;
+
     /* Nothing to do if the current block/page is already loaded */
     if ((desiredBlock == nandmcb.currentLogicalBlock) && (desiredPage == nandmcb.currentPage))
         return (0);
@@ -87,7 +90,6 @@ Int32 nand_seek (Int32 loc, Int32 from)
     /* Update the currently loaded block/page info */
     nandmcb.currentLogicalBlock = desiredBlock;
     nandmcb.currentPage         = desiredPage;
-    nandmcb.fpos                = desiredPos;
 
     return (0);
 
@@ -172,12 +174,8 @@ Int32 nand_open (void *ptr_driver, void (*asyncComplete)(void *))
         nand_free_return (NAND_MALLOC_BLOCK_INFO_FAIL);
 
 
-    /* mdebug - read page 0 */
-    nandHwDriverReadPage(0, 0, nandmcb.page);
-
-
-    /* Bad blocks are identified by reading page 0 and page 1. If the first two
-     * bytes in these pages is not 0xffff then the block is bad */
+    /* Bad blocks are identified by reading page 0 and page 1. If the first 
+     * byte in these pages is not 0xff then the block is bad */
     nandmcb.numBadBlocks = 0;
     for (i = 0; i < nandmcb.devInfo.totalBlocks; i++)  {
 
@@ -185,7 +183,7 @@ Int32 nand_open (void *ptr_driver, void (*asyncComplete)(void *))
        if (ret < 0)
           nand_free_return (ret);
 
-       ret = nandHwDriverReadBytes (i, 0, nandmcb.devInfo.pageSizeBytes, 1, &nandmcb.page[1]);
+       ret = nandHwDriverReadBytes (i, 1, nandmcb.devInfo.pageSizeBytes, 1, &nandmcb.page[1]);
        if (ret < 0)
           nand_free_return (ret);
         
@@ -239,10 +237,10 @@ Int32 nand_read (Uint8 *ptr_buf, Uint32 num_bytes)
     /* Convert the global file position to an offset in the currently cached page */
     pIdx = nandmcb.fpos % nandmcb.devInfo.pageSizeBytes;
 
-
     for (i = 0; i < num_bytes; i++)  {
 
-        ptr_buf[i] = nandmcb.page[pIdx++];
+        ptr_buf[i]    = nandmcb.page[pIdx++];
+        nandmcb.fpos += 1;
 
         if (pIdx >= nandmcb.devInfo.pageSizeBytes)  {
 
@@ -255,7 +253,7 @@ Int32 nand_read (Uint8 *ptr_buf, Uint32 num_bytes)
             }
 
             
-            /* Load the new block */
+            /* Load the new page */
             if (nandHwDriverReadPage((Uint32)(nandmcb.logicalToPhysMap[nandmcb.currentLogicalBlock]), nandmcb.currentPage, nandmcb.page) < 0)
                 return (-2);
 
@@ -303,11 +301,11 @@ Int32 nand_peek (Uint8 *ptr_buf, Uint32 num_bytes)
  *  @b  Description
  *  @n
  *      This function returns how much data is available for immediate read.
- *      On nand this always returns -1.
+ *      On nand this always returns the page size.
  */
 Int32 nand_query (void)
 {
-    return (-1);
+    return (nandmcb.devInfo.pageSizeBytes);
 }
    
 

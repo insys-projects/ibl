@@ -27,7 +27,15 @@ $(IBLS_C6X):
 
 # will need to add a line for each additional ARCH type added
 clean:
-	make -f makestg2 clean ARCH=c64x
+	make -f makestg2 clean   ARCH=c64x
+	make -f makestg2 cleant  ARCH=c64x TARGET=c6472
+	make -C ../util/bconvert       clean
+	make -C ../util/btoccs         clean
+	make -C ../util/i2cConfig      clean
+	make -C ../util/nandWriter     clean
+	make -C ../util/romparse_c6472 clean
+	make -C ../test/test1		   clean
+	make -C ../test/test2		   clean
 
 
 

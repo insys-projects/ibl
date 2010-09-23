@@ -11,9 +11,13 @@ endif
 
 ECODIR= $(IBL_ROOT)/hw
 
+# If no target specified, set CSRC to all files (used for clean)
 ifeq ($(TARGET),c6472)
- CSRC= t64.c cpmacdrv.c pll.c psc.c emif31.c mdio.c gpio.c nandgpio.c i2c.c
+ CSRC= t64.c cpmacdrv.c pll.c psc.c emif31.c mdio.c gpio.c nandgpio.c i2c.c nandwrgpio.c
+else
+ CSRC= t64.c cpmacdrv.c pll.c psc.c emif31.c mdio.c gpio.c nandgpio.c i2c.c nandwrgpio.c
 endif
+
 
 .PHONY: hw
 

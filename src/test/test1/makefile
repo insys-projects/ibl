@@ -17,3 +17,5 @@ test1.obj: test1.c
 	cl6x -g -c -mv 6400+ test1.c
 
 
+clean:
+	rm -f test1.btbl.bin test1.btbl.ccs test1.btbl test1.out test1.obj

@@ -52,6 +52,9 @@ void iblBootBlob (BOOT_MODULE_FXN_TABLE *bootFxn, Uint32 *entry, void *formatPar
         if (dataSize < 0)
             break;
 
+        if (dataSize > remainSize)
+            dataSize = remainSize;
+
         if (dataSize > 0)  {
 
             (*bootFxn->read)(datap, dataSize);

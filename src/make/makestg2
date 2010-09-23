@@ -53,6 +53,15 @@ $(CLEAN_MODULES):
 	@echo cleaning $(subst clean_, ,$@)
 	make -C $(IBL_ROOT)/$(subst clean_,,$@)/$(ARCH)/make clean
 	
+cleant:
+	rm -rf ibl_$(TARGET)/ibl_$(TARGET).out
+	rm -rf ibl_$(TARGET)/ibl_$(TARGET).map
+	rm -rf ibl_$(TARGET)/ibl_le.b
+	rm -rf ibl_$(TARGET)/ibl.b
+	rm -rf ibl_$(TARGET)/ibl.i2c.b
+	rm -rf ibl_$(TARGET)/ibl.i2c.ccs
+	rm -rf ibl_$(TARGET)/i2crom.ccs
+	
 
 
 

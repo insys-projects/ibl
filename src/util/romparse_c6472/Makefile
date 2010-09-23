@@ -12,6 +12,8 @@ lex.yy.o: rparse.flex
 	gcc -c lex.yy.c
 
 
+clean:
+	rm -f romparse.exe rparse.tab.o lex.yy.o lex.yy.c rparse.tab.c rparse.tab.h
 
 
 

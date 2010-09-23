@@ -68,6 +68,7 @@ RTLIBS     = $(subst /,$(DIRSEP),$(ALLFARLIB))
 # -pds97:  shut off no source in file warning
 #CFLAGS  = -c -k -mi200 -ml3 -o2 -pm -pds1111 -pds827 -pds824 -pds837 -pds1037 -pds195 -pds97 -pden -pdr $(CPUFLAGS)
 CFLAGS  = -c -k -mi200 -ml3 -ms3 -o2 -pm -pds1111 -pds827 -pds824 -pds837 -pds1037 -pds195 -pds97 -pden -pdr $(CPUFLAGS)
+#CFLAGS  = -c -k -mi200 -ml0 -ms3 -o2 -pm -pds1111 -pds827 -pds824 -pds837 -pds1037 -pds195 -pds97 -pden -pdr $(CPUFLAGS)
 
 ifeq ($(ENDIAN),big)
  CFLAGS+= -me
@@ -78,6 +79,7 @@ endif
 # -g  : enable debugging
 # -ss : interlist C source and optimizer with .asm source
 DCFLAGS = -g -as  -ss
+#DCFLAGS = -as  -ss
 #DCFLAGS = -gp
 
 
