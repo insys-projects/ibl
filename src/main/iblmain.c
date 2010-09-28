@@ -23,6 +23,7 @@
 #include "iblblob.h"
 #include "timer.h"
 #include "i2c.h"
+#include "ibl_elf.h"
 #include <string.h>
 
 
@@ -246,6 +247,12 @@ Uint32 iblBoot (BOOT_MODULE_FXN_TABLE *bootFxn, Int32 dataFormat, void *formatPa
         case ibl_BOOT_FORMAT_BBLOB:
             iblBootBlob (bootFxn, &entry, formatParams);
             break;
+
+#if 0
+        case ibl_BOOT_FORMAT_ELF:
+            iblBootElf (bootFxn, &entry);
+            break;
+#endif
 
         default:
             iblStatus.invalidDataFormatSpec += 1;

@@ -11,15 +11,17 @@ test2: gen_cdefdep utils test2_$(ENDIAN).blob
 ifeq ($(ENDIAN),little)
  LIB= $(TOOLSC6X)/cgtools/lib/rts64plus.lib
  OPT=
+ C2B_OPT=
 else
  LIB= $(TOOLSC6X)/cgtools/lib/rts64pluse.lib
  OPT= -me
+ C2B_OPT= -swap
 endif
 
 
 
 test2_$(ENDIAN).blob: test2_$(ENDIAN).bccs
-	..\..\util\btoccs\ccs2bin $< $@
+	..\..\util\btoccs\ccs2bin $(C2B_OPT) $< $@
 
 test2_$(ENDIAN).bccs: test2_$(ENDIAN).b
 	..\..\util\btoccs\b2ccs $< $@

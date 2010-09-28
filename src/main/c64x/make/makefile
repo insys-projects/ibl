@@ -30,6 +30,7 @@ C6X_C_DIR+= ;$(IBL_ROOT)/interp/bis
 C6X_C_DIR+= ;$(IBL_ROOT)/interp/coff
 C6X_C_DIR+= ;$(IBL_ROOT)/interp/btbl
 C6X_C_DIR+= ;$(IBL_ROOT)/interp/blob
+C6X_C_DIR+= ;$(IBL_ROOT)/interp/elf
 C6X_C_DIR+= ;$(IBL_ROOT)/arch/$(ARCH)
 C6X_C_DIR+= ;$(IBL_ROOT)/device
 C6X_C_DIR+= ;$(IBL_ROOT)/device/$(TARGET)

@@ -12,7 +12,20 @@ endif
 
 ECODIR= $(IBL_ROOT)/interp
 
-CSRC= bis.c cload.c osal.c btblpr.c btblwrap.c gem.c blob.c
+# BIS 
+CSRC= bis.c 
+
+# COFF
+CSRC += cload.c osal.c 
+
+# TI BOOT TABLE
+CSRC += btblpr.c btblwrap.c gem.c 
+
+# Blob
+CSRC += blob.c
+
+# elf loader files
+CSRC += dload.c elfwrap.c dlw_client.c dload_endian.c ArrayList.c
 
 
 .PHONY: interp
@@ -33,6 +46,7 @@ vpath % $(ECODIR)/bis
 vpath % $(ECODIR)/coff
 vpath % $(ECODIR)/btbl
 vpath % $(ECODIR)/blob
+vpath % $(ECODIR)/elf
 
 interp: gen_cdefdep makefile $(OBJS)
 

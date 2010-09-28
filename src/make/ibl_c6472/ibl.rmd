@@ -1,7 +1,6 @@
 -a
 -boot
 -e _c_int00
--order L
 
 ROMS
 {

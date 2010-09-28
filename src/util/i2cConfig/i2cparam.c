@@ -68,9 +68,15 @@ void setupTable (void)
     ibl.ethConfig[0].useBootpFileName = FALSE;
     ibl.ethConfig[0].bootFormat       = ibl_BOOT_FORMAT_BBLOB;
 
+#if 0
     SETIP(ibl.ethConfig[0].ethInfo.ipAddr,    192,168,2,100);
     SETIP(ibl.ethConfig[0].ethInfo.serverIp,  192,168,2,110);
     SETIP(ibl.ethConfig[0].ethInfo.gatewayIp, 192,168,2,2);
+    SETIP(ibl.ethConfig[0].ethInfo.netmask,   255,255,255,0);
+#endif
+    SETIP(ibl.ethConfig[0].ethInfo.ipAddr,    10,218,109,35);
+    SETIP(ibl.ethConfig[0].ethInfo.serverIp,  10,218,109,196);
+    SETIP(ibl.ethConfig[0].ethInfo.gatewayIp, 10,218,109,1);
     SETIP(ibl.ethConfig[0].ethInfo.netmask,   255,255,255,0);
 
     /* Leave the hardware address as 0 so the e-fuse value will be used */

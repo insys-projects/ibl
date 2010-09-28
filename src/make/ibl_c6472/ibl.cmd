@@ -37,6 +37,15 @@
 ../interp/c64x/make/btblpr.oc
 ../interp/c64x/make/gem.oc
 ../interp/c64x/make/blob.oc
+
+/*
+../interp/c64x/make/dload.oc
+../interp/c64x/make/elfwrap.oc
+../interp/c64x/make/dlw_client.oc
+../interp/c64x/make/dload_endian.oc
+../interp/c64x/make/ArrayList.oc
+*/
+
 ../ecc/c64x/make/3byte_ecc.oc
 
 -c
@@ -47,12 +56,12 @@
 
 MEMORY
 {
-	TEXT   :  origin = 0x801000, length = 0x10000
-	STACK  :  origin = 0x811000, length = 0x0800
-	HEAP   :  origin = 0x811800, length = 0x6000
-	DATA   :  origin = 0x817800, length = 0x3000
-	CFG    :  origin = 0x821800, length = 0x0300
-	STAT :    origin = 0x821b00, length = 0x0200
+	TEXT   :  origin = 0x801000, length = 0x20000
+	STACK  :  origin = 0x821000, length = 0x0800
+	HEAP   :  origin = 0x821800, length = 0x6000
+	DATA   :  origin = 0x827800, length = 0x3000
+	CFG    :  origin = 0x831800, length = 0x0300
+	STAT :    origin = 0x831b00, length = 0x0200
 }
 
 SECTIONS

@@ -14,6 +14,13 @@ endif
 MODULES= main device ethboot nandboot driver hw interp ecc
 CLEAN_MODULES=$(addprefix clean_,$(MODULES))
 
+ifeq ($(ENDIAN),little)
+	HEX_OPT= -order L
+	BCV_OPT= -le
+else
+	HEX_OPT= -order M
+	BCV_OPT= -be
+endif
 
 include $(IBL_ROOT)/make/$(ARCH)/makedefs.mk
 
@@ -27,14 +34,14 @@ c6455: $(MODULES)
 
 c6472: $(MODULES) utils
 	$(LD) -o ibl_$@/ibl_$@.out -m ibl_$@/ibl_$@.map  ibl_$@/ibl.cmd $(RTLIBS)
-	hex6x ibl_$@/ibl.rmd ibl_$@/ibl_$@.out
-	../util/bconvert/bconvert64x -le ibl_le.b ibl.b
+	hex6x $(HEX_OPT) ibl_$@/ibl.rmd ibl_$@/ibl_$@.out
+	../util/bconvert/bconvert64x $(BCV_OPT) ibl_le.b ibl.b
 	$(CP) ibl.b ibl_$@
 	../util/btoccs/b2i2c ibl_$@/ibl.b ibl_$@/ibl.i2c.b
 	../util/btoccs/b2ccs ibl_$@/ibl.i2c.b ibl_$@/ibl.i2c.ccs
 	../util/romparse_$@/romparse ibl_$@/i2crom.map
 	$(CP) i2crom.ccs ibl_$@
-	$(RM) -f i2crom.ccs ibl.b
+	$(RM) i2crom.ccs ibl.b
 
 
 $(MODULES):
