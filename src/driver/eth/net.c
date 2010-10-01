@@ -575,6 +575,44 @@ static Int32 net_peek (Uint8* ptr_buf, Uint32 num_bytes)
     return (net_read_peek (ptr_buf, num_bytes, NET_PEEK));
 }
 
+
+/**
+ *  @b  Description
+ *          Read data until the transfer is done
+ */
+#define MIN(a,b)         ((a) < (b)) ? (a) : (b)
+void net_complete_transfer (void)
+{
+    Int32 dataSize;
+    Int32 n;
+    uint8 buf[16];
+
+    do  {
+
+        dataSize = stream_level();
+
+        if (dataSize > 0)  {
+
+            while (dataSize > 0)  {
+
+                n = MIN(dataSize, sizeof(buf));
+             net_read (buf, n);
+             dataSize = dataSize - n;
+         }
+
+        } else if (dataSize == 0)  {
+
+            net_peek (buf, 1);
+    
+        }
+
+    } while (dataSize >= 0);
+
+}
+
+
+
+
 /**
  *  @b  Description
  *  @n
@@ -616,9 +654,21 @@ static Int32 net_seek (Int32 loc, Int32 from)
     if (desiredPos == netmcb.fileOffset)
         return (0);
 
-    /* Check for an invalid position */
-    if (desiredPos < netmcb.fileOffset)
-        return (-1);
+    /* To seek backwords the current tftp transfer is completed,
+     * and then restarted */
+    if (desiredPos < netmcb.fileOffset)   {
+
+        /* Complete the transfer */
+        net_complete_transfer ();
+
+        /* Reset the current file offset */
+        netmcb.fileOffset = 0;
+
+        /* Re-request the data file */
+        tftp_get_file (netmcb.net_device.server_ip, netmcb.net_device.file_name);
+
+    }
+        
 
     /* Read data from the file until the file position matches the desired one */
     num_bytes = desiredPos - netmcb.fileOffset;

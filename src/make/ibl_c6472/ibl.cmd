@@ -38,13 +38,11 @@
 ../interp/c64x/make/gem.oc
 ../interp/c64x/make/blob.oc
 
-/*
 ../interp/c64x/make/dload.oc
 ../interp/c64x/make/elfwrap.oc
 ../interp/c64x/make/dlw_client.oc
 ../interp/c64x/make/dload_endian.oc
 ../interp/c64x/make/ArrayList.oc
-*/
 
 ../ecc/c64x/make/3byte_ecc.oc
 
