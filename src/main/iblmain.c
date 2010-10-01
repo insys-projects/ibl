@@ -222,6 +222,9 @@ Uint32 iblBoot (BOOT_MODULE_FXN_TABLE *bootFxn, Int32 dataFormat, void *formatPa
         if (iblIsCoff (fid.coffVer))
             dataFormat = ibl_BOOT_FORMAT_COFF;
 
+        if (iblIsElf (fid.dataBuf))
+            dataFormat = ibl_BOOT_FORMAT_ELF;
+
         else  {
             iblStatus.autoDetectFailCnt += 1;
             return (0);

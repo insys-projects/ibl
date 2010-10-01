@@ -51,9 +51,8 @@ $(OBJS): cdefdep
 
 
 gen_cdefdep:
-	@echo CSRC= $(CSRC)
 	@echo Checking command line dependencies
-	@echo $(ENDIAN) $(TARGET) $(ARCH) > cdefdep.tmp
+	@echo $(ENDIAN) $(TARGET) $(ARCH) $(CDEFS) > cdefdep.tmp
 	@sh -c 'if diff -q cdefdep.tmp cdefdep ; then echo same ; else $(CP) cdefdep.tmp cdefdep ; fi '
 
 

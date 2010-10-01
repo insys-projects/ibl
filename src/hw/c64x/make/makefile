@@ -18,6 +18,7 @@ else
  CSRC= t64.c cpmacdrv.c pll.c psc.c emif31.c mdio.c gpio.c nandgpio.c i2c.c nandwrgpio.c
 endif
 
+CDEFS += -DIBL_I2C_CFG_EEPROM_BUS_ADDR=$(I2C_PARAM_BUS_ADDR)
 
 .PHONY: hw
 
@@ -67,7 +68,7 @@ $(OBJS): cdefdep
 
 gen_cdefdep:
 	@echo Checking command line dependencies
-	@echo $(ENDIAN) $(TARGET) $(ARCH) > cdefdep.tmp
+	@echo $(ENDIAN) $(TARGET) $(ARCH) $(CDEFS) > cdefdep.tmp
 	@sh -c 'if diff -q cdefdep.tmp cdefdep ; then echo same ; else $(CP) cdefdep.tmp cdefdep ; fi '
 
 

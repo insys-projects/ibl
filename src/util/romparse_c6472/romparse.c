@@ -258,6 +258,9 @@ void assignKeyVal (int field, int value)
     case SWPLL:            current_table.i2c.swPll = value;
                            break;
 
+    case DEV_ADDR_EXT:     current_table.i2c.dev_addr_ext = value;
+                           break;
+
 
   }
 
@@ -286,7 +289,8 @@ void assignKeyStr (int value, char *y)
     if (!strcmp (z, progFile[i].fname))  {
       /* Found a match - copy the address */
       current_table.i2c.dev_addr     = progFile[i].addressBytes & 0xffff;
-      current_table.i2c.dev_addr_ext = 0x50;  /* hard coded to i2c rom slave address */
+      if (current_table.i2c.dev_addr_ext == 0)
+        current_table.i2c.dev_addr_ext = 0x50;  /* hard coded to i2c rom slave address */
       return;
     }
 
@@ -296,7 +300,8 @@ void assignKeyStr (int value, char *y)
   i = openProgFile (z);
   if (i >= 0) {
     current_table.i2c.dev_addr     = progFile[i].addressBytes & 0xffff;
-    current_table.i2c.dev_addr_ext = 0x50;
+    if (current_table.i2c.dev_addr_ext == 0)
+        current_table.i2c.dev_addr_ext = 0x50;
   }
 
 } /* assignKeyStr */

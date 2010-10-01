@@ -54,6 +54,10 @@
 #include <string.h>
 #include "file_ovr.h"
 
+/* Eat printfs. */
+#define printf  mprintf
+#define vprintf(x,y) 
+
 #if 0
 #include "dlw_debug.h"
 #include "dlw_dsbt.h"

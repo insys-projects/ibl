@@ -93,7 +93,7 @@ unsigned dwordConvert (unsigned char *data, int idx, int iMax)
 
 
 
-#define SIZE	0x100000   /* max array size */
+#define SIZE	0x200000   /* max array size */
 
 int main (int argc, char *argv[])
 {

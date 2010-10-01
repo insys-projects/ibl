@@ -18,6 +18,7 @@ core_freq_mhz     { yylval = CORE_FREQ_MHZ;     return (CORE_FREQ_MHZ);     }
 i2c_clk_freq_khz  { yylval = I2C_CLK_FREQ_KHZ;  return (I2C_CLK_FREQ_KHZ);  }
 exe_file          { yylval = EXE_FILE;          return (EXE_FILE);          }
 pci_parm		  { yylval = PCI_PARMS;         return (PCI_PARMS);	        }
+dev_addr_ext      { yylval = DEV_ADDR_EXT;      return (DEV_ADDR_EXT);		}
 next_dev_addr     { yylval = NEXT_DEV_ADDR;     return (NEXT_DEV_ADDR);     }
 next_dev_addr_ext { yylval = NEXT_DEV_ADDR_EXT; return (NEXT_DEV_ADDR_EXT); }
 address_delay     { yylval = ADDRESS_DELAY;     return (ADDRESS_DELAY);     }

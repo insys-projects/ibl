@@ -50,7 +50,12 @@
 #define IBL_I2C_CLK_FREQ_KHZ            100
 #define IBL_I2C_OWN_ADDR                10
 #define IBL_I2C_CFG_ADDR_DELAY          0x100       /* Delay between sending the address and reading data */
-#define IBL_I2C_CFG_EEPROM_BUS_ADDR     0x50
+
+#ifndef IBL_I2C_CFG_EEPROM_BUS_ADDR
+ #error hello
+ #define IBL_I2C_CFG_EEPROM_BUS_ADDR    0x50
+#endif
+
 #define IBL_I2C_CFG_TABLE_DATA_ADDR     (0x10000 - 0x300)
  
  

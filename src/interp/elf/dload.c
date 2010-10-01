@@ -52,6 +52,11 @@
 #include "dload.h"
 #include "dload_api.h"
 
+/* Eat printfs. */
+#define printf mprintf
+
+
+
 #if 0
 
 #include "ArrayList.h"
@@ -2309,7 +2314,7 @@ static int32_t relocate_dependency_graph_modules(LOADER_FILE_DESC *fd,
 /*    The core loader must have read access to the file pointed to by fd.    */
 /*                                                                           */
 /*****************************************************************************/
-int32_t DLOAD_load(LOADER_FILE_DESC *fd, int argc, char** argv, uint32_t *entry)
+int32_t DLOAD_load(LOADER_FILE_DESC *fd, int argc, char** argv, int32_t *entry)
 {
     DLIMP_Dynamic_Module *dyn_module = new_DLIMP_Dynamic_Module(fd);
 
@@ -2406,9 +2411,9 @@ int32_t DLOAD_load(LOADER_FILE_DESC *fd, int argc, char** argv, uint32_t *entry)
    /* Support static loading as special case.                                */
    /*------------------------------------------------------------------------*/
    if (!dyn_module->relocatable)  {
-      dload_static_executable(fd, dyn_module);
+      return (dload_static_executable(fd, dyn_module));
       *entry = dyn_module->fhdr.e_entry;
-      return (0);
+      return (0); 
    }
 
 #if 0

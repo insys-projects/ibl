@@ -109,7 +109,7 @@ BOOL     DLOAD_load_symbols(LOADER_FILE_DESC* fp);
 /*    The core loader must have read access to the file pointed by fp.       */
 /*                                                                           */
 /*---------------------------------------------------------------------------*/
-int      DLOAD_load(LOADER_FILE_DESC* fp, int argc, char** argv, uint32_t *entry);
+int      DLOAD_load(LOADER_FILE_DESC* fp, int argc, char** argv, int32_t *entry);
 
 /*---------------------------------------------------------------------------*/
 /* DLOAD_unload()                                                            */

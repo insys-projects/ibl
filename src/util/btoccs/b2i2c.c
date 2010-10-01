@@ -121,7 +121,7 @@ void blockCheckSum (unsigned char *block, int blockSize)
 
 }
 
-#define SIZE	0x10000   /* max array size */
+#define SIZE	0x20000   /* max array size */
 
 int main (int argc, char *argv[])
 {

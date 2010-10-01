@@ -12,6 +12,7 @@
  
 
 void iblBootElf (BOOT_MODULE_FXN_TABLE *bootFxn, Uint32 *ientry_point);
+BOOL iblIsElf (Uint8 *elfhdr);
 
 
 #endif /* _IBL_ELF_H */
