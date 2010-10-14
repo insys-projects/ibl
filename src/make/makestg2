@@ -14,6 +14,8 @@ endif
 MODULES= main device ethboot nandboot driver hw interp ecc
 CLEAN_MODULES=$(addprefix clean_,$(MODULES))
 
+TARGETS= c6472 c6474
+
 ifeq ($(ENDIAN),little)
 	HEX_OPT= -order L
 	IEXT=     le
@@ -35,7 +37,7 @@ c6455: $(MODULES)
 	$(LD) -o ibl_$@/ibl_$@.out -m ibl_$@/ibl_$@.map  ibl_$@/ibl.cmd $(RTLIBS)
 
 
-c6472: $(MODULES) utils
+$(TARGETS): $(MODULES) utils
 	$(LD) -o ibl_$@/ibl_$@.out -m ibl_$@/ibl_$@.map  ibl_$@/ibl.cmd $(RTLIBS)
 	hex6x $(HEX_OPT) ibl_$@/ibl.rmd ibl_$@/ibl_$@.out
 	../util/bconvert/bconvert64x -$(IEXT) ibl_le.b ibl.b
@@ -54,7 +56,7 @@ $(MODULES):
 
 utils:
 	make -C $(IBL_ROOT)/util/btoccs
-	make -C $(IBL_ROOT)/util/romparse_$(TARGET)
+#	make -C $(IBL_ROOT)/util/romparse_$(TARGET)
 	make -C $(IBL_ROOT)/util/bconvert
 
 clean: $(CLEAN_MODULES)

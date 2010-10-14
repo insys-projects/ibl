@@ -165,6 +165,7 @@ Int32 cpmac_drv_start (NET_DRV_DEVICE* ptr_device)
     if (ptr_device->port_num >= TARGET_EMAC_N_PORTS)
         return (-1);
 
+
     ptr_EMACRegs = (CPMAC_REGS *)(aptr_EMACRegs[ptr_device->port_num]);
     pDesc        = (EMAC_Desc *)(aptr_EmacDesc[ptr_device->port_num]);
         
@@ -272,9 +273,7 @@ Int32 cpmac_drv_start (NET_DRV_DEVICE* ptr_device)
     
     /* Initialize the MAC Control: We set the Receive Ownership Bit and the Receive
      * Offset Length Word and enable the MII. */
-    ptr_EMACRegs->MACCONTROL = CPMAC_MACCONTROL_RXOWNERSHIP | 
-                               CPMAC_MACCONTROL_RXOFFLENBLOCK | 
-                               CPMAC_MACCONTROL_MIIEN;
+    ptr_EMACRegs->MACCONTROL = TARGET_MAC_CONTROL;
 
     /* Startup RX */
     ptr_EMACRegs->RX0HDP = (Uint32)emacMCB.rx_bd;

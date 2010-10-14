@@ -135,6 +135,7 @@ typedef struct NET_DRV_DEVICE
      * has been received then the function returns 0
      */
     Int32 (*receive) (struct NET_DRV_DEVICE* ptr_device, Uint8* buffer);
+    
 }NET_DRV_DEVICE;
 
 /**

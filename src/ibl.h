@@ -200,6 +200,24 @@ typedef struct iblEth_s
 
 
 /**
+ *  @brief
+ *      This structure is used to control the operation of the ibl sgmii ports
+ *
+ *  @details
+ *      The physical register configuration is provided
+ */
+typedef struct iblSgmii_s
+{
+    uint32  adviseAbility;      /**< The advise ability register */
+    uint32  control;            /**< The control register        */
+    uint32  txConfig;           /**< Serdes Tx config            */
+    uint32  rxConfig;           /**< Serdes Rx config            */
+    uint32  auxConfig;          /**< Serdes Aux config           */
+  
+} iblSgmii_t;
+
+
+/**
  *  @def ibl_N_ETH_PORTS
  */
 #define ibl_N_ETH_PORTS     2  /**< The number of ethernet port configurations available */
@@ -359,6 +377,8 @@ typedef struct ibl_s
     iblDdr_t  ddrConfig;                     /**< DDR configuration @ref iblDdr_t  */
     
     iblEth_t  ethConfig[ibl_N_ETH_PORTS];    /**< Ethernet boot configuration. @ref iblEth_t */
+    
+    iblSgmii_t sgmiiConfig[ibl_N_ETH_PORTS]; /**< SGMII boot configuration. @ref iblSgmii_t */
     
     iblMdio_t mdioConfig;                    /**< MDIO configuration. @ref iblMdio_t */
     

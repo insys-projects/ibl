@@ -122,6 +122,9 @@ void main (void)
     }
 #endif
 
+
+#if 0  /* debugging c6472 using ccs download. Remove for i2c config download */
+
     /* Load the default configuration table from the i2c. The actual speed of the device
      * isn't really known here, since it is part of the table, so a compile time
      * value is used (the pll may have been configured during the initial load) */
@@ -141,7 +144,10 @@ void main (void)
        /* There is no recovery if the load of the configuration table failed */
        iblStatus.tableLoadFail = 0x11111111;
        for (;;);
+
     }
+
+#endif
 
     /* Load default mac addresses for ethernet boot if requested */
     for (i = 0; i < ibl_N_ETH_PORTS; i++)  {

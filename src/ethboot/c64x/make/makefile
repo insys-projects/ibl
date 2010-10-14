@@ -29,6 +29,7 @@ C6X_C_DIR+= ;$(IBL_ROOT)/driver/eth
 C6X_C_DIR+= ;$(STDINC)
 C6X_C_DIR+= ;$(IBL_ROOT)/hw/macs
 C6X_C_DIR+= ;$(IBL_ROOT)/hw/mdio
+C6X_C_DIR+= ;$(IBL_ROOT)/hw/sgmii
 export C6X_C_DIR
 
 

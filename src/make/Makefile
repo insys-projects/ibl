@@ -7,7 +7,7 @@
 #*
 #*******************************************************************************************
 
-IBLS_C6X= c6455 c6472 
+IBLS_C6X= c6455 c6472 c6474
 
 
 all:
@@ -43,6 +43,7 @@ $(IBLS_C6X):
 clean:
 	make -f makestg2 clean   ARCH=c64x
 	make -f makestg2 cleant  ARCH=c64x TARGET=c6472
+	make -f makestg2 cleant  ARCH=c64x TARGET=c6474
 	make -C ../util/bconvert       clean
 	make -C ../util/btoccs         clean
 	make -C ../util/i2cConfig      clean

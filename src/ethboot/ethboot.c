@@ -17,6 +17,7 @@
 #include "ethboot.h"
 #include "net.h"
 #include "cpmacdrv.h"
+#include "sgmii.h"
 #include "device.h"
 #include "mdioapi.h"
 #include <string.h>
@@ -76,6 +77,11 @@ void iblEthBoot (Int32 eIdx)
     if (ibl.mdioConfig.nMdioOps > 0)
         hwMdio (ibl.mdioConfig.nMdioOps, ibl.mdioConfig.mdio, 
                 ibl.mdioConfig.mdioClkDiv, ibl.mdioConfig.interDelay);
+
+
+    /* SGMII configuration. If sgmii is not present this statement is defined
+     * to void in target.h */
+    hwSgmiiConfig (ibl.ethConfig[eIdx].port, &ibl.sgmiiConfig[eIdx]);
 
 
     nDevice.port_num = ibl.ethConfig[eIdx].port;

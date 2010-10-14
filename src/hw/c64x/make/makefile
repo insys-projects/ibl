@@ -15,7 +15,11 @@ ECODIR= $(IBL_ROOT)/hw
 ifeq ($(TARGET),c6472)
  CSRC= t64.c cpmacdrv.c pll.c psc.c emif31.c mdio.c gpio.c nandgpio.c i2c.c nandwrgpio.c
 else
- CSRC= t64.c cpmacdrv.c pll.c psc.c emif31.c mdio.c gpio.c nandgpio.c i2c.c nandwrgpio.c
+ ifeq ($(TARGET),c6474)
+  CSRC= t64.c cpmacdrv.c pll.c psc.c emif31.c mdio.c gpio.c nandgpio.c i2c.c nandwrgpio.c sgmii.c
+ else
+  CSRC= t64.c cpmacdrv.c pll.c psc.c emif31.c mdio.c gpio.c nandgpio.c i2c.c nandwrgpio.c sgmii.c
+ endif
 endif
 
 CDEFS += -DIBL_I2C_CFG_EEPROM_BUS_ADDR=$(I2C_PARAM_BUS_ADDR)
@@ -43,6 +47,7 @@ C6X_C_DIR+= ;$(IBL_ROOT)/hw/gpio
 C6X_C_DIR+= ;$(IBL_ROOT)/hw/nands
 C6X_C_DIR+= ;$(IBL_ROOT)/hw/nands/gpio
 C6X_C_DIR+= ;$(IBL_ROOT)/hw/i2c
+C6X_C_DIR+= ;$(IBL_ROOT)/hw/sgmii
 C6X_C_DIR+= ;$(IBL_ROOT)/ecc
 export C6X_C_DIR
 
@@ -58,6 +63,18 @@ ifeq ($(TARGET),c6472)
  vpath % $(ECODIR)/gpio
  vpath % $(ECODIR)/nands/gpio
  vpath % $(ECODIR)/i2c
+endif
+
+ifeq ($(TARGET),c6474)
+ vpath % $(ECODIR)/macs/cpmac
+ vpath % $(ECODIR)/plls/pllxx1p8
+ vpath % $(ECODIR)/pscs/psc2
+ vpath % $(ECODIR)/ddrs/emif31
+ vpath % $(ECODIR)/mdio
+ vpath % $(ECODIR)/gpio
+ vpath % $(ECODIR)/nands/gpio
+ vpath % $(ECODIR)/i2c
+ vpath % $(ECODIR)/sgmii
 endif
 
 

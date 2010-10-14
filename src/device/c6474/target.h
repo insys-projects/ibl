@@ -20,29 +20,46 @@
  */
 #define TARGET_DEVICE_CPMAC
  
-#define TARGET_EMAC_N_PORTS            2
+#define TARGET_EMAC_N_PORTS            1
 
-#define TARGET_EMAC_BASE_ADDRESSES     { 0x02c80000u, 0x02cc0000u }
-#define TARGET_EMAC_DSC_BASE_ADDR      { 0x02c82000u, 0x02cc2000u }
+#define TARGET_EMAC_BASE_ADDRESSES     { 0x02c80000u }
+#define TARGET_EMAC_DSC_BASE_ADDR      { 0x02c82000u }
+
+#define TARGET_SGMII_BASE_ADDRESSES    { 0x02c40000u }
+
+/* SGMII offsets (at least the serdes configs, vary between devices, so
+ * they are defined here. */
+#define TARGET_SGMII_IDVER             0x000
+#define TARGET_SGMII_SOFT_RESET        0x004
+#define TARGET_SGMII_CONTROL           0x010
+#define TARGET_SGMII_STATUS            0x014
+#define TARGET_SGMII_MR_ADV_ABILITY    0x018
+#define TARGET_SGMII_MR_LP_ADV_ABILITY 0x020
+#define TARGET_SGMII_TX_CFG            0x030
+#define TARGET_SGMII_RX_CFG            0x034
+#define TARGET_SGMII_AUX_CFG           0x038
 
 /* Leave mdio disabled */
 #define dev_mdio_open()     1
 
-/* The mac control register values used */
-#define TARGET_MAC_CONTROL     CPMAC_MACCONTROL_RXOWNERSHIP   |      \
-                               CPMAC_MACCONTROL_RXOFFLENBLOCK |      \
-                               CPMAC_MACCONTROL_MIIEN
 
-/* There is no sgmii on the 6472, so the sgmii config is defined to a void statement */
-#define hwSgmiiConfig(x,y)
-
+/* The mac control register values */
+#define TARGET_MAC_CONTROL	  ( 1 << 18)            /* EXT_EN              */     \
+                            | ( 0 << 9 )            /* Round robin         */     \
+                    		| ( 1 << 7 )            /* GIG                 */     \
+                            | ( 0 << 6 )            /* TX pacing disabled  */     \
+                            | ( 1 << 5 )            /* GMII RX & TX        */     \
+                            | ( 0 << 4 )            /* TX flow disabled    */     \
+                            | ( 0 << 3 )            /* RX flow disabled    */     \
+                            | ( 0 << 1 )            /* Loopback enabled    */     \
+                            | ( 1 << 0 )            /* full duplex         */
 
 
 /**
  *  @brief
  *    Device Timer definitions
  */
-#define TIMER0_BASE             0x025e0000u
+#define TIMER0_BASE             0x02910000u
 
 #define TIMER_INPUT_DIVIDER     6           /* Timer driven from cpu clock / 6 */
 
@@ -52,34 +69,24 @@
  */
 #define MAIN_PLL        0   /**< The index to the main PLL */
 
-/**
- * @def NET_PLL
- */
-#define NET_PLL         1   /**< The index to the network PLL */
-
-/**
- *  @def DDR_PLL
- */
-#define DDR_PLL         2   /**< The index to the DDR PLL */
-
 
 /**
  *  @brief
  *    Device PLL definitions
  */
-#define DEVICE_PLL_BASE(x)  ((x) == MAIN_PLL ? 0x29a0000 : ((x) == NET_PLL ? 0x29c0000 : 0x29c0400))
+#define DEVICE_PLL_BASE(x)  ((x) == MAIN_PLL ? 0x29a0000 : 0)
 
 
 /**
  * @brief 
  *  Device PSC definitions
  */
-#define DEVICE_PSC_BASE     0x02ae0000u
+#define DEVICE_PSC_BASE     0x02ac0000u
 
 /**
  * @brief
- *  The PSC number for ethernet port 0 is 7, and for port 1 it is 8 */
-#define TARGET_PWR_ETH(x)   ((x) == 0  ?  7  :  8)
+ *  The ethernet is in the always on domain */
+#define TARGET_PWR_ETH(x)   -1
 
 /**
  *  @brief
@@ -93,13 +100,13 @@
  *  @brief
  *    Device DDR controller definitions
  */
-#define DEVICE_DDR_BASE  0x78000000
+#define DEVICE_DDR_BASE  0x70000000
 
 /**
  * @brief
  *  The highest module number
  */
-#define TARGET_PWR_MAX_MOD  13
+#define TARGET_PWR_MAX_MOD  5
  
 
 /**

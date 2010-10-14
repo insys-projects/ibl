@@ -8,7 +8,7 @@
  * @file iblcfg.h
  *
  * @brief
- *	 Build time configurations for the c6472 ibl are defined
+ *	 Build time configurations for the c6474 ibl are defined
  *
  ***************************************************************************/
 #ifndef IBLCFG_H
@@ -46,7 +46,7 @@
 /**
  * @brief The I2C bus address and data address of the ibl table.
  */
-#define IBL_I2C_DEV_FREQ_MHZ            625
+#define IBL_I2C_DEV_FREQ_MHZ            1000
 #define IBL_I2C_CLK_FREQ_KHZ            100
 #define IBL_I2C_OWN_ADDR                10
 #define IBL_I2C_CFG_ADDR_DELAY          0x100       /* Delay between sending the address and reading data */
