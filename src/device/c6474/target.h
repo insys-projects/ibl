@@ -42,6 +42,8 @@
 /* Leave mdio disabled */
 #define dev_mdio_open()     1
 
+/* No chip level reset required for ethernet, the function call is made a void statment */
+#define deviceSetEthResetState(x,y)
 
 /* The mac control register values */
 #define TARGET_MAC_CONTROL	  ( 1 << 18)            /* EXT_EN              */     \
@@ -94,6 +96,12 @@
  *    A value < 0 tells the low level psc driver to simply return success
  */
 #define TARGET_PWR_NAND     -1
+
+/**
+ * @brief
+ *  Flag to indicate timer 0 power up requested. The time is always on in the 6474
+ */
+#define TARGET_PWR_TIMER_0  -1
 
 
 /**

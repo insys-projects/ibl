@@ -28,6 +28,9 @@
 /* Leave mdio disabled */
 #define dev_mdio_open()     1
 
+/* No chip level reset required for ethernet, the function call is made a void statment */
+#define deviceSetEthResetState(x,y)
+
 /* The mac control register values used */
 #define TARGET_MAC_CONTROL     CPMAC_MACCONTROL_RXOWNERSHIP   |      \
                                CPMAC_MACCONTROL_RXOFFLENBLOCK |      \
@@ -88,6 +91,11 @@
  */
 #define TARGET_PWR_NAND     -1
 
+/**
+ * @brief
+ *  Flag to indicate timer 0 power up requested. The time is always on in the 6472
+ */
+#define TARGET_PWR_TIMER_0  -1
 
 /**
  *  @brief

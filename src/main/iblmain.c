@@ -109,21 +109,14 @@ void main (void)
     memset (&iblStatus, 0, sizeof(iblStatus_t));
     iblStatus.iblMagic = ibl_MAGIC_VALUE;
 
-    /* Initialize the system timer (software tracking of the hardware timer state */
+
+    /* Power up the timer */
+    devicePowerPeriph (TARGET_PWR_TIMER_0);
+
+    /* Initialize the system timer (software tracking of the hardware timer state) */
     timer_init ();
 
-#if 0
-    /* If there is no magic value in the ibl configuration structure then a default
-     * table is used. */
-    if (ibl.iblMagic != ibl_MAGIC_VALUE)  {
-        deviceLoadDefaultIblTable();
-        iblStatus.noMagic = 1;
-        ibl.iblMagic = ibl_MAGIC_VALUE;
-    }
-#endif
 
-
-#if 0  /* debugging c6472 using ccs download. Remove for i2c config download */
 
     /* Load the default configuration table from the i2c. The actual speed of the device
      * isn't really known here, since it is part of the table, so a compile time
@@ -147,7 +140,6 @@ void main (void)
 
     }
 
-#endif
 
     /* Load default mac addresses for ethernet boot if requested */
     for (i = 0; i < ibl_N_ETH_PORTS; i++)  {

@@ -169,6 +169,9 @@ Int32 cpmac_drv_start (NET_DRV_DEVICE* ptr_device)
     ptr_EMACRegs = (CPMAC_REGS *)(aptr_EMACRegs[ptr_device->port_num]);
     pDesc        = (EMAC_Desc *)(aptr_EmacDesc[ptr_device->port_num]);
         
+    /* Some devices require chip level application of reset before device configuration.
+     * Devices that dont require this will define this function call to be a void statement */
+    deviceSetEthResetState (ptr_device->port_num, TRUE);
     
     /* Reset EMAC */
     ptr_EMACRegs->SOFTRESET = 0x1;
@@ -282,6 +285,11 @@ Int32 cpmac_drv_start (NET_DRV_DEVICE* ptr_device)
     /* Enable receive filters for channel 1 and all broadcast packets. */
     ptr_EMACRegs->RXUNICASTSET = 1;
     ptr_EMACRegs->RXMBPENABLE = CPMAC_RXMBPENABLE_RXBROADEN;
+
+
+    /* Some devices require chip level application of reset before device configuration.
+     * Devices that dont require this will define this function call to be a void statement */
+    deviceSetEthResetState (ptr_device->port_num, FALSE);
 
     /* Initialize the Device MDIO layer: The function returns only when 
      * the LINK is UP and RUNNING. */

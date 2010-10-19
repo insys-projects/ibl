@@ -7,6 +7,8 @@
 #*
 #**************************************************************************
 
+DEVICES= c6455 c6472 c6474
+
 ifndef IBL_ROOT
  IBL_ROOT=../..
 endif
@@ -38,8 +40,8 @@ CDEFS += -DIBL_I2C_CFG_EEPROM_BUS_ADDR=$(I2C_PARAM_BUS_ADDR)
 
 .PHONY: i2cparam.cmd
 
-c6472: gen_cdefdep $(MODULES) $(OBJS) i2cparam_$(TARGET).cmd
-	$(LD) -o i2cparam_$(TARGET).out -m i2cparam_$(TARGET).map i2cparam_$(TARGET).cmd $(RTLIBS)
+$(DEVICES): gen_cdefdep $(MODULES) $(OBJS) i2cparam.cmd
+	$(LD) -o i2cparam_$(TARGET).out -m i2cparam_$(TARGET).map i2cparam.cmd $(RTLIBS)
 
 $(MODULES):
 	@echo making $@

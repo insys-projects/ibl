@@ -91,5 +91,17 @@ int32 deviceConfigureForNand(void);
  */
 void deviceLoadDefaultEthAddress (uint8 *maddr);
 
+/**
+ *  @brief
+ *      Reset the ethernet controller
+ *
+ *  @details
+ *      Some devices require an external ethernet reset before configuration
+ */
+#ifndef deviceSetEthResetState
+void deviceSetEthResetState (int32 portNum, BOOL applyReset);
+#endif
+ 
+
 #endif
 

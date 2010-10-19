@@ -42,6 +42,15 @@ C6X_C_DIR+= ;$(IBL_ROOT)/driver/timer
 C6X_C_DIR+= ;$(IBL_ROOT)/hw/i2c
 C6X_C_DIR+= ;$(IBL_ROOT)/cfg/$(TARGET)
 C6X_C_DIR+= ;$(STDINC)
+
+# Paths to the kicker intermediate boot loader for devices which require them
+ifeq ($(TARGET),c6455)
+ C6X_C_DIR+= ;$(IBL_ROOT)/make/ibl_c6455
+ C6X_C_DIR+= ;$(IBL_ROOT)/util/romparse
+endif
+
+
+
 export C6X_C_DIR
 
 

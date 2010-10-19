@@ -11,6 +11,7 @@
 ../main/c64x/make/iblmain.oc
 ../device/c64x/make/c6455.oc
 ../ethboot/c64x/make/ethboot.oc
+../nandboot/c64x/make/nandboot.oc
 ../driver/c64x/make/net.oc
 ../driver/c64x/make/arp.oc
 ../driver/c64x/make/ip.oc
@@ -19,31 +20,56 @@
 ../driver/c64x/make/timer.oc
 ../driver/c64x/make/bootp.oc
 ../driver/c64x/make/tftp.oc
+../driver/c64x/make/nand.oc
 ../hw/c64x/make/t64.oc
 ../hw/c64x/make/cpmacdrv.oc
+../hw/c64x/make/pll.oc
+../hw/c64x/make/emif31.oc
+../hw/c64x/make/mdio.oc
+../hw/c64x/make/gpio.oc
+../hw/c64x/make/nandgpio.oc
+../hw/c64x/make/i2c.oc
 ../interp/c64x/make/bis.oc
+../interp/c64x/make/cload.oc
+../interp/c64x/make/osal.oc
+../interp/c64x/make/btblwrap.oc
+../interp/c64x/make/btblpr.oc
+../interp/c64x/make/gem.oc
+../interp/c64x/make/blob.oc
+../interp/c64x/make/dload.oc
+../interp/c64x/make/elfwrap.oc
+../interp/c64x/make/dlw_client.oc
+../interp/c64x/make/dload_endian.oc
+../interp/c64x/make/ArrayList.oc
+../ecc/c64x/make/3byte_ecc.oc
+
 
 -c
 -stack 0x400
+-heap 0x6000
 
 
 
 MEMORY
 {
-	L2   :  origin = 0x800000, length = 0x10000
-	CFG  :  origin = 0x810000, length = 0x0200
-	STAT :  origin = 0x810200, length = 0x0200
+	TEXT   :  origin = 0x801000, length = 0x20000
+	STACK  :  origin = 0x821000, length = 0x0800
+	HEAP   :  origin = 0x821800, length = 0x6000
+	DATA   :  origin = 0x827800, length = 0x3000
+	CFG    :  origin = 0x831800, length = 0x0300
+	STAT :    origin = 0x831b00, length = 0x0200
 }
 
 SECTIONS
 {
-	.stack  > L2
-	.cinit  > L2
-	.const  > L2
-	.text   > L2
-	.far    > L2
-	.switch > L2
-	.bss    > L2
+	.stack  > STACK
+	.sysmem > HEAP
+	.cinit  > TEXT
+	.const  > TEXT
+	.text   > TEXT
+	.switch > TEXT
+	.far    > DATA
+	.bss    > DATA
 
     .ibl_config_table > CFG
 	.ibl_status_table > STAT

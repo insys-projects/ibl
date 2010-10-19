@@ -29,6 +29,8 @@ ibl_t ibl;
  * @brief  The desired ibl configuration is setup here. Edit the fields
  *         to match the desired setup.
  */
+
+#if 0
 void setupTable (void)
 {
 
@@ -101,6 +103,9 @@ void setupTable (void)
     ibl.ethConfig[1].bootFormat       = ibl_BOOT_FORMAT_BBLOB;
 
 
+    /* SGMII */
+
+
     /* Leave the hardware address as 0 so the e-fuse value will be used */
     /* Leave all remaining fields as 0 since bootp will fill them in */
 
@@ -133,6 +138,8 @@ void setupTable (void)
     ibl.nandConfig.nandPriority = ibl_DEVICE_NOBOOT;
 
 }
+
+#endif
 
 
 /**
@@ -218,19 +225,20 @@ void main (void)
 
     volatile Int32 i;
 
+    printf ("Run the GEL for for the device to be configured, press return to program the I2C\n");
+    getchar ();
 
     /* Program the main system PLL */
     hwPllSetPll (MAIN_PLL,      
-                 1,                                 /* Pre-divider  */
-                 IBL_I2C_DEV_FREQ_MHZ / 25,         /* Multiplier   */
-                 1);                                /* Post-divider */
+                 ibl.pllConfig[ibl_MAIN_PLL].prediv,         /* Pre-divider  */
+                 ibl.pllConfig[ibl_MAIN_PLL].pllOutFreqMhz,  /* Multiplier   */
+                 ibl.pllConfig[ibl_MAIN_PLL].postdiv);       /* Post-divider */
 
-    setupTable();
 
-    hwI2Cinit (IBL_I2C_DEV_FREQ_MHZ,        /* The CPU frequency during I2C data load */
-               DEVICE_I2C_MODULE_DIVISOR,   /* The divide down of CPU that drives the i2c */
-               IBL_I2C_CLK_FREQ_KHZ/8,      /* The I2C data rate used during table load. Slowed for writes */
-               IBL_I2C_OWN_ADDR);           /* The address used by this device on the i2c bus */
+    hwI2Cinit (ibl.pllConfig[ibl_MAIN_PLL].pllOutFreqMhz,  /* The CPU frequency during I2C data load */
+               DEVICE_I2C_MODULE_DIVISOR,                  /* The divide down of CPU that drives the i2c */
+               IBL_I2C_CLK_FREQ_KHZ/8,                     /* The I2C data rate used during table load. Slowed for writes */
+               IBL_I2C_OWN_ADDR);                          /* The address used by this device on the i2c bus */
 
 
     /* Block the data into 64 byte blocks aligned on 64 byte boundaries for the data write.

@@ -8,7 +8,7 @@
 #*
 #***************************************************************
 
-DEVICES= c6472
+DEVICES= c6455 c6472 c6474
 
 all:
 	@echo must specify a target [ $(DEVICES) ]

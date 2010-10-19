@@ -48,7 +48,7 @@ clean:
 	make -C ../util/btoccs         clean
 	make -C ../util/i2cConfig      clean
 	make -C ../util/nandWriter     clean
-	make -C ../util/romparse_c6472 clean
+	make -C ../util/romparse       clean
 	make -C ../test/test1		   clean
 	make -C ../test/test2		   clean
 

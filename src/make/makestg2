@@ -14,7 +14,7 @@ endif
 MODULES= main device ethboot nandboot driver hw interp ecc
 CLEAN_MODULES=$(addprefix clean_,$(MODULES))
 
-TARGETS= c6472 c6474
+TARGETS= c6472 c6474 c6455
 
 ifeq ($(ENDIAN),little)
 	HEX_OPT= -order L
@@ -29,22 +29,15 @@ include $(IBL_ROOT)/make/$(ARCH)/makedefs.mk
 export ARCH
 export TARGET
 
-#CDEFS += -DIBL_I2C_CFG_EEPROM_BUS_ADDR=$(I2C_PARAM_BUS_ADDR)
-#export CDEFS
 
-
-c6455: $(MODULES)
-	$(LD) -o ibl_$@/ibl_$@.out -m ibl_$@/ibl_$@.map  ibl_$@/ibl.cmd $(RTLIBS)
-
-
-$(TARGETS): $(MODULES) utils
+$(TARGETS): $(MODULES) utils $(RIBL)
 	$(LD) -o ibl_$@/ibl_$@.out -m ibl_$@/ibl_$@.map  ibl_$@/ibl.cmd $(RTLIBS)
 	hex6x $(HEX_OPT) ibl_$@/ibl.rmd ibl_$@/ibl_$@.out
 	../util/bconvert/bconvert64x -$(IEXT) ibl_le.b ibl.b
 	$(CP) ibl.b ibl_$@
 	../util/btoccs/b2i2c ibl_$@/ibl.b ibl_$@/ibl.i2c.b
 	../util/btoccs/b2ccs ibl_$@/ibl.i2c.b ibl_$@/ibl.i2c.ccs
-	../util/romparse_$@/romparse ibl_$@/i2crom_$(IEXT).map
+	../util/romparse/romparse ibl_$@/i2crom_$(IEXT).map
 	$(CP) i2crom.ccs ibl_$@/i2crom_$(IEXT).ccs
 	$(CP) i2crom.ccs ibl_$@/i2crom_$(IEXT).dat
 	$(RM) i2crom.ccs ibl_le.b ibl.b
@@ -54,9 +47,12 @@ $(MODULES):
 	@echo making $@
 	make -C $(IBL_ROOT)/$@/$(ARCH)/make $@
 
+
 utils:
 	make -C $(IBL_ROOT)/util/btoccs
-#	make -C $(IBL_ROOT)/util/romparse_$(TARGET)
+	make -C $(IBL_ROOT)/util/romparse TARGET=$(TARGET)
+	make -C $(IBL_ROOT)/util/i2cRead  TARGET=$(TARGET) $(TARGET)
+	make -C $(IBL_ROOT)/util/i2cWrite TARGET=$(TARGET) $(TARGET)
 	make -C $(IBL_ROOT)/util/bconvert
 
 clean: $(CLEAN_MODULES)

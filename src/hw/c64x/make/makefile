@@ -18,7 +18,11 @@ else
  ifeq ($(TARGET),c6474)
   CSRC= t64.c cpmacdrv.c pll.c psc.c emif31.c mdio.c gpio.c nandgpio.c i2c.c nandwrgpio.c sgmii.c
  else
-  CSRC= t64.c cpmacdrv.c pll.c psc.c emif31.c mdio.c gpio.c nandgpio.c i2c.c nandwrgpio.c sgmii.c
+  ifeq ($(TARGET),c6455)
+   CSRC= t64.c cpmacdrv.c pll.c emif31.c mdio.c gpio.c nandgpio.c i2c.c nandwrgpio.c
+  else
+   CSRC= t64.c cpmacdrv.c pll.c psc.c emif31.c mdio.c gpio.c nandgpio.c i2c.c nandwrgpio.c sgmii.c
+  endif
  endif
 endif
 
@@ -75,6 +79,16 @@ ifeq ($(TARGET),c6474)
  vpath % $(ECODIR)/nands/gpio
  vpath % $(ECODIR)/i2c
  vpath % $(ECODIR)/sgmii
+endif
+
+ifeq ($(TARGET),c6455)
+ vpath % $(ECODIR)/macs/cpmac
+ vpath % $(ECODIR)/plls/pllxx1p8
+ vpath % $(ECODIR)/ddrs/emif31
+ vpath % $(ECODIR)/mdio
+ vpath % $(ECODIR)/gpio
+ vpath % $(ECODIR)/nands/gpio
+ vpath % $(ECODIR)/i2c
 endif
 
 
