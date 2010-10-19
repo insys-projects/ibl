@@ -38,6 +38,27 @@
 #define MAX_BIS_FUNCTION_SUPPORT    3
 
 
+/**
+ * @brief No I/O sections accepted in boot table format
+ */
+#define BOOTCONFIG_NO_BTBL_IO
+
+/**
+ * @brief The I2C bus address and data address of the ibl table.
+ */
+#define IBL_I2C_DEV_FREQ_MHZ            1000
+#define IBL_I2C_CLK_FREQ_KHZ            100
+#define IBL_I2C_OWN_ADDR                10
+#define IBL_I2C_CFG_ADDR_DELAY          0x100       /* Delay between sending the address and reading data */
+
+#ifndef IBL_I2C_CFG_EEPROM_BUS_ADDR
+ #define IBL_I2C_CFG_EEPROM_BUS_ADDR    0x50
+#endif
+
+#define IBL_I2C_CFG_TABLE_DATA_ADDR     (0x10000 - 0x300)
+
+
+
 
 
 
