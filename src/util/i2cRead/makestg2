@@ -1,0 +1,60 @@
+#*********************************************************************************
+#* FILE PURPOSE: Build the I2C EEPROM reader
+#*********************************************************************************
+#* FILE NAME: makestg2
+#*
+#* DESCRIPTION: Builds the i2c reader
+#*
+#*********************************************************************************
+
+
+DEVICES= c6455 c6472 c6474
+
+ifndef IBL_ROOT
+ IBL_ROOT=../..
+endif
+
+ECODIR= $(IBL_ROOT)/util/i2cRead
+
+MODULES= hw
+CLEAN_MODULES=$(addprefix clean_,$(MODULES))
+
+CSRC= i2cRead.c
+
+include $(IBL_ROOT)/make/$(ARCH)/makeeco.mk
+
+C6X_C_DIR=   $(IBL_ROOT)/hw/i2c
+C6X_C_DIR+= ;$(IBL_ROOT)/cfg/$(TARGET)
+C6X_C_DIR+= ;$(IBL_ROOT)/device/$(TARGET)
+C6X_C_DIR+= ;$(IBL_ROOT)/arch/$(ARCH)
+C6X_C_DIR+= ;$(STDINC)
+export C6X_C_DIR
+
+export ARCH
+export TARGET
+
+$(DEVICES): gen_cdefdep $(MODULES) $(OBJS) i2cRead.cmd
+	$(LD) -o i2cRead.out -m i2cRead.map i2cRead.cmd $(RTLIBS)
+
+
+$(MODULES):
+	@echo making $@
+	make -C $(IBL_ROOT)/$@/$(ARCH)/make $@
+
+
+clean2: $(CLEAN_MODULES)
+	@rm -f $(OBJS)
+	@rm -f $(subst .c,.dc,$(CSRC))
+
+$(CLEAN_MODULES):
+	@echo cleaning $(subst clean_, ,$@)
+	make -C $(IBL_ROOT)/$(subst clean,,$@)/$(ARCH)/make clean
+
+$(OBJS): cdefdep
+
+
+gen_cdefdep:
+	@echo Checking command line dependencies
+	@echo $(ENDIAN) $(ARCH) > cdefdep.tmp
+	@sh -c 'if diff -q cdefdep.tmp cdefdep ; then echo same ; else $(CP) cdefdep.tmp cdefdep ; fi '
+
