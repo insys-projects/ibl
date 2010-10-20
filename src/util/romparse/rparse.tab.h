@@ -21,6 +21,7 @@
 #define	ADDRESS_DELAY	275
 #define	SWPLL	276
 #define	DEV_ADDR_EXT	277
+#define	DEV_ADDR	278
 
 
 extern YYSTYPE yylval;

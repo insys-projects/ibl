@@ -36,7 +36,7 @@ $(TARGETS): $(MODULES) utils $(RIBL)
 	../util/bconvert/bconvert64x -$(IEXT) ibl_le.b ibl.b
 	$(CP) ibl.b ibl_$@
 	../util/btoccs/b2i2c ibl_$@/ibl.b ibl_$@/ibl.i2c.b
-	../util/btoccs/b2ccs ibl_$@/ibl.i2c.b ibl_$@/ibl.i2c.ccs
+	../util/btoccs/b2ccs ibl_$@/ibl.i2c.b ibl_$@/ibl.i2c.$(IEXT).ccs
 	../util/romparse/romparse ibl_$@/i2crom_$(IEXT).map
 	$(CP) i2crom.ccs ibl_$@/i2crom_$(IEXT).ccs
 	$(CP) i2crom.ccs ibl_$@/i2crom_$(IEXT).dat

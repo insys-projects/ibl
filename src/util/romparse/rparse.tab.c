@@ -25,6 +25,7 @@
 #define	ADDRESS_DELAY	275
 #define	SWPLL	276
 #define	DEV_ADDR_EXT	277
+#define	DEV_ADDR	278
 
 #line 2 "rparse.y"
 
@@ -43,11 +44,11 @@ extern char *yytext;
 
 
 
-#define	YYFINAL		31
+#define	YYFINAL		32
 #define	YYFLAG		-32768
-#define	YYNTBASE	23
+#define	YYNTBASE	24
 
-#define YYTRANSLATE(x) ((unsigned)(x) <= 277 ? yytranslate[x] : 28)
+#define YYTRANSLATE(x) ((unsigned)(x) <= 278 ? yytranslate[x] : 29)
 
 static const char yytranslate[] = {     0,
      2,     2,     2,     2,     2,     2,     2,     2,     2,     2,
@@ -77,23 +78,23 @@ static const char yytranslate[] = {     0,
      2,     2,     2,     2,     2,     2,     2,     2,     2,     2,
      2,     2,     2,     2,     2,     1,     2,     3,     4,     5,
      6,     7,     8,     9,    10,    11,    12,    13,    14,    15,
-    16,    17,    18,    19,    20,    21,    22
+    16,    17,    18,    19,    20,    21,    22,    23
 };
 
 #if YYDEBUG != 0
 static const short yyprhs[] = {     0,
      0,     2,     5,    10,    14,    16,    19,    23,    27,    29,
     31,    33,    35,    37,    39,    41,    43,    45,    47,    49,
-    51
+    51,    53
 };
 
-static const short yyrhs[] = {    24,
-     0,    23,    24,     0,     5,     3,    25,     4,     0,    17,
-     6,     8,     0,    26,     0,    25,    26,     0,    27,     6,
-     7,     0,    27,     6,     8,     0,     9,     0,    10,     0,
+static const short yyrhs[] = {    25,
+     0,    24,    25,     0,     5,     3,    26,     4,     0,    17,
+     6,     8,     0,    27,     0,    26,    27,     0,    28,     6,
+     7,     0,    28,     6,     8,     0,     9,     0,    10,     0,
     11,     0,    12,     0,    13,     0,    14,     0,    15,     0,
     16,     0,    18,     0,    19,     0,    22,     0,    20,     0,
-    21,     0
+    21,     0,    23,     0
 };
 
 #endif
@@ -102,7 +103,7 @@ static const short yyrhs[] = {    24,
 static const short yyrline[] = { 0,
     12,    13,    16,    18,    23,    24,    27,    29,    33,    34,
     35,    36,    37,    38,    39,    40,    41,    42,    43,    44,
-    45
+    45,    46
 };
 #endif
 
@@ -112,63 +113,65 @@ static const short yyrline[] = { 0,
 static const char * const yytname[] = {   "$","error","$undefined.","LBRACE",
 "RBRACE","SECTION","EQU","VALUE","STRING","BOOT_MODE","PARAM_INDEX","OPTIONS",
 "MULTI_I2C_ID","MY_I2C_ID","CORE_FREQ_MHZ","I2C_CLK_FREQ_KHZ","EXE_FILE","PCI_PARMS",
-"NEXT_DEV_ADDR","NEXT_DEV_ADDR_EXT","ADDRESS_DELAY","SWPLL","DEV_ADDR_EXT","promspec",
-"bootParams","assigns","assign","keyword", NULL
+"NEXT_DEV_ADDR","NEXT_DEV_ADDR_EXT","ADDRESS_DELAY","SWPLL","DEV_ADDR_EXT","DEV_ADDR",
+"promspec","bootParams","assigns","assign","keyword", NULL
 };
 #endif
 
 static const short yyr1[] = {     0,
-    23,    23,    24,    24,    25,    25,    26,    26,    27,    27,
-    27,    27,    27,    27,    27,    27,    27,    27,    27,    27,
-    27
+    24,    24,    25,    25,    26,    26,    27,    27,    28,    28,
+    28,    28,    28,    28,    28,    28,    28,    28,    28,    28,
+    28,    28
 };
 
 static const short yyr2[] = {     0,
      1,     2,     4,     3,     1,     2,     3,     3,     1,     1,
      1,     1,     1,     1,     1,     1,     1,     1,     1,     1,
-     1
+     1,     1
 };
 
 static const short yydefact[] = {     0,
      0,     0,     0,     1,     0,     0,     2,     9,    10,    11,
     12,    13,    14,    15,    16,    17,    18,    20,    21,    19,
-     0,     5,     0,     4,     3,     6,     0,     7,     8,     0,
-     0
+    22,     0,     5,     0,     4,     3,     6,     0,     7,     8,
+     0,     0
 };
 
 static const short yydefgoto[] = {     3,
-     4,    21,    22,    23
+     4,    22,    23,    24
 };
 
-static const short yypact[] = {     8,
-     0,    -2,    19,-32768,    28,    12,-32768,-32768,-32768,-32768,
+static const short yypact[] = {    16,
+     0,    -2,    20,-32768,    29,     5,-32768,-32768,-32768,-32768,
 -32768,-32768,-32768,-32768,-32768,-32768,-32768,-32768,-32768,-32768,
-    -4,-32768,    15,-32768,-32768,-32768,    -6,-32768,-32768,    22,
--32768
+-32768,    -4,-32768,    17,-32768,-32768,-32768,    -6,-32768,-32768,
+    22,-32768
 };
 
 static const short yypgoto[] = {-32768,
-    20,-32768,     5,-32768
+    21,-32768,     4,-32768
 };
 
 
-#define	YYLAST		50
+#define	YYLAST		52
 
 
-static const short yytable[] = {    25,
-    28,    29,     5,     6,     8,     9,    10,    11,    12,    13,
-    14,    15,     1,    16,    17,    18,    19,    20,    30,    24,
-    27,    31,     7,     1,     2,    26,     0,     0,     0,     0,
-     0,     0,     0,     0,     0,     2,     8,     9,    10,    11,
-    12,    13,    14,    15,     0,    16,    17,    18,    19,    20
+static const short yytable[] = {    26,
+    29,    30,     5,     6,     8,     9,    10,    11,    12,    13,
+    14,    15,    25,    16,    17,    18,    19,    20,    21,    31,
+     1,    32,    28,     7,     1,    27,     0,     0,     0,     0,
+     0,     0,     2,     0,     0,     0,     2,     8,     9,    10,
+    11,    12,    13,    14,    15,     0,    16,    17,    18,    19,
+    20,    21
 };
 
 static const short yycheck[] = {     4,
      7,     8,     3,     6,     9,    10,    11,    12,    13,    14,
-    15,    16,     5,    18,    19,    20,    21,    22,     0,     8,
-     6,     0,     3,     5,    17,    21,    -1,    -1,    -1,    -1,
-    -1,    -1,    -1,    -1,    -1,    17,     9,    10,    11,    12,
-    13,    14,    15,    16,    -1,    18,    19,    20,    21,    22
+    15,    16,     8,    18,    19,    20,    21,    22,    23,     0,
+     5,     0,     6,     3,     5,    22,    -1,    -1,    -1,    -1,
+    -1,    -1,    17,    -1,    -1,    -1,    17,     9,    10,    11,
+    12,    13,    14,    15,    16,    -1,    18,    19,    20,    21,
+    22,    23
 };
 /* -*-C-*-  Note some compilers choke on comments on `#line' lines.  */
 #line 3 "bison.simple"
@@ -736,6 +739,10 @@ case 21:
 #line 45 "rparse.y"
 {  yyval=yyvsp[0];  ;
     break;}
+case 22:
+#line 46 "rparse.y"
+{  yyval=yyvsp[0];  ;
+    break;}
 }
    /* the action file gets copied in in place of this dollarsign */
 #line 498 "bison.simple"
@@ -934,7 +941,7 @@ yyerrhandle:
   yystate = yyn;
   goto yynewstate;
 }
-#line 48 "rparse.y"
+#line 49 "rparse.y"
 
 
 

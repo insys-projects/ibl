@@ -12,6 +12,25 @@ section
   multi_i2c_id = 0
   my_i2c_id    = 1
   address_delay = 0
-  exe_file = "ibl_c6455/ibl.i2c.ccs"
+  exe_file = "ibl_c6455/ibl.i2c.le.ccs"
 }
 
+section
+{
+  param_index   = 1
+  boot_mode     = 5
+  options       = 1
+
+  core_freq_mhz    = 50
+  i2c_clk_freq_khz = 400
+
+  dev_addr_ext = 0x51
+  dev_addr     = 0
+
+  multi_i2c_id  = 0
+  my_i2c_id     = 1
+  address_delay = 0
+
+}
+
+  

@@ -263,6 +263,9 @@ void assignKeyVal (int field, int value)
     case DEV_ADDR_EXT:     current_table.i2c.dev_addr_ext = value;
                            break;
 
+    case DEV_ADDR:         current_table.i2c.dev_addr = value;
+                           break;
+
 
   }
 
