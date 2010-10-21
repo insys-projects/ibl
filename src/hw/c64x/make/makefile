@@ -18,10 +18,18 @@ else
  ifeq ($(TARGET),c6474)
   CSRC= t64.c cpmacdrv.c pll.c psc.c emif31.c mdio.c gpio.c nandgpio.c i2c.c nandwrgpio.c sgmii.c
  else
-  ifeq ($(TARGET),c6455)
-   CSRC= t64.c cpmacdrv.c pll.c emif31.c mdio.c gpio.c nandgpio.c i2c.c nandwrgpio.c
-  else
+  ifeq ($(TARGET),c6474l)
    CSRC= t64.c cpmacdrv.c pll.c psc.c emif31.c mdio.c gpio.c nandgpio.c i2c.c nandwrgpio.c sgmii.c
+  else
+   ifeq ($(TARGET),c6457)
+    CSRC= t64.c cpmacdrv.c pll.c psc.c emif31.c mdio.c gpio.c nandgpio.c i2c.c nandwrgpio.c sgmii.c
+   else
+    ifeq ($(TARGET),c6455)
+     CSRC= t64.c cpmacdrv.c pll.c emif31.c mdio.c gpio.c nandgpio.c i2c.c nandwrgpio.c
+    else
+     CSRC= t64.c cpmacdrv.c pll.c psc.c emif31.c mdio.c gpio.c nandgpio.c i2c.c nandwrgpio.c sgmii.c
+    endif
+   endif
   endif
  endif
 endif

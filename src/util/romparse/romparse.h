@@ -13,7 +13,7 @@
 /* tiboot.h defines the boot parameters structure that will be created */
 #if defined(c6472)
  #include "tiboot_c6472.h"
-#elif defined(c6474)
+#elif defined(c6474) || defined(c6474l)
  #include "tiboot_c6474.h"
 #elif defined(c6455)
  #include "tiboot_c6455.h"
