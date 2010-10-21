@@ -63,14 +63,31 @@ hotmenu setConfig_c6472()
     ibl.ethConfig[0].bootFormat       = ibl_BOOT_FORMAT_BBLOB;
 
 
-    SETIP(ibl.ethConfig[0].ethInfo.ipAddr,    10,218,109,35);
-    SETIP(ibl.ethConfig[0].ethInfo.serverIp,  10,218,109,196);
-    SETIP(ibl.ethConfig[0].ethInfo.gatewayIp, 10,218,109,1);
+    SETIP(ibl.ethConfig[0].ethInfo.ipAddr,    158,218,100,113);
+    SETIP(ibl.ethConfig[0].ethInfo.serverIp,  158,218,100,25);
+    SETIP(ibl.ethConfig[0].ethInfo.gatewayIp, 158,218,100,2);
     SETIP(ibl.ethConfig[0].ethInfo.netmask,   255,255,255,0);
 
     /* Leave the hardware address as 0 so the e-fuse value will be used */
 
-    strcpy (ibl.ethConfig[0].ethInfo.fileName, "test.blob");
+
+
+
+    ibl.ethConfig[0].ethInfo.fileName[0]  = 'c';
+    ibl.ethConfig[0].ethInfo.fileName[1]  = '6';
+    ibl.ethConfig[0].ethInfo.fileName[2]  = '4';
+    ibl.ethConfig[0].ethInfo.fileName[3]  = '7';
+    ibl.ethConfig[0].ethInfo.fileName[4]  = '2';
+    ibl.ethConfig[0].ethInfo.fileName[5]  = '-';
+    ibl.ethConfig[0].ethInfo.fileName[6]  = 'l';
+    ibl.ethConfig[0].ethInfo.fileName[7]  = 'e';
+    ibl.ethConfig[0].ethInfo.fileName[8]  = '.';
+    ibl.ethConfig[0].ethInfo.fileName[9]  = 'b';
+    ibl.ethConfig[0].ethInfo.fileName[10] = 'i';
+    ibl.ethConfig[0].ethInfo.fileName[11] = 'n';
+    ibl.ethConfig[0].ethInfo.fileName[12] = '\0';
+    ibl.ethConfig[0].ethInfo.fileName[13] = '\0';
+    ibl.ethConfig[0].ethInfo.fileName[14] = '\0';
 
     /* Even though the entire range of DDR2 is chosen, the load will
      * stop when the ftp reaches the end of the file */
@@ -105,11 +122,20 @@ hotmenu setConfig_c6472()
 
 
     /* Leave the hardware address as 0 so the e-fuse value will be used */
+    ibl.ethConfig[0].ethInfo.hwAddress[0] = 0;
+    ibl.ethConfig[0].ethInfo.hwAddress[1] = 0;
+    ibl.ethConfig[0].ethInfo.hwAddress[2] = 0;
+    ibl.ethConfig[0].ethInfo.hwAddress[3] = 0;
+    ibl.ethConfig[0].ethInfo.hwAddress[4] = 0;
+    ibl.ethConfig[0].ethInfo.hwAddress[5] = 0;
+
+
     /* Leave all remaining fields as 0 since bootp will fill them in */
 
 
-    /* Even though the entire range of DDR2 is chosen, the load will
-     * stop when the ftp reaches the end of the file */
+    /* Even though the entire range of DDR2 is chosen, the load will */
+    /* stop when the ftp reaches the end of the file */
+ 
     ibl.ethConfig[1].blob.startAddress  = 0xe0000000;       /* Base address of DDR2 */
     ibl.ethConfig[1].blob.sizeBytes     = 0x20000000;       /* All of DDR2 */
     ibl.ethConfig[1].blob.branchAddress = 0xe0000000;       /* Base of DDR2 */
@@ -174,34 +200,34 @@ hotmenu setConfig_c6474()
     ibl.ethConfig[0].doBootp          = FALSE;
     ibl.ethConfig[0].useBootpServerIp = FALSE;
     ibl.ethConfig[0].useBootpFileName = FALSE;
-    ibl.ethConfig[0].bootFormat       = ibl_BOOT_FORMAT_BLOB;
+    ibl.ethConfig[0].bootFormat       = ibl_BOOT_FORMAT_BBLOB;
 
-    SETIP(ibl.ethConfig[0].ethInfo.ipAddr,    10,218,109,35);
-    SETIP(ibl.ethConfig[0].ethInfo.serverIp,  10,218,109,196);
-    SETIP(ibl.ethConfig[0].ethInfo.gatewayIp, 10,218,109,1);
+    SETIP(ibl.ethConfig[0].ethInfo.ipAddr,    158,218,100,114);
+    SETIP(ibl.ethConfig[0].ethInfo.serverIp,  158,218,100,25);
+    SETIP(ibl.ethConfig[0].ethInfo.gatewayIp, 158,218,100,2);
     SETIP(ibl.ethConfig[0].ethInfo.netmask,   255,255,255,0);
 
     /* Set the hardware address as 0 so the e-fuse value will be used */
-    ibl.ethConfig[0].hwAddress[0] = 0;
-    ibl.ethConfig[0].hwAddress[1] = 0;
-    ibl.ethConfig[0].hwAddress[2] = 0;
-    ibl.ethConfig[0].hwAddress[3] = 0;
-    ibl.ethConfig[0].hwAddress[4] = 0;
-    ibl.ethConfig[0].hwAddress[5] = 0;
+    ibl.ethConfig[0].ethInfo.hwAddress[0] = 0;
+    ibl.ethConfig[0].ethInfo.hwAddress[1] = 0;
+    ibl.ethConfig[0].ethInfo.hwAddress[2] = 0;
+    ibl.ethConfig[0].ethInfo.hwAddress[3] = 0;
+    ibl.ethConfig[0].ethInfo.hwAddress[4] = 0;
+    ibl.ethConfig[0].ethInfo.hwAddress[5] = 0;
 
 
-    ibl.ethConfig[0].ethInfo.fileName[0]  = 't';
-    ibl.ethConfig[0].ethInfo.fileName[1]  = 'e';
-    ibl.ethConfig[0].ethInfo.fileName[2]  = 's';
-    ibl.ethConfig[0].ethInfo.fileName[3]  = 't';
-    ibl.ethConfig[0].ethInfo.fileName[4]  = '.';
-    ibl.ethConfig[0].ethInfo.fileName[5]  = 'b';
+    ibl.ethConfig[0].ethInfo.fileName[0]  = 'c';
+    ibl.ethConfig[0].ethInfo.fileName[1]  = '6';
+    ibl.ethConfig[0].ethInfo.fileName[2]  = '4';
+    ibl.ethConfig[0].ethInfo.fileName[3]  = '7';
+    ibl.ethConfig[0].ethInfo.fileName[4]  = '4';
+    ibl.ethConfig[0].ethInfo.fileName[5]  = '-';
     ibl.ethConfig[0].ethInfo.fileName[6]  = 'l';
-    ibl.ethConfig[0].ethInfo.fileName[7]  = 'o';
-    ibl.ethConfig[0].ethInfo.fileName[8]  = 'b';
-    ibl.ethConfig[0].ethInfo.fileName[9]  = '\0';
-    ibl.ethConfig[0].ethInfo.fileName[10] = '\0';
-    ibl.ethConfig[0].ethInfo.fileName[11] = '\0';
+    ibl.ethConfig[0].ethInfo.fileName[7]  = 'e';
+    ibl.ethConfig[0].ethInfo.fileName[8]  = '.';
+    ibl.ethConfig[0].ethInfo.fileName[9]  = 'b';
+    ibl.ethConfig[0].ethInfo.fileName[10] = 'i';
+    ibl.ethConfig[0].ethInfo.fileName[11] = 'n';
     ibl.ethConfig[0].ethInfo.fileName[12] = '\0';
     ibl.ethConfig[0].ethInfo.fileName[13] = '\0';
     ibl.ethConfig[0].ethInfo.fileName[14] = '\0';
@@ -209,13 +235,19 @@ hotmenu setConfig_c6474()
 
     /* Even though the entire range of DDR2 is chosen, the load will
      * stop when the ftp reaches the end of the file */
-    ibl.ethConfig[0].blob.startAddress  = 0xe0000000;       /* Base address of DDR2 */
+    ibl.ethConfig[0].blob.startAddress  = 0x80000000;       /* Base address of DDR2 */
     ibl.ethConfig[0].blob.sizeBytes     = 0x20000000;       /* All of DDR2 */
-    ibl.ethConfig[0].blob.branchAddress = 0xe0000000;       /* Base of DDR2 */
+    ibl.ethConfig[0].blob.branchAddress = 0x80000000;       /* Base of DDR2 */
 
     /* There is no port 1 on the 6474 */
     ibl.ethConfig[1].ethPriority      = ibl_DEVICE_NOBOOT;
 
+    /* SGMII is present */
+    ibl.sgmiiConfig[0].adviseAbility = 0;
+    ibl.sgmiiConfig[0].control       = 0;
+    ibl.sgmiiConfig[0].txConfig      = 0;
+    ibl.sgmiiConfig[0].rxConfig      = 0;
+    ibl.sgmiiConfig[0].auxConfig     = 0;
 
     /* MDIO configuration */
     ibl.mdioConfig.nMdioOps = 8;
@@ -277,18 +309,18 @@ hotmenu setConfig_c6455()
     ibl.ethConfig[0].bootFormat       = ibl_BOOT_FORMAT_BBLOB;
 
 
-    SETIP(ibl.ethConfig[0].ethInfo.ipAddr,    10,218,109,35);
-    SETIP(ibl.ethConfig[0].ethInfo.serverIp,  10,218,109,196);
-    SETIP(ibl.ethConfig[0].ethInfo.gatewayIp, 10,218,109,1);
+    SETIP(ibl.ethConfig[0].ethInfo.ipAddr,    158,218,100,118);
+    SETIP(ibl.ethConfig[0].ethInfo.serverIp,  158,218,100,25);
+    SETIP(ibl.ethConfig[0].ethInfo.gatewayIp, 158,218,100,2);
     SETIP(ibl.ethConfig[0].ethInfo.netmask,   255,255,255,0);
 
     /* There is no e-fuse mac address. A value must be assigned
-    ibl.ethConfig[0].hwAddress[0] = 0x00;
-    ibl.ethConfig[0].hwAddress[1] = 0xe0;
-    ibl.ethConfig[0].hwAddress[2] = 0xa6;
-    ibl.ethConfig[0].hwAddress[3] = 0x66;
-    ibl.ethConfig[0].hwAddress[4] = 0x57;
-    ibl.ethConfig[0].hwAddress[5] = 0x19;
+    ibl.ethConfig[0].ethInfo.hwAddress[0] = 0x00;
+    ibl.ethConfig[0].ethInfo.hwAddress[1] = 0xe0;
+    ibl.ethConfig[0].ethInfo.hwAddress[2] = 0xa6;
+    ibl.ethConfig[0].ethInfo.hwAddress[3] = 0x66;
+    ibl.ethConfig[0].ethInfo.hwAddress[4] = 0x57;
+    ibl.ethConfig[0].ethInfo.hwAddress[5] = 0x19;
 
 
     ibl.ethConfig[0].ethInfo.fileName[0]  = 't';
