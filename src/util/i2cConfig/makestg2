@@ -21,6 +21,10 @@ CLEAN_MODULES=$(addprefix clean_,$(MODULES))
 
 CSRC= i2cparam.c
 
+
+# enable debug info in the compile
+UTIL=yes
+
 include $(IBL_ROOT)/make/$(ARCH)/makeeco.mk
 
 C6X_C_DIR=  $(IBL_ROOT)

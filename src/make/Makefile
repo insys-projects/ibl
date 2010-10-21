@@ -20,9 +20,15 @@ ifndef ENDIAN
 endif
 export ENDIAN
 
+# The debug flag changes compiler options
+ifndef DEBUG
+ DEBUG=no
+endif
+export DEBUG
+
 # The value of I2C_PARAM_BUS_ADDR determines the I2C bus address used
 # to read the ibl configuration table from. The default values are
-# 0x50 for little endian and 0x51 for big endian
+# 0x50 for little endian and 0x51 for big endian.
 
 ifndef I2C_PARAM_BUS_ADDR
  ifeq ($(ENDIAN),little)

@@ -22,6 +22,7 @@
 extern cregister unsigned int DNUM;
 
 
+#if 0
 /**
  * @brief The default boot configuration table is filled in
  *
@@ -153,6 +154,7 @@ void deviceLoadDefaultIblTable (void)
     
 
 }
+#endif
 
 /**
  *  @brief Determine if an address is local

@@ -66,9 +66,15 @@ RTLIBS     = $(subst /,$(DIRSEP),$(ALLFARLIB))
 # -pds824: shut off #pragma symbol warnings (can be applied to file level symbol only)
 # -pds837: shut off #pragma symbol warnings (can be applied to file level symbol only)
 # -pds97:  shut off no source in file warning
-#CFLAGS  = -c -k -mi200 -ml3 -o2 -pm -pds1111 -pds827 -pds824 -pds837 -pds1037 -pds195 -pds97 -pden -pdr $(CPUFLAGS)
-#CFLAGS  = -c -k -mi200 -ml3 -ms3 -o2 -pm -pds1111 -pds827 -pds824 -pds837 -pds1037 -pds195 -pds97 -pden -pdr $(CPUFLAGS)
-CFLAGS  = -c -k -mi200 -ml0 -ms3 -o2 -pm -pds1111 -pds827 -pds824 -pds837 -pds1037 -pds195 -pds97 -pden -pdr $(CPUFLAGS)
+ifneq ($(UTIL),yes)
+ ifeq ($(DEBUG),yes)
+  CFLAGS  = -c -k -mi200 -ml3 -ms3 -o2 -pm -pds1111 -pds827 -pds824 -pds837 -pds1037 -pds195 -pds97 -pden -pdr $(CPUFLAGS)
+ else
+  CFLAGS  = -c -k -mi200 -ml0 -ms3 -o2 -pm -pds1111 -pds827 -pds824 -pds837 -pds1037 -pds195 -pds97 -pden -pdr $(CPUFLAGS)
+ endif
+else
+ CFLAGS  = -c -k -mi200 -ml3 -ms3 -o2 -pm -pds1111 -pds827 -pds824 -pds837 -pds1037 -pds195 -pds97 -pden -pdr $(CPUFLAGS)
+endif
 
 ifeq ($(ENDIAN),big)
  CFLAGS+= -me
@@ -78,9 +84,15 @@ endif
 # -as : keep local symbols
 # -g  : enable debugging
 # -ss : interlist C source and optimizer with .asm source
-#DCFLAGS = -g -as  -ss
-DCFLAGS = -as  -ss
-#DCFLAGS = -gp
+ifneq ($(UTIL),yes)
+ ifeq ($(DEBUG),yes)
+  DCFLAGS = -g -as  -ss
+ else
+  DCFLAGS = -as  -ss
+ endif
+else
+ DCFLAGS = -g -as  -ss
+endif
 
 
 # ASM options
