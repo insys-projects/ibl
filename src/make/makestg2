@@ -14,7 +14,7 @@ endif
 MODULES= main device ethboot nandboot driver hw interp ecc
 CLEAN_MODULES=$(addprefix clean_,$(MODULES))
 
-TARGETS= c6472 c6474 c6455 c6457
+TARGETS= c6472 c6474 c6474l c6455 c6457
 
 ifeq ($(ENDIAN),little)
 	HEX_OPT= -order L
