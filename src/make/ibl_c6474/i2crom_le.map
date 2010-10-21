@@ -5,7 +5,7 @@ section
   sw_pll		= 20
   options       = 1
 
-  core_freq_mhz    = 50
+  core_freq_mhz    = 1000
   i2c_clk_freq_khz = 400
 
   dev_addr_ext = 0x50
