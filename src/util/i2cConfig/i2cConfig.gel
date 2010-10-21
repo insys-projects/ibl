@@ -243,11 +243,11 @@ hotmenu setConfig_c6474()
     ibl.ethConfig[1].ethPriority      = ibl_DEVICE_NOBOOT;
 
     /* SGMII is present */
-    ibl.sgmiiConfig[0].adviseAbility = 0;
-    ibl.sgmiiConfig[0].control       = 0;
-    ibl.sgmiiConfig[0].txConfig      = 0;
-    ibl.sgmiiConfig[0].rxConfig      = 0;
-    ibl.sgmiiConfig[0].auxConfig     = 0;
+    ibl.sgmiiConfig[0].adviseAbility = 0x9801;
+    ibl.sgmiiConfig[0].control       = 0x20;
+    ibl.sgmiiConfig[0].txConfig      = 0x00000ea3;
+    ibl.sgmiiConfig[0].rxConfig      = 0x00081023;
+    ibl.sgmiiConfig[0].auxConfig     = 0x0000000b;
 
     /* MDIO configuration */
     ibl.mdioConfig.nMdioOps = 8;
