@@ -277,14 +277,14 @@ void deviceLoadDefaultEthAddress (uint8 *maddr)
 
     /* Read the e-fuse mac address */
     macA = *((uint32 *)0x2880834);
-    macB = *((uint32 *)0x2880834);
+    macB = *((uint32 *)0x2880838);
 
-    maddr[0] = (macA >> 24) & 0xff;
-    maddr[1] = (macA >> 16) & 0xff;
-    maddr[2] = (macA >>  8) & 0xff;
-    maddr[3] = (macA >>  0) & 0xff;
-    maddr[4] = (macB >> 24) & 0xff;
-    maddr[5] = (macB >> 16) & 0xff;
+    maddr[0] = (macB >>  8) & 0xff;
+    maddr[1] = (macB >>  0) & 0xff;
+    maddr[2] = (macA >> 24) & 0xff;
+    maddr[3] = (macA >> 16) & 0xff;
+    maddr[4] = (macA >>  8) & 0xff;
+    maddr[5] = (macA >>  0) & 0xff;
 }
 
 
