@@ -17,6 +17,8 @@
  #include "tiboot_c6474.h"
 #elif defined(c6455)
  #include "tiboot_c6455.h"
+#elif defined(c6457)
+ #include "tiboot_c6457.h"
 #else
  #error invalid or missing device specification
 #endif
