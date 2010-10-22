@@ -269,7 +269,8 @@ static Int32 bootp_receive (Int32 sock, Uint8* ptr_data, Int32 num_bytes)
     if (netmcb.net_device.use_bootp_server_ip == TRUE)
         netmcb.net_device.server_ip  = serverIP;
 
-    netmcb.net_device.net_mask   = htonl(subnetmask);
+    netmcb.net_device.net_mask   = subnetmask;
+
     ip_add_route (FLG_RT_NETWORK, netmcb.net_device.ip_address, netmcb.net_device.net_mask, 0);
 
     if (netmcb.net_device.use_bootp_file_name == TRUE)
