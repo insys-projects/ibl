@@ -17,6 +17,14 @@
 #include "nand.h"
 #include "device.h"
 
+/** 
+ * @brief
+ *   Nandboot is disabled through iblcfg.h. Disable the definition for the compilation
+ */
+#ifdef iblNandBoot
+ #undef iblNandBoot
+#endif
+
 
 void iblNandBoot (void)
 {

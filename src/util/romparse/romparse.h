@@ -38,6 +38,7 @@ typedef struct {
   int  sizeBytes;
   int  addressBytes;
   unsigned int data[MAX_DATA_LEN_32bit];
+  int  tag[NUM_BOOT_PARAM_TABLES];          /* identifies boot parameter tables which use this file */
 } progFile_t;
 
 /* Define the PCI parameter structure */

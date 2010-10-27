@@ -162,7 +162,8 @@ void main (void)
     for (;;)  {
 
         /* Start looping through the boot modes to find the one with the lowest priority
-         * value, and try to boot it */
+         * value, and try to boot it. If a boot mode is not supported the function
+         * statement is simply defined to be a void statement */
         for (i = ibl_HIGHEST_PRIORITY; i < ibl_LOWEST_PRIORITY; i++)  {
 
             for (j = 0; j < ibl_N_ETH_PORTS; j++)  {

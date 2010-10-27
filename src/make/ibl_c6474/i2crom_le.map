@@ -6,7 +6,7 @@ section
   options       = 1
 
   core_freq_mhz    = 1000
-  i2c_clk_freq_khz = 400
+  i2c_clk_freq_khz = 100
 
   dev_addr_ext = 0x50
 

@@ -32,7 +32,9 @@ extern FILE *yyin;
  *************************************************************************************/
 BOOT_PARAMS_T boot_params[NUM_BOOT_PARAM_TABLES];
 BOOT_PARAMS_T current_table;
+int           current_file;       /* Identifies the program file in the current table */
 int           ctable_index = -1;  /* Destination of current table */
+int           max_index    =  0;  /* maximum table index, used for compacting output */
 
 /************************************************************************************
  * Declaration: The structure storing the program data files, and the number of
@@ -53,6 +55,14 @@ int       pciSet = 0;
  *              plus room for the PCI eeai config.
  *************************************************************************************/
 int romBase = DATA_BASE;
+
+
+/*************************************************************************************
+ * Declaration: Args passed in from the command line
+ *************************************************************************************/
+char *inputFile;
+int   compact = 0;
+
 
 /*************************************************************************************
  * FUNCTION PURPOSE: flex/bison required support functions.
@@ -81,6 +91,25 @@ void initTable (BOOT_PARAMS_T *current_table)
 }
 
 /*************************************************************************************
+ * FUNCTION PURPOSE: Initialize the program data file table
+ *************************************************************************************
+ * DESCRIPTION: The size and tags are all setup
+ *************************************************************************************/
+void initProgFile (void)
+{
+  int i, j;
+
+  for (i = 0; i < NUM_BOOT_PARAM_TABLES; i++)  {
+    progFile[i].sizeBytes = 0;
+
+    for (j = 0; j < NUM_BOOT_PARAM_TABLES; j++)
+      progFile[i].tag[j] = -1;
+
+  }
+
+}
+
+/*************************************************************************************
  * FUNCTION PURPOSE: Complete a section
  *************************************************************************************
  * DESCRIPTION: The parser has detected a complete section. Copy the section into
@@ -88,6 +117,8 @@ void initTable (BOOT_PARAMS_T *current_table)
  *************************************************************************************/
 void section (void)
 {
+  int i;
+
   /* It's an error if no section value has been declared */
   if (ctable_index == -1)  {
     fprintf (stderr, "romparse: the section did not have a boot paramter index specified\n");
@@ -109,7 +140,21 @@ void section (void)
   memcpy (&boot_params[ctable_index], &current_table, sizeof (BOOT_PARAMS_T));
   initTable (&current_table);
 
+  /* Track the maximum table index */
+  if (ctable_index > max_index)
+    max_index = ctable_index;
+
+  /* If the section referenced a data file, link the data file back to this section */
+  if (current_file >= 0)  {
+    for (i = 0; i < NUM_BOOT_PARAM_TABLES; i++)  {
+      if (progFile[current_file].tag[i] < 0)
+        progFile[current_file].tag[i] = ctable_index;
+        break;
+    }
+  }
+
   ctable_index = -1;
+  current_file = -1;
 
 } /* section */
 
@@ -138,7 +183,7 @@ int openProgFile (char *fname)
   }
 
   /* Put the section at the next available i2c rom address */
-  progFile[nProgFiles].addressBytes = romBase;
+  /* progFile[nProgFiles].addressBytes = romBase; */
 
   /* Read the one line ccs header. The length field in terms of lines */
   fgets (iline, 132, str);
@@ -154,7 +199,7 @@ int openProgFile (char *fname)
   fclose (str);
 
   /* Update the next free rom base */
-  romBase = romBase + progFile[nProgFiles].sizeBytes;
+  /* romBase = romBase + progFile[nProgFiles].sizeBytes; */
 
   i = nProgFiles;
   nProgFiles += 1;
@@ -293,7 +338,8 @@ void assignKeyStr (int value, char *y)
 
     if (!strcmp (z, progFile[i].fname))  {
       /* Found a match - copy the address */
-      current_table.i2c.dev_addr     = progFile[i].addressBytes & 0xffff;
+      current_file = i;
+      /* current_table.i2c.dev_addr     = progFile[i].addressBytes & 0xffff; */
       if (current_table.i2c.dev_addr_ext == 0)
         current_table.i2c.dev_addr_ext = 0x50;  /* hard coded to i2c rom slave address */
       return;
@@ -304,7 +350,8 @@ void assignKeyStr (int value, char *y)
   /* Open and read the ccs file, set the ROM address */
   i = openProgFile (z);
   if (i >= 0) {
-    current_table.i2c.dev_addr     = progFile[i].addressBytes & 0xffff;
+    /* current_table.i2c.dev_addr     = progFile[i].addressBytes & 0xffff; */
+    current_file = i;
     if (current_table.i2c.dev_addr_ext == 0)
         current_table.i2c.dev_addr_ext = 0x50;
   }
@@ -322,7 +369,9 @@ void createOutput (void)
   FILE *str;
   int   totalLenBytes;
   int   i, j;
+  int   nTables;
   unsigned int value, v1, v2;
+  unsigned int base;
 
   str = fopen ("i2crom.ccs", "w");
   if (str == NULL)  {
@@ -330,20 +379,38 @@ void createOutput (void)
     exit (-1);
   }
 
-  /* Compute the total size of the i2c prom. Include all the i2c boot paramater tables,
-   * as well as the PCI parameter table, (which is not necessarily present). */
-  totalLenBytes = DATA_BASE;
+  /* Compact the i2c eeprom to use the minimum memory possible */
+  base    = DATA_BASE;
+  nTables = NUM_BOOT_PARAM_TABLES; 
 
-  for (i = 0; i < nProgFiles; i++)
-    totalLenBytes += progFile[i].sizeBytes;
+  if ((compact != 0) && (pciSet == 0))  {
+    nTables = max_index + 1;
+    base    = nTables * 0x80;  /* The number of parameter tables * size of a parameter table */
+  }
 
+
+  for (i = 0; i < NUM_BOOT_PARAM_TABLES; i++)  {
+    progFile[i].addressBytes = base;
+    base = base + progFile[i].sizeBytes;
+  }
+
+  /* Setup the base program file addresses. If a parameter set has
+   * been tagged it means that this is an i2c program load */
+  for (i = 0; i < NUM_BOOT_PARAM_TABLES; i++)  {
+    for (j = 0; j < NUM_BOOT_PARAM_TABLES; j++)  {
+      if (progFile[i].tag[j] >= 0)
+        boot_params[progFile[i].tag[j]].i2c.dev_addr = progFile[i].addressBytes;
+    }
+  }
+      
+  /* The total length of the i2c eeprom is now stored in base */
   /* Write out the ccs header */
-  fprintf (str, "1651 1 10000 1 %x\n", totalLenBytes >> 2);
+  fprintf (str, "1651 1 10000 1 %x\n", base >> 2);
 
   /* Write out the boot parameter tables. 0x80 bytes will be written out.
    * There are 16 bits in every parameter field, which is why the index
    * is from 0 to 0x40 */
-  for (i = 0; i < NUM_BOOT_PARAM_TABLES; i++)  {
+  for (i = 0; i < nTables; i++)  {
     for (j = 0; j < (0x80 >> 1); j += 2)  {
       v1 = boot_params[i].parameter[j];
       v2 = boot_params[i].parameter[j+1];
@@ -354,8 +421,10 @@ void createOutput (void)
 
   /* Write out the PCI parameter base. If none was included then zeros will be
    * written out */
-  for (i = 0; i < PCI_DATA_LEN_32bit; i++)  {
-    fprintf (str, "0x%08x\n", pciFile.data[i]);
+  if (pciSet)  {
+    for (i = 0; i < PCI_DATA_LEN_32bit; i++)  {
+      fprintf (str, "0x%08x\n", pciFile.data[i]);
+    }
   }
                                 
 
@@ -380,6 +449,48 @@ void initPciParams (void)
   memset (&pciFile, 0, sizeof(pciFile_t));
 } /* initPciParams */
 
+
+
+/************************************************************************************
+ * FUNCTION PURPOSE: Parse the input arguments.
+ ************************************************************************************
+ * DESCRIPTION: Returns -1 on invalid args
+ ************************************************************************************/
+int parseIt (int argc, char *argv[])
+{
+  int i;
+
+  if (argc < 2)  {
+     fprintf (stderr, "usage: %s [-compact] inputfile\n", argv[0]);
+     return (-1);
+  }
+
+  inputFile = NULL;  
+
+  for (i = 1; i < argc;  )  {
+
+    if (!strcmp (argv[i], "-compact"))  {
+      compact = 1;
+      i += 1;
+
+    } else  {
+
+      if (inputFile != NULL)  {
+        fprintf (stderr, "usage: %s [-compact] inputfile\n", argv[0]);
+        return (-1);
+      }
+
+      inputFile = argv[i];
+      i += 1;
+    }
+  }
+
+  return (0);
+
+}
+
+
+
 /************************************************************************************
  * FUNCTION PURPOSE: main function
  ************************************************************************************
@@ -394,19 +505,23 @@ int main (int argc, char *argv[])
     initTable(&boot_params[i]);
 
   initTable (&current_table);
+  current_file = -1;
+
+  /* Initialize the program file structure */
+  initProgFile ();
 
   /* Initialize the PCI param table */
   initPciParams ();
-  
-  /* open the input  */
-  if (argc != 2)  {
-    fprintf (stderr, "usage: %s inputfile\n", argv[0]);
-    return (-1);
-  }
 
-  yyin = fopen (argv[1], "r");
+
+  /* Parse the input parameters */
+  if (parseIt (argc, argv))
+    return (-1);
+
+  
+  yyin = fopen (inputFile, "r");
   if (yyin == NULL)  {
-    fprintf (stderr, "%s: could not open file %s\n", argv[0], argv[1]);
+    fprintf (stderr, "%s: could not open file %s\n", argv[0], inputFile);
     return (-1);
   }
 

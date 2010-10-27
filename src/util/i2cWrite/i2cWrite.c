@@ -19,6 +19,7 @@
 /* Run time configuration */
 unsigned int   deviceFreqMhz = 1000;
 unsigned short busAddress    = 0x50;
+unsigned int   i2cBlockSize  = 64;
 unsigned int   nbytes        = I2C_SIZE_BYTES;
 unsigned int   dataAddress   = 0;
 
@@ -26,8 +27,8 @@ unsigned int   dataAddress   = 0;
 #pragma DATA_SECTION(i2cData, ".i2cData")
 unsigned int i2cData[I2C_SIZE_BYTES >> 2];
 
-#define I2C_BLOCK_SIZE_BYTES    64
-unsigned char i2cBlock[I2C_BLOCK_SIZE_BYTES+4];  /* need 2 bytes for the address */
+#define I2C_MAX_BLOCK_SIZE_BYTES    256
+unsigned char i2cBlock[I2C_MAX_BLOCK_SIZE_BYTES+4];  /* need 2 bytes for the address */
 
 /** 
  *  @brief
@@ -53,7 +54,7 @@ int formBlock (unsigned int addr, int byteIndex, int n)
     p = byteIndex >> 2;
 
 
-    for (i = 0; i < I2C_BLOCK_SIZE_BYTES; i += 4, p++)  {
+    for (i = 0; i < i2cBlockSize; i += 4, p++)  {
 
         i2cBlock[i+2+0] = (i2cData[p] >> 24) & 0xff;
         i2cBlock[i+2+1] = (i2cData[p] >> 16) & 0xff;
@@ -117,11 +118,11 @@ void main (void)
 
 
 
-    for (n = 0; n < nbytes; n += I2C_BLOCK_SIZE_BYTES)  {
+    for (n = 0; n < nbytes; n += i2cBlockSize)  {
 
         remain = nbytes - n;
-        if (remain > I2C_BLOCK_SIZE_BYTES)
-            remain = I2C_BLOCK_SIZE_BYTES;
+        if (remain > i2cBlockSize)
+            remain = i2cBlockSize;
 
         /* formBlock sets up the address as well as the data */
         progBytes = formBlock (dataAddress + n, n, remain);

@@ -163,6 +163,8 @@ typedef struct strtab
 
 unsigned int unpack();
 
+#define reloc_read(x)   TRUE
+
 /* extern void mem_copy(unsigned char* dst, unsigned char* src, int nbytes); - defined in osal.h */
 /******************************************************************************/
 /*                                                                            */
@@ -631,8 +633,11 @@ int cload_sect_data(SCNHDR *sptr)
 	    /*----------------------------------------------------------------*/
 	    /* PERFORM THE RELOCATION AND READ IN THE NEXT RELOCATION ENTRY.  */
 	    /*----------------------------------------------------------------*/
+#if 0
 	    if (!relocate(&reloc, packet + i, curr_sect)) 
                 { free (packet); return FALSE; }
+#endif
+
 #if FILE_BASED  
 	    if (n_reloc++ < sptr->s_nreloc                                    &&
 	       (fseek(fin, sptr->s_relptr + ((int)n_reloc * relsz), 0) != 0  ||
@@ -1171,6 +1176,7 @@ char *sym_add_name(SYMENT *symptr)
 }
 #endif
 
+#if 0
 /******************************************************************************/
 /*                                                                            */
 /* RELOC_ADD() - Add an entry to the relocation symbol table.  This table     */
@@ -1834,6 +1840,7 @@ int reloc_read(RELOC *rptr, unsigned int offset)
 }
 
 
+#endif
 /*************************************************************************/
 /*                                                                       */
 /*   RELOC_SIZE()-                                                       */
@@ -1987,6 +1994,7 @@ int reloc_stop(int type)
 }
 
 
+#if 0
 /******************************************************************************/
 /*                                                                            */
 /* SYM_RELOC_AMOUNT() - Determine the amount of relocation for a particular   */
@@ -2019,6 +2027,7 @@ int sym_reloc_amount(RELOC *rp)
    return 0;
 }
 
+#endif
 
 /******************************************************************************/
 /*                                                                            */

@@ -24,7 +24,7 @@ void hwEmif3p1Enable (iblEmif3p1_t *cfg)
 {
     uint32 v;
 
-    v = cfg->sdcfg | (1 << 15);  /* Unlock */
+    v = cfg->sdcfg | (1 << 15) | (1 << 23);  /* Timing unlock (bit 15), boot unlock (bit 23) set */
     DEVICE_REG32_W (DEVICE_DDR_BASE + DDR_REG_SDCFG, v);
 
     DEVICE_REG32_W (DEVICE_DDR_BASE + DDR_REG_SDRFC,  cfg->sdrfc);
@@ -32,7 +32,11 @@ void hwEmif3p1Enable (iblEmif3p1_t *cfg)
     DEVICE_REG32_W (DEVICE_DDR_BASE + DDR_REG_SDTIM2, cfg->sdtim2);
     DEVICE_REG32_W (DEVICE_DDR_BASE + DDR_REG_DMCCTL, cfg->dmcctl);
 
-    v = cfg->sdcfg & (~(1 << 15));  /* lock */
+    v = v & (~(1 << 23));  /* Clear boot lock */
+    DEVICE_REG32_W (DEVICE_DDR_BASE + DDR_REG_SDCFG, v);
+
+
+    v = v & (~(1 << 15));  /* Clear timing lock */
     DEVICE_REG32_W (DEVICE_DDR_BASE + DDR_REG_SDCFG, v);
     
 }

@@ -24,6 +24,12 @@ else
 	IEXT=     be
 endif
 
+ifeq ($(TARGET),c6474)
+  COMPACT= -compact
+else
+  COMPACT=
+endif
+
 include $(IBL_ROOT)/make/$(ARCH)/makedefs.mk
 
 export ARCH
@@ -37,7 +43,7 @@ $(TARGETS): $(MODULES) utils $(RIBL)
 	$(CP) ibl.b ibl_$@
 	../util/btoccs/b2i2c ibl_$@/ibl.b ibl_$@/ibl.i2c.b
 	../util/btoccs/b2ccs ibl_$@/ibl.i2c.b ibl_$@/ibl.i2c.$(IEXT).ccs
-	../util/romparse/romparse ibl_$@/i2crom_$(IEXT).map
+	../util/romparse/romparse $(COMPACT) ibl_$@/i2crom_$(IEXT).map
 	$(CP) i2crom.ccs ibl_$@/i2crom_$(IEXT).ccs
 	$(CP) i2crom.ccs ibl_$@/i2crom_$(IEXT).dat
 	$(RM) i2crom.ccs ibl_le.b ibl.b

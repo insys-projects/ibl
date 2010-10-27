@@ -55,10 +55,20 @@
  #define IBL_I2C_CFG_EEPROM_BUS_ADDR    0x50
 #endif
 
-#define IBL_I2C_CFG_TABLE_DATA_ADDR     (0x10000 - 0x300)
+#define IBL_I2C_CFG_TABLE_DATA_ADDR     (0x8000 - 0x300)
  
  
 
+/**
+ * @brief No NAND support. Define the function call to be a void statement
+ */
+#define iblNandBoot()
+
+/**
+ * @brief No Elf support
+ */
+#define iblIsElf(x)         FALSE
+#define iblBootElf(x,y)     for (;;);
 
 
 #endif

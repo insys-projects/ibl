@@ -11,7 +11,6 @@
 ../main/c64x/make/iblmain.oc
 ../device/c64x/make/c6474.oc
 ../ethboot/c64x/make/ethboot.oc
-../nandboot/c64x/make/nandboot.oc
 ../driver/c64x/make/net.oc
 ../driver/c64x/make/arp.oc
 ../driver/c64x/make/ip.oc
@@ -20,15 +19,12 @@
 ../driver/c64x/make/timer.oc
 ../driver/c64x/make/bootp.oc
 ../driver/c64x/make/tftp.oc
-../driver/c64x/make/nand.oc
 ../hw/c64x/make/t64.oc
 ../hw/c64x/make/cpmacdrv.oc
 ../hw/c64x/make/pll.oc
 ../hw/c64x/make/psc.oc
 ../hw/c64x/make/emif31.oc
 ../hw/c64x/make/mdio.oc
-../hw/c64x/make/gpio.oc
-../hw/c64x/make/nandgpio.oc
 ../hw/c64x/make/i2c.oc
 ../hw/c64x/make/sgmii.oc
 ../interp/c64x/make/bis.oc
@@ -39,13 +35,17 @@
 ../interp/c64x/make/gem.oc
 ../interp/c64x/make/blob.oc
 
-../interp/c64x/make/dload.oc
-../interp/c64x/make/elfwrap.oc
-../interp/c64x/make/dlw_client.oc
-../interp/c64x/make/dload_endian.oc
-../interp/c64x/make/ArrayList.oc
+/* ../interp/c64x/make/dload.oc */
+/* ../interp/c64x/make/elfwrap.oc */
+/* ../interp/c64x/make/dlw_client.oc */
+/* ../interp/c64x/make/dload_endian.oc */
+/* ../interp/c64x/make/ArrayList.oc */
 
-../ecc/c64x/make/3byte_ecc.oc
+/* ../nandboot/c64x/make/nandboot.oc */
+/* ../driver/c64x/make/nand.oc */
+/* ../ecc/c64x/make/3byte_ecc.oc */
+/* ../hw/c64x/make/gpio.oc */
+/* ../hw/c64x/make/nandgpio.oc */
 
 -c
 -stack 0x800

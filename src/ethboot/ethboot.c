@@ -22,6 +22,13 @@
 #include "mdioapi.h"
 #include <string.h>
 
+/**
+ *  @brief Remove the possible re-definition of iblEthBoot. iblcfg.h defines this to be a void
+ *         statement if there is no ethernet boot support. It must be re-enabled for the compile
+ */
+#ifdef iblEthBoot
+ #undef iblEthBoot
+#endif
 
 /* Convert an IP address from unsigned char to IPN (uint32) */
 #define FORM_IPN(x)     (  (x[0] << 24) | \
