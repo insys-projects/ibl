@@ -8,7 +8,7 @@
  * @file iblcfg.h
  *
  * @brief
- *	 Build time configurations for the c6474 Lite EVM ibl are defined
+ *	 Build time configurations for the c6474 Lite ibl are defined
  *
  ***************************************************************************/
 #ifndef IBLCFG_H
@@ -59,6 +59,16 @@
  
  
 
+/**
+ * @brief No NAND support. Define the function call to be a void statement
+ */
+#define iblNandBoot()
+
+/**
+ * @brief No Elf support
+ */
+#define iblIsElf(x)         FALSE
+#define iblBootElf(x,y)     for (;;);
 
 
 #endif
