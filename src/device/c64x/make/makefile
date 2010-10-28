@@ -23,7 +23,11 @@ else
   ifeq ($(TARGET),c6474)
    CSRC= c6474.c
   else
-   CSRC= c6472.c c6455.c c6474.c
+   ifeq ($(TARGET),c6474l)
+    CSRC= c6474l.c
+   else
+    CSRC= c6472.c c6455.c c6474.c c6474l.c 
+   endif 
   endif
  endif
 endif
