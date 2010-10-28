@@ -425,6 +425,10 @@ void createOutput (void)
     for (i = 0; i < PCI_DATA_LEN_32bit; i++)  {
       fprintf (str, "0x%08x\n", pciFile.data[i]);
     }
+  }  else  {
+    for (i = 0; i < PCI_DATA_LEN_32bit; i++)  {
+      fprintf (str, "0x%08x\n", 0);
+    }
   }
                                 
 

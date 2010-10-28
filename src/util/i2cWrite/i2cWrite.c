@@ -13,6 +13,7 @@
 #include "i2c.h"
 #include "target.h"
 #include <stdio.h>
+#include <string.h>
 
 #define I2C_SIZE_BYTES  0x10000
 
@@ -27,8 +28,36 @@ unsigned int   dataAddress   = 0;
 #pragma DATA_SECTION(i2cData, ".i2cData")
 unsigned int i2cData[I2C_SIZE_BYTES >> 2];
 
+#pragma DATA_SECTION(i2cRead, ".i2cRead")
+unsigned int i2cRead[I2C_SIZE_BYTES >> 2];
+
 #define I2C_MAX_BLOCK_SIZE_BYTES    256
 unsigned char i2cBlock[I2C_MAX_BLOCK_SIZE_BYTES+4];  /* need 2 bytes for the address */
+
+
+/**
+ * @brief
+ *  Get a single byte of data from i2cData based on big endian ordering
+ */
+
+UINT8 getByte(int idx)
+{
+    int    word;
+    int    byte;
+    UINT8  u;
+    unsigned int v;
+
+    word = idx >> 2;
+    byte = idx & 0x3;
+
+    v = i2cData[word];
+
+    u = (v >> ((3 - byte) << 3)) & 0xff;
+
+    return (u);
+
+}
+
 
 /** 
  *  @brief
@@ -108,6 +137,11 @@ void main (void)
     int     n;
     int     remain;
     int     progBytes;
+    int     eCount;
+
+    UINT8  *iData;
+    UINT8   writeByte;
+    int     j;
 
     volatile int i;
 
@@ -150,8 +184,51 @@ void main (void)
 
     }
 
+    printf ("I2C write complete, reading data\n");
 
-    printf ("I2C write complete\n");
+    memset (i2cRead, 0xffffffff, sizeof(i2cRead));
+
+    /* Read the data back */
+    i2cRet = hwI2cMasterRead (dataAddress,
+                              nbytes,
+                              (UINT8 *)i2cRead,
+                              busAddress,
+                              0x100);
+
+
+    if (i2cRet != I2C_RET_OK)  {
+        showI2cError (i2cRet);
+        return;
+    }
+
+    printf ("I2C read complete, comparing data\n");
+
+    /* The data received was simply packed bytes, but the data sent was in big endian mode,
+     * so the compare must get the ordering correct */
+    iData  = (UINT8 *)i2cRead;
+    eCount = 0;
+    for (j = 0; j < nbytes; j++)  {
+      
+        writeByte = getByte(j);
+        if (writeByte != iData[j])  {
+            printf ("Error at data byte %d: expected 0x%02x, read 0x%02x\n", j, writeByte, iData[j]);
+            eCount += 1;
+        }
+
+        if (eCount >= 20)  {
+          printf ("Too many errors, stopping compare\n");
+          break;
+        }
+
+    }
+
+    if (eCount == 0)
+        printf ("Data compare passed\n");
+    else
+        printf ("Data compare failed\n");
+
+
+
 }
         
 

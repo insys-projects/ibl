@@ -10,13 +10,15 @@ i2cWrite.oc
 MEMORY
 {
 	I2C_DAT  :  origin = 0x800000  length = 0x10000
-	L2       :  origin = 0x810000  length = 0x10000
+	I2C_READ :  origin = 0x810000  length = 0x10000
+	L2       :  origin = 0x820000  length = 0x10000
 
 }
 
 SECTIONS
 {
 	.i2cData > I2C_DAT
+	.i2cRead > I2C_READ
 	.stack   > L2
 	.heap    > L2
 	.text    > L2

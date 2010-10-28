@@ -59,6 +59,7 @@ utils:
 	make -C $(IBL_ROOT)/util/romparse TARGET=$(TARGET)
 	make -C $(IBL_ROOT)/util/i2cRead  TARGET=$(TARGET) $(TARGET)
 	make -C $(IBL_ROOT)/util/i2cWrite TARGET=$(TARGET) $(TARGET)
+	make -C $(IBL_ROOT)/util/i2cConfig $(TARGET)
 	make -C $(IBL_ROOT)/util/bconvert
 
 clean: $(CLEAN_MODULES)
