@@ -380,13 +380,16 @@ void createOutput (void)
   }
 
   /* Compact the i2c eeprom to use the minimum memory possible */
-  base    = DATA_BASE;
+  base    = PCI_PARAM_BASE;
   nTables = NUM_BOOT_PARAM_TABLES; 
 
   if ((compact != 0) && (pciSet == 0))  {
     nTables = max_index + 1;
     base    = nTables * 0x80;  /* The number of parameter tables * size of a parameter table */
   }
+
+  if (pciSet)
+    base = base + PCI_EEAI_PARAM_SIZE;
 
 
   for (i = 0; i < NUM_BOOT_PARAM_TABLES; i++)  {
@@ -424,10 +427,6 @@ void createOutput (void)
   if (pciSet)  {
     for (i = 0; i < PCI_DATA_LEN_32bit; i++)  {
       fprintf (str, "0x%08x\n", pciFile.data[i]);
-    }
-  }  else  {
-    for (i = 0; i < PCI_DATA_LEN_32bit; i++)  {
-      fprintf (str, "0x%08x\n", 0);
     }
   }
                                 
