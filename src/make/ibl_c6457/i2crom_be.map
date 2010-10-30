@@ -1,0 +1,18 @@
+section 
+{
+  param_index   = 0
+  boot_mode     = 257
+  sw_pll		= 20
+  options       = 1
+
+  core_freq_mhz    = 1000
+  i2c_clk_freq_khz = 100
+
+  dev_addr_ext = 0x50
+
+  multi_i2c_id = 0
+  my_i2c_id    = 1
+  address_delay = 0
+  exe_file = "ibl_c6457/ibl.i2c.be.ccs"
+}
+
