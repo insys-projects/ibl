@@ -376,6 +376,112 @@ hotmenu setConfig_c6474lite()
 
 }
 
+menuitem "EVM c6457 EVM IBL";
+
+hotmenu setConfig_c6457()
+{
+    ibl.iblMagic = ibl_MAGIC_VALUE;
+
+    ibl.pllConfig[ibl_MAIN_PLL].doEnable      = TRUE;
+    ibl.pllConfig[ibl_MAIN_PLL].prediv        = 1;
+    ibl.pllConfig[ibl_MAIN_PLL].mult          = 20;
+    ibl.pllConfig[ibl_MAIN_PLL].postdiv       = 1;
+    ibl.pllConfig[ibl_MAIN_PLL].pllOutFreqMhz = 1000;
+
+    /* The DDR PLL. The multipliers/dividers are fixed, so are really dont cares */
+    ibl.pllConfig[ibl_DDR_PLL].doEnable = TRUE;
+
+    /* The network PLL. The multipliers/dividers are fixed */
+    ibl.pllConfig[ibl_NET_PLL].doEnable = TRUE;
+
+    /* EMIF configuration */
+    ibl.ddrConfig.configDdr = TRUE;
+
+    ibl.ddrConfig.uEmif.emif3p1.sdcfg  = 0x00d38a32; /* cas5, 8 banks, 10 bit column */
+    ibl.ddrConfig.uEmif.emif3p1.sdrfc  = 0x00000a0e; /* Refresh 333Mhz */ 
+    ibl.ddrConfig.uEmif.emif3p1.sdtim1 = 0x832474da; /* Timing 1 */
+    ibl.ddrConfig.uEmif.emif3p1.sdtim2 = 0x3d44c742; /* Timing 2 */
+    ibl.ddrConfig.uEmif.emif3p1.dmcctl = 0x50001906; /* PHY read latency for CAS 5 is 5 + 2 - 1 */
+
+
+    /* Ethernet configuration for port 0 */
+    ibl.ethConfig[0].ethPriority      = ibl_HIGHEST_PRIORITY;
+    ibl.ethConfig[0].port             = 0;
+
+    /* Bootp is disabled. The server and file name are provided here */
+    ibl.ethConfig[0].doBootp          = FALSE;
+    ibl.ethConfig[0].useBootpServerIp = FALSE;
+    ibl.ethConfig[0].useBootpFileName = FALSE;
+    ibl.ethConfig[0].bootFormat       = ibl_BOOT_FORMAT_BBLOB;
+
+    SETIP(ibl.ethConfig[0].ethInfo.ipAddr,    158,218,100,115);
+    SETIP(ibl.ethConfig[0].ethInfo.serverIp,  158,218,100,25);
+    SETIP(ibl.ethConfig[0].ethInfo.gatewayIp, 158,218,100,2);
+    SETIP(ibl.ethConfig[0].ethInfo.netmask,   255,255,255,0);
+
+    /* Set the hardware address as 0 so the e-fuse value will be used */
+    ibl.ethConfig[0].ethInfo.hwAddress[0] = 0;
+    ibl.ethConfig[0].ethInfo.hwAddress[1] = 0;
+    ibl.ethConfig[0].ethInfo.hwAddress[2] = 0;
+    ibl.ethConfig[0].ethInfo.hwAddress[3] = 0;
+    ibl.ethConfig[0].ethInfo.hwAddress[4] = 0;
+    ibl.ethConfig[0].ethInfo.hwAddress[5] = 0;
+
+
+    ibl.ethConfig[0].ethInfo.fileName[0]  = 'c';
+    ibl.ethConfig[0].ethInfo.fileName[1]  = '6';
+    ibl.ethConfig[0].ethInfo.fileName[2]  = '4';
+    ibl.ethConfig[0].ethInfo.fileName[3]  = '5';
+    ibl.ethConfig[0].ethInfo.fileName[4]  = '7';
+    ibl.ethConfig[0].ethInfo.fileName[5]  = '-';
+    ibl.ethConfig[0].ethInfo.fileName[6]  = 'l';
+    ibl.ethConfig[0].ethInfo.fileName[7]  = 'e';
+    ibl.ethConfig[0].ethInfo.fileName[8]  = '.';
+    ibl.ethConfig[0].ethInfo.fileName[9]  = 'b';
+    ibl.ethConfig[0].ethInfo.fileName[10] = 'i';
+    ibl.ethConfig[0].ethInfo.fileName[11] = 'n';
+    ibl.ethConfig[0].ethInfo.fileName[12] = '\0';
+    ibl.ethConfig[0].ethInfo.fileName[13] = '\0';
+    ibl.ethConfig[0].ethInfo.fileName[14] = '\0';
+
+
+    /* Even though the entire range of DDR2 is chosen, the load will
+     * stop when the ftp reaches the end of the file */
+    ibl.ethConfig[0].blob.startAddress  = 0x80000000;       /* Base address of DDR2 */
+    ibl.ethConfig[0].blob.sizeBytes     = 0x20000000;       /* All of DDR2 */
+    ibl.ethConfig[0].blob.branchAddress = 0x80000000;       /* Base of DDR2 */
+
+    /* There is no port 1 on the 6457 Lite EVM */
+    ibl.ethConfig[1].ethPriority      = ibl_DEVICE_NOBOOT;
+
+    /* SGMII is present */
+    ibl.sgmiiConfig[0].adviseAbility = 0x9801;
+    ibl.sgmiiConfig[0].control       = 0x20;
+    ibl.sgmiiConfig[0].txConfig      = 0x00000e23;
+    ibl.sgmiiConfig[0].rxConfig      = 0x00081023;
+    ibl.sgmiiConfig[0].auxConfig     = 0x0000000b;
+
+    /* MDIO configuration */
+    ibl.mdioConfig.nMdioOps = 8;
+    ibl.mdioConfig.mdioClkDiv = 0x26;
+    ibl.mdioConfig.interDelay = 2000;   /* ~2ms at 1000 MHz */
+
+    ibl.mdioConfig.mdio[0] =  (1 << 30) | ( 4 << 21) | (27 << 16) | 0x0081;
+    ibl.mdioConfig.mdio[1] =  (1 << 30) | (26 << 21) | (15 << 16) | 0x0047;
+    ibl.mdioConfig.mdio[2] =  (1 << 30) | (26 << 21) | (14 << 16) | 0x0047;
+    ibl.mdioConfig.mdio[3] =  (1 << 30) | ( 0 << 21) | (15 << 16) | 0x8140;
+
+    ibl.mdioConfig.mdio[4] =  (1 << 30) | ( 0 << 21) | (14 << 16) | 0x8140;
+    ibl.mdioConfig.mdio[5] =  (1 << 30) | ( 1 << 21) | (22 << 16) | 0x043e;
+    ibl.mdioConfig.mdio[6] =  (1 << 30) | ( 1 << 21) | (22 << 16) | 0x043e;
+    ibl.mdioConfig.mdio[7] =  (1 << 30) | ( 0 << 21) | ( 1 << 16) | 0xa100;
+
+
+    /* This board has NAND. We will enable later */
+    ibl.nandConfig.nandPriority = ibl_DEVICE_NOBOOT;
+
+}
+
 menuitem "EVM c6455 IBL";
 
 hotmenu setConfig_c6455()
