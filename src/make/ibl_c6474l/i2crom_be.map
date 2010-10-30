@@ -8,7 +8,7 @@ section
   core_freq_mhz    = 1000
   i2c_clk_freq_khz = 400
 
-  dev_addr_ext = 0x51
+  dev_addr_ext = 0x50
 
   multi_i2c_id = 0
   my_i2c_id    = 1
