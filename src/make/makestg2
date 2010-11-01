@@ -16,6 +16,8 @@ CLEAN_MODULES=$(addprefix clean_,$(MODULES))
 
 TARGETS= c6472 c6474 c6474l c6455 c6457
 
+COMMON_SYMBOLS= hwI2Cinit hwI2cMasterRead iblBootBtbl
+
 ifeq ($(ENDIAN),little)
 	HEX_OPT= -order L
 	IEXT=     le
@@ -35,17 +37,38 @@ include $(IBL_ROOT)/make/$(ARCH)/makedefs.mk
 export ARCH
 export TARGET
 
+$(TARGETS): iblMain
 
-$(TARGETS): $(MODULES) utils $(RIBL)
-	$(LD) -o ibl_$@/ibl_$@.out -m ibl_$@/ibl_$@.map  ibl_$@/ibl.cmd $(RTLIBS)
-	hex6x $(HEX_OPT) ibl_$@/ibl.rmd ibl_$@/ibl_$@.out
+
+# For the init code a raw image is created as well as the i2c code to verify
+# endian independent code is generated. The symbols required for linking
+# the full application are then extracted
+iblInit: $(MODULES) utils
+	$(LD) -o ibl_$(TARGET)/ibl_$(TARGET)_init.out -m ibl_$(TARGET)/ibl_$(TARGET)_init.map ibl_$(TARGET)/ibl_init.cmd $(RTLIBS)
+
+	hex6x $(HEX_OPT) ibl_$(TARGET)/ibl_init_image.rmd ibl_$(TARGET)/ibl_$(TARGET)_init.out
+	$(CP) ibl_le.b ibl_$(TARGET)/ibl.b
+	../util/btoccs/b2ccs ibl_$(TARGET)/ibl.b ibl_$(TARGET)/ibl_init.$(IEXT).ccs
+
+	hex6x $(HEX_OPT) ibl_$(TARGET)/ibl_init.rmd ibl_$(TARGET)/ibl_$(TARGET)_init.out
 	../util/bconvert/bconvert64x -$(IEXT) ibl_le.b ibl.b
-	$(CP) ibl.b ibl_$@
-	../util/btoccs/b2i2c ibl_$@/ibl.b ibl_$@/ibl.i2c.b
-	../util/btoccs/b2ccs ibl_$@/ibl.i2c.b ibl_$@/ibl.i2c.$(IEXT).ccs
-	../util/romparse/romparse $(COMPACT) ibl_$@/i2crom_$(IEXT).map
-	$(CP) i2crom.ccs ibl_$@/i2crom_$(IEXT).ccs
-	$(CP) i2crom.ccs ibl_$@/i2crom_$(IEXT).dat
+	$(CP) ibl.b ibl_$(TARGET)
+	../util/btoccs/b2i2c ibl_$(TARGET)/ibl.b ibl_$(TARGET)/ibl.i2c.b
+	../util/btoccs/b2ccs ibl_$(TARGET)/ibl.i2c.b ibl_$(TARGET)/ibl.i2c.$(IEXT).ccs
+
+	bash ../util/symExtract/symExtract ibl_$(TARGET)/ibl_$(TARGET)_init.map ibl_$(TARGET)/ibl_init_symbols.inc $(COMMON_SYMBOLS)
+
+	
+iblMain: iblInit $(MODULES)
+	$(LD) -o ibl_$(TARGET)/ibl_$(TARGET).out -m ibl_$(TARGET)/ibl_$(TARGET).map  ibl_$(TARGET)/ibl.cmd $(RTLIBS)
+	hex6x $(HEX_OPT) ibl_$(TARGET)/ibl.rmd ibl_$(TARGET)/ibl_$(TARGET).out
+	../util/bconvert/bconvert64x -$(IEXT) ibl_le.b ibl.b
+	$(CP) ibl.b ibl_$(TARGET)
+	../util/btoccs/b2i2c ibl_$(TARGET)/ibl.b ibl_$(TARGET)/ibl.i2c.b
+	../util/btoccs/b2ccs ibl_$(TARGET)/ibl.i2c.b ibl_$(TARGET)/ibl.i2c.$(IEXT).ccs
+	../util/romparse/romparse $(COMPACT) ibl_$(TARGET)/i2crom_$(IEXT).map
+	$(CP) i2crom.ccs ibl_$(TARGET)/i2crom_$(IEXT).ccs
+	$(CP) i2crom.ccs ibl_$(TARGET)/i2crom_$(IEXT).dat
 	$(RM) i2crom.ccs ibl_le.b ibl.b
 
 

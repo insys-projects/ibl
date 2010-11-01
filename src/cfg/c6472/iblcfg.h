@@ -51,12 +51,10 @@
 #define IBL_I2C_OWN_ADDR                10
 #define IBL_I2C_CFG_ADDR_DELAY          0x100       /* Delay between sending the address and reading data */
 
-#ifndef IBL_I2C_CFG_EEPROM_BUS_ADDR
- #define IBL_I2C_CFG_EEPROM_BUS_ADDR    0x50
-#endif
+#define IBL_I2C_CFG_EEPROM_BUS_ADDR    0x50
 
 #define IBL_I2C_CFG_TABLE_DATA_ADDR     (0x10000 - 0x300)
- 
+#define IBL_I2C_MAP_TABLE_DATA_ADDR     0x180
  
 
 

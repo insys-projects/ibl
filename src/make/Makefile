@@ -14,35 +14,17 @@ all:
 	@echo must specify a target [ $(IBLS_C6X) ]
 
 
-# Default options that can be overridden on the command line
-ifndef ENDIAN
- ENDIAN=little
-endif
-export ENDIAN
-
 # The debug flag changes compiler options
 ifndef DEBUG
  DEBUG=no
 endif
 export DEBUG
 
-# The value of I2C_PARAM_BUS_ADDR determines the I2C bus address used
-# to read the ibl configuration table from. The default values are
-# 0x50 for little endian and 0x51 for big endian.
-
-ifndef I2C_PARAM_BUS_ADDR
- ifeq ($(ENDIAN),little)
-   I2C_PARAM_BUS_ADDR=0x50
- else
-   I2C_PARAM_BUS_ADDR=0x51
- endif
-endif
-
-export I2C_PARAM_BUS_ADDR
 
 
 $(IBLS_C6X):
-	make -f makestg2 ARCH=c64x TARGET=$@ $@ 
+	make -f makestg2 ARCH=c64x TARGET=$@ ENDIAN=big    $@ 
+	make -f makestg2 ARCH=c64x TARGET=$@ ENDIAN=little $@ 
 
 
 # will need to add a line for each additional ARCH type added

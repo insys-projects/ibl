@@ -14,7 +14,7 @@ endif
 ECODIR= $(IBL_ROOT)/main
 
 
-CSRC= iblmain.c
+CSRC= iblmain.c iblinit.c
 
 
 CDEFS += -DIBL_I2C_CFG_EEPROM_BUS_ADDR=$(I2C_PARAM_BUS_ADDR)

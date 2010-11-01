@@ -15,7 +15,7 @@ ECODIR= $(IBL_ROOT)/device
 
 # For no target set CSRC to all sources for clean
 ifeq ($(TARGET),c6472)
- CSRC= c6472.c
+ CSRC= c6472.c c6472init.c
 else 
  ifeq ($(TARGET),c6455)
   CSRC= c6455.c

@@ -384,6 +384,8 @@ typedef struct ibl_s
     
     iblNand_t nandConfig;                    /**< NAND configuration @ref iblNand_t */
     
+    uint16    chkSum;                        /**< Ones complement checksum over the whole config structure */
+    
     
 /*    iblI2c_t  i2cConfig;  */
 /*    iblSpi_t  spiConfig;  */
@@ -424,6 +426,24 @@ extern ibl_t ibl;
 
 
 /**
+ *  @defgroup iblFailCode
+ *
+ * @ingroup iblFailCode
+ * @{
+ *      @def ibl_FAIL_CODE_INVALID_I2C_ADDRESS
+ */
+#define ibl_FAIL_CODE_INVALID_I2C_ADDRESS  700      /**< Invalid i2c eeprom address encountered */
+ 
+/**
+ *  @def ibl_FAIL_CODE_BTBL_FAIL
+ */
+#define ibl_FAIL_CODE_BTBL_FAIL             701     /**< Boot table processing function error */
+
+ 
+ /* @} */
+
+
+/**
  * @brief
  *   Provide status on the boot operation
  *
@@ -434,6 +454,14 @@ extern ibl_t ibl;
 typedef struct iblStatus_s
 {
     uint32 iblMagic;        /**<  The @ref ibl_MAGIC_VALUE is placed here to indicate the boot has begun */
+    
+    uint32 iblFail;         /**<  If non-zero the IBL has encountered a fatal error */
+    
+    uint32 i2cRetries;      /**<  Count of I2C read retries */
+    uint32 magicRetries;    /**<  Count of I2C re-reads because the magic number was incorrect */ 
+    uint32 mapSizeFail;     /**<  Number of times an invalid map table size was read from the i2c */
+    uint32 mapRetries;      /**<  Number of times the checksum failed on the read of the i2c map */
+    uint32 i2cDataRetries;  /**<  Number of retries while reading block data from the i2c */
     
     int32  tableLoadFail;   /**<  If non-zero then the load of the parameter table from i2c failed */
     
@@ -456,6 +484,23 @@ typedef struct iblStatus_s
                                
 extern iblStatus_t iblStatus;                               
 
+
+/** 
+ *  @brief
+ *      The i2c map structure
+ *
+ *  @details 
+ *      The i2c eeprom contains a structure which identifies the location of the big and little
+ *      endian ibl images on the eeprom.
+ */
+typedef struct iblI2cMap_s 
+{
+    uint16  length;         /**<  Size of the structure in bytes */
+    uint16  chkSum;         /**<  Value which makes the ones complement checksum over the block equal to 0 or -0 */
+    uint32  addrLe;         /**<  Base address of the boot tables for the little endian image */
+    uint32  addrBe;         /**<  Base address of the boot tables for the big endian image */
+
+} iblI2cMap_t;
 
 
 

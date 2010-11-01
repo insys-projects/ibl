@@ -26,28 +26,13 @@
 #include "ibl_elf.h"
 #include <string.h>
 
-
 /**
- * @brief The ibl table is declared.
- *
- * @details
- *   The ibl table is declared uninitialized by this ibl program. An external
- *   initialization can be performed if the default operation of the ibl is
- *   not desired.
+ *  @brief
+ *      Data structures shared between the 1st and 2nd stage IBL load
+ *      are declared in a single header file, included in both stages
  */
-#pragma DATA_SECTION(ibl, ".ibl_config_table")
-ibl_t ibl;
+#include "iblStage.h"
 
-
-/**
- * @brief The ibl status table is declared.
- *  
- * @details
- *   The ibl status table is declared. It is initialized at run time
- *   in function main.
- */
-#pragma DATA_SECTION(iblStatus, ".ibl_status_table")
-iblStatus_t iblStatus;
 
 
 /* Eat printfs */
@@ -151,9 +136,6 @@ void main (void)
 
     }
 
-
-    /* Pll configuration is device specific */
-    devicePllConfig ();
 
     /* DDR configuration is device specific */
     deviceDdrConfig ();
