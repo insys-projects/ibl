@@ -22,6 +22,8 @@
 #define	SWPLL	276
 #define	DEV_ADDR_EXT	277
 #define	DEV_ADDR	278
+#define	LAYOUT	279
+#define	ALIGN	280
 
 
 extern YYSTYPE yylval;

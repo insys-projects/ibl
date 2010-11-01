@@ -39,6 +39,12 @@ export TARGET
 
 $(TARGETS): iblMain
 
+i2cRom:
+	../util/romparse/romparse $(COMPACT) ibl_$(TARGET)/i2crom.map
+	$(CP) i2crom.ccs ibl_$(TARGET)/i2crom.ccs
+	$(CP) i2crom.ccs ibl_$(TARGET)/i2crom.dat
+	$(RM) i2crom.ccs ibl_le.b ibl.b
+
 
 # For the init code a raw image is created as well as the i2c code to verify
 # endian independent code is generated. The symbols required for linking
@@ -54,7 +60,7 @@ iblInit: $(MODULES) utils
 	../util/bconvert/bconvert64x -$(IEXT) ibl_le.b ibl.b
 	$(CP) ibl.b ibl_$(TARGET)
 	../util/btoccs/b2i2c ibl_$(TARGET)/ibl.b ibl_$(TARGET)/ibl.i2c.b
-	../util/btoccs/b2ccs ibl_$(TARGET)/ibl.i2c.b ibl_$(TARGET)/ibl.i2c.$(IEXT).ccs
+	../util/btoccs/b2ccs ibl_$(TARGET)/ibl.i2c.b ibl_$(TARGET)/ibl_init.i2c.$(IEXT).ccs
 
 	bash ../util/symExtract/symExtract ibl_$(TARGET)/ibl_$(TARGET)_init.map ibl_$(TARGET)/ibl_init_symbols.inc $(COMMON_SYMBOLS)
 
@@ -66,10 +72,6 @@ iblMain: iblInit $(MODULES)
 	$(CP) ibl.b ibl_$(TARGET)
 	../util/btoccs/b2i2c ibl_$(TARGET)/ibl.b ibl_$(TARGET)/ibl.i2c.b
 	../util/btoccs/b2ccs ibl_$(TARGET)/ibl.i2c.b ibl_$(TARGET)/ibl.i2c.$(IEXT).ccs
-	../util/romparse/romparse $(COMPACT) ibl_$(TARGET)/i2crom_$(IEXT).map
-	$(CP) i2crom.ccs ibl_$(TARGET)/i2crom_$(IEXT).ccs
-	$(CP) i2crom.ccs ibl_$(TARGET)/i2crom_$(IEXT).dat
-	$(RM) i2crom.ccs ibl_le.b ibl.b
 
 
 $(MODULES):
