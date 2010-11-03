@@ -161,6 +161,13 @@ void iblSwap (void)
         ibl.sgmiiConfig[i].auxConfig     = swap32val (ibl.sgmiiConfig[i].auxConfig);
     }
 
+    ibl.mdioConfig.nMdioOps   = swap16val (ibl.mdioConfig.nMdioOps);
+    ibl.mdioConfig.mdioClkDiv = swap16val (ibl.mdioConfig.mdioClkDiv);
+    ibl.mdioConfig.interDelay = swap32val (ibl.mdioConfig.interDelay);
+
+    for (i = 0; i < ibl_N_MDIO_CFGS; i++)
+        ibl.mdioConfig.mdio[i] = swap32val (ibl.mdioConfig.mdio[i]);
+
     ibl.nandConfig.nandPriority       = swap32val (ibl.nandConfig.nandPriority);
     ibl.nandConfig.bootFormat         = swap32val (ibl.nandConfig.bootFormat);
     ibl.nandConfig.blob.startAddress  = swap32val (ibl.nandConfig.blob.startAddress);
