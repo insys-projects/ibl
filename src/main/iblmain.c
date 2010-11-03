@@ -101,31 +101,6 @@ void main (void)
     /* Initialize the system timer (software tracking of the hardware timer state) */
     timer_init ();
 
-
-
-    /* Load the default configuration table from the i2c. The actual speed of the device
-     * isn't really known here, since it is part of the table, so a compile time
-     * value is used (the pll may have been configured during the initial load) */
-    hwI2Cinit (IBL_I2C_DEV_FREQ_MHZ,        /* The CPU frequency during I2C data load */
-               DEVICE_I2C_MODULE_DIVISOR,   /* The divide down of CPU that drives the i2c */
-               IBL_I2C_CLK_FREQ_KHZ,        /* The I2C data rate used during table load */
-               IBL_I2C_OWN_ADDR);           /* The address used by this device on the i2c bus */
-
-    if (hwI2cMasterRead (IBL_I2C_CFG_TABLE_DATA_ADDR,    /* The address on the eeprom of the table */
-                         sizeof(ibl_t),                  /* The number of bytes to read */
-                         (UINT8 *)&ibl,                  /* Where to store the bytes */
-                         IBL_I2C_CFG_EEPROM_BUS_ADDR,    /* The bus address of the eeprom */
-                         IBL_I2C_CFG_ADDR_DELAY)         /* The delay between sending the address and reading data */
-
-         != I2C_RET_OK)  {
-
-       /* There is no recovery if the load of the configuration table failed */
-       iblStatus.tableLoadFail = 0x11111111;
-       for (;;);
-
-    }
-
-
     /* Load default mac addresses for ethernet boot if requested */
     for (i = 0; i < ibl_N_ETH_PORTS; i++)  {
 

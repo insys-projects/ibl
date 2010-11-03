@@ -70,6 +70,9 @@ void iblBootBtbl (BOOT_MODULE_FXN_TABLE *bootFxn, Uint32 *entry_point)
 
         switch (tiBootTable.state)  {
 
+            case BOOT_TBL_STATE_PAD:   readSize = 2;
+                                       break;
+
             case BOOT_TBL_STATE_INIT:  
             case BOOT_TBL_STATE_SIZE:  
             case BOOT_TBL_STATE_ADDR:  readSize = 4;

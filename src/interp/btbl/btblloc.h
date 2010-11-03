@@ -36,7 +36,8 @@ typedef UINT16 BOOT_TBL_STATE_T;
 #define BOOT_TBL_STATE_SIZE         3
 #define BOOT_TBL_STATE_ADDR         4 
 #define BOOT_TBL_STATE_DATA         5 
-#define BOOT_TBL_STATE_FLUSH        6 
+#define BOOT_TBL_STATE_PAD          6
+#define BOOT_TBL_STATE_FLUSH        7 
 #define BOOT_TBL_LAST_STATE         BOOT_TBL_STATE_FLUSH
 #define BOOT_TBL_NUM_STATES         (BOOT_TBL_LAST_STATE + 1)
 

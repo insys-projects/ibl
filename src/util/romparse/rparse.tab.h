@@ -24,6 +24,8 @@
 #define	DEV_ADDR	278
 #define	LAYOUT	279
 #define	ALIGN	280
+#define	PAD	281
+#define	LENGTH	282
 
 
 extern YYSTYPE yylval;

@@ -1,6 +1,7 @@
 /* Lexical analyzer for the eeprom boot builder */
 %{
 #include "rparse.tab.h"
+extern int line;
 %}
 %%
 
@@ -10,6 +11,7 @@
 
 section           { yylval = SECTION;           rBegin(SECTION); return (SECTION);           }
 layout			  { yylval = LAYOUT;			rBegin(LAYOUT);  return (LAYOUT);			 }
+pad				  { yylval = PAD;				rBegin(PAD);     return (PAD);				 }
 boot_mode         { yylval = BOOT_MODE;                          return (BOOT_MODE);         }
 param_index       { yylval = PARAM_INDEX;                        return (PARAM_INDEX);       }
 options           { yylval = OPTIONS;                            return (OPTIONS);           }
@@ -26,6 +28,7 @@ next_dev_addr_ext { yylval = NEXT_DEV_ADDR_EXT;                  return (NEXT_DE
 address_delay     { yylval = ADDRESS_DELAY;                      return (ADDRESS_DELAY);     }
 sw_pll			  { yylval = SWPLL;				                 return (SWPLL);			 }
 align			  { yylval = ALIGN;							     return (ALIGN);             }
+len				  { yylval = LENGTH;							 return (LENGTH);			 }
 
 
 [0-9]+ 		 { yylval = atoi(yytext); return (VALUE);  }
@@ -34,7 +37,7 @@ align			  { yylval = ALIGN;							     return (ALIGN);             }
 \".*\"		return (STRING);
 
 [ \t]+		;
-[\n]		;
+[\n]		line++ ;
 
 %%
 

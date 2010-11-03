@@ -20,127 +20,39 @@
 
 ibl_t ibl;
 
-#define SETIP(array,i0,i1,i2,i3)      array[0]=(i0);  \
-                                      array[1]=(i1);  \
-                                      array[2]=(i2);  \
-                                      array[3]=(i3)
 
 /**
- * @brief  The desired ibl configuration is setup here. Edit the fields
- *         to match the desired setup.
+ *  @brief
+ *      Ones complement addition
  */
-
-#if 0
-void setupTable (void)
+inline uint16 onesComplementAdd (uint16 value1, uint16 value2)
 {
+  uint32 result;
 
-    /* Initialize the table */
-    memset (&ibl, 0, sizeof (ibl_t));
+  result = (uint32)value1 + (uint32)value2;
 
-    ibl.iblMagic = ibl_MAGIC_VALUE;
-
-    ibl.pllConfig[ibl_MAIN_PLL].doEnable      = TRUE;
-    ibl.pllConfig[ibl_MAIN_PLL].prediv        = 1;
-    ibl.pllConfig[ibl_MAIN_PLL].mult          = 28;
-    ibl.pllConfig[ibl_MAIN_PLL].postdiv       = 1;
-    ibl.pllConfig[ibl_MAIN_PLL].pllOutFreqMhz = 700;
-
-    /* The DDR PLL. The multipliers/dividers are fixed, so are really dont cares */
-    ibl.pllConfig[ibl_DDR_PLL].doEnable = TRUE;
-
-    /* The network PLL. The multipliers/dividers are fixed */
-    ibl.pllConfig[ibl_NET_PLL].doEnable = TRUE;
-
-    /* EMIF configuration. The values are for DDR at 533 MHz  */
-    ibl.ddrConfig.configDdr = TRUE;
-
-    ibl.ddrConfig.uEmif.emif3p1.sdcfg  = 0x00538832; /* timing, 32bit wide */
-    ibl.ddrConfig.uEmif.emif3p1.sdrfc  = 0x0000073B; /* Refresh 533Mhz */ 
-    ibl.ddrConfig.uEmif.emif3p1.sdtim1 = 0x47245BD2; /* Timing 1 */
-    ibl.ddrConfig.uEmif.emif3p1.sdtim2 = 0x0125DC44; /* Timing 2 */
-    ibl.ddrConfig.uEmif.emif3p1.dmcctl = 0x50001906; /* PHY read latency for CAS 5 is 5 + 2 - 1 */
-
-    /* Ethernet configuration for port 0 */
-    ibl.ethConfig[0].ethPriority      = ibl_HIGHEST_PRIORITY;
-    ibl.ethConfig[0].port             = 0;
-
-    /* Bootp is disabled. The server and file name are provided here */
-    ibl.ethConfig[0].doBootp          = FALSE;
-    ibl.ethConfig[0].useBootpServerIp = FALSE;
-    ibl.ethConfig[0].useBootpFileName = FALSE;
-    ibl.ethConfig[0].bootFormat       = ibl_BOOT_FORMAT_BBLOB;
-
-#if 0
-    SETIP(ibl.ethConfig[0].ethInfo.ipAddr,    192,168,2,100);
-    SETIP(ibl.ethConfig[0].ethInfo.serverIp,  192,168,2,110);
-    SETIP(ibl.ethConfig[0].ethInfo.gatewayIp, 192,168,2,2);
-    SETIP(ibl.ethConfig[0].ethInfo.netmask,   255,255,255,0);
-#endif
-    SETIP(ibl.ethConfig[0].ethInfo.ipAddr,    10,218,109,35);
-    SETIP(ibl.ethConfig[0].ethInfo.serverIp,  10,218,109,196);
-    SETIP(ibl.ethConfig[0].ethInfo.gatewayIp, 10,218,109,1);
-    SETIP(ibl.ethConfig[0].ethInfo.netmask,   255,255,255,0);
-
-    /* Leave the hardware address as 0 so the e-fuse value will be used */
-
-    strcpy (ibl.ethConfig[0].ethInfo.fileName, "test.blob");
-
-    /* Even though the entire range of DDR2 is chosen, the load will
-     * stop when the ftp reaches the end of the file */
-    ibl.ethConfig[0].blob.startAddress  = 0xe0000000;       /* Base address of DDR2 */
-    ibl.ethConfig[0].blob.sizeBytes     = 0x20000000;       /* All of DDR2 */
-    ibl.ethConfig[0].blob.branchAddress = 0xe0000000;       /* Base of DDR2 */
-
-    /* For port 1 use bootp */
-    /* Ethernet configuration for port 0 */
-    ibl.ethConfig[1].ethPriority      = ibl_HIGHEST_PRIORITY + 1;
-    ibl.ethConfig[1].port             = 1;
-
-    /* Bootp is disabled. The server and file name are provided here */
-    ibl.ethConfig[1].doBootp          = TRUE;
-    ibl.ethConfig[1].useBootpServerIp = TRUE;
-    ibl.ethConfig[1].useBootpFileName = TRUE;
-    ibl.ethConfig[1].bootFormat       = ibl_BOOT_FORMAT_BBLOB;
-
-
-    /* SGMII */
-
-
-    /* Leave the hardware address as 0 so the e-fuse value will be used */
-    /* Leave all remaining fields as 0 since bootp will fill them in */
-
-
-    /* Even though the entire range of DDR2 is chosen, the load will
-     * stop when the ftp reaches the end of the file */
-    ibl.ethConfig[1].blob.startAddress  = 0xe0000000;       /* Base address of DDR2 */
-    ibl.ethConfig[1].blob.sizeBytes     = 0x20000000;       /* All of DDR2 */
-    ibl.ethConfig[1].blob.branchAddress = 0xe0000000;       /* Base of DDR2 */
-    
-
-
-    /* MDIO configuration */
-    ibl.mdioConfig.nMdioOps = 8;
-    ibl.mdioConfig.mdioClkDiv = 0x20;
-    ibl.mdioConfig.interDelay = 1400;   /* ~2ms at 700 MHz */
-
-    ibl.mdioConfig.mdio[0] =  (1 << 30) | (27 << 21) | (24 << 16) | 0x848b;
-    ibl.mdioConfig.mdio[1] =  (1 << 30) | (20 << 21) | (24 << 16) | 0x0ce0;
-    ibl.mdioConfig.mdio[2] =  (1 << 30) | (24 << 21) | (24 << 16) | 0x4101;
-    ibl.mdioConfig.mdio[3] =  (1 << 30) | ( 0 << 21) | (24 << 16) | 0x9140;
-
-    ibl.mdioConfig.mdio[4] =  (1 << 30) | (27 << 21) | (25 << 16) | 0x848b;
-    ibl.mdioConfig.mdio[5] =  (1 << 30) | (20 << 21) | (25 << 16) | 0x0ce0;
-    ibl.mdioConfig.mdio[6] =  (1 << 30) | (24 << 21) | (25 << 16) | 0x4101;
-    ibl.mdioConfig.mdio[7] =  (1 << 30) | ( 0 << 21) | (25 << 16) | 0x9140;
-
-
-    /* Nand boot is disabled */
-    ibl.nandConfig.nandPriority = ibl_DEVICE_NOBOOT;
-
+  result = (result >> 16) + (result & 0xFFFF); /* add in carry   */
+  result += (result >> 16);                    /* maybe one more */
+  return ((uint16)result);
 }
 
-#endif
 
+/**
+ *  @brief
+ *      Ones complement checksum computation 
+ */
+uint16 onesComplementChksum (uint16 * restrict p_data, uint16 len)
+{
+  uint16 chksum = 0;
+
+  while (len > 0)
+  {
+    chksum = onesComplementAdd(chksum, *p_data);
+    p_data++;
+    len--;
+  }
+  return (chksum);
+} 
 
 /**
  *  @brief
@@ -222,6 +134,7 @@ void main (void)
     char     iline[132];
     Int32    n; 
     Int32    currentOffset;
+    uint16   chk; 
 
     volatile Int32 i;
 
@@ -231,7 +144,7 @@ void main (void)
     /* Program the main system PLL */
     hwPllSetPll (MAIN_PLL,      
                  ibl.pllConfig[ibl_MAIN_PLL].prediv,         /* Pre-divider  */
-                 ibl.pllConfig[ibl_MAIN_PLL].pllOutFreqMhz,  /* Multiplier   */
+                 ibl.pllConfig[ibl_MAIN_PLL].mult,           /* Multiplier   */
                  ibl.pllConfig[ibl_MAIN_PLL].postdiv);       /* Post-divider */
 
 
@@ -240,6 +153,14 @@ void main (void)
                IBL_I2C_CLK_FREQ_KHZ/8,                     /* The I2C data rate used during table load. Slowed for writes */
                IBL_I2C_OWN_ADDR);                          /* The address used by this device on the i2c bus */
 
+
+    /* Compute the checksum over the ibl configuration structure */
+    ibl.chkSum = 0;
+    chk = onesComplementChksum ((uint16 *)&ibl, sizeof(ibl_t)/sizeof(uint16));
+    if (ibl.chkSum != 0xffff)
+      ibl.chkSum = ~chk;
+
+    
 
     /* Block the data into 64 byte blocks aligned on 64 byte boundaries for the data write.
      * The block address is prepended to the data block before writing */

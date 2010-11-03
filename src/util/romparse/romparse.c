@@ -28,6 +28,11 @@
 extern FILE *yyin;
 
 /*************************************************************************************
+ * Declaration: Keep track of lines in the parse
+ *************************************************************************************/
+int line = 1;
+
+/*************************************************************************************
  * Declaration: currentType identifies the current parse mode, either SECTION
  *              or LAYOUT.
  *************************************************************************************/
@@ -47,7 +52,13 @@ int           max_index    =  0;  /* maximum table index, used for compacting ou
  * Declaration: Layout tables. 
  ************************************************************************************/
 layout_t  layouts[MAX_LAYOUTS];   /* Array of layout structures */                
-int       currentLayout = 0;      /* Currently active layout    */
+int       currentLayout;          /* Currently active layout    */
+
+/************************************************************************************
+ * Declaration: Pads
+ ************************************************************************************/
+pad_t pads[MAX_PADS];             /* Array of pad structures */
+int   currentPad;                 /* Currently active pad    */
 
 /************************************************************************************
  * Declaration: The structure storing the program data files, and the number of
@@ -61,6 +72,12 @@ int        nProgFiles = 0;
  ************************************************************************************/
 pciFile_t pciFile;
 int       pciSet = 0;
+
+/*************************************************************************************
+ * Declaration: The array that tracks the ordering of pad and layout structures
+ *************************************************************************************/
+padLayoutOrder_t padLayoutOrder[MAX_PADS+MAX_LAYOUTS];
+int currentPL = 0;
 
 /*************************************************************************************
  * Declaration: The next free address in the ROM for general data usage. For the
@@ -86,7 +103,7 @@ int   compact = 0;
  *************************************************************************************/
 void yyerror (char *s)
 {
-  fprintf (stderr, "flex/bison error is %s\n", s);
+  fprintf (stderr, "flex/bison error is %s at line %d\n", s, line);
 } /* yyerror */
 
 void yywrap (void)
@@ -170,6 +187,11 @@ void setLayout (void)
       progFile[layouts[currentLayout].file[i]].align = newAlign;
 
   }
+
+
+  padLayoutOrder[currentPL].type  = LAYOUT;
+  padLayoutOrder[currentPL].index = currentLayout;
+  currentPL += 1;
     
   currentLayout += 1;      /* Advance to the next layout */
 
@@ -177,7 +199,38 @@ void setLayout (void)
     initLayout (&layouts[currentLayout]);
 
 }    
-    
+
+/*************************************************************************************
+ * FUNCTION PURPOSE: Initialize a pad structure
+ *************************************************************************************
+ * DESCRIPTION: A pad structure is set to the default state
+ *************************************************************************************/
+void initPad (pad_t *p)
+{
+  p->address = 0;
+  p->len     = 0;
+}
+
+
+/**************************************************************************************
+ * FUNCTION PURPOSE: Complete a pad
+ **************************************************************************************
+ * DESCRIPTION: The parser has found a complete pad specification. Complete the pad
+ *              structure
+ **************************************************************************************/
+void setPad (void)
+{
+
+  padLayoutOrder[currentPL].type  = PAD;
+  padLayoutOrder[currentPL].index = currentPad;
+  currentPL += 1;
+
+  currentPad += 1;
+
+  if (currentPad < MAX_PADS)
+    initPad (&pads[currentPad]);
+
+}
 
 
 /*************************************************************************************
@@ -334,70 +387,118 @@ int setPciParams (char *fname)
 void assignKeyVal (int field, int value)
 {
 
-  if ((currentType == SECTION) && (currentLayout >= MAX_LAYOUTS))  {
-    fprintf (stderr, "romparse: Too many layout sections (max = %d\n", MAX_LAYOUTS);
-    return;
-  }
+  switch (currentType)   {
 
 
+    case SECTION:
 
-  switch (field)  {
 
-    case BOOT_MODE:        current_table.common.boot_mode = value;
-                           break;
+      switch (field)  {
 
-    case PARAM_INDEX:      ctable_index = value;
-                           break;
+        case BOOT_MODE:        current_table.common.boot_mode = value;
+                               break;
 
-    case OPTIONS:          current_table.i2c.options = value;
-                           break;
+        case PARAM_INDEX:      ctable_index = value;
+                               break;
 
-    case MULTI_I2C_ID:     current_table.i2c.multi_i2c_id = value;
-                           break;
+        case OPTIONS:          current_table.i2c.options = value;
+                               break;
 
-    case MY_I2C_ID:        current_table.i2c.my_i2c_id = value;
-                           break;
+        case MULTI_I2C_ID:     current_table.i2c.multi_i2c_id = value;
+                               break;
 
-    case CORE_FREQ_MHZ:    current_table.i2c.core_freq_mhz = value;
-                           break;
+        case MY_I2C_ID:        current_table.i2c.my_i2c_id = value;
+                               break;
 
-    case I2C_CLK_FREQ_KHZ: current_table.i2c.i2c_clk_freq_khz = value;
-                           break;
+        case CORE_FREQ_MHZ:    current_table.i2c.core_freq_mhz = value;
+                               break;
 
-    case NEXT_DEV_ADDR:    current_table.i2c.next_dev_addr = value;
-                           break;
+        case I2C_CLK_FREQ_KHZ: current_table.i2c.i2c_clk_freq_khz = value;
+                               break;
+
+        case NEXT_DEV_ADDR:    current_table.i2c.next_dev_addr = value;
+                               break;
                                
 
-    case NEXT_DEV_ADDR_EXT: current_table.i2c.next_dev_addr_ext = value;
-                            break;
+        case NEXT_DEV_ADDR_EXT: current_table.i2c.next_dev_addr_ext = value;
+                                break;
 
-    case ADDRESS_DELAY:    current_table.i2c.address_delay = value;
-                           break;
+        case ADDRESS_DELAY:    current_table.i2c.address_delay = value;
+                               break;
 
 #ifndef c6455         
-    case SWPLL:            current_table.i2c.swPll = value;
-                           break;
+        case SWPLL:            current_table.i2c.swPll = value;
+                               break;
 #endif
 
-    case DEV_ADDR_EXT:     if (currentType == SECTION)
-                             current_table.i2c.dev_addr_ext = value;
-                           else 
-                             layouts[currentLayout].dev_addr = value;
+        case DEV_ADDR_EXT:     current_table.i2c.dev_addr_ext = value;
+                               break;
 
+        case DEV_ADDR:         current_table.i2c.dev_addr = value;
+                               break;
+
+
+        default:
+            fprintf (stderr, "romparse: Invalid assignment in section specification (line %d)\n", line);
+            break;
+
+      }
+
+      break;
+
+
+    case LAYOUT:
+
+      if (currentLayout >= MAX_LAYOUTS)  { 
+        fprintf (stderr, "romparse: Too many layout sections (max = %d)\n", MAX_LAYOUTS);
+        exit (-1);
+      }
+
+
+      switch (field)  {
+
+        case DEV_ADDR_EXT: layouts[currentLayout].dev_addr = value;
                            break;
 
-    case DEV_ADDR:         if (currentType == SECTION) 
-                             current_table.i2c.dev_addr = value;
-                           else
-                             layouts[currentLayout].address = value;
-
+        case DEV_ADDR:     layouts[currentLayout].address = value;
                            break;
 
-    case ALIGN:            layouts[currentLayout].align = value;
+        case ALIGN:        layouts[currentLayout].align = value;
                            break;
 
 
-  }
+        default:
+            fprintf (stderr, "romparase: Invalid assignment in layout specification (line %d)\n", line);
+            break;
+
+      }
+      break;
+
+
+    case PAD:
+
+      if (currentPad >= MAX_PADS)  {
+        fprintf (stderr, "romparse: Too many pad sections (max = %d)\n", MAX_PADS);
+        exit (-1);
+      }
+
+      switch (field)  {
+
+        case DEV_ADDR:  pads[currentPad].address = value;
+                        break;
+
+        case LENGTH:    pads[currentPad].len = value;
+                        break;
+
+        default:
+          fprintf (stderr, "romparse: Invalid assignment in pad specificaiton (line %d)\n", line);
+          break;
+
+      }
+      break;
+
+   }
+
 
 } /* assignKeyVal */
 
@@ -562,39 +663,54 @@ void createOutput (void)
   if (pciSet)
     base = base + PCI_EEAI_PARAM_SIZE;
 
-  /* Layout tables */
-  for (i = 0; i < currentLayout; i++)  {
 
-    /* Determine the size of the table. Four bytes for each file, plus the 4 byte header */ 
-    v1 = (layouts[i].nFiles * 4) + 4;
+  /* Pad, layout tables */
+  for (i = 0; i < currentPL; i++)  {
 
-    v2 = (layouts[i].dev_addr << 16) + layouts[i].address;
+    j = padLayoutOrder[i].index;
 
-    if (v2 == 0)
-      base = base + v1;
+    if (padLayoutOrder[i].type == LAYOUT)  {
 
-    else  {
+      /* Determine the size of the table. Four bytes for each file, plus the 4 byte header */ 
+      v1 = (layouts[j].nFiles * 4) + 4;
 
-      /* Mask out device address bits but extend past 64k */
-      v2 = v2 & I2C_ADDR_MASK;
+      v2 = (layouts[j].dev_addr << 16) + layouts[j].address;
 
-      if (base > v2)  {
-        fprintf (stderr, "romparse: fatal error - layout block %d specified a start address of 0x%04x\n", i, layouts[i].address);
+      if (v2 == 0)
+        base = base + v1;
+
+      else  {
+
+        /* Mask out device address bits but extend past 64k */
+        v2 = v2 & I2C_ADDR_MASK;
+
+        if (base > v2)  {
+          fprintf (stderr, "romparse: fatal error - layout block %d specified a start address of 0x%04x\n", j, layouts[j].address);
+          fprintf (stderr, "          but this conflicts with the base mapping (ends at 0x%04x)\n", base);
+          exit (-1);
+        }
+
+        base = layouts[j].address + v1;
+
+
+      }  
+    }  else  {   /* Otherwise this is a pad */
+
+      if (base > pads[j].address)  {
+        fprintf (stderr, "romparse: fatal error - pad block %d specified a start address of 0x%04x\n", j, pads[j].address);
         fprintf (stderr, "          but this conflicts with the base mapping (ends at 0x%04x)\n", base);
         exit (-1);
       }
 
-      base = layouts[i].address + v1;
+      base = pads[j].address + pads[j].len;
 
     }
-
   }
-
 
   for (i = 0; i < NUM_BOOT_PARAM_TABLES; i++)  {
     if (progFile[i].align > 0)  
       base = ((base + progFile[i].align - 1) / progFile[i].align) * progFile[i].align;
-    progFile[i].addressBytes = base;
+    progFile[i].addressBytes = base + (0x50 << 16);  /* For now hard code the base address */
     base = base + progFile[i].sizeBytes;
   }
 
@@ -603,7 +719,7 @@ void createOutput (void)
   for (i = 0; i < NUM_BOOT_PARAM_TABLES; i++)  {
     for (j = 0; j < NUM_BOOT_PARAM_TABLES; j++)  {
       if (progFile[i].tag[j] >= 0)
-        boot_params[progFile[i].tag[j]].i2c.dev_addr = progFile[i].addressBytes;
+        boot_params[progFile[i].tag[j]].i2c.dev_addr = (progFile[i].addressBytes & 0xffff);
     }
   }
 
@@ -669,7 +785,7 @@ void createOutput (void)
   /* Write out each of the program files */
   for (i = 0; i < nProgFiles; i++)  {
 
-    base = imagePad (base, image, progFile[i].addressBytes);
+    base = imagePad (base, image, (progFile[i].addressBytes & I2C_ADDR_MASK));
 
     for (j = 0; j < progFile[i].sizeBytes >> 2; j++)
       base = imageWord (base, image, (progFile[i]).data[j]);

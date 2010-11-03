@@ -1,6 +1,5 @@
 
-i2cWrite.oc
-../../hw/c64x/make/i2c.oc
+/* Object file list provided in linker invokation */
 
 -c
 -a
@@ -9,9 +8,9 @@ i2cWrite.oc
 
 MEMORY
 {
-	I2C_DAT  :  origin = 0x800000  length = 0x10000
-	I2C_READ :  origin = 0x810000  length = 0x10000
-	L2       :  origin = 0x820000  length = 0x10000
+	I2C_DAT  :  origin = 0x800000  length = 0x20000
+	I2C_READ :  origin = 0x820000  length = 0x20000
+	L2       :  origin = 0x840000  length = 0x10000
 
 }
 

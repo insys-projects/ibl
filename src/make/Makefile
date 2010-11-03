@@ -25,6 +25,7 @@ export DEBUG
 $(IBLS_C6X):
 	make -f makestg2 ARCH=c64x TARGET=$@ ENDIAN=big    $@ 
 	make -f makestg2 ARCH=c64x TARGET=$@ ENDIAN=little $@ 
+	make -f makestg2 ARCH=c64x TARGET=$@               compare
 	make -f makestg2 ARCH=c64x TARGET=$@               i2cRom
 
 

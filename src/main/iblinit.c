@@ -106,16 +106,83 @@ uint32 swap32val (uint32 v)
 
 /**
  *  @brief
- *      Swap an array of 32 bit values
+ *      Do a 2 byte endian swap
  */
-void swap32mem (uint32 *pv, int32 nwords)
+uint16 swap16val (uint16 v)
 {
-    int32 i;
+    v = (((v >> 8) & 0xff) << 0)  |
+        (((v >> 0) & 0xff) << 8);
 
-    for (i = 0; i < nwords; i++)
-        pv[i] = swap32val (pv[i]);
+    return (v);
 
 }
+
+/**
+ *  @brief
+ *  Do an endian swap on the ibl structure
+ */
+void iblSwap (void)
+{
+    int i;
+
+    ibl.iblMagic = swap32val (ibl.iblMagic);
+
+    for (i = 0; i < ibl_N_PLL_CFGS; i++)  {
+        ibl.pllConfig[i].doEnable      = swap16val (ibl.pllConfig[i].doEnable);
+        ibl.pllConfig[i].prediv        = swap32val (ibl.pllConfig[i].prediv);
+        ibl.pllConfig[i].mult          = swap32val (ibl.pllConfig[i].mult);
+        ibl.pllConfig[i].postdiv       = swap32val (ibl.pllConfig[i].postdiv);
+        ibl.pllConfig[i].pllOutFreqMhz = swap32val (ibl.pllConfig[i].pllOutFreqMhz);
+    }
+
+    ibl.ddrConfig.configDdr = swap16val (ibl.ddrConfig.configDdr);
+
+    ibl.ddrConfig.uEmif.emif3p1.sdcfg  = swap32val(ibl.ddrConfig.uEmif.emif3p1.sdcfg);
+    ibl.ddrConfig.uEmif.emif3p1.sdrfc  = swap32val(ibl.ddrConfig.uEmif.emif3p1.sdrfc);
+    ibl.ddrConfig.uEmif.emif3p1.sdtim1 = swap32val(ibl.ddrConfig.uEmif.emif3p1.sdtim1);
+    ibl.ddrConfig.uEmif.emif3p1.sdtim2 = swap32val(ibl.ddrConfig.uEmif.emif3p1.sdtim2);
+    ibl.ddrConfig.uEmif.emif3p1.dmcctl = swap32val(ibl.ddrConfig.uEmif.emif3p1.dmcctl);
+
+    for (i = 0; i < ibl_N_ETH_PORTS; i++)  {
+        ibl.ethConfig[i].ethPriority        = swap32val (ibl.ethConfig[i].ethPriority);
+        ibl.ethConfig[i].port               = swap32val (ibl.ethConfig[i].port);
+        ibl.ethConfig[i].doBootp            = swap16val (ibl.ethConfig[i].doBootp);
+        ibl.ethConfig[i].useBootpServerIp   = swap16val (ibl.ethConfig[i].useBootpServerIp);
+        ibl.ethConfig[i].useBootpFileName   = swap16val (ibl.ethConfig[i].useBootpFileName);
+        ibl.ethConfig[i].bootFormat         = swap32val (ibl.ethConfig[i].bootFormat);
+        ibl.ethConfig[i].blob.startAddress  = swap32val (ibl.ethConfig[i].blob.startAddress);
+        ibl.ethConfig[i].blob.sizeBytes     = swap32val (ibl.ethConfig[i].blob.sizeBytes);
+        ibl.ethConfig[i].blob.branchAddress = swap32val (ibl.ethConfig[i].blob.branchAddress);
+
+        ibl.sgmiiConfig[i].adviseAbility = swap32val (ibl.sgmiiConfig[i].adviseAbility);
+        ibl.sgmiiConfig[i].control       = swap32val (ibl.sgmiiConfig[i].control);
+        ibl.sgmiiConfig[i].txConfig      = swap32val (ibl.sgmiiConfig[i].txConfig);
+        ibl.sgmiiConfig[i].rxConfig      = swap32val (ibl.sgmiiConfig[i].rxConfig);
+        ibl.sgmiiConfig[i].auxConfig     = swap32val (ibl.sgmiiConfig[i].auxConfig);
+    }
+
+    ibl.nandConfig.nandPriority       = swap32val (ibl.nandConfig.nandPriority);
+    ibl.nandConfig.bootFormat         = swap32val (ibl.nandConfig.bootFormat);
+    ibl.nandConfig.blob.startAddress  = swap32val (ibl.nandConfig.blob.startAddress);
+    ibl.nandConfig.blob.sizeBytes     = swap32val (ibl.nandConfig.blob.sizeBytes);
+    ibl.nandConfig.blob.branchAddress = swap32val (ibl.nandConfig.blob.branchAddress);
+
+    ibl.nandConfig.nandInfo.busWidthBits  = swap32val (ibl.nandConfig.nandInfo.busWidthBits);
+    ibl.nandConfig.nandInfo.pageSizeBytes = swap32val (ibl.nandConfig.nandInfo.pageSizeBytes);
+    ibl.nandConfig.nandInfo.pageEccBytes  = swap32val (ibl.nandConfig.nandInfo.pageEccBytes);
+    ibl.nandConfig.nandInfo.pagesPerBlock = swap32val (ibl.nandConfig.nandInfo.pagesPerBlock);
+    ibl.nandConfig.nandInfo.totalBlocks   = swap32val (ibl.nandConfig.nandInfo.totalBlocks);
+    ibl.nandConfig.nandInfo.addressBytes  = swap32val (ibl.nandConfig.nandInfo.addressBytes);
+    ibl.nandConfig.nandInfo.lsbFirst      = swap16val (ibl.nandConfig.nandInfo.lsbFirst);
+    ibl.nandConfig.nandInfo.blockOffset   = swap32val (ibl.nandConfig.nandInfo.blockOffset);
+    ibl.nandConfig.nandInfo.pageOffset    = swap32val (ibl.nandConfig.nandInfo.pageOffset);
+    ibl.nandConfig.nandInfo.columnOffset  = swap32val (ibl.nandConfig.nandInfo.columnOffset);
+    ibl.nandConfig.nandInfo.postCommand   = swap16val (ibl.nandConfig.nandInfo.postCommand);
+
+    ibl.chkSum = swap16val (ibl.chkSum);
+}
+
+        
 
 /**
  *  @brief
@@ -160,6 +227,10 @@ Uint8 i2cFifoRead(void)
     v = i2cData[i2cFifoOut];
 
     i2cFifoOut += 1;
+
+    if (i2cFifoOut == i2cFifoIn)
+        i2cFifoOut = i2cFifoIn = 0;
+
     if (i2cFifoOut >= I2C_MAX_BLOCK_SIZE)
         i2cFifoOut = 0;
 
@@ -319,7 +390,7 @@ void main (void)
 
                  if (ibl.chkSum != 0)  {
 
-                    v = onesComplementChksum ((UINT16 *)&ibl, sizeof(ibl_t));
+                    v = onesComplementChksum ((UINT16 *)&ibl, sizeof(ibl_t) / sizeof(UINT16));
                     if ((v != 0) && (v != 0xffff))  {
                         iblStatus.i2cRetries += 1;
                         continue;
@@ -332,7 +403,7 @@ void main (void)
                     break;
 
                 if (swap32val (ibl.iblMagic) == ibl_MAGIC_VALUE)  {
-                    swap32mem ((uint32 *)&ibl, (sizeof(ibl_t) + 3) >> 2);
+                    iblSwap ();
                     break;
                 }
 
@@ -359,8 +430,12 @@ void main (void)
                 /* On the I2C EEPROM the table is always formatted with the most significant
                  * byte first. So if the device is running little endain the endian must be
                  * swapped */
-                if (littleEndian == TRUE)
-                    swap32mem ((uint32 *)&map, (sizeof(iblI2cMap_t) + 3) >> 2);
+                if (littleEndian == TRUE)  {
+                    map.length = swap16val (map.length);
+                    map.chkSum = swap16val (map.chkSum);
+                    map.addrLe = swap32val (map.addrLe);
+                    map.addrBe = swap32val (map.addrBe);
+                }
 
                 if (map.length != sizeof(iblI2cMap_t))  {
                     iblStatus.mapSizeFail += 1;

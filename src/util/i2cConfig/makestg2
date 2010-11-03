@@ -13,6 +13,12 @@ ifndef IBL_ROOT
  IBL_ROOT=../..
 endif
 
+ifeq ($(ENDIAN),big)
+ IEXT=be
+else
+ IEXT=le
+endif
+
 ECODIR= $(IBL_ROOT)/util/i2cConfig
 
 MODULES= hw
@@ -45,7 +51,7 @@ CDEFS += -DIBL_I2C_CFG_EEPROM_BUS_ADDR=$(I2C_PARAM_BUS_ADDR)
 .PHONY: i2cparam.cmd
 
 $(DEVICES): gen_cdefdep $(MODULES) $(OBJS) i2cparam.cmd
-	$(LD) -o i2cparam_$(TARGET).out -m i2cparam_$(TARGET).map i2cparam.cmd $(RTLIBS)
+	$(LD) -o i2cparam_$(TARGET)_$(IEXT).out -m i2cparam_$(TARGET)_$(IEXT).map i2cparam.$(IEXT).oc ../../hw/c64x/make/i2c.$(IEXT).oc ../../hw/c64x/make/pll.$(IEXT).oc i2cparam.cmd $(RTLIBS)
 
 $(MODULES):
 	@echo making $@
@@ -67,7 +73,7 @@ $(OBJS): cdefdep
 
 gen_cdefdep:
 	@echo Checking command line dependencies
-	@echo $(ENDIAN) $(TARGET) $(ARCH) > cdefdep.tmp
+	@echo $(TARGET) $(ARCH) > cdefdep.tmp
 	@sh -c 'if diff -q cdefdep.tmp cdefdep ; then echo same ; else $(CP) cdefdep.tmp cdefdep ; fi '
 
 	

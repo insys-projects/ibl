@@ -6,7 +6,7 @@ extern char *yytext;
 %token LBRACE RBRACE SECTION EQU VALUE STRING BOOT_MODE PARAM_INDEX OPTIONS 
 %token MULTI_I2C_ID MY_I2C_ID CORE_FREQ_MHZ I2C_CLK_FREQ_KHZ 
 %token EXE_FILE PCI_PARMS NEXT_DEV_ADDR NEXT_DEV_ADDR_EXT ADDRESS_DELAY SWPLL
-%token DEV_ADDR_EXT DEV_ADDR LAYOUT ALIGN
+%token DEV_ADDR_EXT DEV_ADDR LAYOUT ALIGN PAD LENGTH
 %%
 
 promspec   : segment
@@ -15,6 +15,7 @@ promspec   : segment
 
 segment	   : bootParams
 		   | layout
+		   | pad
 		   ;
 
 bootParams : SECTION LBRACE assigns RBRACE
@@ -25,6 +26,10 @@ bootParams : SECTION LBRACE assigns RBRACE
 
 layout     : LAYOUT LBRACE assigns RBRACE
 			 { setLayout ();  }
+		   ;
+
+pad		   : PAD LBRACE assigns RBRACE
+		     { setPad ();  }
 		   ;
 
 
@@ -53,6 +58,7 @@ keyword    : BOOT_MODE		     {  $$=$1;  }
 		   | SWPLL				 {  $$=$1;  }
 		   | DEV_ADDR			 {  $$=$1;  }
 		   | ALIGN				 {  $$=$1;  }
+		   | LENGTH              {  $$=$1;  }
 		   ;
 
 %%

@@ -45,12 +45,20 @@ i2cRom:
 	$(CP) i2crom.ccs ibl_$(TARGET)/i2crom.dat
 	$(RM) i2crom.ccs ibl_le.b ibl.b
 
+# Target compare checks if the iblInit is compiled the same for both endians
+compare:
+	@echo -
+	@sh -c 'if diff -q ibl_$(TARGET)/ibl_init.le.ccs ibl_$(TARGET)/ibl_init.be.ccs ; then echo IBL init endian neutral ; else echo !!! WARNING !!!! IBL ini NOT endian neutral !!! ; fi '
+	@echo -
 
 # For the init code a raw image is created as well as the i2c code to verify
 # endian independent code is generated. The symbols required for linking
 # the full application are then extracted
 iblInit: $(MODULES) utils
+	cat ibl_$(TARGET)/ibl_init_objs_template.inc | sed -e s/ENDIAN_TAG/$(IEXT)/g > ibl_$(TARGET)/ibl_init_objs.inc
 	$(LD) -o ibl_$(TARGET)/ibl_$(TARGET)_init.out -m ibl_$(TARGET)/ibl_$(TARGET)_init.map ibl_$(TARGET)/ibl_init.cmd $(RTLIBS)
+	cp ibl_$(TARGET)/ibl_$(TARGET)_init.out ibl_$(TARGET)/ibl_$(TARGET)_init.$(IEXT).out
+	rm -f ibl_$(TARGET)/ibl_init_obj.inc
 
 	hex6x $(HEX_OPT) ibl_$(TARGET)/ibl_init_image.rmd ibl_$(TARGET)/ibl_$(TARGET)_init.out
 	$(CP) ibl_le.b ibl_$(TARGET)/ibl.b
@@ -66,7 +74,11 @@ iblInit: $(MODULES) utils
 
 	
 iblMain: iblInit $(MODULES)
-	$(LD) -o ibl_$(TARGET)/ibl_$(TARGET).out -m ibl_$(TARGET)/ibl_$(TARGET).map  ibl_$(TARGET)/ibl.cmd $(RTLIBS)
+	cat ibl_$(TARGET)/ibl_objs_template.inc | sed -e s/ENDIAN_TAG/$(IEXT)/g > ibl_$(TARGET)/ibl_objs.inc
+	$(LD) -o ibl_$(TARGET)/ibl_$(TARGET).out -m ibl_$(TARGET)/ibl_$(TARGET).$(IEXT).map  ibl_$(TARGET)/ibl.cmd $(RTLIBS)
+	cp ibl_$(TARGET)/ibl_$(TARGET).out ibl_$(TARGET)/ibl_$(TARGET).$(IEXT).out
+	rm -f ibl_$(TARGET)/ibl_obj.inc
+
 	hex6x $(HEX_OPT) ibl_$(TARGET)/ibl.rmd ibl_$(TARGET)/ibl_$(TARGET).out
 	../util/bconvert/bconvert64x -$(IEXT) ibl_le.b ibl.b
 	$(CP) ibl.b ibl_$(TARGET)
@@ -77,7 +89,6 @@ iblMain: iblInit $(MODULES)
 $(MODULES):
 	@echo making $@
 	make -C $(IBL_ROOT)/$@/$(ARCH)/make $@
-
 
 utils:
 	make -C $(IBL_ROOT)/util/btoccs

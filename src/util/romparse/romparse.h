@@ -71,4 +71,24 @@ typedef struct  {
 #define I2C_ADDR_MASK   0x0fffff
 
 
+/* Pad section. The pad section creates a gap in the i2c memory map */
+#define MAX_PADS        8
+typedef struct  {
+  unsigned int address;
+  unsigned int len;
+} pad_t;
+
+
+/* Layout/pad interleave. The rom specification must be in order, so this structure tracks
+ * the arrangement of layouts and pads */
+typedef struct
+{
+  int type;   /* Either PAD or LAYOUT */
+  int index;  /* The array index for the pad/layout */
+  
+} padLayoutOrder_t;
+
+
+
+
 #endif /* ROMPARSE_H */
