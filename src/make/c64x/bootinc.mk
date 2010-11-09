@@ -27,7 +27,7 @@ endif
 CFLAGS+= -ms2
 
 ifdef RTLIBS
-RTLIBS = $(TOOLSC6X)/cgtools/lib/rts6400.lib
+RTLIBS = $(TOOLSC6X)/lib/rts6400.lib
 endif
 
 # Rule to run splint. Form the splint

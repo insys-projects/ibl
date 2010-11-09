@@ -74,7 +74,7 @@ $(DEVICES):
 
 
 clean:
-	make -f makestg2 clean2 ARCH=c64x
+	make -f makestg2 clean2 ARCH=c64x  
 
 
 

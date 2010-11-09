@@ -81,6 +81,7 @@ TESTOBJS = $(patsubst %.s62, %.$(AOBJEXT), $(BIOSSFILES) \
 CLEAN_INTERMEDIATES = $(patsubst %.s62, %.lst, $(BIOSSFILES)  \
                         $(patsubst %.c, %.asm, $(CFILES) $(EXCFILES) $(TESTCFILES)) \
                         $(patsubst %.c, %.lst, $(CFILES) $(EXCFILES) $(TESTCFILES)) \
+                        $(patsubst %.c, %.cif, $(CFILES) $(EXCFILES) $(TESTCFILES)) \
                         $(patsubst %.$(ASMEXT), %.lst, $(AFILES) $(EXAFILES) $(TESTAFILES)) \
 						$(patsubst %.sa, %.asm, $(LINAFILES) $(TESTLINASMFILES)) \
 						$(patsubst %.sa, %.lst, $(LINAFILES) $(TESTLINASMFILES)) \
@@ -150,11 +151,11 @@ endif
 
 # how to build .c and .s files on c64x
 FNAMEDEF   = -dTNFNAME=$(notdir $<)
-GGCCOMPILE = $(CC) $(CFLAGS) $(DCFLAGS) $(CDEFS) $(FNAMEDEF) $< -eo.$(COBJEXT)
+GGCCOMPILE = $(CC) $(CFLAGS) $(DCFLAGS) $(CDEFS) $(FNAMEDEF) $(FUNCOPTS) $< -eo.$(COBJEXT)
 GGLCOMPILE = $(CC) $(CFLAGS) $(DCFLAGS) $(CDEFS) $(FNAMEDEF) $< -eo.$(LOBJEXT)
-GGACOMPILE = $(AS) $(AFLAGS) $(ADEFS) $< $@ -eo.$(AOBJEXT)
-GGCMAKEDEP = $(MAKEDEP) $(MAKEDEP_OPT) $(CDEPINC)    -e$(COBJEXT) -o$$.$(CDEPEXT) $< 
-GGLMAKEDEP = $(MAKEDEP) $(MAKEDEP_OPT) $(ADEPINC) -a -e$(AOBJEXT) -o$$.$(LDEPEXT) $<
+GGACOMPILE = $(AS) $(AFLAGS) $(ADEFS) $< -eo.$(AOBJEXT)
+GGCMAKEDEP = $(CC) $(PPDEP_FLAGS) $(CFLAGS) $(DCFLAGS) $(CDEFS) $(FNAMEDEF) $(FUNCOPTS) $<
+GGLMAKEDEP = $(CC) $(PPDEP_FLAGS) $(CFLAGS) $(DCFLAGS) $(CDEFS) $(FNAMEDEF) $< 
 GGAMAKEDEP = $(MAKEDEP) $(MAKEDEP_OPT) $(ADEPINC) -a -e$(AOBJEXT) -o$$.$(ADEPEXT) $<
 GGALMAKEDEP = $(MAKEDEP) $(MAKEDEP_OPT) $(ALDEPINC) -a -e$(ALOBJEXT) -o$$.$(ALDEPEXT) $<
 
@@ -184,6 +185,9 @@ ADEPINC = $(subst \,/,-I$(subst ;, -I,$(C6X_A_DIR)))
 
 %.$(CDEPEXT): %.c
 	$(GGCMAKEDEP)
+	sed -e 's/$(notdir $*).obj[ ]*:[ ]*/$(notdir $*).oc $(subst /,\/,$@): /' < $(patsubst %.$(CDEPEXT),%.$(CDEPEXT)_TMP,$@) > $(patsubst %.$(CDEPEXT),%.$(CDEPEXT)_TMP_2,$@)
+	sed -e "s/\\/\//g" < $(patsubst %.$(CDEPEXT),%.$(CDEPEXT)_TMP_2,$@) > $@
+	@$(RM) $(patsubst %.$(CDEPEXT),%.$(CDEPEXT)_TMP,$@) $(patsubst %.$(CDEPEXT),%.$(CDEPEXT)_TMP_2,$@)
 
 # dependency for .sa files
 %.$(LDEPEXT): %.sa

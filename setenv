@@ -5,10 +5,8 @@ export C_DIR="$C6X_C_DIR"
 
 PATH=$C6X_BASE_DIR/bin:$PATH
 
-rm hacky-stuff/cgtools; ln -sf $C6X_BASE_DIR hacky-stuff/cgtools
 
-export TOOLSC6X=$PWD/hacky-stuff
+export TOOLSC6X=$C6X_BASE_DIR
 export TOOLSC6XDOS=$TOOLSC6X
-export MAKEDEPPATH="gawk -f $PWD/src/make/makedep/makedep.gawk "
-export TOOLSBIOSC6XDOS=$PWD/hacky-stuff/bios-stuff-qq
+export TOOLSBIOSC6XDOS=$TOOLSC6X
 

@@ -9,12 +9,12 @@
 #* (C) Copyright 1999 TELOGY Networks, Inc.             
 #*******************************************************************************
 
-CC          = $(TOOLSC6X)/cgtools/bin/cl6x
-AS          = $(TOOLSC6X)/cgtools/bin/cl6x
-LD          = $(TOOLSC6X)/cgtools/bin/cl6x -z
-ARIN        = $(TOOLSC6X)/cgtools/bin/ar6x -rq
-AROUT       = $(TOOLSC6X)/cgtools/bin/ar6x -xq 
-HEX6X		= $(TOOLSC6X)/cgtools/bin/hex6x
+CC          = $(TOOLSC6X)/bin/cl6x
+AS          = $(TOOLSC6X)/bin/cl6x
+LD          = $(TOOLSC6X)/bin/cl6x -z
+ARIN        = $(TOOLSC6X)/bin/ar6x -rq
+AROUT       = $(TOOLSC6X)/bin/ar6x -xq 
+HEX6X		= $(TOOLSC6X)/bin/hex6x
 CDBTOOL     = $(COMSPEC) /c $(TOOLSBIOSCDBC6X)\gconfgen
 MAKEDEP     = $(MAKEDEPPATH)
 MAKEDEP_OPT = -q
@@ -45,9 +45,9 @@ endif
 CPUFLAGS   = -mv6400+
 
 ifeq ($(ENDIAN),big)
-  ALLFARLIB       = $(TOOLSC6XDOS)/cgtools/lib/rts64pluse.lib
+  ALLFARLIB       = $(TOOLSC6XDOS)/lib/rts64pluse.lib
 else
-  ALLFARLIB       = $(TOOLSC6XDOS)/cgtools/lib/rts64plus.lib
+  ALLFARLIB       = $(TOOLSC6XDOS)/lib/rts64plus.lib
 endif
 
 RTLIBS     = $(subst /,$(DIRSEP),$(ALLFARLIB))
@@ -106,9 +106,11 @@ ifeq ($(ENDIAN),big)
  AFLAGS+= -me
 endif
 
+PPDEP_FLAGS  = -ppd=$(patsubst %.$(CDEPEXT),%.$(CDEPEXT)_TMP,$@)
+
 # Include files for standard (non siu) modules.  Also used by linker to find
 # library files.
-FSTDINC  =$(TOOLSC6XDOS)/cgtools/include;$(TOOLSC6XDOS)/cgtools/lib
+FSTDINC  =$(TOOLSC6XDOS)/include;$(TOOLSC6XDOS)/lib
 FSTDINC +=;$(TOOLSC6XDOS)/rtdx/include;$(TOOLSC6XDOS)/rtdx/lib
 FSTDINC +=;$(TOOLSBIOSC6XDOS)/bios/include;$(TOOLSBIOSC6XDOS)/bios/lib
 FSTDINC +=;$(TOOLSBIOSC6XDOS)/xdais/include;;$(TOOLSBIOSC6XDOS)/xdais/src/api

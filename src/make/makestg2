@@ -67,7 +67,7 @@ clean: $(CLEAN_MODULES)
 
 $(CLEAN_MODULES):
 	@echo cleaning $(subst clean_, ,$@)
-	make -C $(IBL_ROOT)/$(subst clean_,,$@)/$(ARCH)/make clean
+	make -C $(IBL_ROOT)/$(subst clean_,,$@)/$(ARCH)/make clean ARCH=c64x TARGET=c6472
 	
 cleant:
 	rm -rf ibl_$(TARGET)/ibl_$(TARGET).out

@@ -9,11 +9,11 @@ CFLAGS= -g -c -mv 6400+ $(OPT)
 test2: gen_cdefdep utils test2_$(ENDIAN).blob
 
 ifeq ($(ENDIAN),little)
- LIB= $(TOOLSC6X)/cgtools/lib/rts64plus.lib
+ LIB= $(TOOLSC6X)/lib/rts64plus.lib
  OPT=
  C2B_OPT=
 else
- LIB= $(TOOLSC6X)/cgtools/lib/rts64pluse.lib
+ LIB= $(TOOLSC6X)/lib/rts64pluse.lib
  OPT= -me
  C2B_OPT= -swap
 endif

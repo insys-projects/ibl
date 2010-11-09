@@ -1,0 +1,31 @@
+#*********************************************************************************
+#* FILE PURPOSE: Build the I2C EEPROM reader
+#*********************************************************************************
+#* FILE NAME: makestg2
+#*
+#* DESCRIPTION: Builds the i2c reader
+#*
+#*********************************************************************************
+
+
+DEVICES= c6455 c6472 c6474 c6474l c6457
+
+ifndef IBL_ROOT
+ IBL_ROOT=../..
+endif
+
+
+export C6X_C_DIR
+
+export ARCH
+export TARGET
+
+
+clean2: $(CLEAN_MODULES)
+	@rm -f $(OBJS)
+	@rm -f $(subst .c,.dc,$(CSRC))
+
+$(CLEAN_MODULES):
+	@echo cleaning $(subst clean_, ,$@)
+	make -C $(IBL_ROOT)/$(subst clean,,$@)/$(ARCH)/make clean
+
