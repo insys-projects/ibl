@@ -497,8 +497,12 @@ typedef struct iblI2cMap_s
 {
     uint16  length;         /**<  Size of the structure in bytes */
     uint16  chkSum;         /**<  Value which makes the ones complement checksum over the block equal to 0 or -0 */
+    
     uint32  addrLe;         /**<  Base address of the boot tables for the little endian image */
+    uint32  configLe;       /**<  Base address of the ibl structure for use with the little endian image */
+    
     uint32  addrBe;         /**<  Base address of the boot tables for the big endian image */
+    uint32  configBe;       /**<  Base address of the ibl structure for use with the big endian image */
 
 } iblI2cMap_t;
 

@@ -456,7 +456,7 @@ void boot_proc_boot_tbl_flush(BOOT_TBL_CB_T* p_inst)
  *****************************************************************************/
 void boot_init_boot_tbl_inst(BOOT_TBL_CB_T *p_btbl_inst)
 {
-    memset(p_btbl_inst, 0, sizeof(BOOT_TBL_CB_T));
+    btblMemset(p_btbl_inst, 0, sizeof(BOOT_TBL_CB_T));
     p_btbl_inst->state = BOOT_TBL_STATE_INIT;
     
     /*

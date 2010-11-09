@@ -20,6 +20,11 @@
 
 ibl_t ibl;
 
+/* The configAddress must be programmed. On images which support both endians
+ * there can be two seperate configurations, one for big endian, and one for little */
+unsigned int configBusAddress = 0x50;
+unsigned int configAddress    = 0;
+
 
 /**
  *  @brief
@@ -138,6 +143,15 @@ void main (void)
 
     volatile Int32 i;
 
+    if (configAddress == 0)  {
+      printf ("Error: The global variable config address must be setup prior to running this program\n");
+      printf ("       This is the address in the I2C eeprom where the parameters live. On configurations\n");
+      printf ("       which support both big and little endian it is possible to configure the IBL to\n");
+      printf ("       usage a different configuration table for each endian, so this program must be run\n");
+      printf ("       twice. The value 0 is invalid for configAddress\n");
+      return;
+    }
+
     printf ("Run the GEL for for the device to be configured, press return to program the I2C\n");
     getchar ();
 
@@ -167,15 +181,15 @@ void main (void)
     currentOffset = 0;
     do  {
 
-        n = formBlock ((UINT8 *)&ibl, sizeof(ibl_t), &currentOffset, writeBlock, IBL_I2C_CFG_TABLE_DATA_ADDR);
+        n = formBlock ((UINT8 *)&ibl, sizeof(ibl_t), &currentOffset, writeBlock, configAddress);
 
         if (n > 0)  {
 
-            iret = hwI2cMasterWrite (IBL_I2C_CFG_EEPROM_BUS_ADDR,   /* The I2C bus address of the eeprom */
-                                     writeBlock,                    /* The data to write */
-                                     n,                             /* The number of bytes to write */
-                                     I2C_RELEASE_BUS,               /* Release the bus when the write is done */
-                                     FALSE );                       /* Bus is not owned at start of operation */
+            iret = hwI2cMasterWrite (configBusAddress,   /* The I2C bus address of the eeprom */
+                                     writeBlock,         /* The data to write */
+                                     n,                  /* The number of bytes to write */
+                                     I2C_RELEASE_BUS,    /* Release the bus when the write is done */
+                                     FALSE );            /* Bus is not owned at start of operation */
 
             if (iret != I2C_RET_OK)  {
                 sprintf (iline, "Block at offset %d\n", currentOffset);

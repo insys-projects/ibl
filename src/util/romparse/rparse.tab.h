@@ -26,6 +26,7 @@
 #define	ALIGN	280
 #define	PAD	281
 #define	LENGTH	282
+#define	PAD_FILE_ID	283
 
 
 extern YYSTYPE yylval;

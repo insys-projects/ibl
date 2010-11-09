@@ -17,6 +17,12 @@
 #define fclose(x)           0
 
 
+/* Redirect memory operations */
+#define malloc      iblMalloc
+#define free        iblFree
+#define memset      iblMemset
+#define memcpy      iblMemcpy
+
 #define FILE BOOT_MODULE_FXN_TABLE
 
 #endif /* _FILE_OVR_H */

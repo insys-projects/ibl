@@ -46,8 +46,6 @@ export C6X_C_DIR
 export ARCH
 export TARGET
 
-CDEFS += -DIBL_I2C_CFG_EEPROM_BUS_ADDR=$(I2C_PARAM_BUS_ADDR)
-
 .PHONY: i2cparam.cmd
 
 $(DEVICES): gen_cdefdep $(MODULES) $(OBJS) i2cparam.cmd

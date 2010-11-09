@@ -91,7 +91,7 @@ void main (void)
     int32 i, j;
 
     /* Initialize the status structure */
-    memset (&iblStatus, 0, sizeof(iblStatus_t));
+    iblMemset (&iblStatus, 0, sizeof(iblStatus_t));
     iblStatus.iblMagic = ibl_MAGIC_VALUE;
 
 

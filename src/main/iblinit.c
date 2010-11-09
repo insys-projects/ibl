@@ -56,6 +56,43 @@ extern Int32 btblWrapEcode;
 
 /**
  *  @brief
+ *      The malloc function used for both boot stages of the ibl
+ */
+void *iblMalloc (Uint32 size)
+{
+    return (malloc (size));
+}
+
+/**
+ *  @brief
+ *      The free function used for both stages of the ibl
+ */
+void iblFree (void *mem)
+{
+    free (mem);
+}
+
+/**
+ *  @brief
+ *      The memset function used for both stages of the ibl
+ */
+void *iblMemset (void *mem, Int32 ch, Uint32 n)
+{
+    return (memset (mem, ch, n));
+}
+
+/**
+ *  @brief
+ *      The memcpy function used for both stages of the ibl
+ */
+void *iblMemcpy (void *s1, const void *s2, Uint32 n)
+{
+    return (memcpy (s1, s2, n));
+
+}
+
+/**
+ *  @brief
  *      Ones complement addition
  */
 inline uint16 onesComplementAdd (uint16 value1, uint16 value2)
@@ -331,6 +368,27 @@ Int32 iblI2cRead (Uint8 *buf, Uint32 num_bytes)
 
 }
 
+#define iblBITMASK(x,y)      (   (   (  ((UINT32)1 << (((UINT32)x)-((UINT32)y)+(UINT32)1) ) - (UINT32)1 )   )   <<  ((UINT32)y)   )
+#define iblREAD_BITFIELD(z,x,y)   (((UINT32)z) & iblBITMASK(x,y)) >> (y)
+/**
+ *  @brief
+ *      Return the lower 16 bits of a 32 bit value. A function is used (with cross-function optomization off)
+ *      which results in an endian independent version
+ */
+uint16 readLower16 (uint32 v)
+{
+    return (iblREAD_BITFIELD(v,15,0));
+
+}
+
+/**
+ * @brief
+ *      Return the upper 16 bits of a 32 bit value. A function is used to force an endian independent version
+ */
+uint16 readUpper16 (uint32 v)
+{
+  return (iblREAD_BITFIELD(v,31,16));
+}
 
 
 /**
@@ -364,6 +422,8 @@ void main (void)
 {
 
     uint16       v;
+    uint16       configAddrLsw;
+    uint16       configAddrMsw;
     uint32       entry;
     void         (*exit)();
     iblI2cMap_t  map;
@@ -383,14 +443,67 @@ void main (void)
                IBL_I2C_OWN_ADDR);           /* The address used by this device on the i2c bus */
 
 
+    /* Read the I2C mapping information from the eeprom */
+    for (;;)  {
+        if (hwI2cMasterRead (IBL_I2C_MAP_TABLE_DATA_ADDR,     /* The address on the eeprom of the data mapping */
+                             sizeof(iblI2cMap_t),             /* The number of bytes to read */
+                             (UINT8 *)&map,                   /* Where to store the bytes */
+                             IBL_I2C_MAP_TABLE_DATA_BUS_ADDR, /* The bus address of the eeprom */
+                             IBL_I2C_CFG_ADDR_DELAY)          /* The delay between sending the address and reading data */
+
+             == I2C_RET_OK)  {
+
+                /* On the I2C EEPROM the table is always formatted with the most significant
+                 * byte first. So if the device is running little endain the endian must be
+                 * swapped */
+                if (littleEndian == TRUE)  {
+                    map.length   = swap16val (map.length);
+                    map.chkSum   = swap16val (map.chkSum);
+                    map.addrLe   = swap32val (map.addrLe);
+                    map.configLe = swap32val (map.configLe);
+                    map.addrBe   = swap32val (map.addrBe);
+                    map.configBe = swap32val (map.configBe);
+
+                    configAddrLsw = readLower16 (map.configLe);
+                    configAddrMsw = readUpper16 (map.configLe);
+
+                }  else  {
+                    configAddrLsw = readLower16 (map.configBe);
+                    configAddrMsw = readUpper16 (map.configLe);
+
+                }
+
+
+                if (map.length != sizeof(iblI2cMap_t))  {
+                    iblStatus.mapSizeFail += 1;
+                    continue;
+                }
+
+                if (map.chkSum != 0)  {
+                    
+                    v = onesComplementChksum ((UINT16 *)&map, sizeof(iblI2cMap_t));
+                    if ((v != 0) && (v != 0xffff))  {
+                        iblStatus.mapRetries += 1;
+                        continue;
+                    }
+                }
+
+                break;
+        }
+
+        iblStatus.mapRetries += 1;
+
+    }
+
+
     /* Read the i2c configuration tables until the checksum passes and the magic number
      * matches. The checksum must be verified before the endian re-ordering is done */
     for (;;)  {
 
-        if (hwI2cMasterRead (IBL_I2C_CFG_TABLE_DATA_ADDR,    /* The address on the eeprom of the table */
+        if (hwI2cMasterRead (configAddrLsw,                  /* The address on the eeprom of the table */
                              sizeof(ibl_t),                  /* The number of bytes to read */
                              (UINT8 *)&ibl,                  /* Where to store the bytes */
-                             IBL_I2C_CFG_EEPROM_BUS_ADDR,    /* The bus address of the eeprom */
+                             configAddrMsw,                  /* The bus address of the eeprom */
                              IBL_I2C_CFG_ADDR_DELAY)         /* The delay between sending the address and reading data */
 
              == I2C_RET_OK)  {
@@ -423,47 +536,6 @@ void main (void)
 
     /* Pll configuration is device specific */
     devicePllConfig ();
-
-    /* The IBL table is in place. Read the I2C map information from the eeprom */
-    for (;;)  {
-        if (hwI2cMasterRead (IBL_I2C_MAP_TABLE_DATA_ADDR,    /* The address on the eeprom of the data mapping */
-                             sizeof(iblI2cMap_t),            /* The number of bytes to read */
-                             (UINT8 *)&map,                  /* Where to store the bytes */
-                             IBL_I2C_CFG_EEPROM_BUS_ADDR,    /* The bus address of the eeprom */
-                             IBL_I2C_CFG_ADDR_DELAY)         /* The delay between sending the address and reading data */
-
-             == I2C_RET_OK)  {
-
-                /* On the I2C EEPROM the table is always formatted with the most significant
-                 * byte first. So if the device is running little endain the endian must be
-                 * swapped */
-                if (littleEndian == TRUE)  {
-                    map.length = swap16val (map.length);
-                    map.chkSum = swap16val (map.chkSum);
-                    map.addrLe = swap32val (map.addrLe);
-                    map.addrBe = swap32val (map.addrBe);
-                }
-
-                if (map.length != sizeof(iblI2cMap_t))  {
-                    iblStatus.mapSizeFail += 1;
-                    continue;
-                }
-
-                if (map.chkSum != 0)  {
-                    
-                    v = onesComplementChksum ((UINT16 *)&map, sizeof(iblI2cMap_t));
-                    if ((v != 0) && (v != 0xffff))  {
-                        iblStatus.mapRetries += 1;
-                        continue;
-                    }
-                }
-
-                break;
-        }
-
-        iblStatus.mapRetries += 1;
-
-    }
 
 
     /* The rest of the IBL is in boot table format. Read and process the data */

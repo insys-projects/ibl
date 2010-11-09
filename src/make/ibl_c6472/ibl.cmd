@@ -20,7 +20,6 @@
 /* Common memory and section areas between ibl_init and ibl */
 #include "ibl_common.inc"
 
-
 SECTIONS
 {
 	.cinit  > TEXT

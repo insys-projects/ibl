@@ -29,6 +29,7 @@ address_delay     { yylval = ADDRESS_DELAY;                      return (ADDRESS
 sw_pll			  { yylval = SWPLL;				                 return (SWPLL);			 }
 align			  { yylval = ALIGN;							     return (ALIGN);             }
 len				  { yylval = LENGTH;							 return (LENGTH);			 }
+pad_file_id       { yylval = PAD_FILE_ID;						 return (PAD_FILE_ID);		 }
 
 
 [0-9]+ 		 { yylval = atoi(yytext); return (VALUE);  }
@@ -36,6 +37,7 @@ len				  { yylval = LENGTH;							 return (LENGTH);			 }
 
 \".*\"		return (STRING);
 
+;.*\n       line++ ;
 [ \t]+		;
 [\n]		line++ ;
 

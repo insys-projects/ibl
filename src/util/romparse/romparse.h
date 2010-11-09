@@ -52,14 +52,22 @@ typedef struct {
 } pciFile_t;
 
 
+/* Distinguish between a layout and pad */
+#define PLT_PAD     10
+#define PLT_FILE    11
+typedef struct {
+  int type;
+  int index;
+} plt_t;
+
 /* Define a layout table. A layout table is a block of data which contains the addresses
  * of data files. Each address is 32 bits, with the upper 16 bits specifying the i2c 
  * id, the lower address the byte address of the 1st block in the table */
 #define MAX_LAYOUTS         2
 #define MAX_LAYOUT_FILES    8
 typedef struct  {
-  int nFiles;                   /* Number of files in file list*/
-  int file[MAX_LAYOUT_FILES];   /* Index of each file in progFile array */
+  int nPlt;                      /* Number of elements in the plt array */
+  plt_t plt[MAX_LAYOUT_FILES];   /* Index of each file/pad in order */
   
   unsigned int address;         /* I2c data address of the table */
   unsigned int dev_addr;        /* I2c device address of the table */
@@ -74,7 +82,9 @@ typedef struct  {
 /* Pad section. The pad section creates a gap in the i2c memory map */
 #define MAX_PADS        8
 typedef struct  {
-  unsigned int address;
+  int          id;
+  unsigned int address;     /* I2C data address */
+  unsigned int dev_addr;    /* I2C device address */
   unsigned int len;
 } pad_t;
 

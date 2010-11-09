@@ -160,7 +160,7 @@ void rBegin (int blockType)
 void initLayout (layout_t *cl)
 {
 
-  cl->nFiles   = 0;
+  cl->nPlt     = 0;
   cl->dev_addr = 0x50;
   cl->address  = 0;
   cl->align    = 0;
@@ -179,12 +179,16 @@ void setLayout (void)
   int currentAlign;
   int newAlign;
 
-  for (i = 0; i < layouts[currentLayout].nFiles; i++)  {
-    currentAlign = progFile[layouts[currentLayout].file[i]].align;
-    newAlign     = layouts[currentLayout].align;
+  for (i = 0; i < layouts[currentLayout].nPlt; i++)  {
 
-    if (newAlign > currentAlign)
-      progFile[layouts[currentLayout].file[i]].align = newAlign;
+    if (layouts[currentLayout].plt[i].type == PLT_FILE)  {
+
+      currentAlign = progFile[layouts[currentLayout].plt[i].index].align;
+      newAlign     = layouts[currentLayout].align;
+
+      if (newAlign > currentAlign)
+        progFile[layouts[currentLayout].plt[i].index].align = newAlign;
+    }
 
   }
 
@@ -207,8 +211,10 @@ void setLayout (void)
  *************************************************************************************/
 void initPad (pad_t *p)
 {
-  p->address = 0;
-  p->len     = 0;
+  p->id       = -1;
+  p->address  = 0;
+  p->dev_addr = 0x50;
+  p->len      = 0;
 }
 
 
@@ -466,6 +472,15 @@ void assignKeyVal (int field, int value)
         case ALIGN:        layouts[currentLayout].align = value;
                            break;
 
+        case PAD_FILE_ID:   if (layouts[currentLayout].nPlt >= MAX_LAYOUT_FILES)  {
+                              fprintf (stderr, "romparse: line %d: number of layout entries exceeds maximum of %d\n", line, MAX_LAYOUT_FILES);
+                              exit (-1);
+                            }
+                            layouts[currentLayout].plt[layouts[currentLayout].nPlt].type  = PLT_PAD;
+                            layouts[currentLayout].plt[layouts[currentLayout].nPlt].index = value;
+                            layouts[currentLayout].nPlt += 1;
+                            break;
+
 
         default:
             fprintf (stderr, "romparase: Invalid assignment in layout specification (line %d)\n", line);
@@ -489,6 +504,9 @@ void assignKeyVal (int field, int value)
 
         case LENGTH:    pads[currentPad].len = value;
                         break;
+
+        case PAD_FILE_ID: pads[currentPad].id = value;
+                          break;
 
         default:
           fprintf (stderr, "romparse: Invalid assignment in pad specificaiton (line %d)\n", line);
@@ -535,9 +553,16 @@ void assignKeyStr (int value, char *y)
 
       }  else  {   /* LAYOUT */
 
-        if (currentLayout < MAX_LAYOUTS)
-          layouts[currentLayout].file[layouts[currentLayout].nFiles++] = i;
-        else
+        if (currentLayout < MAX_LAYOUTS)  {
+          if (layouts[currentLayout].nPlt <= MAX_LAYOUT_FILES)  {
+            layouts[currentLayout].plt[layouts[currentLayout].nPlt].type  = PLT_FILE;
+            layouts[currentLayout].plt[layouts[currentLayout].nPlt].index = i;
+            layouts[currentLayout].nPlt += 1;
+
+          }  else  {
+            fprintf (stderr, "romparse: line %d: Max number (%d) of layout specification exceeded\n", line, MAX_LAYOUT_FILES);
+          }
+        }  else
           fprintf (stderr, "romparse: Number of layout sections exceeded (max = %d)\n", MAX_LAYOUTS);
 
       }
@@ -560,9 +585,16 @@ void assignKeyStr (int value, char *y)
 
     }  else  {  /* LAYOUT */
         
-        if (currentLayout < MAX_LAYOUTS)
-          layouts[currentLayout].file[layouts[currentLayout].nFiles++] = i;
-        else
+        if (currentLayout < MAX_LAYOUTS)  {
+          if (layouts[currentLayout].nPlt <= MAX_LAYOUT_FILES)  {
+            layouts[currentLayout].plt[layouts[currentLayout].nPlt].type  = PLT_FILE;
+            layouts[currentLayout].plt[layouts[currentLayout].nPlt].index = i;
+            layouts[currentLayout].nPlt += 1;
+
+          }  else  {
+            fprintf (stderr, "romparse: line %d: Max number (%d) of layout specification exceeded\n", line, MAX_LAYOUT_FILES);
+          }
+        }  else
           fprintf (stderr, "romparse: Number of layout sections exceeded (max = %d)\n", MAX_LAYOUTS);
 
     }
@@ -639,7 +671,7 @@ void createOutput (void)
 {
   FILE *str;
   int   totalLenBytes;
-  int   i, j;
+  int   i, j, k;
   int   nTables, len;
   unsigned int value, v1, v2;
   unsigned int base, obase;
@@ -664,6 +696,25 @@ void createOutput (void)
     base = base + PCI_EEAI_PARAM_SIZE;
 
 
+  /* Change the layout index value for pad mapping to a true array index value.
+   * Also reflect the device address from the layout into the pad */
+  for (i = 0; i < currentLayout; i++)  {
+    
+    for (j = 0; j < layouts[i].nPlt; j++)  {
+
+      if (layouts[i].plt[j].type == PLT_PAD)  {
+
+        for (k = 0; k < currentPad; k++)  {
+
+          if (layouts[i].plt[j].index == pads[k].id)  {
+            layouts[i].plt[j].index = k;
+            pads[k].dev_addr = layouts[i].dev_addr;
+          }
+        }
+      }
+    }
+  }
+
   /* Pad, layout tables */
   for (i = 0; i < currentPL; i++)  {
 
@@ -672,7 +723,7 @@ void createOutput (void)
     if (padLayoutOrder[i].type == LAYOUT)  {
 
       /* Determine the size of the table. Four bytes for each file, plus the 4 byte header */ 
-      v1 = (layouts[j].nFiles * 4) + 4;
+      v1 = (layouts[j].nPlt * 4) + 4;
 
       v2 = (layouts[j].dev_addr << 16) + layouts[j].address;
 
@@ -771,13 +822,22 @@ void createOutput (void)
     if (v1 > 0)
       base  = imagePad (base, image, v1);
     obase = base;
-    len   = (layouts[i].nFiles * 4) + 4;
+    len   = (layouts[i].nPlt * 4) + 4;
 
     /* Write out the block size and checksum */
     base = imageWord(base, image, len << 16);
 
-    for (j = 0; j < layouts[i].nFiles; j++)
-        base = imageWord (base, image, progFile[layouts[i].file[j]].addressBytes);
+    for (j = 0; j < layouts[i].nPlt; j++)  {
+        
+        if (layouts[i].plt[j].type == PLT_FILE) 
+          base = imageWord (base, image, progFile[layouts[i].plt[j].index].addressBytes);
+        else  {
+          v1 = pads[layouts[i].plt[j].index].dev_addr;
+          v2 = pads[layouts[i].plt[j].index].address;
+          base = imageWord (base, image, (v1 << 16) + v2);
+        }
+
+    }
 
   }
                                 

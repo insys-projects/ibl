@@ -16,7 +16,7 @@ CLEAN_MODULES=$(addprefix clean_,$(MODULES))
 
 TARGETS= c6472 c6474 c6474l c6455 c6457
 
-COMMON_SYMBOLS= hwI2Cinit hwI2cMasterRead iblBootBtbl
+COMMON_SYMBOLS= hwI2Cinit hwI2cMasterRead iblBootBtbl iblMalloc iblFree iblMemset iblMemcpy
 
 ifeq ($(ENDIAN),little)
 	HEX_OPT= -order L

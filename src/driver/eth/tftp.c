@@ -17,6 +17,7 @@
 #include "timer.h"
 #include "stream.h"
 #include <string.h>
+#include "net_osal.h"
 
 
 /**********************************************************************
@@ -195,7 +196,7 @@ static void tftp_send_ack(void)
     TFTPHDR* ptr_tftphdr;
 
     /* Initialize the data buffer. */ 
-    memset ((void *)&tftpmcb.buffer[0], 0, TFTP_DATA_SIZE + TFTPHEADER_SIZE);
+    netMemset ((void *)&tftpmcb.buffer[0], 0, TFTP_DATA_SIZE + TFTPHEADER_SIZE);
 
     /* Create an ACK packet which is to be sent out. Get the pointer to the
      * TFTP Header. */
@@ -453,7 +454,7 @@ Int32 tftp_get_file (IPN server_ip, Int8* filename)
     }
 
     /* Initialize the TFTP MCB at this stage... */
-    memset ((void *)&tftpmcb, 0, sizeof(TFTP_MCB));
+    netMemset ((void *)&tftpmcb, 0, sizeof(TFTP_MCB));
 
     /* Populate the socket structure and register this with the UDP module. */
     socket.local_port       = 1234;
