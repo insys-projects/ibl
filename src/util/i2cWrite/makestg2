@@ -43,6 +43,8 @@ export C6X_C_DIR
 export ARCH
 export TARGET
 
+
+
 $(DEVICES): gen_cdefdep $(MODULES) $(OBJS) i2cWrite.cmd
 	$(LD) -o i2cWrite_$(IEXT).out -m i2cWrite_$(IEXT).map i2cWrite.$(IEXT).oc ../../hw/c64x/make/i2c.$(IEXT).oc ../../hw/c64x/make/pll.$(IEXT).oc i2cWrite.cmd $(RTLIBS)
 
@@ -65,6 +67,6 @@ $(OBJS): cdefdep
 
 gen_cdefdep:
 	@echo Checking command line dependencies
-	@echo $(ARCH) > cdefdep.tmp
+	@echo $(ARCH) $(TARGET) > cdefdep.tmp
 	@sh -c 'if diff -q cdefdep.tmp cdefdep ; then echo same ; else $(CP) cdefdep.tmp cdefdep ; fi '
 

@@ -532,6 +532,24 @@ void assignKeyStr (int value, char *y)
   int i;
   char *z;
 
+  /* The special case of a 0 (plus the quotes) length string means an empty entry for a layout */
+  if (strlen(y) == 2)  {
+
+    if (currentType == LAYOUT)  {
+      if (layouts[currentLayout].nPlt <= MAX_LAYOUT_FILES)  {
+        layouts[currentLayout].plt[layouts[currentLayout].nPlt].type  = PLT_FILE;
+        layouts[currentLayout].plt[layouts[currentLayout].nPlt].index = -1;
+        layouts[currentLayout].nPlt += 1;
+
+      }  else  {
+        fprintf (stderr, "romparse: line %d: Max number (%d) of layout specification exceeded\n", line, MAX_LAYOUT_FILES);
+      }
+    }  else
+         fprintf (stderr, "romparse: Number of layout sections exceeded (max = %d)\n", MAX_LAYOUTS);
+
+    return;
+  }
+
 
   /* the input string still contains the quotes. Remove them here */
   z = &y[1];
@@ -829,9 +847,13 @@ void createOutput (void)
 
     for (j = 0; j < layouts[i].nPlt; j++)  {
         
-        if (layouts[i].plt[j].type == PLT_FILE) 
-          base = imageWord (base, image, progFile[layouts[i].plt[j].index].addressBytes);
-        else  {
+        if (layouts[i].plt[j].type == PLT_FILE)  {
+          if (layouts[i].plt[j].index == -1)  {
+            base = imageWord (base, image, 0xffffffff);
+          } else {
+            base = imageWord (base, image, progFile[layouts[i].plt[j].index].addressBytes);
+          } 
+        }  else  {
           v1 = pads[layouts[i].plt[j].index].dev_addr;
           v2 = pads[layouts[i].plt[j].index].address;
           base = imageWord (base, image, (v1 << 16) + v2);

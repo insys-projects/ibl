@@ -123,13 +123,17 @@ void main (void)
          * statement is simply defined to be a void statement */
         for (i = ibl_HIGHEST_PRIORITY; i < ibl_LOWEST_PRIORITY; i++)  {
 
+#ifndef EXCLUDE_ETH
             for (j = 0; j < ibl_N_ETH_PORTS; j++)  {
                 if (ibl.ethConfig[j].ethPriority == i)
                 iblEthBoot (j);
             }
+#endif
 
+#ifndef EXCLUDE_NAND
             if (ibl.nandConfig.nandPriority == i)
                 iblNandBoot ();
+#endif
 
             iblStatus.heartBeat += 1;
         }
@@ -172,14 +176,20 @@ Uint32 iblBoot (BOOT_MODULE_FXN_TABLE *bootFxn, Int32 dataFormat, void *formatPa
         (*bootFxn->peek)((Uint8 *)&fid, sizeof(fid));
 
         /* BIS */
+#ifndef EXCLUDE_BIS
         if (fid.bisValue == BIS_MAGIC_NUMBER)
             dataFormat = ibl_BOOT_FORMAT_BIS;
+#endif
 
+#ifndef EXCLUDE_COFF
         if (iblIsCoff (fid.coffVer))
             dataFormat = ibl_BOOT_FORMAT_COFF;
+#endif
 
+#ifndef EXCLUDE_ELF
         if (iblIsElf (fid.dataBuf))
             dataFormat = ibl_BOOT_FORMAT_ELF;
+#endif
 
         else  {
             iblStatus.autoDetectFailCnt += 1;
@@ -191,25 +201,33 @@ Uint32 iblBoot (BOOT_MODULE_FXN_TABLE *bootFxn, Int32 dataFormat, void *formatPa
     /* Invoke the parser */
     switch (dataFormat)  {
 
+#ifndef EXCLUDE_BIS
         case ibl_BOOT_FORMAT_BIS:
             iblBootBis (bootFxn, &entry);
             break;
+#endif
 
+#ifndef EXCLUDE_COFF
         case ibl_BOOT_FORMAT_COFF:
             iblBootCoff (bootFxn, &entry);
             break;
+#endif
 
         case ibl_BOOT_FORMAT_BTBL:
             iblBootBtbl (bootFxn, &entry);
             break;
 
+#ifndef EXCLUDE_BLOB
         case ibl_BOOT_FORMAT_BBLOB:
             iblBootBlob (bootFxn, &entry, formatParams);
             break;
+#endif
 
+#ifndef EXCLUDE_ELF
         case ibl_BOOT_FORMAT_ELF:
             iblBootElf (bootFxn, &entry);
             break;
+#endif
 
         default:
             iblStatus.invalidDataFormatSpec += 1;
