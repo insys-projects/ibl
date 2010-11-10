@@ -72,7 +72,7 @@ goto toolperl
 :toolcopy
 echo UPDATING local tools
 :toolperl
-%PERLDOS% make\cpytools\cpytools.pl %TOOLC6XSRC% %TOOLC6XDST% %1
+%PERLDOS% cpytools\cpytools.pl %TOOLC6XSRC% %TOOLC6XDST% %1
 rem note: windows is stupid; "errorlevel 1" means "retval >= 1"
 if errorlevel 1 goto error
 
