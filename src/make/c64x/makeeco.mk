@@ -182,13 +182,20 @@ GGBLOCKEXPNNUMCH = $(BLOCKEXPN) $< $@ $(NUMCH)
 CDEPINC = $(subst \,/,-I$(subst ;, -I,$(C6X_C_DIR)))
 ADEPINC = $(subst \,/,-I$(subst ;, -I,$(C6X_A_DIR)))
 
-
+ifeq ($(OS),Linux)
+%.$(CDEPEXT): %.c
+	$(GGCMAKEDEP)
+	sed -e 's/$(notdir $*).obj[ ]*:[ ]*/$(notdir $*).oc $(subst /,\/,$@): /' < $(patsubst %.$(CDEPEXT),%.$(CDEPEXT)_TMP,$@) > $(patsubst %.$(CDEPEXT),%.$(CDEPEXT)_TMP_2,$@)
+	sed -e 's/\\/\//g' < $(patsubst %.$(CDEPEXT),%.$(CDEPEXT)_TMP_2,$@) > $@
+	@$(RM) $(patsubst %.$(CDEPEXT),%.$(CDEPEXT)_TMP,$@) $(patsubst %.$(CDEPEXT),%.$(CDEPEXT)_TMP_2,$@)
+else
 %.$(CDEPEXT): %.c
 	$(GGCMAKEDEP)
 	sed -e 's/$(notdir $*).obj[ ]*:[ ]*/$(notdir $*).oc $(subst /,\/,$@): /' < $(patsubst %.$(CDEPEXT),%.$(CDEPEXT)_TMP,$@) > $(patsubst %.$(CDEPEXT),%.$(CDEPEXT)_TMP_2,$@)
 	sed -e "s/\\/\//g" < $(patsubst %.$(CDEPEXT),%.$(CDEPEXT)_TMP_2,$@) > $@
 	@$(RM) $(patsubst %.$(CDEPEXT),%.$(CDEPEXT)_TMP,$@) $(patsubst %.$(CDEPEXT),%.$(CDEPEXT)_TMP_2,$@)
 
+endif
 # dependency for .sa files
 %.$(LDEPEXT): %.sa
 	$(GGLMAKEDEP)

@@ -1,0 +1,23 @@
+=====================================================
+C6x Bootloader Release Note
+Version: 0.5.1
+November 2010
+=====================================================
+
+1) Supported TARGETS:
+    - C6455
+    - C6472
+    - C6474
+2) Supported ENDIAN
+    - big
+    - little
+3) Required toolset
+    - TI CGEN compiler CGT_C6000_7.2.0A10218
+4) Build Instructions
+    - Change directory to ibl\src\make
+    - Modify the setupenvLnx.sh script to match the tool environment
+    - Set the environment by running "source setupenvLnx.sh"
+    - For building run:
+        make <TARGET>  ENDIAN=[little|big]
+        make c6455 ENDIAN=liitle
+        make c6455 ENDIAN=big
