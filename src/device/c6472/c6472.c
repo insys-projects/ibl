@@ -108,6 +108,7 @@ int32 devicePowerPeriph (int32 modNum)
  *  @details  On the evm the nand controller is enabled by setting 
  *            gpio 14 high
  */
+#ifndef EXCLUDE_NAND
 int32 deviceConfigureForNand(void)
 {
 	hwGpioSetDirection(NAND_MODE_GPIO, GPIO_OUT);
@@ -115,6 +116,7 @@ int32 deviceConfigureForNand(void)
     return (0);
 
 }
+#endif
 
 
 /**

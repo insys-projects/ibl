@@ -58,26 +58,6 @@ Uint32 deviceLocalAddrToGlobal (Uint32 addr)
 
 
 /**
- * @brief Configure the PLLs
- *
- * @details
- *   Only the main PLL is enabled. The second pll is used for
- *   emac and DDR, with a fixed multiplier, and is enabled
- *   at power up. The divider is configurable, but not done here.
- */
-void devicePllConfig (void)
-{
-    if (ibl.pllConfig[ibl_MAIN_PLL].doEnable == TRUE)
-        hwPllSetPll (MAIN_PLL, 
-                     ibl.pllConfig[ibl_MAIN_PLL].prediv,
-                     ibl.pllConfig[ibl_MAIN_PLL].mult,
-                     ibl.pllConfig[ibl_MAIN_PLL].postdiv);
-
-}
-
-
-
-/**
  * @brief
  *   Enable the DDR
  *
@@ -171,10 +151,12 @@ int32 devicePowerPeriph (int32 modNum)
  *
  *  @details  
  */
+#ifndef EXCLUDE_NAND
 int32 deviceConfigureForNand(void)
 {
     return (0);
 }
+#endif
 
 /**
  *  @brief

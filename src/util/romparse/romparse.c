@@ -21,6 +21,11 @@
 #define DATA_BASE       (PCI_PARAM_BASE + PCI_EEAI_PARAM_SIZE)
 
 
+/*************************************************************************************
+ * Declaration: The base address of the i2c ROM being created. This is just
+ *              the I2C bus address. The default is 0x50
+ *************************************************************************************/
+int i2cRomBase = 0x50;
 
 /*************************************************************************************
  * Declaration: The flex input file is assigned based on the command line
@@ -161,7 +166,7 @@ void initLayout (layout_t *cl)
 {
 
   cl->nPlt     = 0;
-  cl->dev_addr = 0x50;
+  cl->dev_addr = i2cRomBase;
   cl->address  = 0;
   cl->align    = 0;
 
@@ -213,7 +218,7 @@ void initPad (pad_t *p)
 {
   p->id       = -1;
   p->address  = 0;
-  p->dev_addr = 0x50;
+  p->dev_addr = i2cRomBase;
   p->len      = 0;
 }
 
@@ -499,6 +504,9 @@ void assignKeyVal (int field, int value)
 
       switch (field)  {
 
+        case DEV_ADDR_EXT: pads[currentPad].dev_addr = value;
+                           break;
+
         case DEV_ADDR:  pads[currentPad].address = value;
                         break;
 
@@ -567,7 +575,7 @@ void assignKeyStr (int value, char *y)
         current_file = i;
 
         if (current_table.i2c.dev_addr_ext == 0)
-          current_table.i2c.dev_addr_ext = 0x50;  /* hard coded to i2c rom slave address */
+          current_table.i2c.dev_addr_ext = i2cRomBase;  /* hard coded to i2c rom slave address */
 
       }  else  {   /* LAYOUT */
 
@@ -599,7 +607,7 @@ void assignKeyStr (int value, char *y)
 
       current_file = i;
       if (current_table.i2c.dev_addr_ext == 0)
-          current_table.i2c.dev_addr_ext = 0x50;
+          current_table.i2c.dev_addr_ext = i2cRomBase;
 
     }  else  {  /* LAYOUT */
         
@@ -628,12 +636,12 @@ void assignKeyStr (int value, char *y)
  * DESCRIPTION: The 32 bit value is placed in memory in big endian format. The
  *              new offset is returned (4 bytes more then the input offset)
  ************************************************************************************/
-unsigned int imageWord (unsigned int base, unsigned char *image, unsigned int value)
+unsigned int imageWord (unsigned int base, unsigned int start, unsigned char *image, unsigned int value)
 {
-    image[base+0] = (value >> 24) & 0xff;
-    image[base+1] = (value >> 16) & 0xff;
-    image[base+2] = (value >>  8) & 0xff;
-    image[base+3] = (value >>  0) & 0xff;
+    image[base-start+0] = (value >> 24) & 0xff;
+    image[base-start+1] = (value >> 16) & 0xff;
+    image[base-start+2] = (value >>  8) & 0xff;
+    image[base-start+3] = (value >>  0) & 0xff;
 
     return (base + 4);
 
@@ -663,7 +671,7 @@ unsigned int formWord (unsigned int p, unsigned char *image)
  * DESCRIPTION: Byte (value 0) are added to the image to reach the desired address
  *              The desired address is returned.
  ************************************************************************************/
-unsigned int imagePad (unsigned int base, unsigned char *image, unsigned int desired)
+unsigned int imagePad (unsigned int base, unsigned int start, unsigned char *image, unsigned int desired)
 {
   int i;
 
@@ -674,7 +682,7 @@ unsigned int imagePad (unsigned int base, unsigned char *image, unsigned int des
   }
 
   for (i = base; i < desired; i++)
-    image[i] = 0;
+    image[i-start] = 0;
 
   return (desired);
 
@@ -691,8 +699,9 @@ void createOutput (void)
   int   totalLenBytes;
   int   i, j, k;
   int   nTables, len;
+  int   i2cRomStart;
   unsigned int value, v1, v2;
-  unsigned int base, obase;
+  unsigned int base;
   unsigned char *image;
 
   str = fopen ("i2crom.ccs", "w");
@@ -702,12 +711,12 @@ void createOutput (void)
   }
 
   /* Compact the i2c eeprom to use the minimum memory possible */
-  base    = PCI_PARAM_BASE;
+  base    = (i2cRomBase << 16) + PCI_PARAM_BASE;
   nTables = NUM_BOOT_PARAM_TABLES; 
 
   if ((compact != 0) && (pciSet == 0))  {
     nTables = max_index + 1;
-    base    = nTables * 0x80;  /* The number of parameter tables * size of a parameter table */
+    base    = (i2cRomBase << 16) + (nTables * 0x80);  /* The number of parameter tables * size of a parameter table */
   }
 
   if (pciSet)
@@ -750,28 +759,25 @@ void createOutput (void)
 
       else  {
 
-        /* Mask out device address bits but extend past 64k */
-        v2 = v2 & I2C_ADDR_MASK;
-
         if (base > v2)  {
-          fprintf (stderr, "romparse: fatal error - layout block %d specified a start address of 0x%04x\n", j, layouts[j].address);
+          fprintf (stderr, "romparse: fatal error - layout block %d specified a start address of 0x%04x\n", j, (layouts[j].dev_addr << 16) + layouts[j].address);
           fprintf (stderr, "          but this conflicts with the base mapping (ends at 0x%04x)\n", base);
           exit (-1);
         }
 
-        base = layouts[j].address + v1;
+        base = v2 + v1;  /* new base is the base plus the size */
 
 
       }  
     }  else  {   /* Otherwise this is a pad */
 
-      if (base > pads[j].address)  {
-        fprintf (stderr, "romparse: fatal error - pad block %d specified a start address of 0x%04x\n", j, pads[j].address);
+      if (base > ((pads[j].dev_addr << 16) + pads[j].address))  {
+        fprintf (stderr, "romparse: fatal error - pad block %d specified a start address of 0x%04x\n", j, (pads[j].dev_addr << 16) + pads[j].address);
         fprintf (stderr, "          but this conflicts with the base mapping (ends at 0x%04x)\n", base);
         exit (-1);
       }
 
-      base = pads[j].address + pads[j].len;
+      base = (pads[j].dev_addr << 16) + pads[j].address + pads[j].len;
 
     }
   }
@@ -779,7 +785,7 @@ void createOutput (void)
   for (i = 0; i < NUM_BOOT_PARAM_TABLES; i++)  {
     if (progFile[i].align > 0)  
       base = ((base + progFile[i].align - 1) / progFile[i].align) * progFile[i].align;
-    progFile[i].addressBytes = base + (0x50 << 16);  /* For now hard code the base address */
+    progFile[i].addressBytes = base;
     base = base + progFile[i].sizeBytes;
   }
 
@@ -795,14 +801,14 @@ void createOutput (void)
   /* Round up the size to a multiple of 4 bytes to fit into a ccs data file */
   base = (base + 3) & ~3;
 
+  i2cRomStart = (i2cRomBase << 16);
       
   /* The total length of the i2c eeprom is now stored in base */
   /* Write out the ccs header */
-  fprintf (str, "1651 1 10000 1 %x\n", base >> 2);
-
+  fprintf (str, "1651 1 10000 1 %x\n", (base - i2cRomStart) >> 2);
 
   /* Create the image in memory */
-  image = malloc (base * sizeof (unsigned char));
+  image = malloc ((base - i2cRomStart) * sizeof (unsigned char));
   if (image == NULL)  {
     fprintf (stderr, "romparse: malloc failed creating the output image\n");
     exit (-1);
@@ -811,13 +817,13 @@ void createOutput (void)
   /* Write out the boot parameter tables. 0x80 bytes will be written out.
    * There are 16 bits in every parameter field, which is why the index
    * is from 0 to 0x40 */
-  base = 0;
+  base = i2cRomBase << 16;
   for (i = 0; i < nTables; i++)  {
     for (j = 0; j < (0x80 >> 1); j += 2)  {
       v1 = boot_params[i].parameter[j];
       v2 = boot_params[i].parameter[j+1];
       value = (v1 << 16) | v2;
-      base = imageWord (base, image, value);
+      base = imageWord (base, i2cRomStart, image, value);
     }
   }
 
@@ -825,7 +831,7 @@ void createOutput (void)
    * written out */
   if (pciSet)  {
     for (i = 0; i < PCI_DATA_LEN_32bit; i++)  {
-      base = imageWord (base, image, pciFile.data[i]);
+      base = imageWord (base, i2cRomStart, image, pciFile.data[i]);
     }
   }
 
@@ -835,28 +841,27 @@ void createOutput (void)
 
     v1 = (layouts[i].dev_addr << 16) + layouts[i].address;
 
-    /* Mask out device address bits */
-    v1 = v1 & I2C_ADDR_MASK;
+    /* subtract out device address bits */
     if (v1 > 0)
-      base  = imagePad (base, image, v1);
-    obase = base;
+      base  = imagePad (base, i2cRomStart, image, v1);
+
     len   = (layouts[i].nPlt * 4) + 4;
 
     /* Write out the block size and checksum */
-    base = imageWord(base, image, len << 16);
+    base = imageWord(base, i2cRomStart, image, len << 16);
 
     for (j = 0; j < layouts[i].nPlt; j++)  {
         
         if (layouts[i].plt[j].type == PLT_FILE)  {
           if (layouts[i].plt[j].index == -1)  {
-            base = imageWord (base, image, 0xffffffff);
+            base = imageWord (base, i2cRomStart, image, 0xffffffff);
           } else {
-            base = imageWord (base, image, progFile[layouts[i].plt[j].index].addressBytes);
+            base = imageWord (base, i2cRomStart, image, progFile[layouts[i].plt[j].index].addressBytes);
           } 
         }  else  {
           v1 = pads[layouts[i].plt[j].index].dev_addr;
           v2 = pads[layouts[i].plt[j].index].address;
-          base = imageWord (base, image, (v1 << 16) + v2);
+          base = imageWord (base, i2cRomStart, image, (v1 << 16) + v2);
         }
 
     }
@@ -867,14 +872,15 @@ void createOutput (void)
   /* Write out each of the program files */
   for (i = 0; i < nProgFiles; i++)  {
 
-    base = imagePad (base, image, (progFile[i].addressBytes & I2C_ADDR_MASK));
+    v1 = progFile[i].addressBytes;
+    base = imagePad (base, i2cRomStart, image, v1);
 
     for (j = 0; j < progFile[i].sizeBytes >> 2; j++)
-      base = imageWord (base, image, (progFile[i]).data[j]);
+      base = imageWord (base, i2cRomStart, image, (progFile[i]).data[j]);
   }
 
   /* Write out the data file */
-  for (i = 0; i < base; i += 4) 
+  for (i = 0; i < base - i2cRomStart; i += 4) 
     fprintf (str, "0x%08x\n", formWord (i, image));
 
   free (image);
@@ -895,6 +901,24 @@ void initPciParams (void)
 } /* initPciParams */
 
 
+/************************************************************************************
+ * FUNCTION PURPOSE: Read an integer value from a string
+ ************************************************************************************
+ * DESCRIPTION: A decimal or hex value is scanned
+ ************************************************************************************/
+int readVal (char *s)
+{
+  int ret;
+
+  if ((s[0] == '0') && (s[1] == 'x'))
+    sscanf (&s[2], "%x", &ret);
+  else
+    sscanf (s, "%d", &ret);
+
+  return (ret);
+
+}
+  
 
 /************************************************************************************
  * FUNCTION PURPOSE: Parse the input arguments.
@@ -906,7 +930,7 @@ int parseIt (int argc, char *argv[])
   int i;
 
   if (argc < 2)  {
-     fprintf (stderr, "usage: %s [-compact] inputfile\n", argv[0]);
+     fprintf (stderr, "usage: %s [-compact] [-rom_base x] inputfile\n", argv[0]);
      return (-1);
   }
 
@@ -917,6 +941,10 @@ int parseIt (int argc, char *argv[])
     if (!strcmp (argv[i], "-compact"))  {
       compact = 1;
       i += 1;
+
+    } else if (!strcmp (argv[i], "-rom_base"))  {
+      i2cRomBase = readVal (argv[i+1]);
+      i += 2;
 
     } else  {
 

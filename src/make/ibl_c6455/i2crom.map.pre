@@ -13,12 +13,11 @@
 section 
 {
   param_index   = 0
-  boot_mode     = 257
-  sw_pll		= 25
+  boot_mode     = 5
   options       = 1
 
-  core_freq_mhz    = 625
-  i2c_clk_freq_khz = 200
+  core_freq_mhz    = 50
+  i2c_clk_freq_khz = 400
 
   dev_addr_ext = I2C_BUS_ADDR
 

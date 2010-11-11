@@ -1,10 +1,10 @@
 /* ibl_objs_template.inc
  *
- * list of oject files tagged with the endian field for replacement during make
+ * list of object files tagged with the endian field for replacement during make
  */
 
 ../main/c64x/make/iblmain.ENDIAN_TAG.oc
-../device/c64x/make/c6472.ENDIAN_TAG.oc
+../device/c64x/make/c6455.ENDIAN_TAG.oc
 ../driver/c64x/make/timer.ENDIAN_TAG.oc
 ../hw/c64x/make/t64.ENDIAN_TAG.oc
 ../hw/c64x/make/psc.ENDIAN_TAG.oc
@@ -24,6 +24,7 @@
 ../interp/c64x/make/blob.ENDIAN_TAG.oc
 #endif
 
+
 #ifndef EXCLUDE_ELF
 ../interp/c64x/make/dload.ENDIAN_TAG.oc
 ../interp/c64x/make/elfwrap.ENDIAN_TAG.oc
@@ -31,7 +32,6 @@
 ../interp/c64x/make/dload_endian.ENDIAN_TAG.oc
 ../interp/c64x/make/ArrayList.ENDIAN_TAG.oc
 #endif
-
 
 #ifndef EXCLUDE_ETH
 ../ethboot/c64x/make/ethboot.ENDIAN_TAG.oc
@@ -47,9 +47,10 @@
 #endif
 
 #ifndef EXCLUDE_NAND
+../nandboot/c64x/make/nandboot.ENDIAN_TAG.oc
+../driver/c64x/make/nand.ENDIAN_TAG.oc
+../ecc/c64x/make/3byte_ecc.ENDIAN_TAG.oc
 ../hw/c64x/make/gpio.ENDIAN_TAG.oc
 ../hw/c64x/make/nandgpio.ENDIAN_TAG.oc
-../driver/c64x/make/nand.ENDIAN_TAG.oc
-../nandboot/c64x/make/nandboot.ENDIAN_TAG.oc
-../ecc/c64x/make/3byte_ecc.ENDIAN_TAG.oc
 #endif
+

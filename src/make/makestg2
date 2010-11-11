@@ -11,11 +11,11 @@ ifndef IBL_ROOT
 	IBL_ROOT=..
 endif
 
-MAIN_MODULE= main
-MODULES= device ethboot nandboot driver hw interp ecc
+CFG_MODULES= main device
+MODULES= ethboot nandboot driver hw interp ecc
 
 CLEAN_MODULES=$(addprefix clean_,$(MODULES))
-CLEAN_MODULES+=$(addprefix clean,$(MAIN_MODULE))
+CLEAN_MODULES+=$(addprefix clean,$(CFG_MODULES))
 
 
 TARGETS= c6472 c6474 c6474l c6455 c6457
@@ -39,10 +39,8 @@ else
 	IEXT=     be
 endif
 
-ifeq ($(TARGET),c6474)
+ifeq ($(COMPACT_I2C),yes)
   COMPACT= -compact
-else
-  COMPACT=
 endif
 
 include $(IBL_ROOT)/make/$(ARCH)/makedefs.mk
@@ -88,8 +86,8 @@ endif
 
 
 i2cRom:
-	cl6x -ppo -I../cfg/$(TARGET) $(I2C_DEFS) ibl_$(TARGET)/$@.map.pre
-	../util/romparse/romparse $(COMPACT) ibl_$(TARGET)/$@.map.pp
+	$(CC) -ppo -I../cfg/$(TARGET) $(I2C_DEFS) ibl_$(TARGET)/$@.map.pre
+	../util/romparse/romparse $(COMPACT) -rom_base $(I2C_BUS_ADDR) ibl_$(TARGET)/$@.map.pp
 	$(CP) i2crom.ccs ibl_$(TARGET)/$@.ccs
 	$(CP) i2crom.ccs ibl_$(TARGET)/$@.dat
 	$(RM) i2crom.ccs ibl_le.b ibl.b
@@ -108,11 +106,11 @@ compare:
 # For the init code a raw image is created as well as the i2c code to verify
 # endian independent code is generated. The symbols required for linking
 # the full application are then extracted
-iblInit: $(MAIN_MODULE) $(MODULES) utils
+iblInit: $(CFG_MODULES) $(MODULES) utils
 	cat ibl_$(TARGET)/ibl_init_objs_template.inc | sed -e s/ENDIAN_TAG/$(IEXT)/g > ibl_$(TARGET)/ibl_init_objs.inc
 	$(LD) -o ibl_$(TARGET)/ibl_$(TARGET)_init.out -m ibl_$(TARGET)/ibl_$(TARGET)_init.map ibl_$(TARGET)/ibl_init.cmd $(RTLIBS)
-	cp ibl_$(TARGET)/ibl_$(TARGET)_init.out ibl_$(TARGET)/ibl_$(TARGET)_init.$(IEXT).out
-	rm -f ibl_$(TARGET)/ibl_init_obj.inc
+	$(CP) ibl_$(TARGET)/ibl_$(TARGET)_init.out ibl_$(TARGET)/ibl_$(TARGET)_init.$(IEXT).out
+	$(RM) -f ibl_$(TARGET)/ibl_init_obj.inc
 
 	hex6x $(HEX_OPT) ibl_$(TARGET)/ibl_init_image.rmd ibl_$(TARGET)/ibl_$(TARGET)_init.out
 	$(CP) ibl_le.b ibl_$(TARGET)/ibl.b
@@ -127,11 +125,13 @@ iblInit: $(MAIN_MODULE) $(MODULES) utils
 	bash ../util/symExtract/symExtract ibl_$(TARGET)/ibl_$(TARGET)_init.map ibl_$(TARGET)/ibl_init_symbols.inc $(COMMON_SYMBOLS)
 
 	
-iblMain: iblInit $(MAIN_MODULE) $(MODULES)
-	cat ibl_$(TARGET)/ibl_objs_template.inc | sed -e s/ENDIAN_TAG/$(IEXT)/g > ibl_$(TARGET)/ibl_objs.inc
+iblMain: iblInit $(CFG_MODULES) $(MODULES)
+	cat ibl_$(TARGET)/ibl_objs_template.inc | sed -e s/ENDIAN_TAG/$(IEXT)/g > ibl_$(TARGET)/ibl_objs.tmp
+	$(CC) -ppo $(MAINDEFS) -DENDIAN_TAG=$(IEXT) ibl_$(TARGET)/ibl_objs.tmp
+	$(CP) ibl_$(TARGET)/ibl_objs.pp ibl_$(TARGET)/ibl_objs.inc
 	$(LD) -o ibl_$(TARGET)/ibl_$(TARGET).out -m ibl_$(TARGET)/ibl_$(TARGET).$(IEXT).map  ibl_$(TARGET)/ibl.cmd $(RTLIBS)
-	cp ibl_$(TARGET)/ibl_$(TARGET).out ibl_$(TARGET)/ibl_$(TARGET).$(IEXT).out
-	rm -f ibl_$(TARGET)/ibl_obj.inc
+	$(CP) ibl_$(TARGET)/ibl_$(TARGET).out ibl_$(TARGET)/ibl_$(TARGET).$(IEXT).out
+	$(RM) -f ibl_$(TARGET)/ibl_obj.inc
 
 	hex6x $(HEX_OPT) ibl_$(TARGET)/ibl.rmd ibl_$(TARGET)/ibl_$(TARGET).out
 	../util/bconvert/bconvert64x -$(IEXT) ibl_le.b ibl.b
@@ -144,9 +144,9 @@ $(MODULES):
 	@echo making $@
 	make -C $(IBL_ROOT)/$@/$(ARCH)/make $@
 
-$(MAIN_MODULE):
+$(CFG_MODULES):
 	@echo making $@
-	make -C $(IBL_ROOT)/$@/$(ARCH)/make CDEFS=$(MAINDEFS) $@
+	make -C $(IBL_ROOT)/$@/$(ARCH)/make CDEFS='$(MAINDEFS)' $@
 
 utils:
 	make -C $(IBL_ROOT)/util/btoccs

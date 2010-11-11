@@ -74,10 +74,6 @@ typedef struct  {
   int align;
 } layout_t;
 
-/* The i2c address masking is chosen to be 20 bits. This allows eproms to be stacked to use addresses
- * from 0x50 - 0x5f */
-#define I2C_ADDR_MASK   0x0fffff
-
 
 /* Pad section. The pad section creates a gap in the i2c memory map */
 #define MAX_PADS        8
