@@ -296,8 +296,9 @@ Int32 ip_receive (IPHDR* ptr_iphdr, Int32 num_bytes)
     /* We accept only the following packets:-
      *  a) Destination Address is the address of the NET Boot module. 
      *  b) Destination Address is the a special 255.255.255.255 address for BOOTP Reply*/
-    if ((ptr_iphdr->IPDst != netmcb.net_device.ip_address) && (ptr_iphdr->IPDst != 0xFFFFFFFF))
-        return -1;
+    if (netmcb.net_device.use_bootp_server_ip == 0)
+	if ((ptr_iphdr->IPDst != netmcb.net_device.ip_address) && (ptr_iphdr->IPDst != 0xFFFFFFFF))
+        	return -1;
 
     /* Pass the packet to the layer4 receive handlers. */
     switch (ptr_iphdr->Protocol)
