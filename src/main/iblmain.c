@@ -125,14 +125,19 @@ void main (void)
 
 #ifndef EXCLUDE_ETH
             for (j = 0; j < ibl_N_ETH_PORTS; j++)  {
-                if (ibl.ethConfig[j].ethPriority == i)
-                iblEthBoot (j);
+                if (ibl.ethConfig[j].ethPriority == i)  {
+                    iblStatus.activePeriph = ibl_ACTIVE_PERIPH_ETH;
+                    memcpy (&iblStatus.ethParams, &ibl.ethConfig[j].ethInfo, sizeof (iblEthBootInfo_t));
+                    iblEthBoot (j);
+                }
             }
 #endif
 
 #ifndef EXCLUDE_NAND
-            if (ibl.nandConfig.nandPriority == i)
+            if (ibl.nandConfig.nandPriority == i)  {
+                iblStatus.activePeriph = ibl_ACTIVE_PERIPH_NAND;
                 iblNandBoot ();
+            }
 #endif
 
             iblStatus.heartBeat += 1;
@@ -159,43 +164,42 @@ void main (void)
  */
 Uint32 iblBoot (BOOT_MODULE_FXN_TABLE *bootFxn, Int32 dataFormat, void *formatParams)
 { 
-    Uint32 entry = 0;
-
-    union  {
-
-        Uint8   dataBuf[4];   /* Place holder */
-        Uint32  bisValue;
-        Uint16  coffVer;    
-
-    } fid;
-
+    Uint32  entry = 0;
+    Uint32  value32;
+    Uint8   dataBuf[4];   
+    Uint16  value16;
 
     /* Determine the data format if required */
     if (dataFormat == ibl_BOOT_FORMAT_AUTO)  {
 
-        (*bootFxn->peek)((Uint8 *)&fid, sizeof(fid));
+        (*bootFxn->peek)(dataBuf, sizeof(dataBuf));
+        value32 = (dataBuf[0] << 24) | (dataBuf[1] << 16) | (dataBuf[2] << 8) | (dataBuf[3] << 0);
+        value16 = (dataBuf[0] <<  8) | (dataBuf[1] <<  0);
 
         /* BIS */
 #ifndef EXCLUDE_BIS
-        if (fid.bisValue == BIS_MAGIC_NUMBER)
+        if (value32 == BIS_MAGIC_NUMBER)
             dataFormat = ibl_BOOT_FORMAT_BIS;
 #endif
 
 #ifndef EXCLUDE_COFF
-        if (iblIsCoff (fid.coffVer))
+        if (iblIsCoff (value16))
             dataFormat = ibl_BOOT_FORMAT_COFF;
 #endif
 
 #ifndef EXCLUDE_ELF
-        if (iblIsElf (fid.dataBuf))
+        if (iblIsElf (dataBuf))
             dataFormat = ibl_BOOT_FORMAT_ELF;
 #endif
 
-        else  {
+        if (dataFormat == ibl_BOOT_FORMAT_AUTO)  {
             iblStatus.autoDetectFailCnt += 1;
             return (0);
         }
     }        
+
+
+    iblStatus.activeFormat = dataFormat;
 
 
     /* Invoke the parser */

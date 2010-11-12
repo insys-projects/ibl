@@ -463,18 +463,15 @@ typedef struct iblStatus_s
     uint32 mapRetries;      /**<  Number of times the checksum failed on the read of the i2c map */
     uint32 i2cDataRetries;  /**<  Number of retries while reading block data from the i2c */
     
-    int32  tableLoadFail;   /**<  If non-zero then the load of the parameter table from i2c failed */
-    
     int32  heartBeat;       /**<  An increasing value as long as the boot code is running */
-    int32  noMagic;         /**<  A non-zero value here indicates that @ref ibl_MAGIC_VALUE was not found
-                                  in the @ref ibl_t magic field, and default values were loaded. */
+    
     int32  activePeriph;    /**<  Describes the active boot peripheral @ref iblActivePeriph */
     int32  activeFormat;    /**<  Describes the format being decoded */
     
-    int32  autoDetectFailCnt;       /**<  Counts the number of times an auto detect of the data format failed */
-    int32  nameDetectFailCnt;       /**<  Counts the number of times an name detect of the data format failed */
+    uint32  autoDetectFailCnt;      /**<  Counts the number of times an auto detect of the data format failed */
+    uint32  nameDetectFailCnt;      /**<  Counts the number of times an name detect of the data format failed */
     
-    int32 invalidDataFormatSpec;    /**<  Counts the number of times the main boot found an invalid boot format request */
+    uint32 invalidDataFormatSpec;   /**<  Counts the number of times the main boot found an invalid boot format request */
     
     uint32 exitAddress;             /**<  If non-zero the IBL exited and branched to this address */
     

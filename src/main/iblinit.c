@@ -429,7 +429,8 @@ void main (void)
     iblI2cMap_t  map;
 
     memset (&iblStatus, 0, sizeof(iblStatus_t));
-    iblStatus.iblMagic = ibl_MAGIC_VALUE;
+    iblStatus.iblMagic     = ibl_MAGIC_VALUE;
+    iblStatus.activePeriph = ibl_ACTIVE_PERIPH_I2C;
 
     /* Read the endianness setting of the device */
     littleEndian = deviceIsLittleEndian();

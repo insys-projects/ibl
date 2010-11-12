@@ -5,7 +5,7 @@
 #*
 #* DESCRIPTION: Builds the Intermediate Boot Loader (IBL)
 #*
-#*  Usage:  make c6455 | c6472 | c6474 | c6474l | c6457 [DEBUG=yes] [ETH=no] [NAND=no]  \
+#*  Usage:  make c6455 | c6472 | c6474 | c6457 [DEBUG=yes] [ETH=no] [NAND=no]  \
 #*          [BIS=no] [COFF=no] [BLOB=no] [ELF=no] [ENDIAN= both | big | little] [I2C_BUS_ADDR= 0x50 | 0x51] \
 #*			[COMPACT_I2C=yes]
 #*
@@ -15,7 +15,7 @@
 #*
 #* or to test the builds by making all the devices and testing excludes
 #*
-#*			make test
+#*			make test_build
 #*******************************************************************************************
 
 IBLS_C6X= c6455 c6472 c6474 c6474l c6457
@@ -108,7 +108,7 @@ evm_c6474:
 
 
 # Test - builds all the targets, with single component exclusion
-test:
+test_build:
 	make -f makestg1 ARCH=c64x TARGET=c6455 I2C_BUS_ADDR=0x50 COMPACT_I2C=no ENDIAN_MODE=both EXCLUDES=     c6455
 	make -f makestg1 ARCH=c64x TARGET=c6455 I2C_BUS_ADDR=0x50 COMPACT_I2C=no ENDIAN_MODE=both EXCLUDES=ETH  c6455
 	make -f makestg1 ARCH=c64x TARGET=c6455 I2C_BUS_ADDR=0x50 COMPACT_I2C=no ENDIAN_MODE=both EXCLUDES=NAND c6455
