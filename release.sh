@@ -30,8 +30,8 @@ mkdir ibl_bin/c6474/le
 #mkdir ibl_bin/c6457/be
 #mkdir ibl_bin/c6457/le
 
-# Copy i2cConfig GEL file
-cp -f src/util/i2cConfig/i2cConfig.gel ibl_bin/
+# Overwrite Linux environment file
+cp -f setupenvLnx.sh src/make/setupenvLnx.sh
 
 # Build C6455 LE
 pushd src/make
@@ -44,6 +44,10 @@ popd
 cp -f src/make/ibl_c6455/i2crom_le.dat ibl_bin/c6455/le/
 cp -f src/util/i2cWrite/i2cWrite.out   ibl_bin/c6455/le/
 cp -f src/util/i2cConfig/i2cparam_c6455.out   ibl_bin/c6455/le/
+
+
+# Copy i2cConfig GEL file
+cp -f src/util/i2cConfig/i2cConfig.gel ibl_bin/
 
 
 # Build C6455 BE
