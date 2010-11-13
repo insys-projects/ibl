@@ -47,7 +47,7 @@ cp -f src/util/i2cConfig/i2cparam_c6455.out   ibl_bin/c6455/le/
 
 
 # Copy i2cConfig GEL file
-cp -f src/util/i2cConfig/i2cConfig.gel ibl_bin/
+cp -f src/util/i2cConfig/i2cConfig.gel ibl_bin/i2cConfig.gel
 
 
 # Build C6455 BE
