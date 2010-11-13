@@ -525,13 +525,13 @@ hotmenu setConfig_c6455()
     SETIP(ibl.ethConfig[0].ethInfo.gatewayIp, 158,218,100,2);
     SETIP(ibl.ethConfig[0].ethInfo.netmask,   255,255,255,0);
 
-    /* There is no e-fuse mac address. A value must be assigned
-    ibl.ethConfig[0].ethInfo.hwAddress[0] = 0x00;
-    ibl.ethConfig[0].ethInfo.hwAddress[1] = 0xe0;
-    ibl.ethConfig[0].ethInfo.hwAddress[2] = 0xa6;
-    ibl.ethConfig[0].ethInfo.hwAddress[3] = 0x66;
-    ibl.ethConfig[0].ethInfo.hwAddress[4] = 0x57;
-    ibl.ethConfig[0].ethInfo.hwAddress[5] = 0x19;
+    /* There is no e-fuse mac address. A value must be assigned */
+    ibl.ethConfig[0].ethInfo.hwAddress[0] = 10;
+    ibl.ethConfig[0].ethInfo.hwAddress[1] = 224;
+    ibl.ethConfig[0].ethInfo.hwAddress[2] = 166;
+    ibl.ethConfig[0].ethInfo.hwAddress[3] = 102;
+    ibl.ethConfig[0].ethInfo.hwAddress[4] = 87;
+    ibl.ethConfig[0].ethInfo.hwAddress[5] = 25;
 
 
     ibl.ethConfig[0].ethInfo.fileName[0]  = 't';
