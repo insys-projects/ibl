@@ -146,5 +146,5 @@ cp -f src/util/i2cConfig/i2cparam_c6474.out   ibl_bin_$IBL_VERSION/c6474/be/
 #cp -f src/util/i2cConfig/i2cparam_c6457.out   ibl_bin_$IBL_VERSION/c6457/be/
 
 # Create Tar archive for binary package
-tar -cvzf ibl_bin_$IBL_VERSION.tar ibl_bin_$IBL_VERSION
+tar -cvf ibl_bin_$IBL_VERSION.tar ibl_bin_$IBL_VERSION
 
