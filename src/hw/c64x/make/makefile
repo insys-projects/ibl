@@ -88,6 +88,30 @@ ifeq ($(TARGET),c6474)
  vpath % $(ECODIR)/sgmii
 endif
 
+ifeq ($(TARGET),c6474l)
+ vpath % $(ECODIR)/macs/cpmac
+ vpath % $(ECODIR)/plls/pllxx1p8
+ vpath % $(ECODIR)/pscs/psc2
+ vpath % $(ECODIR)/ddrs/emif31
+ vpath % $(ECODIR)/mdio
+ vpath % $(ECODIR)/gpio
+ vpath % $(ECODIR)/nands/gpio
+ vpath % $(ECODIR)/i2c
+ vpath % $(ECODIR)/sgmii
+endif
+
+ifeq ($(TARGET),c6457)
+ vpath % $(ECODIR)/macs/cpmac
+ vpath % $(ECODIR)/plls/pllxx1p8
+ vpath % $(ECODIR)/pscs/psc2
+ vpath % $(ECODIR)/ddrs/emif31
+ vpath % $(ECODIR)/mdio
+ vpath % $(ECODIR)/gpio
+ vpath % $(ECODIR)/nands/gpio
+ vpath % $(ECODIR)/i2c
+ vpath % $(ECODIR)/sgmii
+endif
+
 ifeq ($(TARGET),c6455)
  vpath % $(ECODIR)/macs/cpmac
  vpath % $(ECODIR)/plls/pllxx1p8
