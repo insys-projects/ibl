@@ -66,24 +66,6 @@ Uint32 deviceLocalAddrToGlobal (Uint32 addr)
         
         
 /**
- * @brief Configure the PLLs
- *
- * @details
- *   Only the main PLL can be configured here. The DDR pll is enabled by default,
- *   and the network PLL is enabled through serdes configuration.
- *   the multiplier and dividers.
- */
-void devicePllConfig (void)
-{
-    if (ibl.pllConfig[ibl_MAIN_PLL].doEnable == TRUE)
-        hwPllSetPll (MAIN_PLL, 
-                     ibl.pllConfig[ibl_MAIN_PLL].prediv,
-                     ibl.pllConfig[ibl_MAIN_PLL].mult,
-                     ibl.pllConfig[ibl_MAIN_PLL].postdiv);
-
-}
-
-/**
  * @brief
  *   Enable the DDR
  *
@@ -126,7 +108,7 @@ int32 devicePowerPeriph (int32 modNum)
  *  @details  On the evm the nand controller is enabled by setting 
  *            gpio 14 high
  */
-#if 0
+#ifndef EXCLUDE_NAND
 int32 deviceConfigureForNand(void)
 {
 	hwGpioSetDirection(NAND_MODE_GPIO, GPIO_OUT);

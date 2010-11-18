@@ -1,0 +1,69 @@
+#*******************************************************************************************
+#* FILE PURPOSE: Top level make for the IBL
+#*******************************************************************************************
+#* FILE NAME: Makefile
+#*
+#* DESCRIPTION: Builds the Intermediate Boot Loader (IBL)
+#*
+#*  Usage:  make c6455 | c6472 | c6474 | c6474l | c6457 [DEBUG=yes] [ETH=no] [NAND=no]  \
+#*          [BIS=no] [COFF=no] [BLOB=no] [ELF=no] [ENDIAN= both | big | little] [I2C_BUS_ADDR= 0x50 | 0x51] \
+#*			[COMPACT_I2C=yes]
+#*******************************************************************************************
+
+IBLS_C6X= c6455 c6472 c6474 c6474l c6457
+
+# Excluding functions from the build reduces the I2C eeprom memory used and
+# speeds the initial boot time. Note that boot table cannot be excluded
+# because it is required for the two stage I2C load process
+
+# The endian of the build. The default target builds a single ROM image with both endians present
+ifeq ($(ENDIAN_MODE),big)
+ I2CROM=        big_endian
+ STAGE1_TARGET= be_target
+else
+ ifeq ($(ENDIAN_MODE),little)
+  I2CROM=        little_endian
+  STAGE1_TARGET= le_target
+ else
+  I2CROM=        both
+  STAGE1_TARGET= be_target le_target compare
+ endif
+endif
+
+# The i2c ROM bus address. The code will advance accross I2C bus address boundaries (the code must
+# be blocked so that a single block doesn't cross a boundary, however). 
+ifndef I2C_BUS_ADDR
+ I2C_BUS_ADDR=0x50
+endif
+
+# Excludes identify which components are not part of the build
+export EXCLUDES
+
+all:
+	@echo must specify a target [ $(IBLS_C6X) ]
+
+
+
+be_target:
+	make -f makestg2 ARCH=c64x TARGET=$(TARGET) ENDIAN=big       I2C_BUS_ADDR=$(I2C_BUS_ADDR) $(TARGET)
+
+le_target:
+	make -f makestg2 ARCH=c64x TARGET=$(TARGET) ENDIAN=little    I2C_BUS_ADDR=$(I2C_BUS_ADDR) $(TARGET)
+
+compare:
+	make -f makestg2 ARCH=c64x TARGET=$(TARGET) compare
+
+
+$(IBLS_C6X): $(STAGE1_TARGET)
+	make -f makestg2 ARCH=c64x TARGET=$@ I2CROM=$(I2CROM) I2C_BUS_ADDR=$(I2C_BUS_ADDR) COMPACT_I2C=$(COMPACT_I2C) i2cRom
+
+
+
+
+
+
+
+
+
+
+

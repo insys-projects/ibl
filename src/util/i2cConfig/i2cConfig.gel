@@ -60,12 +60,12 @@ hotmenu setConfig_c6472()
     ibl.ethConfig[0].doBootp          = FALSE;
     ibl.ethConfig[0].useBootpServerIp = FALSE;
     ibl.ethConfig[0].useBootpFileName = FALSE;
-    ibl.ethConfig[0].bootFormat       = ibl_BOOT_FORMAT_BBLOB;
+    ibl.ethConfig[0].bootFormat       = ibl_BOOT_FORMAT_AUTO;
 
 
-    SETIP(ibl.ethConfig[0].ethInfo.ipAddr,    158,218,100,113);
-    SETIP(ibl.ethConfig[0].ethInfo.serverIp,  158,218,100,25);
-    SETIP(ibl.ethConfig[0].ethInfo.gatewayIp, 158,218,100,2);
+    SETIP(ibl.ethConfig[0].ethInfo.ipAddr,    10,218,109,21);
+    SETIP(ibl.ethConfig[0].ethInfo.serverIp,  10,218,109,196);
+    SETIP(ibl.ethConfig[0].ethInfo.gatewayIp, 10,218,109,2);
     SETIP(ibl.ethConfig[0].ethInfo.netmask,   255,255,255,0);
 
     /* Leave the hardware address as 0 so the e-fuse value will be used */
@@ -73,18 +73,18 @@ hotmenu setConfig_c6472()
 
 
 
-    ibl.ethConfig[0].ethInfo.fileName[0]  = 'c';
-    ibl.ethConfig[0].ethInfo.fileName[1]  = '6';
-    ibl.ethConfig[0].ethInfo.fileName[2]  = '4';
-    ibl.ethConfig[0].ethInfo.fileName[3]  = '7';
-    ibl.ethConfig[0].ethInfo.fileName[4]  = '2';
-    ibl.ethConfig[0].ethInfo.fileName[5]  = '-';
-    ibl.ethConfig[0].ethInfo.fileName[6]  = 'l';
-    ibl.ethConfig[0].ethInfo.fileName[7]  = 'e';
-    ibl.ethConfig[0].ethInfo.fileName[8]  = '.';
-    ibl.ethConfig[0].ethInfo.fileName[9]  = 'b';
-    ibl.ethConfig[0].ethInfo.fileName[10] = 'i';
-    ibl.ethConfig[0].ethInfo.fileName[11] = 'n';
+    ibl.ethConfig[0].ethInfo.fileName[0]  = 't';
+    ibl.ethConfig[0].ethInfo.fileName[1]  = 'e';
+    ibl.ethConfig[0].ethInfo.fileName[2]  = 's';
+    ibl.ethConfig[0].ethInfo.fileName[3]  = 't';
+    ibl.ethConfig[0].ethInfo.fileName[4]  = '.';
+    ibl.ethConfig[0].ethInfo.fileName[5]  = 'o';
+    ibl.ethConfig[0].ethInfo.fileName[6]  = 'u';
+    ibl.ethConfig[0].ethInfo.fileName[7]  = 't';
+    ibl.ethConfig[0].ethInfo.fileName[8]  = '\0';
+    ibl.ethConfig[0].ethInfo.fileName[9]  = '\0';
+    ibl.ethConfig[0].ethInfo.fileName[10] = '\0';
+    ibl.ethConfig[0].ethInfo.fileName[11] = '\0';
     ibl.ethConfig[0].ethInfo.fileName[12] = '\0';
     ibl.ethConfig[0].ethInfo.fileName[13] = '\0';
     ibl.ethConfig[0].ethInfo.fileName[14] = '\0';
@@ -104,7 +104,7 @@ hotmenu setConfig_c6472()
     ibl.ethConfig[1].doBootp          = TRUE;
     ibl.ethConfig[1].useBootpServerIp = TRUE;
     ibl.ethConfig[1].useBootpFileName = TRUE;
-    ibl.ethConfig[1].bootFormat       = ibl_BOOT_FORMAT_BBLOB;
+    ibl.ethConfig[1].bootFormat       = ibl_BOOT_FORMAT_AUTO;
 
 
     /* SGMII not present */
@@ -160,6 +160,25 @@ hotmenu setConfig_c6472()
 
     /* Nand boot is disabled */
     ibl.nandConfig.nandPriority = ibl_DEVICE_NOBOOT;
+
+    ibl.nandConfig.bootFormat   = ibl_BOOT_FORMAT_AUTO;
+
+    ibl.nandConfig.nandInfo.busWidthBits  = 8;
+    ibl.nandConfig.nandInfo.pageSizeBytes = 2048;
+    ibl.nandConfig.nandInfo.pageEccBytes  = 64;
+    ibl.nandConfig.nandInfo.pagesPerBlock = 64;
+    ibl.nandConfig.nandInfo.totalBlocks   = 1024;
+
+    ibl.nandConfig.nandInfo.addressBytes  = 4;
+    ibl.nandConfig.nandInfo.lsbFirst      = TRUE;
+    ibl.nandConfig.nandInfo.blockOffset   = 22;
+    ibl.nandConfig.nandInfo.pageOffset    = 16;
+    ibl.nandConfig.nandInfo.columnOffset  = 0;
+
+    ibl.nandConfig.nandInfo.resetCommand    = 0xff;
+    ibl.nandConfig.nandInfo.readCommandPre  = 0;
+    ibl.nandConfig.nandInfo.readCommandPost = 0x30;
+    ibl.nandConfig.nandInfo.postCommand     = TRUE;
 
 }
 

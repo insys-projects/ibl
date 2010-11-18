@@ -14,6 +14,12 @@ ifndef IBL_ROOT
  IBL_ROOT=../..
 endif
 
+ifeq ($(ENDIAN),big)
+ IEXT=be
+else
+ IEXT=le
+endif
+
 ECODIR= $(IBL_ROOT)/util/i2cWrite
 
 MODULES= hw
@@ -27,6 +33,7 @@ UTIL=yes
 include $(IBL_ROOT)/make/$(ARCH)/makeeco.mk
 
 C6X_C_DIR=   $(IBL_ROOT)/hw/i2c
+C6X_C_DIR+= ;$(IBL_ROOT)/hw/plls
 C6X_C_DIR+= ;$(IBL_ROOT)/cfg/$(TARGET)
 C6X_C_DIR+= ;$(IBL_ROOT)/device/$(TARGET)
 C6X_C_DIR+= ;$(IBL_ROOT)/arch/$(ARCH)
@@ -36,8 +43,10 @@ export C6X_C_DIR
 export ARCH
 export TARGET
 
+
+
 $(DEVICES): gen_cdefdep $(MODULES) $(OBJS) i2cWrite.cmd
-	$(LD) -o i2cWrite.out -m i2cWrite.map i2cWrite.cmd $(RTLIBS)
+	$(LD) -o i2cWrite_$(IEXT).out -m i2cWrite_$(IEXT).map i2cWrite.$(IEXT).oc ../../hw/c64x/make/i2c.$(IEXT).oc ../../hw/c64x/make/pll.$(IEXT).oc i2cWrite.cmd $(RTLIBS)
 
 
 $(MODULES):
@@ -58,6 +67,6 @@ $(OBJS): cdefdep
 
 gen_cdefdep:
 	@echo Checking command line dependencies
-	@echo $(ENDIAN) $(ARCH) > cdefdep.tmp
+	@echo $(ARCH) $(TARGET) > cdefdep.tmp
 	@sh -c 'if diff -q cdefdep.tmp cdefdep ; then echo same ; else $(CP) cdefdep.tmp cdefdep ; fi '
 

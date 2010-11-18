@@ -82,6 +82,7 @@ void boot_proc_boot_tbl_size(BOOT_TBL_CB_T* p_inst);
 void boot_proc_boot_tbl_addr(BOOT_TBL_CB_T* p_inst);
 void boot_proc_boot_tbl_data(BOOT_TBL_CB_T* p_inst);
 void boot_proc_boot_tbl_flush(BOOT_TBL_CB_T* p_inst);
+void boot_proc_boot_tbl_pad(BOOT_TBL_CB_T* p_inst);
 
 /*******************************************************************************
  * Local variables 
@@ -322,6 +323,38 @@ void boot_proc_boot_tbl_addr(BOOT_TBL_CB_T* p_inst)
 }
 
 /*******************************************************************************
+ * FUNCTION PURPOSE: Process the boot table in the PAD state
+ *******************************************************************************
+ * DESCRIPTION: Toss data bytes to advance to the next section
+ *******************************************************************************/
+#define MIN(a,b)  (a)<(b) ? (a) : (b)
+void boot_proc_boot_tbl_pad(BOOT_TBL_CB_T* p_inst)
+{
+    UINT32  num_bytes;
+    UINT32  num_uint16_words;
+
+    num_bytes = MIN (p_inst->section_size_bytes, CHIP_UINT16_TO_BYTES(p_inst->data_size_uint16));
+    num_uint16_words = CHIP_BYTES_TO_UINT16(num_bytes);
+
+    /* Update instance variables for the next code section */
+    p_inst->data_size_uint16 -= num_uint16_words;
+    p_inst->p_data           += num_uint16_words;
+    
+    p_inst->section_addr       += num_bytes;
+    p_inst->section_size_bytes -= num_bytes;
+    
+    if(p_inst->section_size_bytes == 0)
+    {
+        p_inst->state = BOOT_TBL_STATE_SIZE;    
+
+        /* Chip specific post block handling. Can be defined to an empty statement */
+        chipBtblBlockDone();
+    }
+}
+
+
+
+/*******************************************************************************
  * FUNCTION PURPOSE: Process the boot table in DATA State
  *******************************************************************************
  * DESCRIPTION: Process the boot table in DATA State
@@ -332,18 +365,20 @@ void boot_proc_boot_tbl_addr(BOOT_TBL_CB_T* p_inst)
  *   BOOT_TBL_CB_T        *p_inst)  - A pointer to Boot Table Control instance
  *
  *****************************************************************************/
-#define MIN(a,b)  (a)<(b) ? (a) : (b)
 void boot_proc_boot_tbl_data(BOOT_TBL_CB_T* p_inst)
 {
-    UINT32  num_bytes;         /* number of bytes to be copy         */
-    UINT32  num_uint16_words;  /* number of 16 bit words to copy     */
+    UINT32  num_bytes;             /* number of bytes to be copy         */
+    UINT32  num_uint16_words;      /* number of 16 bit words to copy     */
+    UINT32  num_uint16_words_pad;  /* number of 16 bit words, rounded up to a multiple of 4 bytes */
+    UINT32  pad_uint16;            /* The amount of pad present */
     UINT16  error;
     
     num_bytes = MIN (p_inst->section_size_bytes, CHIP_UINT16_TO_BYTES(p_inst->data_size_uint16));
     num_uint16_words = CHIP_BYTES_TO_UINT16(num_bytes);
 
     /* Some processors add padding to the memwidth used in the rom (created by tools) */
-    num_uint16_words = chipAddBtblUint16Pad (num_uint16_words);
+    num_uint16_words_pad = chipAddBtblUint16Pad (num_uint16_words);
+    pad_uint16           = num_uint16_words_pad - num_uint16_words;
     
     /* 
      * Record the last UINT16 word and copy the data to the destination
@@ -365,13 +400,22 @@ void boot_proc_boot_tbl_data(BOOT_TBL_CB_T* p_inst)
     
     p_inst->section_addr       += num_bytes;
     p_inst->section_size_bytes -= num_bytes;
-    
+
     if(p_inst->section_size_bytes == 0)
     {
-        p_inst->state = BOOT_TBL_STATE_SIZE;    
 
-        /* Chip specific post block handling. Can be defined to an empty statement */
-        chipBtblBlockDone();
+        if (pad_uint16)  
+        {
+            p_inst->state              = BOOT_TBL_STATE_PAD;
+            p_inst->section_size_bytes = CHIP_UINT16_TO_BYTES(pad_uint16);
+        } 
+        else
+        {
+            p_inst->state = BOOT_TBL_STATE_SIZE;    
+
+            /* Chip specific post block handling. Can be defined to an empty statement */
+            chipBtblBlockDone();
+        }
     }
     
     /* update statistics */
@@ -412,7 +456,7 @@ void boot_proc_boot_tbl_flush(BOOT_TBL_CB_T* p_inst)
  *****************************************************************************/
 void boot_init_boot_tbl_inst(BOOT_TBL_CB_T *p_btbl_inst)
 {
-    memset(p_btbl_inst, 0, sizeof(BOOT_TBL_CB_T));
+    btblMemset(p_btbl_inst, 0, sizeof(BOOT_TBL_CB_T));
     p_btbl_inst->state = BOOT_TBL_STATE_INIT;
     
     /*
@@ -434,6 +478,7 @@ void boot_init_boot_tbl_inst(BOOT_TBL_CB_T *p_btbl_inst)
     btbl_st_proc_fcn[BOOT_TBL_STATE_SIZE]    = boot_proc_boot_tbl_size;
     btbl_st_proc_fcn[BOOT_TBL_STATE_ADDR]    = boot_proc_boot_tbl_addr;
     btbl_st_proc_fcn[BOOT_TBL_STATE_DATA]    = boot_proc_boot_tbl_data;
+    btbl_st_proc_fcn[BOOT_TBL_STATE_PAD]     = boot_proc_boot_tbl_pad;
     btbl_st_proc_fcn[BOOT_TBL_STATE_FLUSH]   = boot_proc_boot_tbl_flush;
     
 } /* end of boot_init_boot_tbl_inst() */

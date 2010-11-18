@@ -25,7 +25,7 @@
  **************************************************************************************
  * DESCRIPTION: Returns the last boot mode type
  **************************************************************************************/
-uint16 hwPllResetType (uint16 pllNum)
+uint16 hwPllResetType (uint32 pllNum)
 {
   if ( ((DEVICE_REG32_R (DEVICE_PLL_BASE(pllNum) + PLL_REG_RSTYPE)) & PLL_REG_RSTYPE_FIELD_POWER_ON_RESET) != 0 )
     return (pll_POR_RESET);
@@ -56,7 +56,7 @@ void hw_pll_delay (uint32 del)
  **********************************************************************************
  * DESCRIPTION: Sets up the pll
  **********************************************************************************/
-int16 hwPllSetPll (uint16 pllNum, uint16 prediv, uint16 mult, uint16 postdiv)
+int16 hwPllSetPll (uint32 pllNum, uint32 prediv, uint32 mult, uint32 postdiv)
 {
   uint32 ctl;
   uint32 status;
@@ -140,7 +140,7 @@ int16 hwPllSetPll (uint16 pllNum, uint16 prediv, uint16 mult, uint16 postdiv)
  **********************************************************************************
  * DESCRIPTION: The pll is put into bypass. Returns 0 on success. 
  **********************************************************************************/
-int16 hwPllDisable (uint16 pllNum)
+int16 hwPllDisable (uint32 pllNum)
 {
   uint32 ctl;
   uint32 pllBase;
@@ -169,7 +169,7 @@ int16 hwPllDisable (uint16 pllNum)
  ***********************************************************************************
  * DESCRIPTION: The PLL is enabled with no changes to multipliers or dividers
  ***********************************************************************************/
-int16 hwPllEnable (uint16 pllNum)
+int16 hwPllEnable (uint32 pllNum)
 {
   uint32 ctl;
   uint32 pllBase;

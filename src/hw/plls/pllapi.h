@@ -16,10 +16,10 @@
 #include "types.h"
 
 /* Prototypes */
-uint16 hwPllResetType (uint16 pllNum);
-int16 hwPllSetPll (uint16 pllNum, uint16 prediv, uint16 mult, uint16 postdiv);
-int16 hwPllDisable (uint16 pllNum);
-int16 hwPllEnable (uint16 pllNum);
+uint16 hwPllResetType (uint32 pllNum);
+int16 hwPllSetPll (uint32 pllNum, uint32 prediv, uint32 mult, uint32 postdiv);
+int16 hwPllDisable (uint32 pllNum);
+int16 hwPllEnable (uint32 pllNum);
 
 
 /**

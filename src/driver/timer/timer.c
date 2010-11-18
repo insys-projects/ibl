@@ -15,6 +15,7 @@
  #include "timer.h"
  #include "devtimer.h"
  #include "iblcfg.h"
+ #include "timer_osal.h"
  #include <string.h>
 
 
@@ -97,7 +98,7 @@ TIMER_MCB   timermcb;
 void timer_init (void)
 {
     /* Initialize the Timer Master Control Block. */
-    memset (&timermcb, 0, sizeof(TIMER_MCB));
+    timerMemset (&timermcb, 0, sizeof(TIMER_MCB));
     return;
 }
 
@@ -184,7 +185,7 @@ void timer_delete (Int32 handle)
     if (timermcb.num_active_timers > 0)
     {
         /* Simply reset the memory contents */
-        memset ((void *)&timermcb.timer[handle], 0, sizeof(TIMER_BLOCK));
+        timerMemset ((void *)&timermcb.timer[handle], 0, sizeof(TIMER_BLOCK));
 
         /* Decrement the number of active timers in the system */
         timermcb.num_active_timers--;

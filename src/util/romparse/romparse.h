@@ -36,9 +36,10 @@
 typedef struct {
   char fname[MAX_FNAME_LEN];
   int  sizeBytes;
-  int  addressBytes;
+  unsigned int  addressBytes;
   unsigned int data[MAX_DATA_LEN_32bit];
   int  tag[NUM_BOOT_PARAM_TABLES];          /* identifies boot parameter tables which use this file */
+  int  align;                               /* alignment requirements for the file */
 } progFile_t;
 
 /* Define the PCI parameter structure */
@@ -49,6 +50,49 @@ typedef struct {
   int addressBytes;
   unsigned int data[PCI_DATA_LEN_32bit];
 } pciFile_t;
+
+
+/* Distinguish between a layout and pad */
+#define PLT_PAD     10
+#define PLT_FILE    11
+typedef struct {
+  int type;
+  int index;
+} plt_t;
+
+/* Define a layout table. A layout table is a block of data which contains the addresses
+ * of data files. Each address is 32 bits, with the upper 16 bits specifying the i2c 
+ * id, the lower address the byte address of the 1st block in the table */
+#define MAX_LAYOUTS         2
+#define MAX_LAYOUT_FILES    8
+typedef struct  {
+  int nPlt;                      /* Number of elements in the plt array */
+  plt_t plt[MAX_LAYOUT_FILES];   /* Index of each file/pad in order */
+  
+  unsigned int address;         /* I2c data address of the table */
+  unsigned int dev_addr;        /* I2c device address of the table */
+  int align;
+} layout_t;
+
+
+/* Pad section. The pad section creates a gap in the i2c memory map */
+#define MAX_PADS        8
+typedef struct  {
+  int          id;
+  unsigned int address;     /* I2C data address */
+  unsigned int dev_addr;    /* I2C device address */
+  unsigned int len;
+} pad_t;
+
+
+/* Layout/pad interleave. The rom specification must be in order, so this structure tracks
+ * the arrangement of layouts and pads */
+typedef struct
+{
+  int type;   /* Either PAD or LAYOUT */
+  int index;  /* The array index for the pad/layout */
+  
+} padLayoutOrder_t;
 
 
 

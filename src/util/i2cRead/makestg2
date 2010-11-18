@@ -16,6 +16,12 @@ endif
 
 ECODIR= $(IBL_ROOT)/util/i2cRead
 
+ifeq ($(ENDIAN),big)
+ IEXT=be
+else
+ IEXT=le
+endif
+
 MODULES= hw
 CLEAN_MODULES=$(addprefix clean_,$(MODULES))
 
@@ -37,7 +43,7 @@ export ARCH
 export TARGET
 
 $(DEVICES): gen_cdefdep $(MODULES) $(OBJS) i2cRead.cmd
-	$(LD) -o i2cRead.out -m i2cRead.map i2cRead.cmd $(RTLIBS)
+	$(LD) -o i2cRead_$(IEXT).out -m i2cRead_$(IEXT).map i2cRead.$(IEXT).oc ../../hw/c64x/make/i2c.$(IEXT).oc i2cRead.cmd $(RTLIBS)
 
 
 $(MODULES):
@@ -58,6 +64,6 @@ $(OBJS): cdefdep
 
 gen_cdefdep:
 	@echo Checking command line dependencies
-	@echo $(ENDIAN) $(ARCH) > cdefdep.tmp
+	@echo $(ARCH) > cdefdep.tmp
 	@sh -c 'if diff -q cdefdep.tmp cdefdep ; then echo same ; else $(CP) cdefdep.tmp cdefdep ; fi '
 

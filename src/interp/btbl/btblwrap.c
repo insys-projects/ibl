@@ -54,11 +54,11 @@ void iblBootBtbl (BOOT_MODULE_FXN_TABLE *bootFxn, Uint32 *entry_point)
     btblWrapEcode = 0;
 
     /* Initialize stats and btbl state */
-    memset (&bootStats, 0, sizeof(bootStats_t));
+    iblMemset (&bootStats, 0, sizeof(bootStats_t));
     
     boot_init_boot_tbl_inst (&tiBootTable);    
 
-    data = malloc (TI_BTBL_BLOCK_SIZE);
+    data = iblMalloc (TI_BTBL_BLOCK_SIZE);
     if (data == NULL)  {
         btblWrapEcode = BTBL_WRAP_ECODE_MALLOC_FAIL;
         return;
@@ -69,6 +69,9 @@ void iblBootBtbl (BOOT_MODULE_FXN_TABLE *bootFxn, Uint32 *entry_point)
     while ((tiBootTable.state != BOOT_TBL_STATE_FLUSH) && (btblEcode == 0)) {
 
         switch (tiBootTable.state)  {
+
+            case BOOT_TBL_STATE_PAD:   readSize = 2;
+                                       break;
 
             case BOOT_TBL_STATE_INIT:  
             case BOOT_TBL_STATE_SIZE:  
@@ -88,7 +91,7 @@ void iblBootBtbl (BOOT_MODULE_FXN_TABLE *bootFxn, Uint32 *entry_point)
             /* No recovery on block read failure */
             if ((*bootFxn->read)(data, blockSize) < 0)  {
                 btblWrapEcode = BTBL_WRAP_ECODE_READ_FAIL;
-                free (data);
+                iblFree (data);
                 return;
             }
 
@@ -114,7 +117,7 @@ void iblBootBtbl (BOOT_MODULE_FXN_TABLE *bootFxn, Uint32 *entry_point)
     if (btblEcode == 0)
         *entry_point = tiBootTable.code_start_addr;
 
-    free (data);
+    iblFree (data);
 
 }
 

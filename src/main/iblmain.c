@@ -26,28 +26,13 @@
 #include "ibl_elf.h"
 #include <string.h>
 
-
 /**
- * @brief The ibl table is declared.
- *
- * @details
- *   The ibl table is declared uninitialized by this ibl program. An external
- *   initialization can be performed if the default operation of the ibl is
- *   not desired.
+ *  @brief
+ *      Data structures shared between the 1st and 2nd stage IBL load
+ *      are declared in a single header file, included in both stages
  */
-#pragma DATA_SECTION(ibl, ".ibl_config_table")
-ibl_t ibl;
+#include "iblStage.h"
 
-
-/**
- * @brief The ibl status table is declared.
- *  
- * @details
- *   The ibl status table is declared. It is initialized at run time
- *   in function main.
- */
-#pragma DATA_SECTION(iblStatus, ".ibl_status_table")
-iblStatus_t iblStatus;
 
 
 /* Eat printfs */
@@ -106,7 +91,7 @@ void main (void)
     int32 i, j;
 
     /* Initialize the status structure */
-    memset (&iblStatus, 0, sizeof(iblStatus_t));
+    iblMemset (&iblStatus, 0, sizeof(iblStatus_t));
     iblStatus.iblMagic = ibl_MAGIC_VALUE;
 
 
@@ -115,31 +100,6 @@ void main (void)
 
     /* Initialize the system timer (software tracking of the hardware timer state) */
     timer_init ();
-
-
-
-    /* Load the default configuration table from the i2c. The actual speed of the device
-     * isn't really known here, since it is part of the table, so a compile time
-     * value is used (the pll may have been configured during the initial load) */
-    hwI2Cinit (IBL_I2C_DEV_FREQ_MHZ,        /* The CPU frequency during I2C data load */
-               DEVICE_I2C_MODULE_DIVISOR,   /* The divide down of CPU that drives the i2c */
-               IBL_I2C_CLK_FREQ_KHZ,        /* The I2C data rate used during table load */
-               IBL_I2C_OWN_ADDR);           /* The address used by this device on the i2c bus */
-
-    if (hwI2cMasterRead (IBL_I2C_CFG_TABLE_DATA_ADDR,    /* The address on the eeprom of the table */
-                         sizeof(ibl_t),                  /* The number of bytes to read */
-                         (UINT8 *)&ibl,                  /* Where to store the bytes */
-                         IBL_I2C_CFG_EEPROM_BUS_ADDR,    /* The bus address of the eeprom */
-                         IBL_I2C_CFG_ADDR_DELAY)         /* The delay between sending the address and reading data */
-
-         != I2C_RET_OK)  {
-
-       /* There is no recovery if the load of the configuration table failed */
-       iblStatus.tableLoadFail = 0x11111111;
-       for (;;);
-
-    }
-
 
     /* Load default mac addresses for ethernet boot if requested */
     for (i = 0; i < ibl_N_ETH_PORTS; i++)  {
@@ -152,9 +112,6 @@ void main (void)
     }
 
 
-    /* Pll configuration is device specific */
-    devicePllConfig ();
-
     /* DDR configuration is device specific */
     deviceDdrConfig ();
 
@@ -166,13 +123,22 @@ void main (void)
          * statement is simply defined to be a void statement */
         for (i = ibl_HIGHEST_PRIORITY; i < ibl_LOWEST_PRIORITY; i++)  {
 
+#ifndef EXCLUDE_ETH
             for (j = 0; j < ibl_N_ETH_PORTS; j++)  {
-                if (ibl.ethConfig[j].ethPriority == i)
-                iblEthBoot (j);
+                if (ibl.ethConfig[j].ethPriority == i)  {
+                    iblStatus.activePeriph = ibl_ACTIVE_PERIPH_ETH;
+                    memcpy (&iblStatus.ethParams, &ibl.ethConfig[j].ethInfo, sizeof (iblEthBootInfo_t));
+                    iblEthBoot (j);
+                }
             }
+#endif
 
-            if (ibl.nandConfig.nandPriority == i)
+#ifndef EXCLUDE_NAND
+            if (ibl.nandConfig.nandPriority == i)  {
+                iblStatus.activePeriph = ibl_ACTIVE_PERIPH_NAND;
                 iblNandBoot ();
+            }
+#endif
 
             iblStatus.heartBeat += 1;
         }
@@ -198,61 +164,74 @@ void main (void)
  */
 Uint32 iblBoot (BOOT_MODULE_FXN_TABLE *bootFxn, Int32 dataFormat, void *formatParams)
 { 
-    Uint32 entry = 0;
-
-    union  {
-
-        Uint8   dataBuf[4];   /* Place holder */
-        Uint32  bisValue;
-        Uint16  coffVer;    
-
-    } fid;
-
+    Uint32  entry = 0;
+    Uint32  value32;
+    Uint8   dataBuf[4];   
+    Uint16  value16;
 
     /* Determine the data format if required */
     if (dataFormat == ibl_BOOT_FORMAT_AUTO)  {
 
-        (*bootFxn->peek)((Uint8 *)&fid, sizeof(fid));
+        (*bootFxn->peek)(dataBuf, sizeof(dataBuf));
+        value32 = (dataBuf[0] << 24) | (dataBuf[1] << 16) | (dataBuf[2] << 8) | (dataBuf[3] << 0);
+        value16 = (dataBuf[0] <<  8) | (dataBuf[1] <<  0);
 
         /* BIS */
-        if (fid.bisValue == BIS_MAGIC_NUMBER)
+#ifndef EXCLUDE_BIS
+        if (value32 == BIS_MAGIC_NUMBER)
             dataFormat = ibl_BOOT_FORMAT_BIS;
+#endif
 
-        if (iblIsCoff (fid.coffVer))
+#ifndef EXCLUDE_COFF
+        if (iblIsCoff (value16))
             dataFormat = ibl_BOOT_FORMAT_COFF;
+#endif
 
-        if (iblIsElf (fid.dataBuf))
+#ifndef EXCLUDE_ELF
+        if (iblIsElf (dataBuf))
             dataFormat = ibl_BOOT_FORMAT_ELF;
+#endif
 
-        else  {
+        if (dataFormat == ibl_BOOT_FORMAT_AUTO)  {
             iblStatus.autoDetectFailCnt += 1;
             return (0);
         }
     }        
 
 
+    iblStatus.activeFormat = dataFormat;
+
+
     /* Invoke the parser */
     switch (dataFormat)  {
 
+#ifndef EXCLUDE_BIS
         case ibl_BOOT_FORMAT_BIS:
             iblBootBis (bootFxn, &entry);
             break;
+#endif
 
+#ifndef EXCLUDE_COFF
         case ibl_BOOT_FORMAT_COFF:
             iblBootCoff (bootFxn, &entry);
             break;
+#endif
 
         case ibl_BOOT_FORMAT_BTBL:
             iblBootBtbl (bootFxn, &entry);
             break;
 
+#ifndef EXCLUDE_BLOB
         case ibl_BOOT_FORMAT_BBLOB:
             iblBootBlob (bootFxn, &entry, formatParams);
             break;
+#endif
 
+#ifndef EXCLUDE_ELF
         case ibl_BOOT_FORMAT_ELF:
             iblBootElf (bootFxn, &entry);
             break;
+#endif
 
         default:
             iblStatus.invalidDataFormatSpec += 1;

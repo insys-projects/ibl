@@ -20,10 +20,13 @@
 #define fread(w,x,y,z)      (((*z->read)((Uint8 *)(w),(Uint32)((x)*(y)))) == 0 ? (y) : 0)
 
 /* Use stdlib functions where possible */
-#define mem_copy(dest,src,nbytes)           memcpy((void *)(dest),(void *)(src),nbytes)
-#define mem_write(buf, nbytes, addr, page)  memcpy((void *)(addr),(void *)(buf),nbytes)
+#define mem_copy(dest,src,nbytes)           iblMemcpy((void *)(dest),(void *)(src),nbytes)
+#define mem_write(buf, nbytes, addr, page)  iblMemcpy((void *)(addr),(void *)(buf),nbytes)
 #define str_comp                            strcmp
 #define strn_copy                           strncpy
+
+#define malloc                              iblMalloc
+#define free                                iblFree
 
 
 /***********************

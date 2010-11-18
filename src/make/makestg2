@@ -11,10 +11,25 @@ ifndef IBL_ROOT
 	IBL_ROOT=..
 endif
 
-MODULES= main device ethboot nandboot driver hw interp ecc
+CFG_MODULES= main device
+MODULES= ethboot nandboot driver hw interp ecc
+
 CLEAN_MODULES=$(addprefix clean_,$(MODULES))
+CLEAN_MODULES+=$(addprefix clean,$(CFG_MODULES))
+
 
 TARGETS= c6472 c6474 c6474l c6455 c6457
+
+# The main module needs to know the device address of the i2c where the image map resides
+MAINDEFS=-DIBL_I2C_MAP_TABLE_DATA_BUS_ADDR=$(I2C_BUS_ADDR)
+
+# Add build time exclusion definitions
+MAINDEFS+=$(addprefix -DEXCLUDE_,$(EXCLUDES))
+
+
+# Common symbols are functions which are loaded with the stage load of the IBL, and
+# also referenced from the second stage
+COMMON_SYMBOLS= hwI2Cinit hwI2cMasterRead iblBootBtbl iblMalloc iblFree iblMemset iblMemcpy
 
 ifeq ($(ENDIAN),little)
 	HEX_OPT= -order L
@@ -24,10 +39,8 @@ else
 	IEXT=     be
 endif
 
-ifeq ($(TARGET),c6474)
+ifeq ($(COMPACT_I2C),yes)
   COMPACT= -compact
-else
-  COMPACT=
 endif
 
 include $(IBL_ROOT)/make/$(ARCH)/makedefs.mk
@@ -35,24 +48,105 @@ include $(IBL_ROOT)/make/$(ARCH)/makedefs.mk
 export ARCH
 export TARGET
 
+$(TARGETS): iblMain
 
-$(TARGETS): $(MODULES) utils $(RIBL)
-	$(LD) -o ibl_$@/ibl_$@.out -m ibl_$@/ibl_$@.map  ibl_$@/ibl.cmd $(RTLIBS)
-	hex6x $(HEX_OPT) ibl_$@/ibl.rmd ibl_$@/ibl_$@.out
-	../util/bconvert/bconvert64x -$(IEXT) ibl_le.b ibl.b
-	$(CP) ibl.b ibl_$@
-	../util/btoccs/b2i2c ibl_$@/ibl.b ibl_$@/ibl.i2c.b
-	../util/btoccs/b2ccs ibl_$@/ibl.i2c.b ibl_$@/ibl.i2c.$(IEXT).ccs
-	../util/romparse/romparse $(COMPACT) ibl_$@/i2crom_$(IEXT).map
-	$(CP) i2crom.ccs ibl_$@/i2crom_$(IEXT).ccs
-	$(CP) i2crom.ccs ibl_$@/i2crom_$(IEXT).dat
+
+
+# The I2C creation options. The I2C map file is run through the C pre-processor to generate
+# the desired I2C mapping. There are three possible configurations - an i2c which has
+# both endians present, or an I2C with only one of the endians
+
+I2C_BE_FILE=      '"ibl_$(TARGET)/ibl.i2c.be.ccs"'
+I2C_LE_FILE=      '"ibl_$(TARGET)/ibl.i2c.le.ccs"'
+I2C_INIT_BE_FILE= '"ibl_$(TARGET)/ibl_init.i2c.be.ccs"'
+I2C_INIT_LE_FILE= '"ibl_$(TARGET)/ibl_init.i2c.le.ccs"'
+
+I2C_DEFS= -DI2C_BUS_ADDR=$(I2C_BUS_ADDR) 
+
+ifeq ($(I2CROM),both) 
+ I2C_DEFS+= -DINIT_EXE_FILE=$(I2C_INIT_LE_FILE)
+ I2C_DEFS+= -DEXE_FILE_1=$(I2C_LE_FILE) 
+ I2C_DEFS+= -DPAD_FILE_ID_1=1 
+ I2C_DEFS+= -DEXE_FILE_2=$(I2C_BE_FILE) 
+ I2C_DEFS+= -DPAD_FILE_ID_2=2 
+else 
+ I2C_DEFS+= -DPAD_FILE_ID_1=1
+ I2C_DEFS+= -DPAD_FILE_ID_2=1
+
+ ifeq ($(I2CROM),little_endian)
+  I2C_DEFS+= -DINIT_EXE_FILE=$(I2C_INIT_LE_FILE)
+  I2C_DEFS+= -DEXE_FILE_1=$(I2C_LE_FILE)
+  I2C_DEFS+= -DEXE_FILE_2='""'
+ else
+  I2C_DEFS+= -DINIT_EXE_FILE=$(I2C_INIT_BE_FILE)
+  I2C_DEFS+= -DEXE_FILE_1='""'
+  I2C_DEFS+= -DEXE_FILE_2=$(I2C_BE_FILE)
+ endif
+endif
+
+
+i2cRom:
+	$(CC) -ppo -I../cfg/$(TARGET) $(I2C_DEFS) ibl_$(TARGET)/$@.map.pre
+	../util/romparse/romparse $(COMPACT) -rom_base $(I2C_BUS_ADDR) ibl_$(TARGET)/$@.map.pp
+	$(CP) i2crom.ccs ibl_$(TARGET)/$@.ccs
+	$(CP) i2crom.ccs ibl_$(TARGET)/$@.dat
 	$(RM) i2crom.ccs ibl_le.b ibl.b
+
+
+
+
+
+
+# Target compare checks if the iblInit is compiled the same for both endians
+compare:
+	@echo -
+	@sh -c 'if diff -q ibl_$(TARGET)/ibl_init.le.ccs ibl_$(TARGET)/ibl_init.be.ccs ; then echo IBL init endian neutral ; else echo !!! WARNING !!!! IBL ini NOT endian neutral !!! ; fi '
+	@echo -
+
+# For the init code a raw image is created as well as the i2c code to verify
+# endian independent code is generated. The symbols required for linking
+# the full application are then extracted
+iblInit: $(CFG_MODULES) $(MODULES) utils
+	cat ibl_$(TARGET)/ibl_init_objs_template.inc | sed -e s/ENDIAN_TAG/$(IEXT)/g > ibl_$(TARGET)/ibl_init_objs.inc
+	$(LD) -o ibl_$(TARGET)/ibl_$(TARGET)_init.out -m ibl_$(TARGET)/ibl_$(TARGET)_init.map ibl_$(TARGET)/ibl_init.cmd $(RTLIBS)
+	$(CP) ibl_$(TARGET)/ibl_$(TARGET)_init.out ibl_$(TARGET)/ibl_$(TARGET)_init.$(IEXT).out
+	$(RM) -f ibl_$(TARGET)/ibl_init_obj.inc
+
+	hex6x $(HEX_OPT) ibl_$(TARGET)/ibl_init_image.rmd ibl_$(TARGET)/ibl_$(TARGET)_init.out
+	$(CP) ibl_le.b ibl_$(TARGET)/ibl.b
+	../util/btoccs/b2ccs ibl_$(TARGET)/ibl.b ibl_$(TARGET)/ibl_init.$(IEXT).ccs
+
+	hex6x $(HEX_OPT) ibl_$(TARGET)/ibl_init.rmd ibl_$(TARGET)/ibl_$(TARGET)_init.out
+	../util/bconvert/bconvert64x -$(IEXT) ibl_le.b ibl.b
+	$(CP) ibl.b ibl_$(TARGET)
+	../util/btoccs/b2i2c ibl_$(TARGET)/ibl.b ibl_$(TARGET)/ibl.i2c.b
+	../util/btoccs/b2ccs ibl_$(TARGET)/ibl.i2c.b ibl_$(TARGET)/ibl_init.i2c.$(IEXT).ccs
+
+	bash ../util/symExtract/symExtract ibl_$(TARGET)/ibl_$(TARGET)_init.map ibl_$(TARGET)/ibl_init_symbols.inc $(COMMON_SYMBOLS)
+
+	
+iblMain: iblInit $(CFG_MODULES) $(MODULES)
+	cat ibl_$(TARGET)/ibl_objs_template.inc | sed -e s/ENDIAN_TAG/$(IEXT)/g > ibl_$(TARGET)/ibl_objs.tmp
+	$(CC) -ppo $(MAINDEFS) -DENDIAN_TAG=$(IEXT) ibl_$(TARGET)/ibl_objs.tmp
+	$(CP) ibl_$(TARGET)/ibl_objs.pp ibl_$(TARGET)/ibl_objs.inc
+	$(LD) -o ibl_$(TARGET)/ibl_$(TARGET).out -m ibl_$(TARGET)/ibl_$(TARGET).$(IEXT).map  ibl_$(TARGET)/ibl.cmd $(RTLIBS)
+	$(CP) ibl_$(TARGET)/ibl_$(TARGET).out ibl_$(TARGET)/ibl_$(TARGET).$(IEXT).out
+	$(RM) -f ibl_$(TARGET)/ibl_obj.inc
+
+	hex6x $(HEX_OPT) ibl_$(TARGET)/ibl.rmd ibl_$(TARGET)/ibl_$(TARGET).out
+	../util/bconvert/bconvert64x -$(IEXT) ibl_le.b ibl.b
+	$(CP) ibl.b ibl_$(TARGET)
+	../util/btoccs/b2i2c ibl_$(TARGET)/ibl.b ibl_$(TARGET)/ibl.i2c.b
+	../util/btoccs/b2ccs ibl_$(TARGET)/ibl.i2c.b ibl_$(TARGET)/ibl.i2c.$(IEXT).ccs
 
 
 $(MODULES):
 	@echo making $@
 	make -C $(IBL_ROOT)/$@/$(ARCH)/make $@
 
+$(CFG_MODULES):
+	@echo making $@
+	make -C $(IBL_ROOT)/$@/$(ARCH)/make CDEFS='$(MAINDEFS)' $@
 
 utils:
 	make -C $(IBL_ROOT)/util/btoccs

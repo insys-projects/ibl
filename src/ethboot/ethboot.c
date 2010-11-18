@@ -21,6 +21,7 @@
 #include "device.h"
 #include "mdioapi.h"
 #include <string.h>
+#include "net_osal.h"
 
 /**
  *  @brief Remove the possible re-definition of iblEthBoot. iblcfg.h defines this to be a void
@@ -56,7 +57,7 @@ void ibl_rec_params (void *params)
     UNFORM_IPN(iblStatus.ethParams.ipAddr, netdev->ip_address);
     UNFORM_IPN(iblStatus.ethParams.serverIp, netdev->server_ip);
 
-    memcpy (iblStatus.ethParams.hwAddress, netdev->mac_address, sizeof(iblStatus.ethParams.hwAddress));
+    netMemcpy (iblStatus.ethParams.hwAddress, netdev->mac_address, sizeof(iblStatus.ethParams.hwAddress));
     strncpy (iblStatus.ethParams.fileName, netdev->file_name, sizeof(iblStatus.ethParams.fileName));
 
 }
@@ -94,7 +95,7 @@ void iblEthBoot (Int32 eIdx)
     nDevice.port_num = ibl.ethConfig[eIdx].port;
 
     /* Simple transation to initialize the driver */
-    memcpy (nDevice.mac_address, ibl.ethConfig[eIdx].ethInfo.hwAddress, sizeof(nDevice.mac_address));
+    netMemcpy (nDevice.mac_address, ibl.ethConfig[eIdx].ethInfo.hwAddress, sizeof(nDevice.mac_address));
 
     nl = FORM_IPN(ibl.ethConfig[eIdx].ethInfo.ipAddr);
     if (ibl.ethConfig[eIdx].doBootp == TRUE)
@@ -110,7 +111,7 @@ void iblEthBoot (Int32 eIdx)
     nDevice.use_bootp_server_ip = ibl.ethConfig[eIdx].useBootpServerIp;
 
     /* Note - the file name structure in nDevice is only 64 bytes, but 128 in ethInfo */
-    memcpy (nDevice.file_name, ibl.ethConfig[eIdx].ethInfo.fileName, sizeof(nDevice.file_name));
+    netMemcpy (nDevice.file_name, ibl.ethConfig[eIdx].ethInfo.fileName, sizeof(nDevice.file_name));
     nDevice.use_bootp_file_name = ibl.ethConfig[eIdx].useBootpFileName;
 
 
@@ -184,6 +185,7 @@ void iblEthBoot (Int32 eIdx)
         }
 
     }
+
 
     entry = iblBoot (&net_boot_module, format, &ibl.ethConfig[eIdx].blob);
 

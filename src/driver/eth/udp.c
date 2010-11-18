@@ -16,6 +16,7 @@
 #include "netif.h"
 #include "iblcfg.h"
 #include <string.h>
+#include "net_osal.h"
 
 
 /**********************************************************************
@@ -190,7 +191,7 @@ Int32 udp_sock_open (SOCKET* ptr_socket)
         if (udp_socket[index].local_port == 0)
         {
             /* Got a free slot. Copy the socket data over and return the index as the handle. */
-            memcpy ((void *)&udp_socket[index], (void *)ptr_socket, sizeof(SOCKET));
+            netMemcpy ((void *)&udp_socket[index], (void *)ptr_socket, sizeof(SOCKET));
             return index;
         }
     }
@@ -245,7 +246,7 @@ Int32 udp_sock_send (Int32 sock, Uint8* ptr_app_data, Int32 num_bytes)
     /*******************************************************************************
      ********************************* APP Data ************************************
      *******************************************************************************/
-    memcpy ((void *)ptr_data, (void *)ptr_app_data, num_bytes);
+    netMemcpy ((void *)ptr_data, (void *)ptr_app_data, num_bytes);
 
     /*******************************************************************************
      ********************************* UDP Header **********************************
@@ -299,7 +300,7 @@ void udp_sock_close (Int32 sock)
     ptr_socket = &udp_socket[sock];
 
     /* Reset the memory block */
-    memset ((void *)ptr_socket, 0, sizeof(SOCKET));
+    netMemset ((void *)ptr_socket, 0, sizeof(SOCKET));
     return;
 }
 
@@ -314,7 +315,7 @@ void udp_sock_close (Int32 sock)
 void udp_init (void)
 {
     /* Initialize the socket table */
-    memset (&udp_socket, 0, sizeof(udp_socket));
+    netMemset (&udp_socket, 0, sizeof(udp_socket));
     return;
 }
 

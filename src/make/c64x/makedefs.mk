@@ -9,6 +9,12 @@
 #* (C) Copyright 1999 TELOGY Networks, Inc.             
 #*******************************************************************************
 
+ifeq ($(ENDIAN),big)
+ MEXT=be
+else
+ MEXT=le
+endif
+
 CC          = $(TOOLSC6X)/cgtools/bin/cl6x
 AS          = $(TOOLSC6X)/cgtools/bin/cl6x
 LD          = $(TOOLSC6X)/cgtools/bin/cl6x -z
@@ -18,9 +24,9 @@ HEX6X		= $(TOOLSC6X)/cgtools/bin/hex6x
 CDBTOOL     = $(COMSPEC) /c $(TOOLSBIOSCDBC6X)\gconfgen
 MAKEDEP     = $(MAKEDEPPATH)
 MAKEDEP_OPT = -q
-COBJEXT     = oc
+COBJEXT     = $(MEXT).oc
 LOBJEXT     = ol
-AOBJEXT     = oa
+AOBJEXT     = $(MEXT).oa
 CDEPEXT     = dc
 LDEPEXT     = dl
 ADEPEXT     = da

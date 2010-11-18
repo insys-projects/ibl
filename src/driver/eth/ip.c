@@ -15,6 +15,7 @@
 #include "net.h"
 #include "netif.h"
 #include <string.h>
+#include "net_osal.h"
 
 
 /**
@@ -179,7 +180,7 @@ void ip_del_route (Uint32 flag)
     }
     
     /* Simply reset all the fields */
-    memset ((void *)ptr_rt, 0, sizeof(RT_ENTRY));
+    netMemset ((void *)ptr_rt, 0, sizeof(RT_ENTRY));
     return;
 }
 
@@ -386,7 +387,7 @@ void ip_send (IPHDR* ptr_iphdr, Uint16 size)
 void ip_init (void)
 {
     /* Reset the routing table */
-    memset (&rt_table, 0, sizeof(rt_table));
+    netMemset (&rt_table, 0, sizeof(rt_table));
     return;
 }
 
