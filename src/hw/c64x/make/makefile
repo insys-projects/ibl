@@ -168,7 +168,7 @@ gen_cdefdep:
 	@echo $(TARGET) $(ARCH) $(CDEFS) $(DEBUG) > cdefdep.tmp
 	@sh -c 'if diff -q cdefdep.tmp cdefdep ; then echo same ; else $(CP) cdefdep.tmp cdefdep ; fi '
 
-clean:
+cleant:
 	make -f makestg2 clean2 ARCH=c64x  
 
 

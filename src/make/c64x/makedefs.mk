@@ -15,12 +15,12 @@ else
  MEXT=le
 endif
 
-CC          = $(TOOLSC6X)/cgtools/bin/cl6x
-AS          = $(TOOLSC6X)/cgtools/bin/cl6x
-LD          = $(TOOLSC6X)/cgtools/bin/cl6x -z
-ARIN        = $(TOOLSC6X)/cgtools/bin/ar6x -rq
-AROUT       = $(TOOLSC6X)/cgtools/bin/ar6x -xq 
-HEX6X		= $(TOOLSC6X)/cgtools/bin/hex6x
+CC          = $(TOOLSC6X)/bin/cl6x
+AS          = $(TOOLSC6X)/bin/cl6x
+LD          = $(TOOLSC6X)/bin/cl6x -z
+ARIN        = $(TOOLSC6X)/bin/ar6x -rq
+AROUT       = $(TOOLSC6X)/bin/ar6x -xq 
+HEX6X		= $(TOOLSC6X)/bin/hex6x
 CDBTOOL     = $(COMSPEC) /c $(TOOLSBIOSCDBC6X)\gconfgen
 MAKEDEP     = $(MAKEDEPPATH)
 MAKEDEP_OPT = -q

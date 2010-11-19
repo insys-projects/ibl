@@ -33,6 +33,9 @@
 #*
 
 
+ifdef BISONSKEL
+ BISONDEFS=-S $(BISONSKEL)
+endif
 
 
 all: gen_cdefdep romparse
@@ -42,7 +45,7 @@ romparse: cdefdep rparse.tab.o lex.yy.o romparse.c
 
 
 rparse.tab.o: rparse.y
-	bison -d rparse.y
+	bison -d $(BISONDEFS) rparse.y
 	gcc -c rparse.tab.c
 
 lex.yy.o: rparse.flex

@@ -38,6 +38,7 @@ set PERL=//t/gen/perl/activestate/5_6_1_635/bin/perl
 set PERLDOS=t:\gen\perl\activestate\5_6_1_635\bin\perl
 
 set CYGWINPATH=//t/gen/gnu/99-11-01/cygwin-b20/H-i586-cygwin32/bin
+set BISONSKEL=t:\gen\gnu\99-11-01\cygwin-b20\share\bison.simple
 set TOOLSC6X=C:/PROGRA~1/TEXASI~1/C6000C~1.12
 set TOOLSC6XDOS=C:\PROGRA~1\TEXASI~1\C6000C~1.12
 

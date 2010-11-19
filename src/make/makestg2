@@ -14,8 +14,9 @@ endif
 CFG_MODULES= main device
 MODULES= ethboot nandboot driver hw interp ecc
 
-CLEAN_MODULES=$(addprefix clean_,$(MODULES))
-CLEAN_MODULES+=$(addprefix clean,$(CFG_MODULES))
+# Note that the Hw module is a two stage clean and handled seperately
+CLEAN_MODULES=$(addprefix clean_,$(subst hw,,$(MODULES)))
+CLEAN_MODULES+=$(addprefix clean_,$(CFG_MODULES))
 
 
 TARGETS= c6472 c6474 c6474l c6455 c6457
@@ -156,12 +157,16 @@ utils:
 	make -C $(IBL_ROOT)/util/i2cConfig $(TARGET)
 	make -C $(IBL_ROOT)/util/bconvert
 
-clean: $(CLEAN_MODULES)
+clean: $(CLEAN_MODULES) hwClean
 	
 
 $(CLEAN_MODULES):
 	@echo cleaning $(subst clean_, ,$@)
-	make -C $(IBL_ROOT)/$(subst clean_,,$@)/$(ARCH)/make clean ARCH=c64x TARGET=c6472
+	make -C $(IBL_ROOT)/$(subst clean_,,$@)/$(ARCH)/make clean ARCH=c64x TARGET=$(TARGET)
+
+hwClean:
+	@echo cleaning hw
+	make -C $(IBL_ROOT)/hw/$(ARCH)/make cleant ARCH=$(ARCH) TARGET=$(TARGET)
 	
 cleant:
 	rm -rf ibl_$(TARGET)/ibl_$(TARGET).out
