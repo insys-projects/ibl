@@ -43,7 +43,7 @@
 #include "net.h"
 #include "netif.h"
 #include <string.h>
-
+#include "net_osal.h"
 
 /**********************************************************************
  *************************** LOCAL Structures *************************
@@ -166,12 +166,12 @@ void arp_resolve (IPN dst_ip, IPHDR* ptr_iphdr, Uint16 l3_pkt_size)
 
     /* Initialize the ARP Cache: The cache did not have information for the resolution to work
      * Reset the cache and start again.  */
-    memset ((void *)&net_arp_cache, 0, sizeof(NET_ARP_CACHE));
+    netMemset ((void *)&net_arp_cache, 0, sizeof(NET_ARP_CACHE));
 
     /* Populate the ARP Cache */
     net_arp_cache.ip_address         = dst_ip;    
     net_arp_cache.pending_packet_len = l3_pkt_size;
-    memcpy ((void *)&net_arp_cache.pending_packet[0], (void *)ptr_iphdr, l3_pkt_size);
+    netMemcpy ((void *)&net_arp_cache.pending_packet[0], (void *)ptr_iphdr, l3_pkt_size);
 
     /* Free up the packet now; we have already stored it in the ARP cache. */
     net_free_tx_packet ((Uint8 *)ptr_iphdr);
@@ -189,12 +189,12 @@ void arp_resolve (IPN dst_ip, IPHDR* ptr_iphdr, Uint16 l3_pkt_size)
     ptr_arphdr->Op           = htons(0x1);
 
     /* Populate the Source IP/MAC Address */
-    memcpy ((void *)&ptr_arphdr->SrcAddr[0], (void *)&netmcb.net_device.mac_address[0], 6);
-    memcpy ((void *)&ptr_arphdr->IPSrc[0], (void *)&netmcb.net_device.ip_address, 4);
+    netMemcpy ((void *)&ptr_arphdr->SrcAddr[0], (void *)&netmcb.net_device.mac_address[0], 6);
+    netMemcpy ((void *)&ptr_arphdr->IPSrc[0], (void *)&netmcb.net_device.ip_address, 4);
 
     /* Populate the Target IP/MAC Address: This is set to 0 since the cache has been reset above. */
-    memcpy ((void *)&ptr_arphdr->DstAddr[0], (void *)&net_arp_cache.mac_address[0], 6);
-    memcpy ((void *)&ptr_arphdr->IPDst[0], (void *)&dst_ip, 4);
+    netMemcpy ((void *)&ptr_arphdr->DstAddr[0], (void *)&net_arp_cache.mac_address[0], 6);
+    netMemcpy ((void *)&ptr_arphdr->IPDst[0], (void *)&dst_ip, 4);
 
     /* Create the Ethernet header. */
     ptr_ethhdr = net_create_eth_header ((Uint8 *)ptr_arphdr, &BroadcastMac[0], 0x806);
@@ -251,7 +251,7 @@ Int32 arp_receive (ARPHDR* ptr_arphdr, Int32 num_bytes)
 
     /* The ARP packet was meant for us; we need to update the ARP cache with the request. */
     net_arp_cache.ip_address = READ32(ptr_arphdr->IPSrc);
-    memcpy ((void *)&net_arp_cache.mac_address[0], (void *)&ptr_arphdr->SrcAddr[0], 6);
+    netMemcpy ((void *)&net_arp_cache.mac_address[0], (void *)&ptr_arphdr->SrcAddr[0], 6);
 
     /* Check if the packet is an ARP request? */
     if (ptr_arphdr->Op == htons(0x1))
@@ -271,12 +271,12 @@ Int32 arp_receive (ARPHDR* ptr_arphdr, Int32 num_bytes)
         ptr_arphdr->Op           = htons(0x2);
 
         /* Populate the Source IP/MAC Address in the ARP Header */
-        memcpy ((void *)&ptr_arphdr->SrcAddr[0], (void *)&netmcb.net_device.mac_address[0], 6);
-        memcpy ((void *)&ptr_arphdr->IPSrc[0], (void *)&netmcb.net_device.ip_address, 4);
+        netMemcpy ((void *)&ptr_arphdr->SrcAddr[0], (void *)&netmcb.net_device.mac_address[0], 6);
+        netMemcpy ((void *)&ptr_arphdr->IPSrc[0], (void *)&netmcb.net_device.ip_address, 4);
 
         /* Populate the Target IP/MAC Address in the ARP Header */
-        memcpy ((void *)&ptr_arphdr->DstAddr[0], (void *)&net_arp_cache.mac_address[0], 6);
-        memcpy ((void *)&ptr_arphdr->IPDst[0], (void *)&net_arp_cache.ip_address, 4);
+        netMemcpy ((void *)&ptr_arphdr->DstAddr[0], (void *)&net_arp_cache.mac_address[0], 6);
+        netMemcpy ((void *)&ptr_arphdr->IPDst[0], (void *)&net_arp_cache.ip_address, 4);
 
         /* Create the Ethernet header. */
         ptr_ethhdr = net_create_eth_header ((Uint8 *)ptr_arphdr, &net_arp_cache.mac_address[0], 0x806);
@@ -300,7 +300,7 @@ Int32 arp_receive (ARPHDR* ptr_arphdr, Int32 num_bytes)
             return -1;
 
         /* We now copy the contents of this packet from the ARP cache */
-        memcpy ((void *)ptr_pending_pkt, (void *)&net_arp_cache.pending_packet[0], 
+        netMemcpy ((void *)ptr_pending_pkt, (void *)&net_arp_cache.pending_packet[0], 
                     net_arp_cache.pending_packet_len);
 
         /* We create the Ethernet header. 
@@ -333,7 +333,7 @@ Int32 arp_receive (ARPHDR* ptr_arphdr, Int32 num_bytes)
  */
 void arp_init (void)
 {
-    memset (&net_arp_cache, 0, sizeof(NET_ARP_CACHE));
+    netMemset (&net_arp_cache, 0, sizeof(NET_ARP_CACHE));
     return;
 }
 

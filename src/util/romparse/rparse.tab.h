@@ -59,6 +59,11 @@
 #define	SWPLL	276
 #define	DEV_ADDR_EXT	277
 #define	DEV_ADDR	278
+#define	LAYOUT	279
+#define	ALIGN	280
+#define	PAD	281
+#define	LENGTH	282
+#define	PAD_FILE_ID	283
 
 
 extern YYSTYPE yylval;

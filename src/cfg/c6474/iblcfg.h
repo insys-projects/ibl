@@ -88,27 +88,18 @@
 #define IBL_I2C_OWN_ADDR                10
 #define IBL_I2C_CFG_ADDR_DELAY          0x100       /* Delay between sending the address and reading data */
 
-#ifdef IBL_I2C_CFG_EEPROM_BUS_ADDR
-#undef IBL_I2C_CFG_EEPROM_BUS_ADDR
+/**
+ *  @brief The default location for the i2c map information can be overridden during make
+ */
+#ifndef IBL_I2C_MAP_TABLE_DATA_BUS_ADDR
+ #define IBL_I2C_MAP_TABLE_DATA_BUS_ADDR 0x50
 #endif
 
-#define IBL_I2C_CFG_EEPROM_BUS_ADDR    0x50
-
-
-#define IBL_I2C_CFG_TABLE_DATA_ADDR     (0x8000 - 0x300)
+#ifndef IBL_I2C_MAP_TABLE_DATA_ADDR
+ #define IBL_I2C_MAP_TABLE_DATA_ADDR     0x100
+#endif
  
  
-
-/**
- * @brief No NAND support. Define the function call to be a void statement
- */
-#define iblNandBoot()
-
-/**
- * @brief No Elf support
- */
-#define iblIsElf(x)         FALSE
-#define iblBootElf(x,y)     for (;;);
 
 
 #endif

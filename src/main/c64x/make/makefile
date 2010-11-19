@@ -49,10 +49,7 @@ endif
 ECODIR= $(IBL_ROOT)/main
 
 
-CSRC= iblmain.c
-
-
-CDEFS += -DIBL_I2C_CFG_EEPROM_BUS_ADDR=$(I2C_PARAM_BUS_ADDR)
+CSRC= iblmain.c iblinit.c
 
 
 .PHONY: main
@@ -99,6 +96,6 @@ $(OBJS): cdefdep
 
 gen_cdefdep:
 	@echo Checking command line dependencies
-	@echo $(ENDIAN) $(TARGET) $(ARCH) $(CDEFS) $(DEBUG) > cdefdep.tmp
+	@echo $(TARGET) $(ARCH) $(CDEFS) $(DEBUG) > cdefdep.tmp
 	@sh -c 'if diff -q cdefdep.tmp cdefdep ; then echo same ; else $(CP) cdefdep.tmp cdefdep ; fi '
 

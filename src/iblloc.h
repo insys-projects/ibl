@@ -110,6 +110,11 @@ typedef struct BOOT_MODULE_FXN_TABLE
 /* Prototypes */
 Uint32 iblBoot (BOOT_MODULE_FXN_TABLE *bootFxn, int32 dataFormat, void *formatParams);
 
+/* Stdlibs referenced through functions to use a single copy in the two stage boot */
+void *iblMalloc (Uint32 size);
+void  iblFree   (void *mem);
+void *iblMemset (void *mem, Int32 ch, Uint32 n);
+void *iblMemcpy (void *s1, const void *s2, Uint32 n);
 
 /* squash printfs */
 void mprintf(char *x, ...);

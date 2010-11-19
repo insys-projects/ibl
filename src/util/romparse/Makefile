@@ -38,7 +38,7 @@
 all: gen_cdefdep romparse
 
 romparse: cdefdep rparse.tab.o lex.yy.o romparse.c
-	gcc -o romparse romparse.c rparse.tab.o lex.yy.o -I../.. -I. -D$(TARGET)
+	gcc -o romparse -g romparse.c rparse.tab.o lex.yy.o -I../.. -I. -D$(TARGET)
 
 
 rparse.tab.o: rparse.y

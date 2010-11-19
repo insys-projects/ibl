@@ -5,9 +5,7 @@
  *
  *************************************************************************/
 
-i2cparam.oc
-../../hw/c64x/make/i2c.oc
-../../hw/c64x/make/pll.oc
+/* Object files included in linker invokation */
 
 -c
 -a
@@ -18,6 +16,7 @@ MEMORY
    STACK   :  origin = 0x810000 length = 0x0400
    TEXT    :  origin = 0x810400 length = 0x8000
    DATA    :  origin = 0x818400 length = 0x0800
+   SYSMEM  :  origin = 0x809000 length = 0x0800
 }
 
 SECTIONS
@@ -32,6 +31,8 @@ SECTIONS
 	.far    > DATA
 	.bss    > DATA
 	.data   > DATA
+
+	.sysmem > SYSMEM
 
 }
 	

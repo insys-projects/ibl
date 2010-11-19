@@ -139,6 +139,14 @@ void deviceLoadDefaultEthAddress (uint8 *maddr);
 void deviceSetEthResetState (int32 portNum, BOOL applyReset);
 #endif
  
+ /**
+  *  @brief
+  *     Return the endian status
+  *
+  *  @details
+  *     Returns true if the device is executing in little endian mode
+  */
+bool deviceIsLittleEndian(void);
 
 #endif
 

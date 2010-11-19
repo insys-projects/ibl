@@ -45,6 +45,7 @@
 #include "timer.h"
 #include "stream.h"
 #include <string.h>
+#include "net_osal.h"
 
 
 /**********************************************************************
@@ -126,7 +127,7 @@ static void bootp_tmr_expiry (void)
     ptr_bootphdr->htype     = BOOTP_HTYPE_ETHERNET;
     ptr_bootphdr->hlen      = 6;
     ptr_bootphdr->xid       = htonl(0x1);
-    memcpy ((void *)&ptr_bootphdr->chaddr, (void *)&netmcb.net_device.mac_address[0], 6);
+    netMemcpy ((void *)&ptr_bootphdr->chaddr, (void *)&netmcb.net_device.mac_address[0], 6);
 
     /* The packet has been populated; send it to the server. */
     udp_sock_send (bootpmcb.sock, (Uint8 *)ptr_bootphdr, sizeof(BOOTPHDR));
@@ -302,7 +303,7 @@ static Int32 bootp_receive (Int32 sock, Uint8* ptr_data, Int32 num_bytes)
     ip_add_route (FLG_RT_NETWORK, netmcb.net_device.ip_address, netmcb.net_device.net_mask, 0);
 
     if (netmcb.net_device.use_bootp_file_name == TRUE)
-        memcpy (netmcb.net_device.file_name, ptr_bootphdr->file, sizeof(netmcb.net_device.file_name));
+        netMemcpy (netmcb.net_device.file_name, ptr_bootphdr->file, sizeof(netmcb.net_device.file_name));
 
     /* Check if we had received a default router? */
     if (defaultRouter != 0)
@@ -347,7 +348,7 @@ void bootp_init (void (*asyncComplete)(void *))
     SOCKET      socket;
 
     /* Initialize the BOOT MCB */ 
-    memset ((void *)&bootpmcb, 0, sizeof(BOOTP_MCB));
+    netMemset ((void *)&bootpmcb, 0, sizeof(BOOTP_MCB));
 
     bootpmcb.asyncComplete = asyncComplete;
 
@@ -379,7 +380,7 @@ void bootp_init (void (*asyncComplete)(void *))
     ptr_bootphdr->htype     = BOOTP_HTYPE_ETHERNET;
     ptr_bootphdr->hlen      = 6;
     ptr_bootphdr->xid       = htonl(0x1);
-    memcpy ((void *)&ptr_bootphdr->chaddr, (void *)&netmcb.net_device.mac_address[0], 6);
+    netMemcpy ((void *)&ptr_bootphdr->chaddr, (void *)&netmcb.net_device.mac_address[0], 6);
 
     /* The packet has been populated; send it to the server. */
     udp_sock_send (bootpmcb.sock, (Uint8 *)ptr_bootphdr, sizeof(BOOTPHDR));

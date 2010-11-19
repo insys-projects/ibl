@@ -40,6 +40,7 @@
 */
 #include <blf.h>
 #include "netif.h"
+#include "net_osal.h"
 
 #ifdef INCLUDE_BLF_NET_MODULE
 #ifdef INCLUDE_BLF_NET_ICMP
@@ -134,7 +135,7 @@ void icmp_receive (IPHDR* ptr_iphdr)
         return;
 
     /* We can blindly copy the 'original' IP packet to the 'reply' IP packet. */
-    utl_memcpy ((void *)ptr_reply_iphdr, (void *)ptr_iphdr, (l4_pkt_size + IPHDR_SIZE));
+    netMemcpy ((void *)ptr_reply_iphdr, (void *)ptr_iphdr, (l4_pkt_size + IPHDR_SIZE));
 
     /* Get the pointer to the new header. 
      *  The new header starts after the IP header. */

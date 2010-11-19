@@ -64,6 +64,7 @@
 #include "ArrayList.h"
 #include "ewrap.h"
 #include "dload_api.h"
+#include "file_ovr.h"
 
 /*****************************************************************************/
 /* AL_INITIALIZE() - Initialize a newly created Array_List object.           */
@@ -119,5 +120,5 @@ int32_t AL_size(Array_List* obj)
 /*****************************************************************************/
 void AL_destroy(Array_List* obj)
 {
-   free(obj->buf);
+   DLIF_free(obj->buf);
 }

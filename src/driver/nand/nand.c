@@ -141,16 +141,16 @@ Int32 nand_seek (Int32 loc, Int32 from)
 Int32 nand_free_return (Int32 retcode)
 {
     if (nandmcb.page != NULL)
-        free (nandmcb.page);
+        iblFree (nandmcb.page);
 
     if (nandmcb.logicalToPhysMap != NULL)
-        free (nandmcb.logicalToPhysMap);
+        iblFree (nandmcb.logicalToPhysMap);
 
     if (nandmcb.physToLogicalMap != NULL)
-        free (nandmcb.physToLogicalMap);
+        iblFree (nandmcb.physToLogicalMap);
 
     if (nandmcb.blocks != NULL)
-        free (nandmcb.blocks);
+        iblFree (nandmcb.blocks);
 
     return (retcode);
 
@@ -174,8 +174,8 @@ Int32 nand_open (void *ptr_driver, void (*asyncComplete)(void *))
     Int32 i, j;
 
     /* Initialize the control info */
-    memset (&nandmcb, 0, sizeof(nandmcb));
-    memcpy (&nandmcb.devInfo, &ibln->nandInfo, sizeof(iblNand_t));
+    iblMemset (&nandmcb, 0, sizeof(nandmcb));
+    iblMemcpy (&nandmcb.devInfo, &ibln->nandInfo, sizeof(iblNand_t));
 
     nandmcb.page             = NULL;
     nandmcb.logicalToPhysMap = NULL;
@@ -188,25 +188,25 @@ Int32 nand_open (void *ptr_driver, void (*asyncComplete)(void *))
 
     /* allocate memory for the page data and the logical to physical block map */
     size = nandmcb.devInfo.pageSizeBytes + nandmcb.devInfo.pageEccBytes;
-    nandmcb.page = malloc (size * sizeof(Uint8));
+    nandmcb.page = iblMalloc (size * sizeof(Uint8));
     if (nandmcb.page == NULL)
         nand_free_return (NAND_MALLOC_PAGE_FAIL);
 
 
     /* Logical to physical map data */
-    nandmcb.logicalToPhysMap = malloc (nandmcb.devInfo.totalBlocks * sizeof(Uint16));
+    nandmcb.logicalToPhysMap = iblMalloc (nandmcb.devInfo.totalBlocks * sizeof(Uint16));
     if (nandmcb.logicalToPhysMap == NULL)  
         nand_free_return (NAND_MALLOC_MAP_LTOP_FAIL);
     
 
     /* Physical to logical map data */
-    nandmcb.physToLogicalMap = malloc (nandmcb.devInfo.totalBlocks * sizeof(Uint16));
+    nandmcb.physToLogicalMap = iblMalloc (nandmcb.devInfo.totalBlocks * sizeof(Uint16));
     if (nandmcb.physToLogicalMap == NULL)  
         nand_free_return (NAND_MALLOC_MAP_PTOL_FAIL);
 
     /* Block info */
     size = nandmcb.devInfo.totalBlocks * sizeof(Uint8);
-    nandmcb.blocks = malloc (size);
+    nandmcb.blocks = iblMalloc (size);
     if (nandmcb.blocks == NULL)  
         nand_free_return (NAND_MALLOC_BLOCK_INFO_FAIL);
 

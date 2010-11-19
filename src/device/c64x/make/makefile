@@ -50,13 +50,13 @@ ECODIR= $(IBL_ROOT)/device
 
 # For no target set CSRC to all sources for clean
 ifeq ($(TARGET),c6472)
- CSRC= c6472.c
+ CSRC= c6472.c c6472init.c
 else 
  ifeq ($(TARGET),c6455)
-  CSRC= c6455.c
+  CSRC= c6455.c c6455init.c
  else
   ifeq ($(TARGET),c6474)
-   CSRC= c6474.c
+   CSRC= c6474.c c6474init.c
   else
    ifeq ($(TARGET),c6474l)
     CSRC= c6474l.c
@@ -99,7 +99,7 @@ $(OBJS): cdefdep
 
 gen_cdefdep:
 	@echo Checking command line dependencies
-	@echo $(ENDIAN) $(TARGET) $(ARCH) $(CDEFS) $(DEBUG) > cdefdep.tmp
+	@echo $(TARGET) $(ARCH) $(CDEFS) $(DEBUG) > cdefdep.tmp
 	@sh -c 'if diff -q cdefdep.tmp cdefdep ; then echo same ; else $(CP) cdefdep.tmp cdefdep ; fi '
 
 

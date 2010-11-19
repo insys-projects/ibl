@@ -447,7 +447,7 @@ Int32 cpmac_drv_receive (NET_DRV_DEVICE* ptr_device, Uint8* buffer)
         pDesc->PktFlgLen = EMAC_DSC_FLAG_OWNER;
 
         /* Copy the data from the descriptor buffer to the supplied buffer. */
-        memcpy((void *)buffer, (void *)pDesc->pBuffer, bytes_received);
+        iblMemcpy((void *)buffer, (void *)pDesc->pBuffer, bytes_received);
 
         /* Put this descriptor back to the HDP. */
         ptr_EMACRegs->RX0HDP = (Uint32)pDesc;

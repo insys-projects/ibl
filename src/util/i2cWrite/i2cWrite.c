@@ -49,17 +49,24 @@
 #include "types.h"
 #include "i2c.h"
 #include "target.h"
+#include "pllapi.h"
 #include <stdio.h>
 #include <string.h>
 
-#define I2C_SIZE_BYTES  0x10000
+#define I2C_SIZE_BYTES  0x20000
 
 /* Run time configuration */
 unsigned int   deviceFreqMhz = 1000;
-unsigned short busAddress    = 0x50;
+unsigned int   prediv        = 1;       /* Pre-divider  */
+unsigned int   mult          = 20;      /* Multiplier   */
+unsigned int   postdiv       = 1;       /* Post-divider */
+
+unsigned int   busAddress    = 0x50;
 unsigned int   i2cBlockSize  = 64;
 unsigned int   nbytes        = I2C_SIZE_BYTES;
 unsigned int   dataAddress   = 0;
+
+#define I2C_DATA_ADDRESS_MASK   0x0fffff        /* 20 bits specifiy the address (4 msb roll into dev address) */
 
 
 #pragma DATA_SECTION(i2cData, ".i2cData")
@@ -129,6 +136,7 @@ int formBlock (unsigned int addr, int byteIndex, int n)
 
     }
 
+
     return (n+2);
 
 }
@@ -171,16 +179,25 @@ void showI2cError (I2C_RET iret)
 void main (void)
 {
     I2C_RET i2cRet;
-    int     n;
+    int     n, m, p;
     int     remain;
     int     progBytes;
     int     eCount;
+
+    unsigned int bAddress;
 
     UINT8  *iData;
     UINT8   writeByte;
     int     j;
 
     volatile int i;
+
+
+    /* Program the main system PLL */
+    hwPllSetPll (0,              /* Main PLL     */
+                 prediv,         /* Pre-divider  */
+                 mult,           /* Multiplier   */
+                 postdiv);       /* Post-divider */
 
     hwI2Cinit (deviceFreqMhz,
                DEVICE_I2C_MODULE_DIVISOR,
@@ -198,11 +215,14 @@ void main (void)
         /* formBlock sets up the address as well as the data */
         progBytes = formBlock (dataAddress + n, n, remain);
 
+        /* Form the i2c bus address. Bits from the i2c address can roll into the bus address field */
+        bAddress = (((busAddress << 16) & ~I2C_DATA_ADDRESS_MASK) + dataAddress + n) >> 16;
+
         if (progBytes < 0)
             return;
 
         /* Write the block */
-        i2cRet = hwI2cMasterWrite (busAddress,
+        i2cRet = hwI2cMasterWrite (bAddress,
                                    i2cBlock,
                                    progBytes,
                                    I2C_RELEASE_BUS,
@@ -225,17 +245,30 @@ void main (void)
 
     memset (i2cRead, 0xffffffff, sizeof(i2cRead));
 
-    /* Read the data back */
-    i2cRet = hwI2cMasterRead (dataAddress,
-                              nbytes,
-                              (UINT8 *)i2cRead,
-                              busAddress,
-                              0x100);
+    iData = (UINT8 *)i2cRead;
+
+    for (p = 0, n = nbytes; n > 0;  n = n - m, p = p + m)  {
+
+      /* bAddress is the complete address, device address in bits 31:16 */
+      bAddress = ((busAddress << 16) & ~I2C_DATA_ADDRESS_MASK) + dataAddress + p;
+
+      /* m is the number of bytes that can be read from the current device address */
+      m = (bAddress + 0x10000) - bAddress;
+      if (m > n) m = n;
+
+      /* Read the data back */
+      i2cRet = hwI2cMasterRead (bAddress & 0xffff,
+                                m,
+                                &iData[p],
+                                bAddress >> 16,
+                                0x100);
 
 
-    if (i2cRet != I2C_RET_OK)  {
-        showI2cError (i2cRet);
-        return;
+      if (i2cRet != I2C_RET_OK)  {
+          showI2cError (i2cRet);
+          return;
+      }
+
     }
 
     printf ("I2C read complete, comparing data\n");

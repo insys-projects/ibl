@@ -1,6 +1,5 @@
 
-i2cRead.oc
-../../hw/c64x/make/i2c.oc
+/* Object files specified on linker invokation */
 
 -c
 -a

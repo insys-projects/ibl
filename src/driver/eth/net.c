@@ -45,6 +45,7 @@
 #include "timer.h"
 #include "stream.h"
 #include <string.h>
+#include "net_osal.h"
 
 
 /**********************************************************************
@@ -148,7 +149,7 @@ Uint8* net_alloc_tx_packet(Int32 packet_len)
     netmcb.txuse = 1;
 
     /* Reset the contents of the packet */
-    memset ((void *)&netmcb.tx_packet[0], 0, sizeof(netmcb.tx_packet));
+    netMemset ((void *)&netmcb.tx_packet[0], 0, sizeof(netmcb.tx_packet));
 
     /* Reserve some space at the head of the packet for the Ethernet headers. */
     return &netmcb.tx_packet[16];
@@ -220,15 +221,15 @@ ETHHDR* net_create_eth_header (Uint8* ptr_l3_hdr, Uint8* dst_mac, Uint16 protoco
     /* Start adding the Ethernet header. 
      *  Move back the data pointer to account for the protocol. */
     ptr_l3_hdr = ptr_l3_hdr - 2;
-    memcpy ((void *)ptr_l3_hdr, (void *)&protocol, sizeof(Uint16));
+    netMemcpy ((void *)ptr_l3_hdr, (void *)&protocol, sizeof(Uint16));
 
     /* Move back the data pointer to account for the source MAC. */
     ptr_l3_hdr = ptr_l3_hdr - 6;
-    memcpy ((void *)ptr_l3_hdr, (void *)&netmcb.net_device.mac_address[0], 6);
+    netMemcpy ((void *)ptr_l3_hdr, (void *)&netmcb.net_device.mac_address[0], 6);
 
     /* Move back the data pointer to account for the destination MAC. */
     ptr_l3_hdr = ptr_l3_hdr - 6;
-    memcpy ((void *)ptr_l3_hdr, (void *)dst_mac, 6);
+    netMemcpy ((void *)ptr_l3_hdr, (void *)dst_mac, 6);
 
     /* Return the pointer to the start of the Ethernet header. */
     return (ETHHDR *)ptr_l3_hdr;
@@ -319,13 +320,13 @@ static Int32 net_open (void* ptr_driver, void (*asyncComplete)(void *))
     }
 
     /* Initialize the NET MCB. */
-    memset (&netmcb, 0, sizeof(NET_MCB));
+    netMemset (&netmcb, 0, sizeof(NET_MCB));
 
     /* Initialize the Network Statistics. */
-    memset (&net_stats, 0, sizeof(NET_STATS));
+    netMemset (&net_stats, 0, sizeof(NET_STATS));
 
     /* Copy the driver information into the NET MCB */
-    memcpy ((void *)&netmcb.net_device, (void *)ptr_net_driver, sizeof(NET_DRV_DEVICE));
+    netMemcpy ((void *)&netmcb.net_device, (void *)ptr_net_driver, sizeof(NET_DRV_DEVICE));
 
     /* Initialize the ARP Module. */
     arp_init ();
@@ -406,7 +407,7 @@ static void proc_packet (void)
     net_stats.num_pkt_rxed++;
 
     /* Extract the destination MAC Address from the received packet. */
-    memcpy ((void *)&dst_mac_address[0], (void *)ptr_data_packet, 6);
+    netMemcpy ((void *)&dst_mac_address[0], (void *)ptr_data_packet, 6);
 
     /* Extract the protocol from the received packet. This is at offset 12 from the 
      * start of the packet. We need to skip the destination and source mac address. */

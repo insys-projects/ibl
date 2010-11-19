@@ -119,6 +119,8 @@ void btblBootException (UINT32 ecode);
 #define BTBL_WRAP_ECODE_READ_FAIL       101
 #define BTBL_WRAP_ECODE_BTBL_FAIL       102
 
+#define btblMemset iblMemset
+
 
 #endif /* BTBLWRAP_H */
 

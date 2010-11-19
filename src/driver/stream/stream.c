@@ -45,6 +45,7 @@
  **********************************************************************/
 #include "types.h"
 #include "iblcfg.h"
+#include "stream_osal.h"
 #include <string.h>
 
 /** 
@@ -341,7 +342,7 @@ void stream_close (void)
 void stream_init (void)
 {
     /* Reset the memory contents. */
-    memset ((void *)&stream_mcb, 0, sizeof(STREAM_MCB));
+    streamMemset ((void *)&stream_mcb, 0, sizeof(STREAM_MCB));
 
     /* Make sure we initialize the free size correctly. */
     stream_mcb.free_size = MAX_SIZE_STREAM_BUFFER;

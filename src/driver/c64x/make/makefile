@@ -66,8 +66,6 @@ NANDSRC= nand.c
 CSRC= $(ETHSRC) $(STRMSRC) $(TIMSRC) $(NANDSRC)
 
 
-CDEFS += -DIBL_I2C_CFG_EEPROM_BUS_ADDR=$(I2C_PARAM_BUS_ADDR)
-
 .PHONY: driver
 
 
@@ -96,7 +94,7 @@ $(OBJS): cdefdep
 
 gen_cdefdep:
 	@echo Checking command line dependencies
-	@echo $(ENDIAN) $(TARGET) $(CDEFS) $(DEBUG) > cdefdep.tmp
+	@echo $(TARGET) $(CDEFS) $(DEBUG) > cdefdep.tmp
 	@sh -c 'if diff -q cdefdep.tmp cdefdep ; then echo same ; else $(CP) cdefdep.tmp cdefdep ; fi '
 
 
