@@ -4,9 +4,10 @@
  */
 
 ../main/c64x/make/iblmain.ENDIAN_TAG.oc
-../device/c64x/make/c6455.ENDIAN_TAG.oc
+../device/c64x/make/c6457.ENDIAN_TAG.oc
 ../driver/c64x/make/timer.ENDIAN_TAG.oc
 ../hw/c64x/make/t64.ENDIAN_TAG.oc
+../hw/c64x/make/psc.ENDIAN_TAG.oc
 ../hw/c64x/make/emif31.ENDIAN_TAG.oc
 
 
@@ -43,6 +44,7 @@
 ../driver/c64x/make/tftp.ENDIAN_TAG.oc
 ../hw/c64x/make/cpmacdrv.ENDIAN_TAG.oc
 ../hw/c64x/make/mdio.ENDIAN_TAG.oc
+../hw/c64x/make/sgmii.ENDIAN_TAG.oc
 #endif
 
 #ifndef EXCLUDE_NAND

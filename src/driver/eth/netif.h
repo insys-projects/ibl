@@ -405,9 +405,7 @@ extern void     udp_init (void);
 extern Int32    udp_receive (IPHDR* ptr_iphdr);
 
 /* BOOTP Module exported API */
-#ifdef INCLUDE_BLF_NET_BOOTP
-extern void      bootp_init (void);
-#endif
+void bootp_init (void (*asyncComplete)(void *));
 
 #ifdef INCLUDE_BLF_NET_ICMP
 extern void      icmp_receive (IPHDR* ptr_iphdr);

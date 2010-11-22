@@ -22,7 +22,7 @@ CLEAN_MODULES+=$(addprefix clean_,$(CFG_MODULES))
 TARGETS= c6472 c6474 c6474l c6455 c6457
 
 # The main module needs to know the device address of the i2c where the image map resides
-MAINDEFS=-DIBL_I2C_MAP_TABLE_DATA_BUS_ADDR=$(I2C_BUS_ADDR)
+MAINDEFS=-DIBL_CFG_I2C_MAP_TABLE_DATA_BUS_ADDR=$(I2C_BUS_ADDR)
 
 # Add build time exclusion definitions
 MAINDEFS+=$(addprefix -DEXCLUDE_,$(EXCLUDES))
@@ -30,7 +30,8 @@ MAINDEFS+=$(addprefix -DEXCLUDE_,$(EXCLUDES))
 
 # Common symbols are functions which are loaded with the stage load of the IBL, and
 # also referenced from the second stage
-COMMON_SYMBOLS= hwI2Cinit hwI2cMasterRead iblBootBtbl iblMalloc iblFree iblMemset iblMemcpy
+#COMMON_SYMBOLS= hwI2Cinit hwI2cMasterRead iblBootBtbl iblMalloc iblFree iblMemset iblMemcpy
+COMMON_SYMBOLS= iblBootBtbl iblMalloc iblFree iblMemset iblMemcpy
 
 ifeq ($(ENDIAN),little)
 	HEX_OPT= -order L
@@ -153,7 +154,7 @@ utils:
 	make -C $(IBL_ROOT)/util/btoccs
 	make -C $(IBL_ROOT)/util/romparse TARGET=$(TARGET)
 	make -C $(IBL_ROOT)/util/i2cRead  TARGET=$(TARGET) $(TARGET)
-	make -C $(IBL_ROOT)/util/i2cWrite TARGET=$(TARGET) $(TARGET)
+	make -C $(IBL_ROOT)/util/i2cWrite TARGET=$(TARGET) I2C_SIZE_BYTES=$(I2C_SIZE_BYTES) $(TARGET)
 	make -C $(IBL_ROOT)/util/i2cConfig $(TARGET)
 	make -C $(IBL_ROOT)/util/bconvert
 
@@ -169,13 +170,37 @@ hwClean:
 	make -C $(IBL_ROOT)/hw/$(ARCH)/make cleant ARCH=$(ARCH) TARGET=$(TARGET)
 	
 cleant:
+	rm -rf ibl_$(TARGET)/ibl_$(TARGET).be.out
+	rm -rf ibl_$(TARGET)/ibl_$(TARGET).le.out
+	rm -rf ibl_$(TARGET)/ibl_$(TARGET).be.map
+	rm -rf ibl_$(TARGET)/ibl_$(TARGET).le.map
+	rm -rf ibl_$(TARGET)/ibl_$(TARGET)_init.map
+	rm -rf ibl_$(TARGET)/ibl_$(TARGET)_init.out
+	rm -rf ibl_$(TARGET)/ibl_$(TARGET)_init.be.map
+	rm -rf ibl_$(TARGET)/ibl_$(TARGET)_init.be.out
+	rm -rf ibl_$(TARGET)/ibl_$(TARGET)_init.le.map
+	rm -rf ibl_$(TARGET)/ibl_$(TARGET)_init.le.out
 	rm -rf ibl_$(TARGET)/ibl_$(TARGET).out
 	rm -rf ibl_$(TARGET)/ibl_$(TARGET).map
 	rm -rf ibl_$(TARGET)/ibl_le.b
 	rm -rf ibl_$(TARGET)/ibl.b
 	rm -rf ibl_$(TARGET)/ibl.i2c.b
-	rm -rf ibl_$(TARGET)/ibl.i2c.ccs
+	rm -rf ibl_$(TARGET)/ibl.i2c.be.ccs
+	rm -rf ibl_$(TARGET)/ibl.i2c.le.ccs
+	rm -rf ibl_$(TARGET)/ibl_init.i2c.be.ccs
+	rm -rf ibl_$(TARGET)/ibl_init.i2c.le.ccs
+	rm -rf ibl_$(TARGET)/ibl_init.le.ccs
+	rm -rf ibl_$(TARGET)/ibl_init.be.ccs
 	rm -rf ibl_$(TARGET)/i2crom.ccs
+	rm -rf ibl_$(TARGET)/i2crom.dat
+	rm -rf ibl_$(TARGET)/i2crom_0x50.dat
+	rm -rf ibl_$(TARGET)/i2crom_0x51.dat
+	rm -rf ibl_$(TARGET)/i2crom.map.pp
+	rm -rf ibl_$(TARGET)/ibl_init_objs.inc
+	rm -rf ibl_$(TARGET)/ibl_init_symbols.inc
+	rm -rf ibl_$(TARGET)/ibl_objs.inc
+	rm -rf ibl_$(TARGET)/ibl_objs.pp
+	rm -rf ibl_$(TARGET)/ibl_objs.tmp
 	
 
 

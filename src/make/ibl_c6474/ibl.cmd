@@ -22,8 +22,6 @@
 
 SECTIONS
 {
-	.stack  > STACK
-	.sysmem > HEAP
 	.cinit  > TEXT
 	.const  > TEXT
 	.text   > TEXT

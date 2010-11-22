@@ -50,6 +50,8 @@
 /* chipStartCore does nothing, since multiple core start is not supported */
 #define chipStartCore(x,y,z)
 
+#include "iblloc.h"
+
 /* A minimal boot stats structure */
 typedef struct bootTblStats_s  {
 

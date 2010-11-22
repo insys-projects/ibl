@@ -50,6 +50,7 @@
  ********************************************************************************/
 #include "types.h"
 #include "ibl.h"
+#include "iblcfg.h"
 #include "nandhwapi.h"
 #include "gpio.h"
 #include "ecc.h"

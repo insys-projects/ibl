@@ -177,22 +177,6 @@
 #define GPIO_SET_FAL_TRIG_REG	0x02B0002C
 #define GPIO_CLR_FAL_TRIG_REG	0x02B00030
 
-/**
- *  @brief
- *    GPIO pin mapping 
- */
-#define NAND_CLE_GPIO_PIN 	GPIO_8     // High: Command Cycle occuring
-#define NAND_ALE_GPIO_PIN 	GPIO_9     // High: Address input cycle oddcuring
-#define NAND_NWE_GPIO_PIN 	GPIO_10
-#define NAND_NRE_GPIO_PIN 	GPIO_12
-#define NAND_NCE_GPIO_PIN 	GPIO_13
-#define NAND_MODE_GPIO		GPIO_14
-
-/**
- *  @brief
- *      The standard NAND delay must be big enough to handle the highest possible
- *      operating frequency of the device */
-#define TARGET_NAND_STD_DELAY				25 // In cpu cycles
 
 /**
  *  @brief

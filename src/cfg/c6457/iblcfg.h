@@ -83,29 +83,39 @@
 /**
  * @brief The I2C bus address and data address of the ibl table.
  */
-#define IBL_I2C_DEV_FREQ_MHZ            1000
-#define IBL_I2C_CLK_FREQ_KHZ            100
-#define IBL_I2C_OWN_ADDR                10
-#define IBL_I2C_CFG_ADDR_DELAY          0x100       /* Delay between sending the address and reading data */
+#define IBL_CFG_I2C_DEV_FREQ_MHZ            1000
+#define IBL_CFG_I2C_CLK_FREQ_KHZ            100
+#define IBL_CFG_I2C_OWN_ADDR                10
+#define IBL_CFG_I2C_ADDR_DELAY              0x100       /* Delay between sending the address and reading data */
 
-#ifndef IBL_I2C_CFG_EEPROM_BUS_ADDR
- #define IBL_I2C_CFG_EEPROM_BUS_ADDR    0x50
+/**
+ *  @brief The default location for the i2c map information can be overridden during make
+ */
+#ifndef IBL_CFG_I2C_MAP_TABLE_DATA_BUS_ADDR
+ #define IBL_CFG_I2C_MAP_TABLE_DATA_BUS_ADDR 0x50
 #endif
 
-#define IBL_I2C_CFG_TABLE_DATA_ADDR     (0x10000 - 0x300)
+
+#ifndef IBL_CFG_I2C_MAP_TABLE_DATA_ADDR
+ #define IBL_CFG_I2C_MAP_TABLE_DATA_ADDR     0x100
+#endif
  
- 
+/**
+ *  @brief
+ *    GPIO pin mapping 
+ */
+#define NAND_CLE_GPIO_PIN 	GPIO_8     // High: Command Cycle occuring
+#define NAND_ALE_GPIO_PIN 	GPIO_9     // High: Address input cycle oddcuring
+#define NAND_NWE_GPIO_PIN 	GPIO_10
+#define NAND_NRE_GPIO_PIN 	GPIO_12
+#define NAND_NCE_GPIO_PIN 	GPIO_13
+#define NAND_MODE_GPIO		GPIO_14
 
 /**
- * @brief No NAND support. Define the function call to be a void statement
- */
-#define iblNandBoot()
-
-/**
- * @brief No Elf support
- */
-#define iblIsElf(x)         FALSE
-#define iblBootElf(x,y)     for (;;);
+ *  @brief
+ *      The standard NAND delay must be big enough to handle the highest possible
+ *      operating frequency of the device */
+#define TARGET_NAND_STD_DELAY				25 // In cpu cycles
 
 
 #endif

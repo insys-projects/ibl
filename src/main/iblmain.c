@@ -54,6 +54,7 @@
 #include "iblcfg.h"
 #include "device.h"
 #include "ethboot.h"
+#include "nandboot.h"
 #include "bis.h"
 #include "coffwrap.h"
 #include "iblbtbl.h"
@@ -129,7 +130,8 @@ void main (void)
 
     /* Initialize the status structure */
     iblMemset (&iblStatus, 0, sizeof(iblStatus_t));
-    iblStatus.iblMagic = ibl_MAGIC_VALUE;
+    iblStatus.iblMagic   = ibl_MAGIC_VALUE;
+    iblStatus.iblVersion = ibl_VERSION;
 
 
     /* Power up the timer */

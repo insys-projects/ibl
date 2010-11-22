@@ -850,7 +850,7 @@ static BOOL allocate_dynamic_segments_and_relocate_symbols
 #endif
 
 
-#if 0
+#if 1
 /*****************************************************************************/
 /* delete_DLIMP_Loaded_Module()                                              */
 /*                                                                           */
@@ -881,8 +881,10 @@ static void delete_DLIMP_Loaded_Module(DLIMP_Loaded_Module **pplm)
     /* Hacky way of indicating that the base image is no longer available.  */
     /* WHHHHAAAAAAATTT!?!?!?!?!?!                                           */
     /*----------------------------------------------------------------------*/
+#if 0
     if (loaded_module->file_handle == DLIMP_application_handle)
         DLIMP_application_handle = 0;
+#endif
 
     /*-----------------------------------------------------------------------*/
     /* Free host heap memory that was allocated for the internal loaded      */
@@ -985,7 +987,7 @@ static DLIMP_Loaded_Module *detach_loaded_module(DLIMP_Dynamic_Module *dyn_modul
 }
 
 
-#if 0
+#if 1
 /*****************************************************************************/
 /* delete_DLIMP_Dynamic_Module()                                             */
 /*                                                                           */
@@ -1990,9 +1992,7 @@ static int32_t dload_static_executable(LOADER_FILE_DESC *fd,
    /*------------------------------------------------------------------------*/
    /* Destruct dynamic module object.                                        */
    /*------------------------------------------------------------------------*/
-#if 0
    delete_DLIMP_Dynamic_Module(&dyn_module);
-#endif
 
 #if LOADER_DEBUG
    if (debugging_on) printf("Finished dload_static_executable()\n");
@@ -2409,6 +2409,7 @@ int32_t DLOAD_load(LOADER_FILE_DESC *fd, int argc, char** argv, int32_t *entry)
    /*------------------------------------------------------------------------*/
    /* Support static loading as special case.                                */
    /*------------------------------------------------------------------------*/
+   *entry = 0;
    if (!dyn_module->relocatable)  {
       return (dload_static_executable(fd, dyn_module));
       *entry = dyn_module->fhdr.e_entry;

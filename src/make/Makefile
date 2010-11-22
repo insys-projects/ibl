@@ -46,14 +46,14 @@
 #*
 #* or to make a board specific configuraiton
 #*
-#*			make evm_c6455 | evm_c6472 | evm_c6474
+#*			make evm_c6455 | evm_c6472 | evm_c6474 | evm_c6457
 #*
 #* or to test the builds by making all the devices and testing excludes
 #*
 #*			make test_build
 #*******************************************************************************************
 
-IBLS_C6X= c6455 c6472 c6474 c6474l c6457
+IBLS_C6X= c6455 c6472 c6474 c6457
 EVMS_C6X= evm_c6455 evm_c6472 evm_c6474
 
 
@@ -87,8 +87,6 @@ ifeq ($(ELF),no)
  EXCLUDES+= ELF
 endif
  
-
-
 
 
 # The endian of the build. The default target builds a single ROM image with both endians present
@@ -136,11 +134,17 @@ evm_c6472:
 
 # The 6474 EVM has a 32k eeprom. A stripped down version is build with only one endian.
 evm_c6474:
-	make -f makestg1 ARCH=c64x TARGET=c6472 I2C_BUS_ADDR=0x50 COMPACT_I2C=no ENDIAN_MODE=little EXCLUDES='ELF NAND BIS' c6474
-	cp ibl_c6474/i2crom.dat ibl_c6474/i2crom.dat i2crom_0x50.dat
-	make -f makestg1 ARCH=c64x TARGET=c6472 I2C_BUS_ADDR=0x51 COMPACT_I2C=no ENDIAN_MODE=big EXCLUDES='ELF NAND BIS' c6474
-	cp ibl_c6474/i2crom.dat ibl_c6474/i2crom.dat i2crom_0x51.dat
+	make -f makestg1 ARCH=c64x TARGET=c6474 I2C_BUS_ADDR=0x50 COMPACT_I2C=yes ENDIAN_MODE=little EXCLUDES='ELF NAND BIS' I2C_SIZE_BYTES=0x8000 c6474
+	cp ibl_c6474/i2crom.dat ibl_c6474/i2crom_0x50.dat
+	make -f makestg1 ARCH=c64x TARGET=c6474 I2C_BUS_ADDR=0x51 COMPACT_I2C=yes ENDIAN_MODE=big EXCLUDES='ELF NAND BIS' I2C_SIZE_BYTES=0x8000 c6474
+	cp ibl_c6474/i2crom.dat ibl_c6474/i2crom_0x51.dat
 
+# The 6457 EVM
+evm_c6457:
+	make -f makestg1 ARCH=c64x TARGET=c6457 I2C_BUS_ADDR=0x50 COMPACT_I2C=yes ENDIAN_MODE=little EXCLUDES='ELF NAND BIS' I2C_SIZE_BYTES=0x8000 c6457
+	cp ibl_c6457/i2crom.dat ibl_c6457/i2crom_0x50.dat
+	make -f makestg1 ARCH=c64x TARGET=c6457 I2C_BUS_ADDR=0x51 COMPACT_I2C=yes ENDIAN_MODE=big EXCLUDES='ELF NAND BIS' I2C_SIZE_BYTES=0x8000 c6457
+	cp ibl_c6457/i2crom.dat ibl_c6457/i2crom_0x51.dat
 
 # Test - builds all the targets, with single component exclusion
 test_build:
@@ -152,40 +156,47 @@ test_build:
 	make -f makestg1 ARCH=c64x TARGET=c6455 I2C_BUS_ADDR=0x50 COMPACT_I2C=no ENDIAN_MODE=both EXCLUDES=ELF  c6455
 	make -f makestg1 ARCH=c64x TARGET=c6455 I2C_BUS_ADDR=0x50 COMPACT_I2C=no ENDIAN_MODE=both EXCLUDES=BLOB c6455
 
-	make -f makestg1 ARCH=c64x TARGET=c6472 I2C_BUS_ADDR=0x50 COMPACT_I2C=no ENDIAN_MODE=both EXCLUDES=     c6455
-	make -f makestg1 ARCH=c64x TARGET=c6472 I2C_BUS_ADDR=0x50 COMPACT_I2C=no ENDIAN_MODE=both EXCLUDES=ETH  c6455
-	make -f makestg1 ARCH=c64x TARGET=c6472 I2C_BUS_ADDR=0x50 COMPACT_I2C=no ENDIAN_MODE=both EXCLUDES=NAND c6455
-	make -f makestg1 ARCH=c64x TARGET=c6472 I2C_BUS_ADDR=0x50 COMPACT_I2C=no ENDIAN_MODE=both EXCLUDES=BIS  c6455
-	make -f makestg1 ARCH=c64x TARGET=c6472 I2C_BUS_ADDR=0x50 COMPACT_I2C=no ENDIAN_MODE=both EXCLUDES=COFF c6455
-	make -f makestg1 ARCH=c64x TARGET=c6472 I2C_BUS_ADDR=0x50 COMPACT_I2C=no ENDIAN_MODE=both EXCLUDES=ELF  c6455
-	make -f makestg1 ARCH=c64x TARGET=c6472 I2C_BUS_ADDR=0x50 COMPACT_I2C=no ENDIAN_MODE=both EXCLUDES=BLOB c6455
+	make -f makestg1 ARCH=c64x TARGET=c6457 I2C_BUS_ADDR=0x50 COMPACT_I2C=yes ENDIAN_MODE=both EXCLUDES=     c6457
+	make -f makestg1 ARCH=c64x TARGET=c6457 I2C_BUS_ADDR=0x50 COMPACT_I2C=yes ENDIAN_MODE=both EXCLUDES=ETH  c6457
+	make -f makestg1 ARCH=c64x TARGET=c6457 I2C_BUS_ADDR=0x50 COMPACT_I2C=yes ENDIAN_MODE=both EXCLUDES=NAND c6457
+	make -f makestg1 ARCH=c64x TARGET=c6457 I2C_BUS_ADDR=0x50 COMPACT_I2C=yes ENDIAN_MODE=both EXCLUDES=BIS  c6457
+	make -f makestg1 ARCH=c64x TARGET=c6457 I2C_BUS_ADDR=0x50 COMPACT_I2C=yes ENDIAN_MODE=both EXCLUDES=COFF c6457
+	make -f makestg1 ARCH=c64x TARGET=c6457 I2C_BUS_ADDR=0x50 COMPACT_I2C=yes ENDIAN_MODE=both EXCLUDES=ELF  c6457
+	make -f makestg1 ARCH=c64x TARGET=c6457 I2C_BUS_ADDR=0x50 COMPACT_I2C=yes ENDIAN_MODE=both EXCLUDES=BLOB c6457
 
-	make -f makestg1 ARCH=c64x TARGET=c6474 I2C_BUS_ADDR=0x50 COMPACT_I2C=no ENDIAN_MODE=both EXCLUDES=     c6455
-	make -f makestg1 ARCH=c64x TARGET=c6474 I2C_BUS_ADDR=0x50 COMPACT_I2C=no ENDIAN_MODE=both EXCLUDES=ETH  c6455
-	make -f makestg1 ARCH=c64x TARGET=c6474 I2C_BUS_ADDR=0x50 COMPACT_I2C=no ENDIAN_MODE=both EXCLUDES=NAND c6455
-	make -f makestg1 ARCH=c64x TARGET=c6474 I2C_BUS_ADDR=0x50 COMPACT_I2C=no ENDIAN_MODE=both EXCLUDES=BIS  c6455
-	make -f makestg1 ARCH=c64x TARGET=c6474 I2C_BUS_ADDR=0x50 COMPACT_I2C=no ENDIAN_MODE=both EXCLUDES=COFF c6455
-	make -f makestg1 ARCH=c64x TARGET=c6474 I2C_BUS_ADDR=0x50 COMPACT_I2C=no ENDIAN_MODE=both EXCLUDES=ELF  c6455
-	make -f makestg1 ARCH=c64x TARGET=c6474 I2C_BUS_ADDR=0x50 COMPACT_I2C=no ENDIAN_MODE=both EXCLUDES=BLOB c6455
+	make -f makestg1 ARCH=c64x TARGET=c6472 I2C_BUS_ADDR=0x50 COMPACT_I2C=no ENDIAN_MODE=both EXCLUDES=     c6472
+	make -f makestg1 ARCH=c64x TARGET=c6472 I2C_BUS_ADDR=0x50 COMPACT_I2C=no ENDIAN_MODE=both EXCLUDES=ETH  c6472
+	make -f makestg1 ARCH=c64x TARGET=c6472 I2C_BUS_ADDR=0x50 COMPACT_I2C=no ENDIAN_MODE=both EXCLUDES=NAND c6472
+	make -f makestg1 ARCH=c64x TARGET=c6472 I2C_BUS_ADDR=0x50 COMPACT_I2C=no ENDIAN_MODE=both EXCLUDES=BIS  c6472
+	make -f makestg1 ARCH=c64x TARGET=c6472 I2C_BUS_ADDR=0x50 COMPACT_I2C=no ENDIAN_MODE=both EXCLUDES=COFF c6472
+	make -f makestg1 ARCH=c64x TARGET=c6472 I2C_BUS_ADDR=0x50 COMPACT_I2C=no ENDIAN_MODE=both EXCLUDES=ELF  c6472
+	make -f makestg1 ARCH=c64x TARGET=c6472 I2C_BUS_ADDR=0x50 COMPACT_I2C=no ENDIAN_MODE=both EXCLUDES=BLOB c6472
+
+	make -f makestg1 ARCH=c64x TARGET=c6474 I2C_BUS_ADDR=0x50 COMPACT_I2C=yes ENDIAN_MODE=both EXCLUDES=     c6474
+	make -f makestg1 ARCH=c64x TARGET=c6474 I2C_BUS_ADDR=0x50 COMPACT_I2C=yes ENDIAN_MODE=both EXCLUDES=ETH  c6474
+	make -f makestg1 ARCH=c64x TARGET=c6474 I2C_BUS_ADDR=0x50 COMPACT_I2C=yes ENDIAN_MODE=both EXCLUDES=NAND c6474
+	make -f makestg1 ARCH=c64x TARGET=c6474 I2C_BUS_ADDR=0x50 COMPACT_I2C=yes ENDIAN_MODE=both EXCLUDES=BIS  c6474
+	make -f makestg1 ARCH=c64x TARGET=c6474 I2C_BUS_ADDR=0x50 COMPACT_I2C=yes ENDIAN_MODE=both EXCLUDES=COFF c6474
+	make -f makestg1 ARCH=c64x TARGET=c6474 I2C_BUS_ADDR=0x50 COMPACT_I2C=yes ENDIAN_MODE=both EXCLUDES=ELF  c6474
+	make -f makestg1 ARCH=c64x TARGET=c6474 I2C_BUS_ADDR=0x50 COMPACT_I2C=yes ENDIAN_MODE=both EXCLUDES=BLOB c6474
+
 
 # will need to add a line for each additional ARCH type added
 clean:
 	make -f makestg2 clean   ARCH=c64x TARGET=c6472
 	make -f makestg2 cleant  ARCH=c64x TARGET=c6472
 	make -f makestg2 cleant  ARCH=c64x TARGET=c6474
-	make -f makestg2 cleant  ARCH=c64x TARGET=c6474l
+	make -f makestg2 cleant  ARCH=c64x TARGET=c6455
 	make -f makestg2 cleant  ARCH=c64x TARGET=c6457
 	make -C ../util/bconvert       clean
 	make -C ../util/btoccs         clean
 	make -C ../util/i2cConfig      clean    ARCH=c64x TARGET=c6455
 	make -C ../util/i2cConfig      clean    ARCH=c64x TARGET=c6472
 	make -C ../util/i2cConfig      clean    ARCH=c64x TARGET=c6474
-	make -C ../util/i2cConfig      clean    ARCH=c64x TARGET=c6474l
 	make -C ../util/i2cConfig      clean    ARCH=c64x TARGET=c6457
 	make -C ../util/nandwriter     clean    ARCH=c64x TARGET=c6455
 	make -C ../util/nandwriter     clean    ARCH=c64x TARGET=c6472
 	make -C ../util/nandwriter     clean    ARCH=c64x TARGET=c6474
-	make -C ../util/nandwriter     clean    ARCH=c64x TARGET=c6474l
 	make -C ../util/nandwriter     clean    ARCH=c64x TARGET=c6457
 	make -C ../util/romparse       clean
 	make -C ../test/test1		   clean

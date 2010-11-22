@@ -59,6 +59,16 @@
 
 #include "types.h"
 
+
+#define ibl_MAKE_VERSION(a,b,c,d)  ((a << 24) | (b << 16) | (c << 8) | (d << 0))
+
+
+/**
+ * @brief
+ *  The version number, 1.0.0.0
+ */
+#define ibl_VERSION  ibl_MAKE_VERSION(1,0,0,0)
+
 /* Information used to make generate a bootp request */
 /**
  * @brief
@@ -491,6 +501,8 @@ extern ibl_t ibl;
 typedef struct iblStatus_s
 {
     uint32 iblMagic;        /**<  The @ref ibl_MAGIC_VALUE is placed here to indicate the boot has begun */
+    
+    uint32 iblVersion;      /**<  The version number. MSB = major, SMSB = minor, SLSB = minor minor LSB= tiny */
     
     uint32 iblFail;         /**<  If non-zero the IBL has encountered a fatal error */
     

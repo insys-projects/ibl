@@ -35,7 +35,7 @@ section
 ; match the definition of struct iblI2cMap_t defined in ibl.h.
 layout
 {
-  dev_addr     = IBL_I2C_MAP_TABLE_DATA_ADDR		; Defined in iblcfg.h
+  dev_addr     = IBL_CFG_I2C_MAP_TABLE_DATA_ADDR		; Defined in iblcfg.h
   dev_addr_ext = I2C_BUS_ADDR
   file_align   = 0x80
 

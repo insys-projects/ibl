@@ -7,7 +7,7 @@
 #*
 #*  Usage:  make c6455 | c6472 | c6474 | c6474l | c6457 [DEBUG=yes] [ETH=no] [NAND=no]  \
 #*          [BIS=no] [COFF=no] [BLOB=no] [ELF=no] [ENDIAN= both | big | little] [I2C_BUS_ADDR= 0x50 | 0x51] \
-#*			[COMPACT_I2C=yes]
+#*			[COMPACT_I2C=yes] [I2C_SIZE_BYTES=..]
 #*******************************************************************************************
 
 IBLS_C6X= c6455 c6472 c6474 c6474l c6457
@@ -30,11 +30,12 @@ else
  endif
 endif
 
-# The i2c ROM bus address. The code will advance accross I2C bus address boundaries (the code must
-# be blocked so that a single block doesn't cross a boundary, however). 
-ifndef I2C_BUS_ADDR
- I2C_BUS_ADDR=0x50
+
+# The default i2c size. This is used only for the i2c writer utility
+ifndef I2C_SIZE_BYTES
+ I2C_SIZE_BYTES=0x20000
 endif
+
 
 # Excludes identify which components are not part of the build
 export EXCLUDES
@@ -45,10 +46,10 @@ all:
 
 
 be_target:
-	make -f makestg2 ARCH=c64x TARGET=$(TARGET) ENDIAN=big       I2C_BUS_ADDR=$(I2C_BUS_ADDR) $(TARGET)
+	make -f makestg2 ARCH=c64x TARGET=$(TARGET) ENDIAN=big    I2C_SIZE_BYTES=$(I2C_SIZE_BYTES) I2C_BUS_ADDR=$(I2C_BUS_ADDR) $(TARGET)
 
 le_target:
-	make -f makestg2 ARCH=c64x TARGET=$(TARGET) ENDIAN=little    I2C_BUS_ADDR=$(I2C_BUS_ADDR) $(TARGET)
+	make -f makestg2 ARCH=c64x TARGET=$(TARGET) ENDIAN=little I2C_SIZE_BYTES=$(I2C_SIZE_BYTES) I2C_BUS_ADDR=$(I2C_BUS_ADDR) $(TARGET)
 
 compare:
 	make -f makestg2 ARCH=c64x TARGET=$(TARGET) compare

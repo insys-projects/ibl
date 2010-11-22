@@ -213,7 +213,8 @@ int cload()
    int result;
 
    load_err = 0;
-   result   = cload_headers() && cload_data();
+
+   result   = cload_headers() && (need_reloc == FALSE) && cload_data();
 
    if (reloc_tab) free(reloc_tab);
    reloc_tab = NULL;

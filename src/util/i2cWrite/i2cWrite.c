@@ -53,7 +53,9 @@
 #include <stdio.h>
 #include <string.h>
 
-#define I2C_SIZE_BYTES  0x20000
+#ifndef I2C_SIZE_BYTES
+ #define I2C_SIZE_BYTES  0x20000
+#endif
 
 /* Run time configuration */
 unsigned int   deviceFreqMhz = 1000;

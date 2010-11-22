@@ -201,8 +201,8 @@ void main (void)
 
     hwI2Cinit (ibl.pllConfig[ibl_MAIN_PLL].pllOutFreqMhz,  /* The CPU frequency during I2C data load */
                DEVICE_I2C_MODULE_DIVISOR,                  /* The divide down of CPU that drives the i2c */
-               IBL_I2C_CLK_FREQ_KHZ/8,                     /* The I2C data rate used during table load. Slowed for writes */
-               IBL_I2C_OWN_ADDR);                          /* The address used by this device on the i2c bus */
+               IBL_CFG_I2C_CLK_FREQ_KHZ/8,                 /* The I2C data rate used during table load. Slowed for writes */
+               IBL_CFG_I2C_OWN_ADDR);                      /* The address used by this device on the i2c bus */
 
 
     /* Compute the checksum over the ibl configuration structure */

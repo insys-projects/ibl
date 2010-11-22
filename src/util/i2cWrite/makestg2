@@ -27,6 +27,8 @@ CLEAN_MODULES=$(addprefix clean_,$(MODULES))
 
 CSRC= i2cWrite.c
 
+CDEFS+= -DI2C_SIZE_BYTES=$(I2C_SIZE_BYTES)
+
 # enable debug info in the compile
 UTIL=yes
 
@@ -67,6 +69,6 @@ $(OBJS): cdefdep
 
 gen_cdefdep:
 	@echo Checking command line dependencies
-	@echo $(ARCH) $(TARGET) > cdefdep.tmp
+	@echo $(ARCH) $(TARGET) $(I2C_SIZE_BYTES) > cdefdep.tmp
 	@sh -c 'if diff -q cdefdep.tmp cdefdep ; then echo same ; else $(CP) cdefdep.tmp cdefdep ; fi '
 

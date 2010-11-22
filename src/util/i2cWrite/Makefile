@@ -54,7 +54,7 @@ endif
 export ENDIAN
 
 $(DEVICES):
-	make -f makestg2 ARCH=c64x TARGET=$@ $@
+	make -f makestg2 ARCH=c64x I2C_SIZE_BYTES=$(I2C_SIZE_BYTES) TARGET=$@ $@
 
 clean:
 	make -f makestg2 clean2 ARCH=c64x
