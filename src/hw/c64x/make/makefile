@@ -153,8 +153,8 @@ endif
 
 ifeq ($(TARGET),c6457)
  vpath % $(ECODIR)/macs/cpmac
- vpath % $(ECODIR)/plls/pllxx1p8
- vpath % $(ECODIR)/pscs/psc2
+ vpath % $(ECODIR)/plls/pllcur
+ vpath % $(ECODIR)/pscs/psccur
  vpath % $(ECODIR)/ddrs/emif31
  vpath % $(ECODIR)/mdio
  vpath % $(ECODIR)/gpio
