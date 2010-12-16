@@ -151,7 +151,7 @@
  *  @brief
  *    Device DDR controller definitions
  */
-#define DEVICE_DDR_BASE  0x80000000
+#define DEVICE_DDR_BASE  0x78000000
 #define targetEmifType() ibl_EMIF_TYPE_31
 
 /**
