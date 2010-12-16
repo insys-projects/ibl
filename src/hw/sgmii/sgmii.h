@@ -56,6 +56,8 @@
  */
 #ifndef hwSgmiiConfig
 int32 hwSgmiiConfig (int32 port, iblSgmii_t *iblSgmii);
+int32 hwSgmiiChecklink (int32 port, iblSgmii_t *iblSgmii);
+void sgmii_delay (uint32 del);
 #endif
 
  
