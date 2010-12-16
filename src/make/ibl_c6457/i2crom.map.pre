@@ -12,7 +12,7 @@
 ;  portion of the IBL
 section 
 {
-  param_index   = 1
+  param_index   = 0
   boot_mode     = 257
   sw_pll		= 20
   options       = 1
