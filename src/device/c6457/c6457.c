@@ -69,7 +69,7 @@ extern cregister unsigned int DNUM;
 bool address_is_local (Uint32 addr)
 {
     /* L2 */
-    if ((addr >= 0x00800000) && (addr < 0x00898000))
+    if ((addr >= 0x00800000) && (addr < 0x00a00000))
         return (TRUE);
 
     /* L1P */
@@ -94,9 +94,6 @@ bool address_is_local (Uint32 addr)
  */
 Uint32 deviceLocalAddrToGlobal (Uint32 addr)
 {
-
-    if (address_is_local (addr))
-        addr = (1 << 28) | (DNUM << 24) | addr;
 
     return (addr);
 
