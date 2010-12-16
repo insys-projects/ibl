@@ -114,7 +114,7 @@ void iblEthBoot (Int32 eIdx)
     void    (*exit)();
     uint8   buf[16];
     char    *ext;
-
+    unsigned int i,j;
 
     /* Power up the device. No action is taken if the device is already powered up */
     if (devicePowerPeriph (TARGET_PWR_ETH(ibl.bootModes[eIdx].port)) < 0)
@@ -125,6 +125,8 @@ void iblEthBoot (Int32 eIdx)
         hwMdio (ibl.mdioConfig.nMdioOps, ibl.mdioConfig.mdio, 
                 ibl.mdioConfig.mdioClkDiv, ibl.mdioConfig.interDelay);
 
+    for (j = 0; j < 0x100; j++)
+    	for (i = 0; i < 0x1000000; i++);
 
     /* SGMII configuration. If sgmii is not present this statement is defined
      * to void in target.h */
