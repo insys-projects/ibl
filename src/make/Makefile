@@ -270,16 +270,22 @@ evm_c6472:
 # The 6474 EVM has a 32k eeprom. A stripped down version is build with only one endian.
 evm_c6474:
 	make -f makestg1 ARCH=c64x TARGET=c6474 I2C_BUS_ADDR=0x50 COMPACT_I2C=yes ENDIAN_MODE=little CEXCLUDES='ELF NAND_GPIO BIS' I2C_SIZE_BYTES=0x8000 c6474
-	cp ibl_c6474/i2crom.dat ibl_c6474/i2crom_0x50.dat
-	make -f makestg1 ARCH=c64x TARGET=c6474 I2C_BUS_ADDR=0x51 COMPACT_I2C=yes ENDIAN_MODE=big CEXCLUDES='ELF NAND_GPIO BIS' I2C_SIZE_BYTES=0x8000 c6474
-	cp ibl_c6474/i2crom.dat ibl_c6474/i2crom_0x51.dat
+	cp ibl_c6474/i2crom.dat ibl_c6474/i2crom_0x50_le.dat
+	make -f makestg1 ARCH=c64x TARGET=c6474 I2C_BUS_ADDR=0x50 COMPACT_I2C=yes ENDIAN_MODE=big CEXCLUDES='ELF NAND_GPIO BIS' I2C_SIZE_BYTES=0x8000 c6474
+	cp ibl_c6474/i2crom.dat ibl_c6474/i2crom_0x50_be.dat
+
+evm_c6474l:
+	make -f makestg1 ARCH=c64x TARGET=c6474 I2C_BUS_ADDR=0x50 COMPACT_I2C=yes ENDIAN_MODE=little CEXCLUDES='ELF NAND_GPIO BIS' c6474
+	cp ibl_c6474/i2crom.dat ibl_c6474/i2crom_0x50_c6474l_le.dat
+	make -f makestg1 ARCH=c64x TARGET=c6474 I2C_BUS_ADDR=0x50 COMPACT_I2C=yes ENDIAN_MODE=big CEXCLUDES='ELF NAND_GPIO BIS' c6474
+	cp ibl_c6474/i2crom.dat ibl_c6474/i2crom_0x50_c6474l_be.dat
 
 # The 6457 EVM
 evm_c6457:
-	make -f makestg1 ARCH=c64x TARGET=c6457 I2C_BUS_ADDR=0x50 COMPACT_I2C=yes ENDIAN_MODE=little CEXCLUDES='ELF NAND_GPIO BIS' I2C_SIZE_BYTES=0x8000 c6457
-	cp ibl_c6457/i2crom.dat ibl_c6457/i2crom_0x50.dat
-	make -f makestg1 ARCH=c64x TARGET=c6457 I2C_BUS_ADDR=0x51 COMPACT_I2C=yes ENDIAN_MODE=big CEXCLUDES='ELF NAND_GPIO BIS' I2C_SIZE_BYTES=0x8000 c6457
-	cp ibl_c6457/i2crom.dat ibl_c6457/i2crom_0x51.dat
+	make -f makestg1 ARCH=c64x TARGET=c6457 I2C_BUS_ADDR=0x50 COMPACT_I2C=yes ENDIAN_MODE=little CEXCLUDES='ELF NAND_GPIO BIS' c6457
+	cp ibl_c6457/i2crom.dat ibl_c6457/i2crom_0x50_c6457_le.dat
+	make -f makestg1 ARCH=c64x TARGET=c6457 I2C_BUS_ADDR=0x51 COMPACT_I2C=yes ENDIAN_MODE=big CEXCLUDES='ELF NAND_GPIO BIS' c6457
+	cp ibl_c6457/i2crom.dat ibl_c6457/i2crom_0x50_c6457_be.dat
 
 # The 6608 EVM
 EVM_6608_SPI_DEFS= SPI_MODE=1 SPI_ADDR_WIDTH=24 SPI_NPIN=5 SPI_CSEL=2 SPI_C2TDEL=1 SPI_CLKDIV=8 SPI_ROM=1
