@@ -118,18 +118,18 @@ hotmenu setConfig_c6472()
 
 
 
-    ibl.ethConfig[0].ethInfo.fileName[0]  = 't';
-    ibl.ethConfig[0].ethInfo.fileName[1]  = 'e';
-    ibl.ethConfig[0].ethInfo.fileName[2]  = 's';
-    ibl.ethConfig[0].ethInfo.fileName[3]  = 't';
-    ibl.ethConfig[0].ethInfo.fileName[4]  = '.';
-    ibl.ethConfig[0].ethInfo.fileName[5]  = 'o';
-    ibl.ethConfig[0].ethInfo.fileName[6]  = 'u';
-    ibl.ethConfig[0].ethInfo.fileName[7]  = 't';
-    ibl.ethConfig[0].ethInfo.fileName[8]  = '\0';
-    ibl.ethConfig[0].ethInfo.fileName[9]  = '\0';
-    ibl.ethConfig[0].ethInfo.fileName[10] = '\0';
-    ibl.ethConfig[0].ethInfo.fileName[11] = '\0';
+    ibl.ethConfig[0].ethInfo.fileName[0]  = 'c';
+    ibl.ethConfig[0].ethInfo.fileName[1]  = '6';
+    ibl.ethConfig[0].ethInfo.fileName[2]  = '4';
+    ibl.ethConfig[0].ethInfo.fileName[3]  = '7';
+    ibl.ethConfig[0].ethInfo.fileName[4]  = '2';
+    ibl.ethConfig[0].ethInfo.fileName[5]  = '-';
+    ibl.ethConfig[0].ethInfo.fileName[6]  = 'l';
+    ibl.ethConfig[0].ethInfo.fileName[7]  = 'e';
+    ibl.ethConfig[0].ethInfo.fileName[8]  = '.';
+    ibl.ethConfig[0].ethInfo.fileName[9]  = 'b';
+    ibl.ethConfig[0].ethInfo.fileName[10] = 'i';
+    ibl.ethConfig[0].ethInfo.fileName[11] = 'n';
     ibl.ethConfig[0].ethInfo.fileName[12] = '\0';
     ibl.ethConfig[0].ethInfo.fileName[13] = '\0';
     ibl.ethConfig[0].ethInfo.fileName[14] = '\0';
@@ -149,7 +149,7 @@ hotmenu setConfig_c6472()
     ibl.ethConfig[1].doBootp          = TRUE;
     ibl.ethConfig[1].useBootpServerIp = TRUE;
     ibl.ethConfig[1].useBootpFileName = TRUE;
-    ibl.ethConfig[1].bootFormat       = ibl_BOOT_FORMAT_AUTO;
+    ibl.ethConfig[1].bootFormat       = ibl_BOOT_FORMAT_BBLOB;
 
 
     /* SGMII not present */
@@ -280,22 +280,21 @@ hotmenu setConfig_c6474()
     ibl.ethConfig[0].ethInfo.hwAddress[5] = 0;
 
 
-    ibl.ethConfig[0].ethInfo.fileName[0]  = 't';
-    ibl.ethConfig[0].ethInfo.fileName[1]  = 'e';
-    ibl.ethConfig[0].ethInfo.fileName[2]  = 's';
-    ibl.ethConfig[0].ethInfo.fileName[3]  = 't';
-    ibl.ethConfig[0].ethInfo.fileName[4]  = '.';
-    ibl.ethConfig[0].ethInfo.fileName[5]  = 'b';
+    ibl.ethConfig[0].ethInfo.fileName[0]  = 'c';
+    ibl.ethConfig[0].ethInfo.fileName[1]  = '6';
+    ibl.ethConfig[0].ethInfo.fileName[2]  = '4';
+    ibl.ethConfig[0].ethInfo.fileName[3]  = '7';
+    ibl.ethConfig[0].ethInfo.fileName[4]  = '4';
+    ibl.ethConfig[0].ethInfo.fileName[5]  = '-';
     ibl.ethConfig[0].ethInfo.fileName[6]  = 'l';
-    ibl.ethConfig[0].ethInfo.fileName[7]  = 'o';
-    ibl.ethConfig[0].ethInfo.fileName[8]  = 'b';
-    ibl.ethConfig[0].ethInfo.fileName[9]  = '\0';
-    ibl.ethConfig[0].ethInfo.fileName[10] = '\0';
-    ibl.ethConfig[0].ethInfo.fileName[11] = '\0';
+    ibl.ethConfig[0].ethInfo.fileName[7]  = 'e';
+    ibl.ethConfig[0].ethInfo.fileName[8]  = '.';
+    ibl.ethConfig[0].ethInfo.fileName[9]  = 'b';
+    ibl.ethConfig[0].ethInfo.fileName[10] = 'i';
+    ibl.ethConfig[0].ethInfo.fileName[11] = 'n';
     ibl.ethConfig[0].ethInfo.fileName[12] = '\0';
     ibl.ethConfig[0].ethInfo.fileName[13] = '\0';
     ibl.ethConfig[0].ethInfo.fileName[14] = '\0';
-
 
     /* Even though the entire range of DDR2 is chosen, the load will
      * stop when the ftp reaches the end of the file */
@@ -420,19 +419,16 @@ hotmenu setConfig_c6474lite()
     ibl.sgmiiConfig[0].auxConfig     = 0x0000000b;
 
     /* MDIO configuration */
-    ibl.mdioConfig.nMdioOps = 8;
-    ibl.mdioConfig.mdioClkDiv = 0x26;
+    ibl.mdioConfig.nMdioOps = 5;
+    ibl.mdioConfig.mdioClkDiv = 0x20;
     ibl.mdioConfig.interDelay = 2000;   /* ~2ms at 1000 MHz */
 
     ibl.mdioConfig.mdio[0] =  (1 << 30) | ( 4 << 21) | (27 << 16) | 0x0081;
-    ibl.mdioConfig.mdio[1] =  (1 << 30) | (26 << 21) | (15 << 16) | 0x0047;
-    ibl.mdioConfig.mdio[2] =  (1 << 30) | (26 << 21) | (14 << 16) | 0x0047;
-    ibl.mdioConfig.mdio[3] =  (1 << 30) | ( 0 << 21) | (15 << 16) | 0x8140;
+    ibl.mdioConfig.mdio[1] =  (1 << 30) | (26 << 21) | (14 << 16) | 0x0047;
+    ibl.mdioConfig.mdio[2] =  (1 << 30) | ( 0 << 21) | (14 << 16) | 0x8140;
 
-    ibl.mdioConfig.mdio[4] =  (1 << 30) | ( 0 << 21) | (14 << 16) | 0x8140;
-    ibl.mdioConfig.mdio[5] =  (1 << 30) | ( 1 << 21) | (22 << 16) | 0x043e;
-    ibl.mdioConfig.mdio[6] =  (1 << 30) | ( 1 << 21) | (22 << 16) | 0x043e;
-    ibl.mdioConfig.mdio[7] =  (1 << 30) | ( 0 << 21) | ( 1 << 16) | 0xa100;
+    ibl.mdioConfig.mdio[3] =  (1 << 30) | ( 1 << 21) | (22 << 16) | 0x043e;
+    ibl.mdioConfig.mdio[4] =  (1 << 30) | ( 0 << 21) | ( 1 << 16) | 0x8140;
 
 
     /* This board has NAND. We will enable later */
@@ -464,8 +460,8 @@ hotmenu setConfig_c6457()
     ibl.ddrConfig.uEmif.emif3p1.sdcfg  = 0x00d38a32; /* cas5, 8 banks, 10 bit column */
     ibl.ddrConfig.uEmif.emif3p1.sdrfc  = 0x00000a0e; /* Refresh 333Mhz */ 
     ibl.ddrConfig.uEmif.emif3p1.sdtim1 = 0x832474da; /* Timing 1 */
-    ibl.ddrConfig.uEmif.emif3p1.sdtim2 = 0x3d44c742; /* Timing 2 */
-    ibl.ddrConfig.uEmif.emif3p1.dmcctl = 0x50001906; /* PHY read latency for CAS 5 is 5 + 2 - 1 */
+    ibl.ddrConfig.uEmif.emif3p1.sdtim2 = 0x0144c742; /* Timing 2 */
+    ibl.ddrConfig.uEmif.emif3p1.dmcctl = 0x001800C6;
 
 
     /* Ethernet configuration for port 0 */
@@ -521,24 +517,20 @@ hotmenu setConfig_c6457()
     /* SGMII is present */
     ibl.sgmiiConfig[0].adviseAbility = 0x9801;
     ibl.sgmiiConfig[0].control       = 0x20;
-    ibl.sgmiiConfig[0].txConfig      = 0x00000e23;
-    ibl.sgmiiConfig[0].rxConfig      = 0x00081023;
+    ibl.sgmiiConfig[0].txConfig      = 0x00000e21;
+    ibl.sgmiiConfig[0].rxConfig      = 0x00081021;
     ibl.sgmiiConfig[0].auxConfig     = 0x0000000b;
 
     /* MDIO configuration */
-    ibl.mdioConfig.nMdioOps = 8;
-    ibl.mdioConfig.mdioClkDiv = 0x26;
-    ibl.mdioConfig.interDelay = 2000;   /* ~2ms at 1000 MHz */
+    ibl.mdioConfig.nMdioOps = 5;
+    ibl.mdioConfig.mdioClkDiv = 0xa5;
+    ibl.mdioConfig.interDelay = 3000;   /* ~2ms at 1000 MHz */
 
     ibl.mdioConfig.mdio[0] =  (1 << 30) | ( 4 << 21) | (27 << 16) | 0x0081;
-    ibl.mdioConfig.mdio[1] =  (1 << 30) | (26 << 21) | (15 << 16) | 0x0047;
-    ibl.mdioConfig.mdio[2] =  (1 << 30) | (26 << 21) | (14 << 16) | 0x0047;
-    ibl.mdioConfig.mdio[3] =  (1 << 30) | ( 0 << 21) | (15 << 16) | 0x8140;
-
-    ibl.mdioConfig.mdio[4] =  (1 << 30) | ( 0 << 21) | (14 << 16) | 0x8140;
-    ibl.mdioConfig.mdio[5] =  (1 << 30) | ( 1 << 21) | (22 << 16) | 0x043e;
-    ibl.mdioConfig.mdio[6] =  (1 << 30) | ( 1 << 21) | (22 << 16) | 0x043e;
-    ibl.mdioConfig.mdio[7] =  (1 << 30) | ( 0 << 21) | ( 1 << 16) | 0xa100;
+    ibl.mdioConfig.mdio[1] =  (1 << 30) | (26 << 21) | (14 << 16) | 0x0047;
+    ibl.mdioConfig.mdio[2] =  (1 << 30) | ( 0 << 21) | (14 << 16) | 0x8140;
+    ibl.mdioConfig.mdio[3] =  (1 << 30) | ( 1 << 21) | (22 << 16) | 0x043e;
+    ibl.mdioConfig.mdio[4] =  (1 << 30) | ( 0 << 21) | ( 1 << 16) | 0x8140;
 
 
     /* This board has NAND. We will enable later */
@@ -598,18 +590,18 @@ hotmenu setConfig_c6455()
     ibl.ethConfig[0].ethInfo.hwAddress[5] = 25;
 
 
-    ibl.ethConfig[0].ethInfo.fileName[0]  = 't';
-    ibl.ethConfig[0].ethInfo.fileName[1]  = 'e';
-    ibl.ethConfig[0].ethInfo.fileName[2]  = 's';
-    ibl.ethConfig[0].ethInfo.fileName[3]  = 't';
-    ibl.ethConfig[0].ethInfo.fileName[4]  = '.';
-    ibl.ethConfig[0].ethInfo.fileName[5]  = 'b';
+    ibl.ethConfig[0].ethInfo.fileName[0]  = 'c';
+    ibl.ethConfig[0].ethInfo.fileName[1]  = '6';
+    ibl.ethConfig[0].ethInfo.fileName[2]  = '4';
+    ibl.ethConfig[0].ethInfo.fileName[3]  = '5';
+    ibl.ethConfig[0].ethInfo.fileName[4]  = '5';
+    ibl.ethConfig[0].ethInfo.fileName[5]  = '-';
     ibl.ethConfig[0].ethInfo.fileName[6]  = 'l';
-    ibl.ethConfig[0].ethInfo.fileName[7]  = 'o';
-    ibl.ethConfig[0].ethInfo.fileName[8]  = 'b';
-    ibl.ethConfig[0].ethInfo.fileName[9]  = '\0';
-    ibl.ethConfig[0].ethInfo.fileName[10] = '\0';
-    ibl.ethConfig[0].ethInfo.fileName[11] = '\0';
+    ibl.ethConfig[0].ethInfo.fileName[7]  = 'e';
+    ibl.ethConfig[0].ethInfo.fileName[8]  = '.';
+    ibl.ethConfig[0].ethInfo.fileName[9]  = 'b';
+    ibl.ethConfig[0].ethInfo.fileName[10] = 'i';
+    ibl.ethConfig[0].ethInfo.fileName[11] = 'n';
     ibl.ethConfig[0].ethInfo.fileName[12] = '\0';
     ibl.ethConfig[0].ethInfo.fileName[13] = '\0';
     ibl.ethConfig[0].ethInfo.fileName[14] = '\0';
@@ -777,18 +769,18 @@ hotmenu setConfig_c6678()
     ibl.bootModes[1].u.ethBoot.ethInfo.hwAddress[5] = 0;
 
 
-    ibl.bootModes[1].u.ethBoot.ethInfo.fileName[0]  = 't';
-    ibl.bootModes[1].u.ethBoot.ethInfo.fileName[1]  = 'e';
-    ibl.bootModes[1].u.ethBoot.ethInfo.fileName[2]  = 's';
-    ibl.bootModes[1].u.ethBoot.ethInfo.fileName[3]  = 't';
-    ibl.bootModes[1].u.ethBoot.ethInfo.fileName[4]  = '.';
-    ibl.bootModes[1].u.ethBoot.ethInfo.fileName[5]  = 'o';
-    ibl.bootModes[1].u.ethBoot.ethInfo.fileName[6]  = 'u';
-    ibl.bootModes[1].u.ethBoot.ethInfo.fileName[7]  = 't';
-    ibl.bootModes[1].u.ethBoot.ethInfo.fileName[8]  = '\0';
-    ibl.bootModes[1].u.ethBoot.ethInfo.fileName[9]  = '\0';
-    ibl.bootModes[1].u.ethBoot.ethInfo.fileName[10] = '\0';
-    ibl.bootModes[1].u.ethBoot.ethInfo.fileName[11] = '\0';
+    ibl.bootModes[1].u.ethBoot.ethInfo.fileName[0]  = 'c';
+    ibl.bootModes[1].u.ethBoot.ethInfo.fileName[1]  = '6';
+    ibl.bootModes[1].u.ethBoot.ethInfo.fileName[2]  = '6';
+    ibl.bootModes[1].u.ethBoot.ethInfo.fileName[3]  = '7';
+    ibl.bootModes[1].u.ethBoot.ethInfo.fileName[4]  = '8';
+    ibl.bootModes[1].u.ethBoot.ethInfo.fileName[5]  = '-';
+    ibl.bootModes[1].u.ethBoot.ethInfo.fileName[6]  = 'l';
+    ibl.bootModes[1].u.ethBoot.ethInfo.fileName[7]  = 'e';
+    ibl.bootModes[1].u.ethBoot.ethInfo.fileName[8]  = '.';
+    ibl.bootModes[1].u.ethBoot.ethInfo.fileName[9]  = 'b';
+    ibl.bootModes[1].u.ethBoot.ethInfo.fileName[10] = 'i';
+    ibl.bootModes[1].u.ethBoot.ethInfo.fileName[11] = 'n';
     ibl.bootModes[1].u.ethBoot.ethInfo.fileName[12] = '\0';
     ibl.bootModes[1].u.ethBoot.ethInfo.fileName[13] = '\0';
     ibl.bootModes[1].u.ethBoot.ethInfo.fileName[14] = '\0';
@@ -844,3 +836,4 @@ hotmenu setConfig_c6678_nand()
     ibl.bootModes[0].u.nandBoot.nandInfo.readCommandPost = 0;
     ibl.bootModes[0].u.nandBoot.nandInfo.postCommand     = FALSE;
 }
+
