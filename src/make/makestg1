@@ -36,7 +36,7 @@ EXCLUDES= $(CEXCLUDES)
 
 # The default i2c size. This is used only for the i2c writer utility
 ifndef I2C_SIZE_BYTES
- I2C_SIZE_BYTES=0x10000
+ I2C_SIZE_BYTES=0x20000
 endif
 
 # exclusions based on device capability
@@ -122,6 +122,7 @@ compare:
 
 $(IBLS_C6X): $(STAGE1_TARGET)
 	make -f makestg2 ARCH=c64x TARGET=$@ I2CROM=$(I2CROM) I2C_BUS_ADDR=$(I2C_BUS_ADDR) COMPACT_I2C=$(COMPACT_I2C) SPI_DEFS='$(SPI_DEFS)' $(ROMS)
+
 
 
 
