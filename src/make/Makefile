@@ -269,9 +269,15 @@ evm_c6472:
 
 # The 6474 EVM has a 32k eeprom. A stripped down version is build with only one endian.
 evm_c6474:
+<<<<<<< HEAD:src/make/Makefile
 	make -f makestg1 ARCH=c64x TARGET=c6474 I2C_BUS_ADDR=0x50 COMPACT_I2C=yes ENDIAN_MODE=little CEXCLUDES='ELF NAND_GPIO BIS' I2C_SIZE_BYTES=0x8000 c6474
 	cp ibl_c6474/i2crom.dat ibl_c6474/i2crom_0x50_le.dat
 	make -f makestg1 ARCH=c64x TARGET=c6474 I2C_BUS_ADDR=0x50 COMPACT_I2C=yes ENDIAN_MODE=big CEXCLUDES='ELF NAND_GPIO BIS' I2C_SIZE_BYTES=0x8000 c6474
+=======
+	make -f makestg1 ARCH=c64x TARGET=c6474 I2C_BUS_ADDR=0x50 I2C_MAP_ADDR=0x200 COMPACT_I2C=yes ENDIAN_MODE=little EXCLUDES='ELF NAND BIS' I2C_SIZE_BYTES=0x8000 c6474
+	cp ibl_c6474/i2crom.dat ibl_c6474/i2crom_0x50_le.dat
+	make -f makestg1 ARCH=c64x TARGET=c6474 I2C_BUS_ADDR=0x50 I2C_MAP_ADDR=0x200 COMPACT_I2C=yes ENDIAN_MODE=big EXCLUDES='ELF NAND BIS' I2C_SIZE_BYTES=0x8000 c6474
+>>>>>>> 1d09767... C6474: Adding i2c map address to the top level Makefile:src/make/Makefile
 	cp ibl_c6474/i2crom.dat ibl_c6474/i2crom_0x50_be.dat
 
 evm_c6474l:
