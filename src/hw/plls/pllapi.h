@@ -58,6 +58,8 @@ int16 hwPllSetPll (uint32 pllNum, uint32 prediv, uint32 mult, uint32 postdiv);
 int16 hwPllDisable (uint32 pllNum);
 int16 hwPllEnable (uint32 pllNum);
 
+SINT16 hwPllSetCfgPll  (UINT32 base, UINT16 prediv, UINT16 mult, UINT16 postdiv, UINT32 chipFreqMhz, UINT32 pllFreqMhz);
+SINT16 hwPllSetCfg2Pll (UINT32 base, UINT16 prediv, UINT16 mult, UINT16 postdiv, UINT32 chipFreqMhz, UINT32 pllFreqMhz);
 
 /**
  * @def pll_POR_RESET

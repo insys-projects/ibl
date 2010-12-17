@@ -48,6 +48,8 @@ endif
 
 ECODIR= $(IBL_ROOT)/device
 
+ASMSRC= c64x.s
+
 # For no target set CSRC to all sources for clean
 ifeq ($(TARGET),c6472)
  CSRC= c6472.c c6472init.c
@@ -63,10 +65,14 @@ else
    else
     ifeq ($(TARGET),c6457)
      CSRC= c6457.c
-    else
-     CSRC= c6472.c c6455.c c6474.c c6474l.c c6457.c 
-    endif
-   endif 
+	else
+	 ifeq ($(TARGET),c661x)
+	  CSRC= c661x.c c661xinit.c c661xutil.c
+     else
+      CSRC= c6472.c c6455.c c6474.c c6474l.c c6457.c c6472init.c c6455init.c c6474init.c c661x.c c661xinit.c c661xutil.c
+     endif
+    endif 
+   endif
   endif
  endif
 endif
@@ -78,6 +84,7 @@ include $(IBL_ROOT)/make/$(ARCH)/makeeco.mk
 
 
 C6X_C_DIR=   $(IBL_ROOT)/device/$(TARGET)
+C6X_C_DIR+= ;$(IBL_ROOT)/cfg/$(TARGET)
 C6X_C_DIR+= ;$(IBL_ROOT)/device
 C6X_C_DIR+= ;$(IBL_ROOT)
 C6X_C_DIR+= ;$(IBL_ROOT)/arch/$(ARCH)
@@ -86,6 +93,11 @@ C6X_C_DIR+= ;$(IBL_ROOT)/hw/plls
 C6X_C_DIR+= ;$(IBL_ROOT)/hw/pscs
 C6X_C_DIR+= ;$(IBL_ROOT)/hw/gpio
 C6X_C_DIR+= ;$(IBL_ROOT)/hw/ddrs/emif31
+C6X_C_DIR+= ;$(IBL_ROOT)/hw/qm
+C6X_C_DIR+= ;$(IBL_ROOT)/hw/cpdma
+C6X_C_DIR+= ;$(IBL_ROOT)/hw/pa
+C6X_C_DIR+= ;$(IBL_ROOT)/hw/serdes
+C6X_C_DIR+= ;$(IBL_ROOT)/driver/eth
 export C6X_C_DIR
 
 vpath % $(IBL_ROOT)/device/$(TARGET)

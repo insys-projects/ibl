@@ -377,6 +377,9 @@ static Int32 net_open (void* ptr_driver, void (*asyncComplete)(void *))
  */
 static Int32 net_close (void)
 {
+    if (netmcb.net_device.stop)
+        (*netmcb.net_device.stop)(&netmcb.net_device);
+
     return 0;
 }
 

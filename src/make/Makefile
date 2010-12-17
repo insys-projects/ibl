@@ -40,7 +40,7 @@
 #*
 #* DESCRIPTION: Builds the Intermediate Boot Loader (IBL)
 #*
-#*  Usage:  make c6455 | c6472 | c6474 | c6457 [DEBUG=yes] [ETH=no] [NAND=no]  \
+#*  Usage:  make c6455 | c6472 | c6474 | c6457 | c661x [DEBUG=yes] [ETH=no] [NAND=no]  \
 #*          [BIS=no] [COFF=no] [BLOB=no] [ELF=no] [ENDIAN= both | big | little] [I2C_BUS_ADDR= 0x50 | 0x51] \
 #*			[COMPACT_I2C=yes]
 #*
@@ -53,7 +53,7 @@
 #*			make test_build
 #*******************************************************************************************
 
-IBLS_C6X= c6455 c6472 c6474 c6457
+IBLS_C6X= c6455 c6472 c6474 c6457 c661x
 EVMS_C6X= evm_c6455 evm_c6472 evm_c6474
 
 

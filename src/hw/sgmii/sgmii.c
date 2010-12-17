@@ -81,10 +81,18 @@ int32 hwSgmiiConfig (int32 port, iblSgmii_t *iblSgmii)
 
     SGMII_ACCESS(port, TARGET_SGMII_MR_ADV_ABILITY) = iblSgmii->adviseAbility;
 
+#ifdef TARGET_SGMII_EXTERNAL_SERDES
+
+    targetSgmiiSerdesConfig (port, (void *)iblSgmii);
+
+#else
+
     /* Serdes configuration */
     SGMII_ACCESS(port, TARGET_SGMII_TX_CFG) = iblSgmii->txConfig;
     SGMII_ACCESS(port, TARGET_SGMII_RX_CFG) = iblSgmii->rxConfig;
     SGMII_ACCESS(port, TARGET_SGMII_AUX_CFG) = iblSgmii->auxConfig;
+
+#endif
 
     return (0);
 

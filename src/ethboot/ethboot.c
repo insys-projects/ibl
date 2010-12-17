@@ -59,6 +59,9 @@
 #include "mdioapi.h"
 #include <string.h>
 #include "net_osal.h"
+#include "cpsw_api.h"
+#include "qm_api.h"
+#include "cpdma_api.h"
 
 /**
  *  @brief Remove the possible re-definition of iblEthBoot. iblcfg.h defines this to be a void
@@ -113,7 +116,6 @@ void iblEthBoot (Int32 eIdx)
     char    *ext;
 
 
-
     /* Power up the device. No action is taken if the device is already powered up */
     if (devicePowerPeriph (TARGET_PWR_ETH(ibl.ethConfig[eIdx].port)) < 0)
         return;
@@ -126,8 +128,48 @@ void iblEthBoot (Int32 eIdx)
 
     /* SGMII configuration. If sgmii is not present this statement is defined
      * to void in target.h */
-    hwSgmiiConfig (ibl.ethConfig[eIdx].port, &ibl.sgmiiConfig[eIdx]);
+    if (ibl.ethConfig[eIdx].port == ibl_PORT_SWITCH_ALL)  {
+        for (n = 0; n < TARGET_EMAC_N_PORTS; n++)
+            hwSgmiiConfig (n, &ibl.sgmiiConfig[n]);
 
+    }  else  {
+
+        hwSgmiiConfig (ibl.ethConfig[eIdx].port, &ibl.sgmiiConfig[eIdx]);
+    }
+            
+
+#ifdef DEVICE_CPSW
+    /* On chip switch configuration */
+    hwCpswConfig (targetGetSwitchCtl(), targetGetSwitchMaxPktSize());
+#endif
+
+
+#ifdef DEVICE_QM
+    /* Queue manager configuration */
+    hwQmSetup ((qmConfig_t *)(targetGetQmConfig()));
+    targetInitQs ();
+#endif
+    
+
+#ifdef DEVICE_CPDMA
+    /* Cpdma configuration. */
+    hwCpdmaRxConfig ((cpdmaRxCfg_t *)targetGetCpdmaRxConfig());
+    hwCpdmaTxConfig ((cpdmaTxCfg_t *)targetGetCpdmaTxConfig());
+#endif
+
+
+#ifdef DEVICE_PA
+    /* Packet accelerator configuration. If PA is not present this statement is defined
+     * to void in target.h */
+    targetPaConfig(ibl.ethConfig[eIdx].ethInfo.hwAddress);
+#endif
+
+
+#ifdef DEVICE_SS
+    /* Streaming switch configuration. If not present this statement is defined to void
+     * in target.h.  If present this is usually defined to a series of register writes */
+    hwConfigStreamingSwitch();
+#endif
 
     nDevice.port_num = ibl.ethConfig[eIdx].port;
 
@@ -256,6 +298,24 @@ void iblEthBoot (Int32 eIdx)
 
     /* Close up the peripheral */
     (*net_boot_module.close)();
+
+
+#ifdef DEVICE_PA
+    hwPaDisable ();
+#endif
+
+#ifdef DEVICE_CPDMA
+    /* Cpdma configuration. */
+    hwCpdmaRxDisable ((cpdmaRxCfg_t *)targetGetCpdmaRxConfig());
+    hwCpdmaTxDisable ((cpdmaTxCfg_t *)targetGetCpdmaTxConfig());
+#endif
+
+#ifdef DEVICE_QM
+    targetFreeQs ();
+    /* Queue manager configuration */
+    hwQmTeardown ();
+#endif
+
 
     if (entry != 0)  {
 

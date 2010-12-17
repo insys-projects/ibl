@@ -19,7 +19,7 @@ CLEAN_MODULES=$(addprefix clean_,$(subst hw,,$(MODULES)))
 CLEAN_MODULES+=$(addprefix clean_,$(CFG_MODULES))
 
 
-TARGETS= c6472 c6474 c6474l c6455 c6457
+TARGETS= c6472 c6474 c6474l c6455 c6457 c661x
 
 # The main module needs to know the device address of the i2c where the image map resides
 MAINDEFS=-DIBL_CFG_I2C_MAP_TABLE_DATA_BUS_ADDR=$(I2C_BUS_ADDR)
@@ -108,7 +108,7 @@ compare:
 # For the init code a raw image is created as well as the i2c code to verify
 # endian independent code is generated. The symbols required for linking
 # the full application are then extracted
-iblInit: $(CFG_MODULES) $(MODULES) utils
+iblInit: $(CFG_MODULES) $(MODULES)
 	cat ibl_$(TARGET)/ibl_init_objs_template.inc | sed -e s/ENDIAN_TAG/$(IEXT)/g > ibl_$(TARGET)/ibl_init_objs.inc
 	$(LD) -o ibl_$(TARGET)/ibl_$(TARGET)_init.out -m ibl_$(TARGET)/ibl_$(TARGET)_init.map ibl_$(TARGET)/ibl_init.cmd $(RTLIBS)
 	$(CP) ibl_$(TARGET)/ibl_$(TARGET)_init.out ibl_$(TARGET)/ibl_$(TARGET)_init.$(IEXT).out
@@ -154,8 +154,8 @@ utils:
 	make -C $(IBL_ROOT)/util/btoccs
 	make -C $(IBL_ROOT)/util/romparse TARGET=$(TARGET)
 	make -C $(IBL_ROOT)/util/i2cRead  TARGET=$(TARGET) $(TARGET)
-	make -C $(IBL_ROOT)/util/i2cWrite TARGET=$(TARGET) I2C_SIZE_BYTES=$(I2C_SIZE_BYTES) $(TARGET)
-	make -C $(IBL_ROOT)/util/i2cConfig $(TARGET)
+	make -C $(IBL_ROOT)/util/i2cWrite TARGET=$(TARGET) I2C_SIZE_BYTES=$(I2C_SIZE_BYTES) MAINDEFS='$(MAINDEFS)' $(TARGET)
+	make -C $(IBL_ROOT)/util/i2cConfig $(TARGET) MAINDEFS='$(MAINDEFS)'
 	make -C $(IBL_ROOT)/util/bconvert
 
 clean: $(CLEAN_MODULES) hwClean

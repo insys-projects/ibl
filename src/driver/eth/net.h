@@ -42,6 +42,8 @@
 #ifndef __NET_H__
 #define __NET_H__
 
+#include "iblloc.h"
+
 /**
  * @brief   This is the MAX MTU of the packet that can be received in
  * the network module. This is configured to Ethernet standards at 1518

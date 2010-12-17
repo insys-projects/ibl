@@ -112,6 +112,12 @@ typedef struct iblEthBootInfo_s
  */
 #define ibl_ETH_PORT_FROM_RBL   -1  /**< The ethernet port used is the same one used 
                                          during the ROM boot load process. */
+                                         
+/**
+ *  @def ibl_PORT_SWITCH_ALL
+ */
+#define ibl_PORT_SWITCH_ALL     -2  /**< The ethernet subsystem is connected to a switch, and
+                                         all ports on the subsystem should be configured */
 
 
 /**
@@ -179,9 +185,118 @@ typedef struct iblEmif3p1_s
  */
 typedef struct iblEmif4p0_s
 {
-    uint32 dummy;           /**< placeholder */
+    uint32  registerMask;               /**< Identifies which registers will be configured */
+    uint32  sdRamConfig;                /**< SDRAM Config Register */
+    uint32  sdRamConfig2;               /**< SDRAM Config2 Register */
+    uint32  sdRamRefreshCtl;            /**< SDRAM Refresh Control Register */
+    uint32  sdRamTiming1;               /**< SDRAM Timing 1 Register */
+    uint32  sdRamTiming2;               /**< SDRAM Timing 2 Register */
+    uint32  sdRamTiming3;               /**< SDRAM Timing 3 Register */
+    uint32  lpDdrNvmTiming;             /**< LPDDR2-NVM Timing Register */
+    uint32  powerManageCtl;             /**< Power Management Control Register */
+    uint32  iODFTTestLogic;             /**< IODFT Test Logic Global Control Register */
+    uint32  performCountCfg;            /**< Performance Counter Config Register */
+    uint32  performCountMstRegSel;      /**< Performance Counter Master Region Select Register */
+    uint32  readIdleCtl;                /**< Read Idle Control Register */
+    uint32  sysVbusmIntEnSet;           /**< VBUSM Interrupt Enable Set Register */
+    uint32  sdRamOutImpdedCalCfg;       /**< SDRAM Output Impedance Calibratin Config Register */
+    uint32  tempAlterCfg;               /**< Temperature Alert Config Register */
+    uint32  ddrPhyCtl1;                 /**< DDR PHY Control 1 Register */
+    uint32  ddrPhyCtl2;                 /**< DDR PHY Control 2 Register */
+    uint32  priClassSvceMap;            /**< DDR Priority to Class of Service Mapping Register */
+    uint32  mstId2ClsSvce1Map;          /**< Master ID to Class of Service 1 Mapping Register */
+    uint32  mstId2ClsSvce2Map;          /**< Master ID to Class of Service 2 Mapping Register */
+    uint32  eccCtl;                     /**< ECC Control Register */
+    uint32  eccRange1;                  /**< ECC Address Range 1 Register */
+    uint32  eccRange2;                  /**< ECC Address Range 2 Register */
+    uint32  rdWrtExcThresh;             /**< Read Write Execution Threshold Register */
    
 } iblEmif4p0_t;
+
+
+/**
+ * @defgroup iblEmif4Select Defines the EMIF4 registers configured by IBL
+ *
+ * @ingroup iblEmif4Select
+ * @{
+ *    @def  ibl_EMIF4_ENABLE_sdRamConfig
+ */
+#define ibl_EMIF4_ENABLE_sdRamConfig                 (1 <<  0)
+
+/** @def ibl_EMIF4_ENABLE_sdRamConfig2 */
+#define  ibl_EMIF4_ENABLE_sdRamConfig2                (1 <<  1)
+
+/** @def ibl_EMIF4_ENABLE_sdRamRefreshCtl */
+#define  ibl_EMIF4_ENABLE_sdRamRefreshCtl             (1 <<  2)
+
+/** @def ibl_EMIF4_ENABLE_sdRamTiming1 */
+#define  ibl_EMIF4_ENABLE_sdRamTiming1                (1 <<  3)
+
+/** @def ibl_EMIF4_ENABLE_sdRamTiming2 */
+#define  ibl_EMIF4_ENABLE_sdRamTiming2                (1 <<  4)
+
+/** @def ibl_EMIF4_ENABLE_sdRamTiming3 */
+#define  ibl_EMIF4_ENABLE_sdRamTiming3                (1 <<  5)
+
+/** @def ibl_EMIF4_ENABLE_lpDdrNvmTiming */
+#define  ibl_EMIF4_ENABLE_lpDdrNvmTiming              (1 <<  6)
+
+/** @def ibl_EMIF4_ENABLE_powerManageCtl */
+#define  ibl_EMIF4_ENABLE_powerManageCtl              (1 <<  7)
+
+/** @def ibl_EMIF4_ENABLE_iODFTTestLogic */
+#define  ibl_EMIF4_ENABLE_iODFTTestLogic              (1 <<  8)
+
+/** @def ibl_EMIF4_ENABLE_performCountCfg */
+#define  ibl_EMIF4_ENABLE_performCountCfg             (1 <<  9)
+
+/** @def ibl_EMIF4_ENABLE_performCountMstRegSel */
+#define  ibl_EMIF4_ENABLE_performCountMstRegSel       (1 << 10)
+
+/** @def ibl_EMIF4_ENABLE_readIdleCtl */
+#define  ibl_EMIF4_ENABLE_readIdleCtl                 (1 << 11)
+
+/** @def ibl_EMIF4_ENABLE_sysVbusmIntEnSet */
+#define  ibl_EMIF4_ENABLE_sysVbusmIntEnSet            (1 << 12)
+
+/** @def ibl_EMIF4_ENABLE_sdRamOutImpdedCalCfg */
+#define  ibl_EMIF4_ENABLE_sdRamOutImpdedCalCfg        (1 << 13)
+
+/** @def ibl_EMIF4_ENABLE_tempAlterCfg */
+#define  ibl_EMIF4_ENABLE_tempAlterCfg                (1 << 14)
+
+/** @def ibl_EMIF4_ENABLE_ddrPhyCtl1 */
+#define  ibl_EMIF4_ENABLE_ddrPhyCtl1                  (1 << 15)
+
+/** @def ibl_EMIF4_ENABLE_ddrPhyCtl2 */
+#define  ibl_EMIF4_ENABLE_ddrPhyCtl2                  (1 << 16)
+
+/** @def ibl_EMIF4_ENABLE_priClassSvceMap */
+#define  ibl_EMIF4_ENABLE_priClassSvceMap             (1 << 17)
+
+/** @def ibl_EMIF4_ENABLE_mstId2ClsSvce1Map */
+#define  ibl_EMIF4_ENABLE_mstId2ClsSvce1Map           (1 << 18)
+
+/** @def ibl_EMIF4_ENABLE_mstId2ClsSvce2Map */
+#define  ibl_EMIF4_ENABLE_mstId2ClsSvce2Map           (1 << 11)
+
+/** @def ibl_EMIF4_ENABLE_eccCtl */
+#define  ibl_EMIF4_ENABLE_eccCtl                      (1 << 19)
+
+/** @def ibl_EMIF4_ENABLE_eccRange1 */
+#define  ibl_EMIF4_ENABLE_eccRange1                   (1 << 20)
+
+/** @def ibl_EMIF4_ENABLE_eccRange2 */
+#define  ibl_EMIF4_ENABLE_eccRange2                   (1 << 21)
+
+/** @def ibl_EMIF4_ENABLE_rdWrtExcThresh */
+#define  ibl_EMIF4_ENABLE_rdWrtExcThresh              (1 << 22)
+
+/** @def BOOT_EMIF4_ENABLE_ALL */
+#define  BOOT_EMIF4_ENABLE_ALL                         0x007fffff
+    
+/* @} */  
+    
 
 /**
  * @brief
@@ -337,6 +452,7 @@ typedef struct iblNand_s
 
     uint32   nandPriority;      /**< The nand boot priority. @ref iblPeriphPriority */
     int32    bootFormat;        /**< The format of the boot data file. @ref iblBootFormats */                            
+    int32    cs;                /**< The nand chip select space */
     iblBinBlob_t blob;          /**< Used only if the format is ibl_BOOT_FORMAT_BBLOB */
     
     
@@ -485,6 +601,12 @@ extern ibl_t ibl;
  *  @def ibl_FAIL_CODE_BTBL_FAIL
  */
 #define ibl_FAIL_CODE_BTBL_FAIL             701     /**< Boot table processing function error */
+
+/**
+ *  @def ibl_FAIL_CODE_PA
+ */
+#define ibl_FAIL_CODE_PA                    702     /**< Packet Accelerator setup failed */
+   
 
  
  /* @} */

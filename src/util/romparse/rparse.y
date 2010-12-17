@@ -7,6 +7,7 @@ extern char *yytext;
 %token MULTI_I2C_ID MY_I2C_ID CORE_FREQ_MHZ I2C_CLK_FREQ_KHZ 
 %token EXE_FILE PCI_PARMS NEXT_DEV_ADDR NEXT_DEV_ADDR_EXT ADDRESS_DELAY SWPLL
 %token DEV_ADDR_EXT DEV_ADDR LAYOUT ALIGN PAD LENGTH PAD_FILE_ID
+%token SWPLL_PREDIV SWPLL_MULT SWPLL_POSTDIV SWPLL_FLAGS
 %%
 
 promspec   : segment
@@ -60,6 +61,10 @@ keyword    : BOOT_MODE		     {  $$=$1;  }
 		   | ALIGN				 {  $$=$1;  }
 		   | LENGTH              {  $$=$1;  }
 		   | PAD_FILE_ID         {  $$=$1;  }
+		   | SWPLL_PREDIV		 {  $$=$1;  }
+		   | SWPLL_MULT			 {  $$=$1;  }
+		   | SWPLL_POSTDIV		 {  $$=$1;  }
+		   | SWPLL_FLAGS		 {  $$=$1;  }
 		   ;
 
 %%

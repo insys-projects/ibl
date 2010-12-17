@@ -150,3 +150,13 @@ bool deviceIsLittleEndian(void);
 
 #endif
 
+
+/**
+ *  @brief
+ *      Provide an approximate delay, in cpu cycles
+ *
+ *  @details
+ *      A delay loop
+ */
+void chipDelay32 (uint32 nCycles);
+

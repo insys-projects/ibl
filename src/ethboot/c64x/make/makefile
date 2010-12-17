@@ -65,6 +65,10 @@ C6X_C_DIR+= ;$(STDINC)
 C6X_C_DIR+= ;$(IBL_ROOT)/hw/macs
 C6X_C_DIR+= ;$(IBL_ROOT)/hw/mdio
 C6X_C_DIR+= ;$(IBL_ROOT)/hw/sgmii
+C6X_C_DIR+= ;$(IBL_ROOT)/hw/cpsw
+C6X_C_DIR+= ;$(IBL_ROOT)/hw/qm
+C6X_C_DIR+= ;$(IBL_ROOT)/hw/cpdma
+C6X_C_DIR+= ;$(IBL_ROOT)/hw/pa
 export C6X_C_DIR
 
 

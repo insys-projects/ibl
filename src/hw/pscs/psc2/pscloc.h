@@ -47,10 +47,6 @@
  *************************************************************************************/
  
  
-#define BOOTBITMASK(x,y)      (   (   (  ((uint32)1 << (((uint32)x)-((uint32)y)+(uint32)1) ) - (uint32)1 )   )   <<  ((uint32)y)   )
-#define BOOT_READ_BITFIELD(z,x,y)   (((uint32)z) & BOOTBITMASK(x,y)) >> (y)
-#define BOOT_SET_BITFIELD(z,f,x,y)  (((uint32)z) & ~BOOTBITMASK(x,y)) | ( (((uint32)f) << (y)) & BOOTBITMASK(x,y) )
-
 /* Register offsets */
 #define PSC_REG_PTCMD           0x120
 #define PSC_REG_PSTAT	        0x128

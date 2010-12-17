@@ -177,3 +177,16 @@
 #define DEVICE_I2C_BASE                 0x02b04000
 #define DEVICE_I2C_MODULE_DIVISOR       6
  
+ 
+/**
+ *  @brief
+ *      Register access macros
+ */
+#define DEVICE_REG32_W(x,y)   *(volatile unsigned int *)(x)=(y)
+#define DEVICE_REG32_R(x)    (*(volatile unsigned int *)(x))
+
+#define BOOTBITMASK(x,y)      (   (   (  ((UINT32)1 << (((UINT32)x)-((UINT32)y)+(UINT32)1) ) - (UINT32)1 )   )   <<  ((UINT32)y)   )
+#define BOOT_READ_BITFIELD(z,x,y)   (((UINT32)z) & BOOTBITMASK(x,y)) >> (y)
+#define BOOT_SET_BITFIELD(z,f,x,y)  (((UINT32)z) & ~BOOTBITMASK(x,y)) | ( (((UINT32)f) << (y)) & BOOTBITMASK(x,y) )
+
+

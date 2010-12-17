@@ -159,7 +159,7 @@ void ptNandConfig (void)
  *  @brief Initialize the driver
  *
  */
-Int32 nandHwDriverInit (nandDevInfo_t *devInfo)
+Int32 nandHwDriverInit (int32 cs, nandDevInfo_t *devInfo)
 {
 	Uint32 cmd;
 

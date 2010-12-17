@@ -92,7 +92,9 @@ typedef unsigned int Uint32;
 /* TI boot types */
 typedef unsigned char  UINT8;
 typedef unsigned short UINT16;
+typedef short          SINT16;
 typedef unsigned int   UINT32;
+typedef int            SINT32;
 
 
 /* Types from evm driver */

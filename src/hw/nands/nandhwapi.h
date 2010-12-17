@@ -56,6 +56,7 @@
 #define NAND_NULL_ARG               -811
 #define NAND_INVALID_ADDR           -812
 #define NAND_ECC_FAILURE            -813
+#define NAND_INVALID_CS             -814
 
 
 /* Information used only for programming flash */
@@ -76,7 +77,7 @@ typedef struct nandProgramInfo_s
 
 
 /* Driver functions */
-Int32 nandHwDriverInit (nandDevInfo_t *devInfo);
+Int32 nandHwDriverInit (int32 cs, nandDevInfo_t *devInfo);
 Int32 nandHwDriverReadBytes (Uint32 block, Uint32 page, Uint32 byte, Uint32 nbytes, Uint8 *data);
 Int32 nandHwDriverReadPage(Uint32 block, Uint32 page, Uint8 *data);
 Int32 nandHwDriverClose (void);

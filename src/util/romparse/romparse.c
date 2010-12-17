@@ -474,9 +474,28 @@ void assignKeyVal (int field, int value)
         case ADDRESS_DELAY:    current_table.i2c.address_delay = value;
                                break;
 
-#ifndef c6455         
+#if (!defined(c6455) && !defined(c661x))
         case SWPLL:            current_table.i2c.swPll = value;
                                break;
+#endif
+
+#ifdef c661x
+        case SWPLL_PREDIV:    current_table.i2c.swPllCfg_lsw &= 0x00ff;
+                              current_table.i2c.swPllCfg_lsw |= ((value & 0xff) << 16);
+                              break;
+
+        case SWPLL_MULT:      current_table.i2c.swPllCfg_msw &= 0xc000;
+                              current_table.i2c.swPllCfg_msw |= (value & 0x3fff);
+                              break;
+
+        case SWPLL_POSTDIV:   current_table.i2c.swPllCfg_lsw &= 0xff00;
+                              current_table.i2c.swPllCfg_lsw |= (value & 0xff);
+                              break;
+
+        case SWPLL_FLAGS:     current_table.i2c.swPllCfg_msw &= 0x3fff;
+                              current_table.i2c.swPllCfg_msw |= ((value & 0x3) << 14);
+                              break;
+
 #endif
 
         case DEV_ADDR_EXT:     current_table.i2c.dev_addr_ext = value;

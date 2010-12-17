@@ -8,7 +8,7 @@
 #*********************************************************************************
 
 
-DEVICES= c6455 c6472 c6474 c6474l c6457
+DEVICES= c6455 c6472 c6474 c6474l c6457 c661x
 
 ifndef IBL_ROOT
  IBL_ROOT=../..
@@ -20,10 +20,29 @@ else
  IEXT=le
 endif
 
+
+# The PLL object files are device specific
+PLL_PATH= ../../hw/c64x/make
+ifeq ($(TARGET),c661x)
+ PLL_OBJS= $(PLL_PATH)/pll.$(IEXT).oc $(PLL_PATH)/cfgpll.$(IEXT).oc $(PLL_PATH)/cfgpll2.$(IEXT).oc
+else
+ PLL_OBJS= $(PLL_PATH)/pll.$(IEXT).oc
+endif
+
+ECODIR= $(IBL_ROOT)/util/i2cConfig
+ifeq ($(TARGET),c661x)
+ TFILES= ../../device/c64x/make/$(TARGET)util.$(IEXT).oc
+endif
+
+
+
 ECODIR= $(IBL_ROOT)/util/i2cWrite
 
 MODULES= hw
+CFG_MODULES= device
+
 CLEAN_MODULES=$(addprefix clean_,$(MODULES))
+CLEAN_MODULES+=$(addprefix clean_,$(CFG_MODULES))
 
 CSRC= i2cWrite.c
 
@@ -47,13 +66,18 @@ export TARGET
 
 
 
-$(DEVICES): gen_cdefdep $(MODULES) $(OBJS) i2cWrite.cmd
-	$(LD) -o i2cWrite_$(IEXT).out -m i2cWrite_$(IEXT).map i2cWrite.$(IEXT).oc ../../hw/c64x/make/i2c.$(IEXT).oc ../../hw/c64x/make/pll.$(IEXT).oc i2cWrite.cmd $(RTLIBS)
+
+$(DEVICES): gen_cdefdep $(MODULES) $(CFG_MODULES) $(OBJS) i2cWrite.cmd
+	$(LD) -o i2cWrite_$(IEXT).out -m i2cWrite_$(IEXT).map i2cWrite.$(IEXT).oc ../../hw/c64x/make/i2c.$(IEXT).oc ../../device/c64x/make/$(TARGET)util.$(IEXT).oc $(PLL_OBJS) $(TFILES) i2cWrite.cmd $(RTLIBS)
 
 
 $(MODULES):
 	@echo making $@
 	make -C $(IBL_ROOT)/$@/$(ARCH)/make $@
+
+$(CFG_MODULES):
+	@echo making $@
+	make -C $(IBL_ROOT)/$@/$(ARCH)/make CDEFS='$(MAINDEFS)' $@
 
 
 clean2: $(CLEAN_MODULES)
