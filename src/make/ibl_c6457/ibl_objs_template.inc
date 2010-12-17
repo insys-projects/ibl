@@ -44,7 +44,7 @@
 ../driver/c64x/make/tftp.ENDIAN_TAG.oc
 ../hw/c64x/make/cpmacdrv.ENDIAN_TAG.oc
 ../hw/c64x/make/mdio.ENDIAN_TAG.oc
-../hw/c64x/make/sgmii.ENDIAN_TAG.oc
+../hw/c64x/make/sgmiicur.ENDIAN_TAG.oc
 #endif
 
 #ifndef EXCLUDE_NAND_GPIO
