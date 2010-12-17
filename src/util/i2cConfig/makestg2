@@ -47,7 +47,9 @@ CLEAN_MODULES+=$(addprefix clean_,$(CFG_MODULES))
 
 CSRC= i2cparam.c
 
-CDEFS+= -DIBL_CFG_I2C_MAP_TABLE_DATA_BUS_ADDR=$(I2C_BUS_ADDR) 
+CDEFS+= -DI2C_BUS_ADDR=$(I2C_BUS_ADDR)
+CDEFS+= -DI2C_MAP_ADDR=$(I2C_MAP_ADDR)
+
 
 # enable debug info in the compile
 UTIL=yes
@@ -96,7 +98,7 @@ $(OBJS): cdefdep
 
 gen_cdefdep:
 	@echo Checking command line dependencies
-	@echo $(TARGET) $(ARCH) > cdefdep.tmp
+	@echo $(TARGET) $(ARCH) $(I2C_BUS_ADDR) $(I2C_MAP_ADDR) > cdefdep.tmp
 	@sh -c 'if diff -q cdefdep.tmp cdefdep ; then echo same ; else $(CP) cdefdep.tmp cdefdep ; fi '
 
 	

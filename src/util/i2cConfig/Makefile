@@ -57,7 +57,7 @@ export ENDIAN
 
 
 $(DEVICES):
-	make -f makestg2 ARCH=c64x TARGET=$@ $@
+	make -f makestg2 ARCH=c64x I2C_BUS_ADDR=$(I2C_BUS_ADDR) I2C_MAP_ADDR=$(I2C_MAP_ADDR) TARGET=$@ $@
 
 
 clean:
