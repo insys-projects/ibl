@@ -138,6 +138,8 @@ void deviceDdrConfig (void)
  */
 int32 devicePowerPeriph (int32 modNum)
 {
+    int32 ret;
+
     /* If the input value is < 0 there is nothing to power up */
     if (modNum < 0)
         return (0);
@@ -145,6 +147,15 @@ int32 devicePowerPeriph (int32 modNum)
 
     if (modNum >= TARGET_PWR_MAX_MOD)
         return (-1);
+
+
+    /* Note that if the sgmii power enable is requested the PA must be
+     * powered up first */
+    if (modNum == TARGET_PWR_ETH(x))  {
+        ret = (int32)pscEnableModule (TARGET_PWR_PA);
+        if (ret != 0)
+            return (ret);
+    }
 
     return ((int32)pscEnableModule(modNum));
         

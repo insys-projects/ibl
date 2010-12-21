@@ -18,6 +18,11 @@
  */
 void devicePllConfig (void)
 {
+
+    /* Unlock the chip registers and leave them unlocked */
+    *((Uint32 *)0x2620038) = 0x83e70b13;
+    *((Uint32 *)0x262003c) = 0x95a4f1e0;
+
     if (ibl.pllConfig[ibl_MAIN_PLL].doEnable == TRUE)
         hwPllSetPll (MAIN_PLL, 
                      ibl.pllConfig[ibl_MAIN_PLL].prediv,

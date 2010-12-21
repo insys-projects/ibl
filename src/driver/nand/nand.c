@@ -165,7 +165,7 @@ Int32 nand_free_return (Int32 retcode)
  *  This function initializes the nand control structure and reads the bad block info
  *  from the nand.
  */
-Int32 nand_open (void *ptr_driver, void (*asyncComplete)(void *))
+Int32 nand_open (void *ptr_driver, void (*asyncComplete)(void *), int32 chipSelect)
 {
     iblNand_t *ibln = (iblNand_t *)ptr_driver;
     
@@ -182,7 +182,7 @@ Int32 nand_open (void *ptr_driver, void (*asyncComplete)(void *))
     nandmcb.physToLogicalMap = NULL;
     nandmcb.blocks           = NULL;
 
-    ret = nandHwDriverInit (&nandmcb.devInfo);
+    ret = nandHwDriverInit (ibln->cs, &nandmcb.devInfo);
     if (ret < 0)
         nand_free_return (ret);
 

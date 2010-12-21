@@ -174,11 +174,43 @@ void iblSwap (void)
 
     ibl.ddrConfig.configDdr = swap16val (ibl.ddrConfig.configDdr);
 
-    ibl.ddrConfig.uEmif.emif3p1.sdcfg  = swap32val(ibl.ddrConfig.uEmif.emif3p1.sdcfg);
-    ibl.ddrConfig.uEmif.emif3p1.sdrfc  = swap32val(ibl.ddrConfig.uEmif.emif3p1.sdrfc);
-    ibl.ddrConfig.uEmif.emif3p1.sdtim1 = swap32val(ibl.ddrConfig.uEmif.emif3p1.sdtim1);
-    ibl.ddrConfig.uEmif.emif3p1.sdtim2 = swap32val(ibl.ddrConfig.uEmif.emif3p1.sdtim2);
-    ibl.ddrConfig.uEmif.emif3p1.dmcctl = swap32val(ibl.ddrConfig.uEmif.emif3p1.dmcctl);
+#define targetEmifType()   ibl_EMIF_TYPE_40
+
+    if (targetEmifType() == ibl_EMIF_TYPE_31)  { 
+        ibl.ddrConfig.uEmif.emif3p1.sdcfg  = swap32val(ibl.ddrConfig.uEmif.emif3p1.sdcfg);
+        ibl.ddrConfig.uEmif.emif3p1.sdrfc  = swap32val(ibl.ddrConfig.uEmif.emif3p1.sdrfc);
+        ibl.ddrConfig.uEmif.emif3p1.sdtim1 = swap32val(ibl.ddrConfig.uEmif.emif3p1.sdtim1);
+        ibl.ddrConfig.uEmif.emif3p1.sdtim2 = swap32val(ibl.ddrConfig.uEmif.emif3p1.sdtim2);
+        ibl.ddrConfig.uEmif.emif3p1.dmcctl = swap32val(ibl.ddrConfig.uEmif.emif3p1.dmcctl);
+       
+    } else if (targetEmifType() == ibl_EMIF_TYPE_40)  {
+        ibl.ddrConfig.uEmif.emif4p0.registerMask          = swap32val(ibl.ddrConfig.uEmif.emif4p0.registerMask);
+        ibl.ddrConfig.uEmif.emif4p0.sdRamConfig           = swap32val(ibl.ddrConfig.uEmif.emif4p0.sdRamConfig);
+        ibl.ddrConfig.uEmif.emif4p0.sdRamConfig2          = swap32val(ibl.ddrConfig.uEmif.emif4p0.sdRamConfig2);
+        ibl.ddrConfig.uEmif.emif4p0.sdRamRefreshCtl       = swap32val(ibl.ddrConfig.uEmif.emif4p0.sdRamRefreshCtl);
+        ibl.ddrConfig.uEmif.emif4p0.sdRamTiming1          = swap32val(ibl.ddrConfig.uEmif.emif4p0.sdRamTiming1);
+        ibl.ddrConfig.uEmif.emif4p0.sdRamTiming2          = swap32val(ibl.ddrConfig.uEmif.emif4p0.sdRamTiming2);
+        ibl.ddrConfig.uEmif.emif4p0.sdRamTiming3          = swap32val(ibl.ddrConfig.uEmif.emif4p0.sdRamTiming3);
+        ibl.ddrConfig.uEmif.emif4p0.lpDdrNvmTiming        = swap32val(ibl.ddrConfig.uEmif.emif4p0.lpDdrNvmTiming);
+        ibl.ddrConfig.uEmif.emif4p0.powerManageCtl        = swap32val(ibl.ddrConfig.uEmif.emif4p0.powerManageCtl);
+        ibl.ddrConfig.uEmif.emif4p0.iODFTTestLogic        = swap32val(ibl.ddrConfig.uEmif.emif4p0.iODFTTestLogic);
+        ibl.ddrConfig.uEmif.emif4p0.performCountCfg       = swap32val(ibl.ddrConfig.uEmif.emif4p0.performCountCfg);
+        ibl.ddrConfig.uEmif.emif4p0.performCountMstRegSel = swap32val(ibl.ddrConfig.uEmif.emif4p0.performCountMstRegSel);
+        ibl.ddrConfig.uEmif.emif4p0.readIdleCtl           = swap32val(ibl.ddrConfig.uEmif.emif4p0.readIdleCtl);
+        ibl.ddrConfig.uEmif.emif4p0.sysVbusmIntEnSet      = swap32val(ibl.ddrConfig.uEmif.emif4p0.sysVbusmIntEnSet);
+        ibl.ddrConfig.uEmif.emif4p0.sdRamOutImpdedCalCfg  = swap32val(ibl.ddrConfig.uEmif.emif4p0.sdRamOutImpdedCalCfg);
+        ibl.ddrConfig.uEmif.emif4p0.tempAlterCfg          = swap32val(ibl.ddrConfig.uEmif.emif4p0.tempAlterCfg);
+        ibl.ddrConfig.uEmif.emif4p0.ddrPhyCtl1            = swap32val(ibl.ddrConfig.uEmif.emif4p0.ddrPhyCtl1);
+        ibl.ddrConfig.uEmif.emif4p0.ddrPhyCtl2            = swap32val(ibl.ddrConfig.uEmif.emif4p0.ddrPhyCtl2);
+        ibl.ddrConfig.uEmif.emif4p0.priClassSvceMap       = swap32val(ibl.ddrConfig.uEmif.emif4p0.priClassSvceMap);
+        ibl.ddrConfig.uEmif.emif4p0.mstId2ClsSvce1Map     = swap32val(ibl.ddrConfig.uEmif.emif4p0.mstId2ClsSvce1Map);
+        ibl.ddrConfig.uEmif.emif4p0.mstId2ClsSvce2Map     = swap32val(ibl.ddrConfig.uEmif.emif4p0.mstId2ClsSvce2Map);
+        ibl.ddrConfig.uEmif.emif4p0.eccCtl                = swap32val(ibl.ddrConfig.uEmif.emif4p0.eccCtl);
+        ibl.ddrConfig.uEmif.emif4p0.eccRange1             = swap32val(ibl.ddrConfig.uEmif.emif4p0.eccRange1);
+        ibl.ddrConfig.uEmif.emif4p0.eccRange2             = swap32val(ibl.ddrConfig.uEmif.emif4p0.eccRange2);
+        ibl.ddrConfig.uEmif.emif4p0.rdWrtExcThresh        = swap32val(ibl.ddrConfig.uEmif.emif4p0.rdWrtExcThresh);
+    }
+    
 
     for (i = 0; i < ibl_N_ETH_PORTS; i++)  {
         ibl.ethConfig[i].ethPriority        = swap32val (ibl.ethConfig[i].ethPriority);

@@ -297,6 +297,20 @@ typedef struct iblEmif4p0_s
     
 /* @} */  
     
+    
+/**
+ * @defgroup iblEmifType Defines the EMIF4 type on a device
+ *
+ * @ingroup iblEmifType
+ * @{
+ */
+/** @def ibl_EMIF_TYPE_31 */
+#define  ibl_EMIF_TYPE_31           31
+
+/** @def ibl_EMIF_TYPE_40 */
+#define  ibl_EMIF_TYPE_40           40
+
+/* @} */
 
 /**
  * @brief

@@ -151,6 +151,7 @@
  *    Device DDR controller definitions
  */
 #define DEVICE_EMIF4_BASE  0x21000000
+#define targetEmifType()   ibl_EMIF_TYPE_40
 
 /**
  *  @brief
@@ -265,6 +266,7 @@ void     targetInitQs (void);
 
 
 #define TARGET_SGMII_EXTERNAL_SERDES
+#define TARGET_SGMII_TYPE_2             /* Use second sgmii setup sequence */
 #define TARGET_SGMII_BASE_ADDRESSES    { 0x02090100, 0x02090200 }
 #define TARGET_SGMII_SERDES_BASE        0x2620340
 #define TARGET_SGMII_SERDES_STATUS_BASE 0x2620158
