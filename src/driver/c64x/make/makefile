@@ -82,6 +82,8 @@ C6X_C_DIR+= ;$(IBL_ROOT)/driver/nand
 C6X_C_DIR+= ;$(IBL_ROOT)/cfg/$(TARGET)
 C6X_C_DIR+= ;$(IBL_ROOT)/hw/timer
 C6X_C_DIR+= ;$(IBL_ROOT)/hw/nands
+C6X_C_DIR+= ;$(IBL_ROOT)/device
+C6X_C_DIR+= ;$(IBL_ROOT)/device/$(TARGET)
 export C6X_C_DIR
 
 vpath % $(subst ;,$(PATHSEP), $(ECODIR)/$(ETHDIR); $(ECODIR)/$(STRMDIR); $(ECODIR)/$(TIMDIR); $(ECODIR)/$(NANDDIR) )

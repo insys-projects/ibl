@@ -57,6 +57,7 @@
 #define NAND_INVALID_ADDR           -812
 #define NAND_ECC_FAILURE            -813
 #define NAND_INVALID_CS             -814
+#define NAND_READ_FAILURE           -815
 
 
 /* Information used only for programming flash */
@@ -76,7 +77,7 @@ typedef struct nandProgramInfo_s
 
 
 
-/* Driver functions */
+/* Driver functions, EMIF and GPIO interface */
 Int32 nandHwDriverInit (int32 cs, nandDevInfo_t *devInfo);
 Int32 nandHwDriverReadBytes (Uint32 block, Uint32 page, Uint32 byte, Uint32 nbytes, Uint8 *data);
 Int32 nandHwDriverReadPage(Uint32 block, Uint32 page, Uint8 *data);
@@ -84,6 +85,12 @@ Int32 nandHwDriverClose (void);
 
 Int32 nandHwDriverWritePage  (Uint32 block, Uint32 page, Uint8 *data, nandProgramInfo_t *winfo);
 Int32 nandHwDriverBlockErase (Uint32 uiBlockNumber, nandProgramInfo_t *winfo);
+
+/* Driver functions, SPI interface */
+Int32 nandHwSpiDriverInit (int32 cs, nandDevInfo_t *devInfo);
+Int32 nandHwSpiDriverReadBytes (Uint32 block, Uint32 page, Uint32 byte, Uint32 nbytes, Uint8 *data);
+Int32 nandHwSpiDriverReadPage(Uint32 block, Uint32 page, Uint8 *data);
+Int32 nandHwSpiDriverClose (void);
 
 
 

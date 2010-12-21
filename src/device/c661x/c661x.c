@@ -61,6 +61,8 @@
 #include "pa_api.h"
 #include "serdes_api.h"
 #include "net.h"
+#include "nandhwapi.h"
+#include "spi_api.h"
 #include <string.h>
 
 extern cregister unsigned int DNUM;
@@ -163,14 +165,54 @@ int32 devicePowerPeriph (int32 modNum)
 
 
 /**
- *  @brief  Enable the pass through version of the nand controller
+ *  @brief  Enable EMIF25 or SPI interface to the NAND
  *
- *  @details  On the evm the nand controller is enabled by setting 
- *            gpio 14 high
  */
 #ifndef EXCLUDE_NAND
 int32 deviceConfigureForNand(void)
 {
+
+#ifndef EXCLUDE_NAND_SPI
+
+    if (ibl.nandConfig.interface == ibl_NAND_IF_SPI)  {
+
+        spiConfig_t spiCfg;
+        uint32      v;
+        SINT16      ret;
+
+        /* SPI is module number 3 only on the c6618. On the c6616 the SPI is in the
+         * always on domain */
+        v = *((Uint32 *)DEVICE_JTAG_ID_REG);
+        if (v == DEVICE_C6618_JTAG_ID_VAL)
+            devicePowerPeriph (3);
+
+        /* Translate to the low level driver */
+        spiCfg.port      = 0;
+        spiCfg.mode      = ibl.spiConfig.mode;
+        spiCfg.addrWidth = ibl.spiConfig.addrWidth;
+        spiCfg.npin      = ibl.spiConfig.nPins;
+        spiCfg.csel      = ibl.spiConfig.csel;
+        spiCfg.c2tdelay  = ibl.spiConfig.c2tdelay;
+
+        /* On c661x devices the PLL module has a built in divide by 6, and the SPI
+         * has a maximum clock divider value of 0xff */
+        v = ibl.pllConfig[ibl_MAIN_PLL].pllOutFreqMhz / (DEVICE_SPI_MOD_DIVIDER * ibl.spiConfig.busFreqMHz);
+        if (v > 0xff)
+            v = 0xff;
+
+        spiCfg.clkdiv =  (UINT16) v;
+
+        ret = hwSpiConfig (&spiCfg);
+
+        if (ret != 0)  {
+            iblStatus.iblFail = ibl_FAIL_CODE_SPI_PARAMS;
+            return (-1);
+        }
+
+    }
+
+#endif
+
     return (0);
 
 }
@@ -524,6 +566,53 @@ void targetFreeQs (void)
     
 }    
 
+
+/**
+ *  @brief Return the NAND interface (EMIF25 or SPI) used based on the value
+ *         of interface
+ */
+#ifndef EXCLUDE_NAND_EMIF
+nandCtbl_t nandEmifCtbl =  {
+
+    nandHwDriverInit,
+    nandHwDriverReadBytes,
+    nandHwDriverReadPage,
+    nandHwDriverClose
+
+};
+#endif
+
+#ifndef EXCLUDE_NAND_SPI
+nandCtbl_t nandSpiCtbl =  {
+
+
+    nandHwSpiDriverInit,
+    nandHwSpiDriverReadBytes,
+    nandHwSpiDriverReadPage,
+    nandHwSpiDriverClose
+
+};
+#endif
+
+nandCtbl_t *deviceGetNandCtbl (int32 interface)
+{
+
+#ifndef EXCLUDE_NAND_SPI
+
+    if (interface == ibl_NAND_IF_SPI)
+        return (&nandSpiCtbl);
+
+#endif
+
+#ifndef EXCLUDE_NAND_EMIF
+    if ((interface >= ibl_NAND_IF_CHIPSEL_2) && (interface <= ibl_NAND_IF_CHIPSEL_5))
+        return (&nandEmifCtbl);
+
+#endif
+
+    return (NULL);
+
+}
 
     
 

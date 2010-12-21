@@ -239,6 +239,7 @@ void iblSwap (void)
 
     ibl.nandConfig.nandPriority       = swap32val (ibl.nandConfig.nandPriority);
     ibl.nandConfig.bootFormat         = swap32val (ibl.nandConfig.bootFormat);
+    ibl.nandConfig.interface          = swap32val (ibl.nandConfig.interface);
     ibl.nandConfig.blob.startAddress  = swap32val (ibl.nandConfig.blob.startAddress);
     ibl.nandConfig.blob.sizeBytes     = swap32val (ibl.nandConfig.blob.sizeBytes);
     ibl.nandConfig.blob.branchAddress = swap32val (ibl.nandConfig.blob.branchAddress);
@@ -254,6 +255,12 @@ void iblSwap (void)
     ibl.nandConfig.nandInfo.pageOffset    = swap32val (ibl.nandConfig.nandInfo.pageOffset);
     ibl.nandConfig.nandInfo.columnOffset  = swap32val (ibl.nandConfig.nandInfo.columnOffset);
     ibl.nandConfig.nandInfo.postCommand   = swap16val (ibl.nandConfig.nandInfo.postCommand);
+
+    ibl.spiConfig.addrWidth  = swap16val (ibl.spiConfig.addrWidth);
+    ibl.spiConfig.nPins      = swap16val (ibl.spiConfig.nPins);
+    ibl.spiConfig.csel       = swap16val (ibl.spiConfig.csel);
+    ibl.spiConfig.c2tdelay   = swap16val (ibl.spiConfig.c2tdelay);
+    ibl.spiConfig.busFreqMHz = swap16val (ibl.spiConfig.busFreqMHz);
 
     ibl.chkSum = swap16val (ibl.chkSum);
 }

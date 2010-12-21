@@ -146,6 +146,10 @@ evm_c6457:
 	make -f makestg1 ARCH=c64x TARGET=c6457 I2C_BUS_ADDR=0x51 COMPACT_I2C=yes ENDIAN_MODE=big EXCLUDES='ELF NAND BIS' I2C_SIZE_BYTES=0x8000 c6457
 	cp ibl_c6457/i2crom.dat ibl_c6457/i2crom_0x51.dat
 
+# The 6618 EVM
+evm_c6618:
+	make -f makestg1 ARCH=c64x TARGET=c661x I2C_BUS_ADDR=0x50 ENDIAN_MODE=little EXCLUDES= DEBUG=YES c661x
+
 # Test - builds all the targets, with single component exclusion
 test_build:
 	make -f makestg1 ARCH=c64x TARGET=c6455 I2C_BUS_ADDR=0x50 COMPACT_I2C=no ENDIAN_MODE=both EXCLUDES=     c6455

@@ -51,6 +51,7 @@
 #include "types.h"
 #include "ibl.h"
 #include "iblloc.h"
+#include "device.h"
 #include "nand.h" 
 #include "nandhwapi.h"
 #include <string.h>
@@ -76,9 +77,13 @@ typedef struct nandmcb_s
     Uint8  *blocks;                     /**< There is one byte per block. A non-zero value indicates
                                              that the block is bad */
 
+    nandCtbl_t *nand_if;                /**< Current low level interface (GPIO, EMIF or SPI) */
+    
+
 } nandmcb_t;
 
 nandmcb_t nandmcb;
+
 
 
 /**
@@ -121,8 +126,10 @@ Int32 nand_seek (Int32 loc, Int32 from)
         return (0);
 
     /* Otherwise load the desired page */
-    if (nandHwDriverReadPage((Uint32)(nandmcb.logicalToPhysMap[desiredBlock]), desiredPage, nandmcb.page) < 0)
-        return (-2);
+    if (nandmcb.nand_if->nct_driverReadPage != NULL)  {
+        if ((*nandmcb.nand_if->nct_driverReadPage)((Uint32)(nandmcb.logicalToPhysMap[desiredBlock]), desiredPage, nandmcb.page) < 0)
+            return (-2);
+    }
 
     /* Update the currently loaded block/page info */
     nandmcb.currentLogicalBlock = desiredBlock;
@@ -165,7 +172,7 @@ Int32 nand_free_return (Int32 retcode)
  *  This function initializes the nand control structure and reads the bad block info
  *  from the nand.
  */
-Int32 nand_open (void *ptr_driver, void (*asyncComplete)(void *), int32 chipSelect)
+Int32 nand_open (void *ptr_driver, void (*asyncComplete)(void *))
 {
     iblNand_t *ibln = (iblNand_t *)ptr_driver;
     
@@ -182,9 +189,19 @@ Int32 nand_open (void *ptr_driver, void (*asyncComplete)(void *), int32 chipSele
     nandmcb.physToLogicalMap = NULL;
     nandmcb.blocks           = NULL;
 
-    ret = nandHwDriverInit (ibln->cs, &nandmcb.devInfo);
-    if (ret < 0)
-        nand_free_return (ret);
+    nandmcb.nand_if = deviceGetNandCtbl (ibln->interface);
+
+    if (nandmcb.nand_if != NULL)  {
+
+        ret = (*nandmcb.nand_if->nct_driverInit)(ibln->interface, (void *)&nandmcb.devInfo);
+        if (ret < 0)
+            nand_free_return (ret);
+
+    }  else  {
+
+        return (-1);
+
+    }
 
     /* allocate memory for the page data and the logical to physical block map */
     size = nandmcb.devInfo.pageSizeBytes + nandmcb.devInfo.pageEccBytes;
@@ -213,22 +230,25 @@ Int32 nand_open (void *ptr_driver, void (*asyncComplete)(void *), int32 chipSele
 
     /* Bad blocks are identified by reading page 0 and page 1. If the first 
      * byte in these pages is not 0xff then the block is bad */
+    if (nandmcb.nand_if == NULL)
+        return (-1);
+
     nandmcb.numBadBlocks = 0;
     for (i = 0; i < nandmcb.devInfo.totalBlocks; i++)  {
 
-       ret = nandHwDriverReadBytes (i, 0, nandmcb.devInfo.pageSizeBytes, 1, &nandmcb.page[0]);
-       if (ret < 0)
-          nand_free_return (ret);
+        ret = (*nandmcb.nand_if->nct_driverReadBytes)(i, 0, nandmcb.devInfo.pageSizeBytes, 1, &nandmcb.page[0]);
+        if (ret < 0)
+            nand_free_return (ret);
 
-       ret = nandHwDriverReadBytes (i, 1, nandmcb.devInfo.pageSizeBytes, 1, &nandmcb.page[1]);
-       if (ret < 0)
-          nand_free_return (ret);
+        ret = (*nandmcb.nand_if->nct_driverReadBytes)(i, 1, nandmcb.devInfo.pageSizeBytes, 1, &nandmcb.page[1]);
+        if (ret < 0)
+            nand_free_return (ret);
         
-       if ((nandmcb.page[0] != 0xff) || (nandmcb.page[1] != 0xff))  {
-          nandmcb.blocks[i] = 0xff;
-          nandmcb.numBadBlocks += 1;
-       } else
-          nandmcb.blocks[i] = 0;
+        if ((nandmcb.page[0] != 0xff) || (nandmcb.page[1] != 0xff))  {
+            nandmcb.blocks[i] = 0xff;
+            nandmcb.numBadBlocks += 1;
+        } else
+            nandmcb.blocks[i] = 0;
 
     }
     
@@ -271,6 +291,10 @@ Int32 nand_read (Uint8 *ptr_buf, Uint32 num_bytes)
     Int32  i;
     Int32  pIdx;
 
+
+    if (nandmcb.nand_if == NULL)
+        return (-1);
+
     /* Convert the global file position to an offset in the currently cached page */
     pIdx = nandmcb.fpos % nandmcb.devInfo.pageSizeBytes;
 
@@ -291,7 +315,7 @@ Int32 nand_read (Uint8 *ptr_buf, Uint32 num_bytes)
 
             
             /* Load the new page */
-            if (nandHwDriverReadPage((Uint32)(nandmcb.logicalToPhysMap[nandmcb.currentLogicalBlock]), nandmcb.currentPage, nandmcb.page) < 0)
+            if ((*nandmcb.nand_if->nct_driverReadPage)((Uint32)(nandmcb.logicalToPhysMap[nandmcb.currentLogicalBlock]), nandmcb.currentPage, nandmcb.page) < 0)
                 return (-2);
 
         }
@@ -313,6 +337,10 @@ Int32 nand_peek (Uint8 *ptr_buf, Uint32 num_bytes)
     Uint32 origLogicalBlock;
     Uint32 origPage;
 
+
+    if (nandmcb.nand_if == NULL)
+        return (-1);
+
     origPos          = nandmcb.fpos;
     origLogicalBlock = nandmcb.currentLogicalBlock;
     origPage         = nandmcb.currentPage;
@@ -322,7 +350,7 @@ Int32 nand_peek (Uint8 *ptr_buf, Uint32 num_bytes)
     if ( (origLogicalBlock != nandmcb.currentLogicalBlock)  ||
          (origPage         != nandmcb.currentPage)  )   {
 
-            if (nandHwDriverReadPage((Uint32)(nandmcb.logicalToPhysMap[origLogicalBlock]), origPage, nandmcb.page) < 0)
+            if ((*nandmcb.nand_if->nct_driverReadPage)((Uint32)(nandmcb.logicalToPhysMap[origLogicalBlock]), origPage, nandmcb.page) < 0)
                 return (-2);
     }
     
@@ -353,7 +381,9 @@ Int32 nand_query (void)
  */
 Int32 nand_close (void)
 {
-    nandHwDriverClose ();
+    if (nandmcb.nand_if != NULL)
+        nandHwDriverClose ();
+
     return (nand_free_return (0));
 
 }

@@ -158,7 +158,7 @@ Int32 nandHwDriverReadPage (Uint32 block, Uint32 page, Uint8 *data)
         v = v | (1 << (gCs + 8 - 2));
         DEVICE_REG32_W (DEVICE_EMIF25_BASE + NAND_FLASH_CTL_REG, v);
 
-        nandHwDriverReadBytes (block, page, i << 8, 256, data);
+        nandHwDriverReadBytes (block, page, i << 8, 256, blockp);
 
         /* Read the ECC value computed by the hardware */
         v = DEVICE_REG32_R (DEVICE_EMIF25_BASE + NAND_FLASH_ECC_REG(gCs));

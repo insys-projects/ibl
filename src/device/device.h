@@ -148,8 +148,6 @@ void deviceSetEthResetState (int32 portNum, BOOL applyReset);
   */
 bool deviceIsLittleEndian(void);
 
-#endif
-
 
 /**
  *  @brief
@@ -160,3 +158,27 @@ bool deviceIsLittleEndian(void);
  */
 void chipDelay32 (uint32 nCycles);
 
+
+/**
+ *  @brief
+ *      Return the NAND interface function table
+ *
+ *  @details
+ *      Some devices support multiple NAND interface at once (EMIF25 and SPI).
+ *      This function returns to the lower level driver the pointer to the
+ *      table to use. The table is selected in the ibl configuration.
+ */
+typedef struct nandCtbl_s  {
+
+    Int32 (*nct_driverInit)      (int32 cs, void *nandDevInfo);
+    Int32 (*nct_driverReadBytes) (Uint32 block, Uint32 page, Uint32 byte, Uint32 nbytes, Uint8 *data);
+    Int32 (*nct_driverReadPage)  (Uint32 block, Uint32 page, Uint8 *data);
+    Int32 (*nct_driverClose)     (void);
+
+} nandCtbl_t;
+
+nandCtbl_t *deviceGetNandCtbl (int32 interface);
+
+
+
+#endif

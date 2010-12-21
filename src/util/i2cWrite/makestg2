@@ -24,7 +24,8 @@ endif
 # The PLL object files are device specific
 PLL_PATH= ../../hw/c64x/make
 ifeq ($(TARGET),c661x)
- PLL_OBJS= $(PLL_PATH)/pll.$(IEXT).oc $(PLL_PATH)/cfgpll.$(IEXT).oc $(PLL_PATH)/cfgpll2.$(IEXT).oc
+ PLL_OBJS=  $(PLL_PATH)/pll.$(IEXT).oc $(PLL_PATH)/cfgpll.$(IEXT).oc $(PLL_PATH)/cfgpll2.$(IEXT).oc
+ PLL_OBJS+= ../../device/c64x/make/c64x.$(IEXT).oa
 else
  PLL_OBJS= $(PLL_PATH)/pll.$(IEXT).oc
 endif

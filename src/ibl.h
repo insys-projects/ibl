@@ -466,13 +466,58 @@ typedef struct iblNand_s
 
     uint32   nandPriority;      /**< The nand boot priority. @ref iblPeriphPriority */
     int32    bootFormat;        /**< The format of the boot data file. @ref iblBootFormats */                            
-    int32    cs;                /**< The nand chip select space */
+    int32    interface;         /**< The nand interface @ref iblNandIf */
     iblBinBlob_t blob;          /**< Used only if the format is ibl_BOOT_FORMAT_BBLOB */
     
     
     nandDevInfo_t nandInfo;     /** Low level device info */
 
 } iblNand_t;
+
+/**
+ * @defgroup iblNandIf defines the interface used for NAND memory. Not all values
+ *           are valid for all devices.
+ *
+ * @ingroup iblNandIf
+ * @{
+ */
+/** @def ibl_NAND_IF_GPIO - GPIO interface */
+#define  ibl_NAND_IF_GPIO           0
+
+/** @def ibl_NAND_IF_CHIPSEL_2 - EMIF interface using chip select 2 */
+#define  ibl_NAND_IF_CHIPSEL_2      2
+
+/** @def ibl_NAND_IF_CHIPSEL_3 - EMIF interface using chip select 3 */
+#define ibl_NAND_IF_CHIPSEL_3       3
+
+/** @def ibl_NAND_IF_CHIPSEL_4 - EMIF interface using chip select 4 */
+#define ibl_NAND_IF_CHIPSEL_4       4
+
+/** @def ibl_NAND_IF_CHIPSEL_5 - EMIF interface using chip select 5 */
+#define ibl_NAND_IF_CHIPSEL_5       5
+
+/** @def ibl_NAND_IF_SPI - NAND interface through SPI */
+#define  ibl_NAND_IF_SPI            100
+
+
+/* @} */
+
+
+/**
+ *  @brief
+ *      SPI configuration used for either NOR or NAND
+ */
+typedef struct iblSpi_s
+{
+    int16  addrWidth;       /**<  16 or 24 are the only valid values */
+    int16  nPins;           /**<  4 or 5 are the only valid values */
+    int16  mode;            /**<  Clock / data polarities (valid values 0-3) */
+    int16  csel;            /**<  Chip select value (5 pin). Only 0b10 and 0b01 are valid */
+    uint16 c2tdelay;        /**<  Setup time between chip select and the transaction */
+    uint16 busFreqMHz;      /**<  Bus speed */
+    
+} iblSpi_t;
+    
     
     
 /**
@@ -561,11 +606,10 @@ typedef struct ibl_s
     
     iblNand_t nandConfig;                    /**< NAND configuration @ref iblNand_t */
     
+    iblSpi_t  spiConfig;                     /**< SPI configuration @ref iblSpi_s */
+    
     uint16    chkSum;                        /**< Ones complement checksum over the whole config structure */
     
-    
-/*    iblI2c_t  i2cConfig;  */
-/*    iblSpi_t  spiConfig;  */
     
      
 } ibl_t;
@@ -621,6 +665,11 @@ extern ibl_t ibl;
  */
 #define ibl_FAIL_CODE_PA                    702     /**< Packet Accelerator setup failed */
    
+   
+/**
+ *  @def ibl_FAIL_CODE_SPI_PARAMS
+ */
+#define ibl_FAIL_CODE_SPI_PARAMS            703     /**< Invalid SPI configuration found */
 
  
  /* @} */

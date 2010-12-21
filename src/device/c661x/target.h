@@ -106,6 +106,12 @@
  */
 #define DEVICE_PSC_BASE     0x02350000u
 
+/**
+ *  @brief
+ *    The SPI module base and module divider
+ */
+#define DEVICE_SPI_BASE(x)          0x20bf0000u
+#define DEVICE_SPI_MOD_DIVIDER      6
 
 /**
  * @brief
