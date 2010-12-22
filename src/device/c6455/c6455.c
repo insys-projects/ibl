@@ -52,6 +52,7 @@
 #include "device.h"
 #include "pllapi.h"
 #include "emif31api.h"
+#include "nandhwapi.h"
 
 
 /**
@@ -209,3 +210,24 @@ void deviceLoadDefaultEthAddress (uint8 *maddr)
     maddr[4] = 0;
     maddr[5] = 0;
 }
+
+/**
+ *  @brief  Return the NAND interface call table. Only GPIO is supported on c6455
+ */
+
+#ifndef EXCLUDE_NAND
+nandCtbl_t nandCtbl =  {
+
+    nandHwDriverInit,
+    nandHwDriverReadBytes,
+    nandHwDriverReadPage,
+    nandHwDriverClose
+
+};
+
+nandCtbl_t *deviceGetNandCtbl (int32 interface)
+{
+    return (&nandCtbl);
+}
+#endif
+

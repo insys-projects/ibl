@@ -31,6 +31,7 @@ else
 endif
 
 ECODIR= $(IBL_ROOT)/util/i2cConfig
+
 ifeq ($(TARGET),c661x)
  TFILES= ../../device/c64x/make/$(TARGET)util.$(IEXT).oc
 endif
@@ -69,7 +70,7 @@ export TARGET
 
 
 $(DEVICES): gen_cdefdep $(MODULES) $(CFG_MODULES) $(OBJS) i2cWrite.cmd
-	$(LD) -o i2cWrite_$(IEXT).out -m i2cWrite_$(IEXT).map i2cWrite.$(IEXT).oc ../../hw/c64x/make/i2c.$(IEXT).oc ../../device/c64x/make/$(TARGET)util.$(IEXT).oc $(PLL_OBJS) $(TFILES) i2cWrite.cmd $(RTLIBS)
+	$(LD) -o i2cWrite_$(IEXT).out -m i2cWrite_$(IEXT).map i2cWrite.$(IEXT).oc ../../hw/c64x/make/i2c.$(IEXT).oc $(PLL_OBJS) $(TFILES) i2cWrite.cmd $(RTLIBS)
 
 
 $(MODULES):

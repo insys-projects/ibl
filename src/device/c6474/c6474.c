@@ -54,6 +54,7 @@
 #include "emif31api.h"
 #include "pscapi.h"
 #include "gpio.h"
+#include "nandhwapi.h"
 #include <string.h>
 
 extern cregister unsigned int DNUM;
@@ -175,6 +176,26 @@ void deviceLoadDefaultEthAddress (uint8 *maddr)
     maddr[4] = (macA >>  8) & 0xff;
     maddr[5] = (macA >>  0) & 0xff;
 }
+
+/**
+ *  @brief  Return the NAND interface call table. Only GPIO is supported on c6474 
+ */
+
+#ifndef EXCLUDE_NAND
+nandCtbl_t nandCtbl =  {
+
+    nandHwDriverInit,
+    nandHwDriverReadBytes,
+    nandHwDriverReadPage,
+    nandHwDriverClose
+
+};
+
+nandCtbl_t *deviceGetNandCtbl (int32 interface)
+{
+    return (&nandCtbl);
+}
+#endif
 
 
 
