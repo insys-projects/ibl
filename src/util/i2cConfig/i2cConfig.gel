@@ -1,3 +1,4 @@
+<<<<<<< HEAD:src/util/i2cConfig/i2cConfig.gel
 #define TRUE  1
 #define FALSE 0
 
@@ -25,7 +26,7 @@
 #define ibl_BOOT_FORMAT_BIS     2
 #define ibl_BOOT_FORMAT_COFF    3
 #define ibl_BOOT_FORMAT_ELF     4
-#define ibl_BOOT_FORMAT_BLOB    5
+#define ibl_BOOT_FORMAT_BBLOB    5
 #define ibl_BOOT_FORMAT_BTBL    6
 
 #define  ibl_PMEM_IF_GPIO         0
@@ -105,7 +106,7 @@ hotmenu setConfig_c6472()
     ibl.ethConfig[0].doBootp          = FALSE;
     ibl.ethConfig[0].useBootpServerIp = FALSE;
     ibl.ethConfig[0].useBootpFileName = FALSE;
-    ibl.ethConfig[0].bootFormat       = ibl_BOOT_FORMAT_AUTO;
+    ibl.ethConfig[0].bootFormat       = ibl_BOOT_FORMAT_BBLOB;
 
 
     SETIP(ibl.ethConfig[0].ethInfo.ipAddr,    10,218,109,21);
@@ -325,7 +326,7 @@ hotmenu setConfig_c6474()
     ibl.mdioConfig.mdio[4] =  (1 << 30) | ( 0 << 21) | (14 << 16) | 0x8140;
     ibl.mdioConfig.mdio[5] =  (1 << 30) | ( 1 << 21) | (22 << 16) | 0x043e;
     ibl.mdioConfig.mdio[6] =  (1 << 30) | ( 1 << 21) | (22 << 16) | 0x043e;
-    ibl.mdioConfig.mdio[7] =  (1 << 30) | ( 0 << 21) | ( 1 << 16) | 0xa100;
+    ibl.mdioConfig.mdio[7] =  (1 << 30) | ( 0 << 21) | ( 1 << 16) | 0x9140;
 
 
     /* Nand boot is disabled */
@@ -428,7 +429,7 @@ hotmenu setConfig_c6474lite()
     ibl.mdioConfig.mdio[2] =  (1 << 30) | ( 0 << 21) | (14 << 16) | 0x8140;
 
     ibl.mdioConfig.mdio[3] =  (1 << 30) | ( 1 << 21) | (22 << 16) | 0x043e;
-    ibl.mdioConfig.mdio[4] =  (1 << 30) | ( 0 << 21) | ( 1 << 16) | 0x8140;
+    ibl.mdioConfig.mdio[4] =  (1 << 30) | ( 0 << 21) | ( 1 << 16) | 0x9140;
 
 
     /* This board has NAND. We will enable later */
