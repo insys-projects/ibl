@@ -23,6 +23,8 @@ MEMORY
 	DATA      :  origin = 0x817c00, length = 0x2c00
 	CFG       :  origin = 0x821800, length = 0x0300
 	STAT      :  origin = 0x821b00, length = 0x0200
+	CORE_1	  :  origin = 0x11800000, length = 4
+	CORE_2	  :  origin = 0x12800000, length = 4
 }
 
 
@@ -34,5 +36,7 @@ SECTIONS
 	.ibl_config_table > CFG
 	.ibl_status_table > STAT
 
+	.idle_c1 > CORE_1
+	.idle_c2 > CORE_2
 }
 
