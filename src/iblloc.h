@@ -119,4 +119,15 @@ void *iblMemcpy (void *s1, const void *s2, Uint32 n);
 /* squash printfs */
 void mprintf(char *x, ...);
 
+
+/* Initial Boot Devices */
+#define BOOT_DEVICE_INVALID    -1
+#define BOOT_DEVICE_I2C         0
+#define BOOT_DEVICE_SPI_NOR     1
+#define BOOT_DEVICE_SPI_NAND    2
+
+BOOT_MODULE_FXN_TABLE *iblInitI2c     (void);
+BOOT_MODULE_FXN_TABLE *iblInitSpiNor  (void);
+BOOT_MODULE_FXN_TABLE *iblInitSpiNand (void);
+
 #endif /* _IBLLOC_H */

@@ -112,6 +112,7 @@
  */
 #define DEVICE_SPI_BASE(x)          0x20bf0000u
 #define DEVICE_SPI_MOD_DIVIDER      6
+#define DEVICE_SPI_MAX_DIVIDER      0xff     
 
 /**
  * @brief
@@ -313,5 +314,18 @@ Int32 targetMacRcv (void *ptr_device, UINT8 *buffer);
  */
 #define DEVICE_REG_XMPAX_L(x) *((volatile unsigned int *)(0x08000000 + (8*(x))))
 #define DEVICE_REG_XMPAX_H(x) *((volatile unsigned int *)(0x08000004 + (8*(x))))
+
+
+/**
+ *  @brief
+ *      ROM boot loader boot modes and table locations
+ */
+#define BOOT_MODE_I2C               40
+#define BOOT_MODE_SPI               50
+
+
+#define ROM_BOOT_PARAMS_ADDR_C6618   0x873680
+#define ROM_BOOT_PARAMS_ADDR_C6616   0x8f3680
+
 
 #endif /* _TARGET_H */

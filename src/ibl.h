@@ -292,8 +292,8 @@ typedef struct iblEmif4p0_s
 /** @def ibl_EMIF4_ENABLE_rdWrtExcThresh */
 #define  ibl_EMIF4_ENABLE_rdWrtExcThresh              (1 << 22)
 
-/** @def BOOT_EMIF4_ENABLE_ALL */
-#define  BOOT_EMIF4_ENABLE_ALL                         0x007fffff
+/** @def ibl_BOOT_EMIF4_ENABLE_ALL */
+#define  ibl_BOOT_EMIF4_ENABLE_ALL                    0x007fffff
     
 /* @} */  
     
@@ -671,6 +671,15 @@ extern ibl_t ibl;
  */
 #define ibl_FAIL_CODE_SPI_PARAMS            703     /**< Invalid SPI configuration found */
 
+/**
+ *  @def ibl_FAIL_CODE_INVALID_INIT_DEVICE
+ */
+#define ibl_FAIL_CODE_INVALID_INIT_DEVICE   704     /**< Second stage boot device specified is invalid */
+
+/**
+ *  @def ibl_FAIL_CODE_INVALID_SPI_ADDRESS
+ */
+#define ibl_FAIL_CODE_INVALID_SPI_ADDRESS   705     /**< Invalid data address specified on SPI */
  
  /* @} */
 
@@ -692,10 +701,14 @@ typedef struct iblStatus_s
     uint32 iblFail;         /**<  If non-zero the IBL has encountered a fatal error */
     
     uint32 i2cRetries;      /**<  Count of I2C read retries */
-    uint32 magicRetries;    /**<  Count of I2C re-reads because the magic number was incorrect */ 
-    uint32 mapSizeFail;     /**<  Number of times an invalid map table size was read from the i2c */
-    uint32 mapRetries;      /**<  Number of times the checksum failed on the read of the i2c map */
     uint32 i2cDataRetries;  /**<  Number of retries while reading block data from the i2c */
+    
+    uint32 spiRetries;      /**<  Count of SPI read retries */
+    uint32 spiDataRetries;  /**<  Number of retries while reading block data from the spi */
+    
+    uint32 magicRetries;    /**<  Count of I2C/SPI re-reads because the magic number was incorrect */ 
+    uint32 mapSizeFail;     /**<  Number of times an invalid map table size was read from the i2c/spi */
+    uint32 mapRetries;      /**<  Number of times the checksum failed on the read of the i2c/spi map */
     
     int32  heartBeat;       /**<  An increasing value as long as the boot code is running */
     
@@ -718,13 +731,13 @@ extern iblStatus_t iblStatus;
 
 /** 
  *  @brief
- *      The i2c map structure
+ *      The ibl boot map structure
  *
  *  @details 
- *      The i2c eeprom contains a structure which identifies the location of the big and little
- *      endian ibl images on the eeprom.
+ *      The ibl boot device contains a structure which identifies the location of the big and little
+ *      endian ibl images on the external device.
  */
-typedef struct iblI2cMap_s 
+typedef struct iblBootMap_s 
 {
     uint16  length;         /**<  Size of the structure in bytes */
     uint16  chkSum;         /**<  Value which makes the ones complement checksum over the block equal to 0 or -0 */
@@ -735,7 +748,7 @@ typedef struct iblI2cMap_s
     uint32  addrBe;         /**<  Base address of the boot tables for the big endian image */
     uint32  configBe;       /**<  Base address of the ibl structure for use with the big endian image */
 
-} iblI2cMap_t;
+} iblBootMap_t;
 
 
 

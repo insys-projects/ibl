@@ -27,6 +27,9 @@ MAINDEFS=-DIBL_CFG_I2C_MAP_TABLE_DATA_BUS_ADDR=$(I2C_BUS_ADDR)
 # Add build time exclusion definitions
 MAINDEFS+=$(addprefix -DEXCLUDE_,$(EXCLUDES))
 
+# Add SPI definitions
+SPI_CFG= $(addprefix -D,$(SPI_DEFS))
+
 
 # Common symbols are functions which are loaded with the stage load of the IBL, and
 # also referenced from the second stage
@@ -109,7 +112,9 @@ compare:
 # endian independent code is generated. The symbols required for linking
 # the full application are then extracted
 iblInit: $(CFG_MODULES) $(MODULES)
-	cat ibl_$(TARGET)/ibl_init_objs_template.inc | sed -e s/ENDIAN_TAG/$(IEXT)/g > ibl_$(TARGET)/ibl_init_objs.inc
+	cat ibl_$(TARGET)/ibl_init_objs_template.inc | sed -e s/ENDIAN_TAG/$(IEXT)/g > ibl_$(TARGET)/ibl_init_objs.tmp
+	$(CC) -ppo $(MAINDEFS) -DENDIAN_TAG=$(IEXT) ibl_$(TARGET)/ibl_init_objs.tmp
+	$(CP) ibl_$(TARGET)/ibl_init_objs.pp ibl_$(TARGET)/ibl_init_objs.inc
 	$(LD) -o ibl_$(TARGET)/ibl_$(TARGET)_init.out -m ibl_$(TARGET)/ibl_$(TARGET)_init.map ibl_$(TARGET)/ibl_init.cmd $(RTLIBS)
 	$(CP) ibl_$(TARGET)/ibl_$(TARGET)_init.out ibl_$(TARGET)/ibl_$(TARGET)_init.$(IEXT).out
 	$(RM) -f ibl_$(TARGET)/ibl_init_obj.inc
@@ -147,15 +152,15 @@ $(MODULES):
 	make -C $(IBL_ROOT)/$@/$(ARCH)/make $@
 
 $(CFG_MODULES):
-	@echo making $@
-	make -C $(IBL_ROOT)/$@/$(ARCH)/make CDEFS='$(MAINDEFS)' $@
+	@echo making $@ SPI_CFG=$(SPI_CFG)
+	make -C $(IBL_ROOT)/$@/$(ARCH)/make CDEFS='$(MAINDEFS) $(SPI_CFG)' $@
 
 utils:
 	make -C $(IBL_ROOT)/util/btoccs
 	make -C $(IBL_ROOT)/util/romparse TARGET=$(TARGET)
-	make -C $(IBL_ROOT)/util/i2cRead  TARGET=$(TARGET) $(TARGET)
-	make -C $(IBL_ROOT)/util/i2cWrite TARGET=$(TARGET) I2C_SIZE_BYTES=$(I2C_SIZE_BYTES) MAINDEFS='$(MAINDEFS)' $(TARGET)
-	make -C $(IBL_ROOT)/util/i2cConfig $(TARGET) MAINDEFS='$(MAINDEFS)'
+	make -C $(IBL_ROOT)/util/i2cRead  TARGET=$(TARGET) $(TARGET) 
+	make -C $(IBL_ROOT)/util/i2cWrite TARGET=$(TARGET) I2C_SIZE_BYTES=$(I2C_SIZE_BYTES) MAINDEFS='$(MAINDEFS) -DEXCLUDE_SPI' $(TARGET)
+	make -C $(IBL_ROOT)/util/i2cConfig $(TARGET) MAINDEFS='$(MAINDEFS) -DEXCLUDE_SPI'
 	make -C $(IBL_ROOT)/util/bconvert
 
 clean: $(CLEAN_MODULES) hwClean

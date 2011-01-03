@@ -33,38 +33,34 @@
  *
 */
 
-#ifndef _IBL_STAGE_H
-#define _IBL_STAGE_H
+
 /**
- * @file iblStage.h
+ *  @file iblinit.c
  *
- * @brief
- *	  This file contains global declarations used by both stages of the IBL
+ *  @brief
+ *      Defines the structures and functions used accross the 2nd part of the
+ *      ibl load.
  */
+ 
+ #include "types.h"
+ 
+uint16 onesComplementChksum (uint16 * restrict p_data, uint16 len);
+uint32 swap32val (uint32 v);
+uint16 swap16val (uint16 v);
+void iblSwap (void);
 
-/**
- * @brief The ibl table is declared.
- *
- * @details
- *   The ibl table is declared uninitialized by this ibl program. An external
- *   initialization can be performed if the default operation of the ibl is
- *   not desired.
- */
-#pragma DATA_SECTION(ibl, ".ibl_config_table")
-ibl_t ibl;
-
-
-/**
- * @brief The ibl status table is declared.
- *  
- * @details
- *   The ibl status table is declared. It is initialized at run time
- *   in function main.
- */
-#pragma DATA_SECTION(iblStatus, ".ibl_status_table")
-iblStatus_t iblStatus;
+uint16 readLower16 (uint32 v);
+uint16 readUpper16 (uint32 v);
 
 
+/* Fifo-ish structure */
+#define I_MAX_BLOCK_SIZE      0x100
 
+extern uint32 iFifoIn;
+extern uint32 iFifoOut;
+extern uint8  iData[];
+extern uint16 iSum[];
 
-#endif  /* _IBL_STAGE_H */
+Uint32 iFifoCount (void);
+Uint8 iFifoRead(void);
+

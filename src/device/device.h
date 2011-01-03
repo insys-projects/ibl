@@ -180,5 +180,16 @@ typedef struct nandCtbl_s  {
 nandCtbl_t *deviceGetNandCtbl (int32 interface);
 
 
+/**
+ *  @brief
+ *      Return the boot device for the second part of the loader
+ */
+Int32 deviceReadBootDevice(void);
+
+/**
+ *  @brief
+ *      Return the default SPI device configuration
+ */
+void deviceLoadInitSpiConfig (void *cfg);
 
 #endif

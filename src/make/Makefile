@@ -41,8 +41,8 @@
 #* DESCRIPTION: Builds the Intermediate Boot Loader (IBL)
 #*
 #*  Usage:  make c6455 | c6472 | c6474 | c6457 | c661x [DEBUG=yes] [ETH=no] [NAND=no]  \
-#*          [BIS=no] [COFF=no] [BLOB=no] [ELF=no] [ENDIAN= both | big | little] [I2C_BUS_ADDR= 0x50 | 0x51] \
-#*			[COMPACT_I2C=yes]
+#*          [BIS=no] [COFF=no] [BLOB=no] [ELF=no] [NAND_SPI=no] [NOR_SPI=no] [ENDIAN= both | big | little] 
+#*          [I2C_BUS_ADDR= 0x50 | 0x51] [COMPACT_I2C=yes]
 #*
 #* or to make a board specific configuraiton
 #*
@@ -86,6 +86,14 @@ endif
 ifeq ($(ELF),no)
  EXCLUDES+= ELF
 endif
+
+ifeq ($(NAND_SPI),no)
+ EXCLUDES+= NAND_SPI
+endif
+
+ifeq ($(NOR_SPI),no)
+ EXCLUDES+= NOR_SPI
+endif
  
 
 
@@ -106,6 +114,46 @@ ifndef I2C_BUS_ADDR
  I2C_BUS_ADDR=0x50
 endif
 
+# The SPI configuration parameters
+ifndef SPI_MODE
+ SPI_MODE=3
+endif
+
+ifndef SPI_ADDR_WIDTH
+ SPI_ADDR_WIDTH=24
+endif
+
+ifndef SPI_NPIN
+ SPI_NPIN=5
+endif
+
+ifndef SPI_CSEL
+ SPI_CSEL=2
+endif
+
+ifndef SPI_C2TDEL
+ SPI_C2TDEL=4
+endif
+
+ifndef SPI_CLKDIV
+ SPI_CLKDIV=8
+endif
+
+ifneq ($(SPI_USE_ROM_PARAMS),0)
+ SPI_ROM=1
+else
+ SPI_ROM=0
+endif
+
+SPI_DEFS=  SPI_MODE=$(SPI_MODE)
+SPI_DEFS+= SPI_ADDR_WIDTH=$(SPI_ADDR_WIDTH) 
+SPI_DEFS+= SPI_NPIN=$(SPI_NPIN) 
+SPI_DEFS+= SPI_CSEL=$(SPI_CSEL) 
+SPI_DEFS+= SPI_C2TDEL=$(SPI_C2TDEL) 
+SPI_DEFS+= SPI_CLKDIV=$(SPI_CLKDIV) 
+SPI_DEFS+= SPI_ROM=$(SPI_ROM)
+
+
 
 
 all:
@@ -120,7 +168,7 @@ export DEBUG
 
 
 $(IBLS_C6X): 
-	make -f makestg1 ARCH=c64x TARGET=$@ I2C_BUS_ADDR=$(I2C_BUS_ADDR) COMPACT_I2C=$(COMPACT_I2C) ENDIAN_MODE=$(ENDIAN_MODE) EXCLUDES='$(EXCLUDES)' $@
+	make -f makestg1 ARCH=c64x TARGET=$@ I2C_BUS_ADDR=$(I2C_BUS_ADDR) COMPACT_I2C=$(COMPACT_I2C) ENDIAN_MODE=$(ENDIAN_MODE) EXCLUDES='$(EXCLUDES)' SPI_DEFS='$(SPI_DEFS)' $@
 
 
 # Configurations for individual evms
@@ -148,7 +196,7 @@ evm_c6457:
 
 # The 6618 EVM
 evm_c6618:
-	make -f makestg1 ARCH=c64x TARGET=c661x I2C_BUS_ADDR=0x50 ENDIAN_MODE=little EXCLUDES= DEBUG=YES c661x
+	make -f makestg1 ARCH=c64x TARGET=c661x I2C_BUS_ADDR=0x50 ENDIAN_MODE=little EXCLUDES= DEBUG=YES SPI_DEFS='$(SPI_DEFS)' c661x
 
 # Test - builds all the targets, with single component exclusion
 test_build:

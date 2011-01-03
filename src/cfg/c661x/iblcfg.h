@@ -101,7 +101,15 @@
 #ifndef IBL_CFG_I2C_MAP_TABLE_DATA_ADDR
  #define IBL_CFG_I2C_MAP_TABLE_DATA_ADDR     0x420
 #endif
- 
+
+
+/**
+ * @brief The default location for the spi map information can be overridden during make
+ */
+#ifndef IBL_CFG_SPI_MAP_TABLE_DATA_ADDR
+ #define IBL_CFG_SPI_MAP_TABLE_DATA_ADDR     0x400
+#endif
+
 
 #endif
 

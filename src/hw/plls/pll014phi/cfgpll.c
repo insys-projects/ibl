@@ -25,7 +25,7 @@
  * DESCRIPTION: The PLL is configured. If the existing configuration matches the requested one no
  *              register write is made.
  *********************************************************************************************************/
-SINT16 hwPllSetCfgPll (UINT32 base, UINT16 prediv, UINT16 mult, UINT16 postdiv, UINT32 chipFreqMhz, UINT32 pllFreqMhz)
+SINT16 hwPllSetCfgPll (UINT32 base, UINT32 prediv, UINT32 mult, UINT32 postdiv, UINT32 chipFreqMhz, UINT32 pllFreqMhz)
 {
     UINT32 reg;
     UINT32 regb;

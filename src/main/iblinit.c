@@ -1,3 +1,38 @@
+/*
+ *
+ * Copyright (C) 2010 Texas Instruments Incorporated - http://www.ti.com/ 
+ * 
+ * 
+ *  Redistribution and use in source and binary forms, with or without 
+ *  modification, are permitted provided that the following conditions 
+ *  are met:
+ *
+ *    Redistributions of source code must retain the above copyright 
+ *    notice, this list of conditions and the following disclaimer.
+ *
+ *    Redistributions in binary form must reproduce the above copyright
+ *    notice, this list of conditions and the following disclaimer in the 
+ *    documentation and/or other materials provided with the   
+ *    distribution.
+ *
+ *    Neither the name of Texas Instruments Incorporated nor the names of
+ *    its contributors may be used to endorse or promote products derived
+ *    from this software without specific prior written permission.
+ *
+ *  THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS 
+ *  "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT 
+ *  LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR
+ *  A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT 
+ *  OWNER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, 
+ *  SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT 
+ *  LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE,
+ *  DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY
+ *  THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT 
+ *  (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE 
+ *  OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+ *
+*/
+
 /**
  *  @file iblinit.c
  *
@@ -30,7 +65,7 @@
 #include "iblcfg.h"
 #include "device.h"
 #include "iblbtbl.h"
-#include "i2c.h"
+#include "iblinit.h"
 #include <string.h>
 
 
@@ -40,12 +75,6 @@
  *      are declared in a single header file, included in both stages
  */
 #include "iblStage.h"
-
-/**
- *  @brief
- *      byte swapping of i2c data must be done when in little endian mode
- */
-bool littleEndian;
 
 /**
  *  @brief
@@ -269,30 +298,39 @@ void iblSwap (void)
 
 /**
  *  @brief
- *      The i2c load context consists of the address of the next block 
- *      to read, and a simple fifo holding any existing data.
+ *      The init load context consists of the address of the next block 
+ *      to read, and a simple fifo-ish structure holding any existing data.
+ *
+ *      A full fifo is not defined here. The individual init load blocks
+ *      (I2C, SPI NOR, SPI NAND) will poke the structure values directly
+ *      to minimize the compiled code size. Most notably is the absence
+ *      of the write function. This fifo will always be completely emptied
+ *      before any writes are done, so writes are always done from the top.
  */
-#define I2C_MAX_BLOCK_SIZE      0x80
-uint32 i2cReadAddress;
+uint32 iFifoIn  = 0;
+uint32 iFifoOut = 0;
+uint8  iData[I_MAX_BLOCK_SIZE];
 
-uint32 i2cFifoIn  = 0;
-uint32 i2cFifoOut = 0;
-uint8  i2cData[I2C_MAX_BLOCK_SIZE];
-uint16 i2cSum[I2C_MAX_BLOCK_SIZE >> 1];
+/**
+ *  @brief
+ *      Checkum calculation. 16 bit values constructed from received bytes
+ *      always in big endian format, regardless of the endianness of the device 
+ */
+uint16 iSum[I_MAX_BLOCK_SIZE >> 1];
 
 
 /**
  *  @brief
  *      Return the number of elements in the fifo
  */
-Uint32 i2cFifoCount (void)
+Uint32 iFifoCount (void)
 {
     Int32 count;
 
-    if (i2cFifoIn >= i2cFifoOut)
-        count = i2cFifoIn - i2cFifoOut;
+    if (iFifoIn >= iFifoOut)
+        count = iFifoIn - iFifoOut;
     else
-        count = i2cFifoIn + I2C_MAX_BLOCK_SIZE - i2cFifoOut;
+        count = iFifoIn + I_MAX_BLOCK_SIZE - iFifoOut;
 
     return (count);
 
@@ -303,109 +341,24 @@ Uint32 i2cFifoCount (void)
  *  @brief
  *      Read a byte from the fifo
  */
-Uint8 i2cFifoRead(void)
+Uint8 iFifoRead(void)
 {
     Uint8 v;
 
-    v = i2cData[i2cFifoOut];
+    v = iData[iFifoOut];
 
-    i2cFifoOut += 1;
+    iFifoOut += 1;
 
-    if (i2cFifoOut == i2cFifoIn)
-        i2cFifoOut = i2cFifoIn = 0;
+    if (iFifoOut == iFifoIn)
+        iFifoOut = iFifoIn = 0;
 
-    if (i2cFifoOut >= I2C_MAX_BLOCK_SIZE)
-        i2cFifoOut = 0;
+    if (iFifoOut >= I_MAX_BLOCK_SIZE)
+        iFifoOut = 0;
 
     return (v);
 
 }
 
-/**
- *  @brief
- *      Read a block of data from the I2C eeprom and put it in the fifo
- */
-void i2cReadBlock (void)
-{
-    uint16 len;
-    int32  i, j;
-    uint32 v;
-
-    for (;;) {
-        while (hwI2cMasterRead (i2cReadAddress & 0xffff,    /* The address on the eeprom of the table */
-                                4,                          /* The number of bytes to read */
-                                i2cData,                    /* Where to store the bytes */
-                                i2cReadAddress >> 16,       /* The bus address of the eeprom */
-                                IBL_CFG_I2C_ADDR_DELAY)     /* The delay between sending the address and reading data */
-    
-             != I2C_RET_OK)  {
-
-            iblStatus.i2cDataRetries += 1;
-        }
-
-        /* Form the length. The received bytes are always in big endian format */
-        len    = (i2cData[0] << 8) | i2cData[1];
-
-
-        if (len > I2C_MAX_BLOCK_SIZE)
-            continue;
-
-
-        while (hwI2cMasterRead (i2cReadAddress & 0xffff,    /* The address on the eeprom of the table */
-                                len,                        /* The number of bytes to read */
-                                i2cData,                    /* Where to store the bytes */
-                                i2cReadAddress >> 16,       /* The bus address of the eeprom */
-                                IBL_CFG_I2C_ADDR_DELAY)     /* The delay between sending the address and reading data */
-    
-             != I2C_RET_OK)  {
-
-            iblStatus.i2cDataRetries += 1;
-        }
-
-
-        /* Must do endian conversion to verify the checksum */
-        for (i = j = 0; i < len; i += 2, j += 1) 
-            i2cSum[j] = (i2cData[i+0] << 8) | i2cData[i+1];
-
-        v = onesComplementChksum (i2cSum, j);
-        if ((v == 0) || (v == 0xffff))
-            break;
-
-        
-        iblStatus.i2cDataRetries += 1;
-
-    }
-
-
-    i2cReadAddress += len;
-    
-    i2cFifoIn  = len;
-    i2cFifoOut = 4;    /* The i2c header is effectively removed */
-
-}
-
-             
-
-
-/**
- *  @brief
- *      Read data from the I2C to pass to the interpreter
- */
-Int32 iblI2cRead (Uint8 *buf, Uint32 num_bytes)
-{
-    int i;
-
-    for (i = 0; i < num_bytes; i++)  {
-
-        if (i2cFifoCount() == 0)
-            i2cReadBlock ();
-
-        buf[i] = i2cFifoRead();
-    }
-
-    return (0);
-
-}
 
 #define iblBITMASK(x,y)      (   (   (  ((UINT32)1 << (((UINT32)x)-((UINT32)y)+(UINT32)1) ) - (UINT32)1 )   )   <<  ((UINT32)y)   )
 #define iblREAD_BITFIELD(z,x,y)   (((UINT32)z) & iblBITMASK(x,y)) >> (y)
@@ -430,22 +383,6 @@ uint16 readUpper16 (uint32 v)
 }
 
 
-/**
- *  @brief
- *      The module function table used for boot from i2c
- */
-BOOT_MODULE_FXN_TABLE i2cinit_boot_module = 
-{
-    NULL,           /* Open  API */
-    NULL,           /* Close API */
-    iblI2cRead,     /* Read  API */
-    NULL,           /* Write API */
-    NULL,           /* Peek  API */
-    NULL,           /* Seek  API */
-    NULL            /* Query API */
-};
-
-
 
 /**
  *  @brief
@@ -460,139 +397,50 @@ BOOT_MODULE_FXN_TABLE i2cinit_boot_module =
 void main (void)
 {
 
-    uint16       v;
-    uint16       configAddrLsw;
-    uint16       configAddrMsw;
+    int32        bootDevice;
     uint32       entry;
     void         (*exit)();
-    iblI2cMap_t  map;
+
+    BOOT_MODULE_FXN_TABLE *bFxnTbl;
 
     memset (&iblStatus, 0, sizeof(iblStatus_t));
     iblStatus.iblMagic     = ibl_MAGIC_VALUE;
     iblStatus.iblVersion   = ibl_VERSION;
     iblStatus.activePeriph = ibl_ACTIVE_PERIPH_I2C;
 
-    /* Read the endianness setting of the device */
-    littleEndian = deviceIsLittleEndian();
+
+    /* Determine the boot device to read from */
+    bootDevice = deviceReadBootDevice();
+
+    switch (bootDevice)  {
+
+#ifndef EXCLUDE_I2C
+    case BOOT_DEVICE_I2C:       bFxnTbl = iblInitI2c ();
+                                break;
+#endif
+
+#ifndef EXCLUDE_NOR_SPI
+    case BOOT_DEVICE_SPI_NOR:   bFxnTbl = iblInitSpiNor ();
+                                break;
+#endif
+
+#ifndef EXCLUDE_NAND_SPI
+    case BOOT_DEVICE_SPI_NAND:  bFxnTbl = iblInitSpiNand ();
+                                break;
+#endif
+
+    default:                    iblStatus.iblFail = ibl_FAIL_CODE_INVALID_INIT_DEVICE;
+                                for (;;);
+
+    }
     
-    /* Load the default configuration table from the i2c. The actual speed of the device
-     * isn't really known here, since it is part of the table, so a compile time
-     * value is used (the pll may have been configured during the initial load) */
-    hwI2Cinit (IBL_CFG_I2C_DEV_FREQ_MHZ,        /* The CPU frequency during I2C data load */
-               DEVICE_I2C_MODULE_DIVISOR,       /* The divide down of CPU that drives the i2c */
-               IBL_CFG_I2C_CLK_FREQ_KHZ,        /* The I2C data rate used during table load */
-               IBL_CFG_I2C_OWN_ADDR);           /* The address used by this device on the i2c bus */
-
-
-    /* Read the I2C mapping information from the eeprom */
-    for (;;)  {
-        if (hwI2cMasterRead (IBL_CFG_I2C_MAP_TABLE_DATA_ADDR,     /* The address on the eeprom of the data mapping */
-                             sizeof(iblI2cMap_t),                 /* The number of bytes to read */
-                             (UINT8 *)&map,                       /* Where to store the bytes */
-                             IBL_CFG_I2C_MAP_TABLE_DATA_BUS_ADDR, /* The bus address of the eeprom */
-                             IBL_CFG_I2C_ADDR_DELAY)              /* The delay between sending the address and reading data */
-
-             == I2C_RET_OK)  {
-
-                /* On the I2C EEPROM the table is always formatted with the most significant
-                 * byte first. So if the device is running little endain the endian must be
-                 * swapped */
-                if (littleEndian == TRUE)  {
-                    map.length   = swap16val (map.length);
-                    map.chkSum   = swap16val (map.chkSum);
-                    map.addrLe   = swap32val (map.addrLe);
-                    map.configLe = swap32val (map.configLe);
-                    map.addrBe   = swap32val (map.addrBe);
-                    map.configBe = swap32val (map.configBe);
-
-                    configAddrLsw = readLower16 (map.configLe);
-                    configAddrMsw = readUpper16 (map.configLe);
-
-                }  else  {
-                    configAddrLsw = readLower16 (map.configBe);
-                    configAddrMsw = readUpper16 (map.configLe);
-
-                }
-
-
-                if (map.length != sizeof(iblI2cMap_t))  {
-                    iblStatus.mapSizeFail += 1;
-                    continue;
-                }
-
-                if (map.chkSum != 0)  {
-                    
-                    v = onesComplementChksum ((UINT16 *)&map, sizeof(iblI2cMap_t));
-                    if ((v != 0) && (v != 0xffff))  {
-                        iblStatus.mapRetries += 1;
-                        continue;
-                    }
-                }
-
-                break;
-        }
-
-        iblStatus.mapRetries += 1;
-
-    }
-
-
-    /* Read the i2c configuration tables until the checksum passes and the magic number
-     * matches. The checksum must be verified before the endian re-ordering is done */
-    for (;;)  {
-
-        if (hwI2cMasterRead (configAddrLsw,                  /* The address on the eeprom of the table */
-                             sizeof(ibl_t),                  /* The number of bytes to read */
-                             (UINT8 *)&ibl,                  /* Where to store the bytes */
-                             configAddrMsw,                  /* The bus address of the eeprom */
-                             IBL_CFG_I2C_ADDR_DELAY)         /* The delay between sending the address and reading data */
-
-             == I2C_RET_OK)  {
-
-                 if (ibl.chkSum != 0)  {
-
-                    v = onesComplementChksum ((UINT16 *)&ibl, sizeof(ibl_t) / sizeof(UINT16));
-                    if ((v != 0) && (v != 0xffff))  {
-                        iblStatus.i2cRetries += 1;
-                        continue;
-                    }
-
-                 }  
-
-
-                if (ibl.iblMagic == ibl_MAGIC_VALUE)
-                    break;
-
-                if (swap32val (ibl.iblMagic) == ibl_MAGIC_VALUE)  {
-                    iblSwap ();
-                    break;
-                }
-
-                iblStatus.magicRetries += 1;
-
-            }
-
-            iblStatus.i2cRetries += 1;
-    }
 
     /* Pll configuration is device specific */
     devicePllConfig ();
 
 
-    /* The rest of the IBL is in boot table format. Read and process the data */
-    if (littleEndian == TRUE) 
-        i2cReadAddress = map.addrLe;
-    else
-        i2cReadAddress = map.addrBe;
-
-    if (i2cReadAddress == 0xffffffff)  {
-        iblStatus.iblFail = ibl_FAIL_CODE_INVALID_I2C_ADDRESS;
-        for (;;);
-    }
-
-
     /* Pass control to the boot table processor */
-    iblBootBtbl (&i2cinit_boot_module, &entry);
+    iblBootBtbl (bFxnTbl, &entry);
 
     if (btblWrapEcode != 0)  {
         iblStatus.iblFail = ibl_FAIL_CODE_BTBL_FAIL;

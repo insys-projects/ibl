@@ -67,6 +67,11 @@
 
 extern cregister unsigned int DNUM;
 
+/* Excluding NAND exclused both SPI and EMIF nand */
+#ifdef EXCLUDE_NAND
+ #define EXCLUDE_NAND_EMIF
+ #define EXCLUDE_NAND_SPI
+#endif
 
 /**
  *  @brief Determine if an address is local
