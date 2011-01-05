@@ -12,14 +12,6 @@
 #include "spi_api.h"
 #include "tiboot_c661x.h"       
 
-#ifdef EXCLUDE_SPI
- #define EXCLUDE_NAND_SPI
- #define EXCLUDE_NOR_SPI
-#elif (defined(EXCLUDE_NAND_SPI) && defined(EXCLUDE_NOR_SPI))
- #define EXCLUDE_SPI
-#endif
-
-
 
 /**
  * @brief Configure the PLLs
@@ -133,7 +125,7 @@ int32 deviceReadBootDevice (void)
 }
 
 
-#ifndef EXCLUDE_SPI
+#if (!defined(EXCLUDE_NOR_SPI) || !defined(EXCLUDE_NAND_SPI))
 /**
  *  @brief
  *      Return the default hardware configuration for SPI. If this information

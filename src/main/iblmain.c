@@ -55,12 +55,14 @@
 #include "device.h"
 #include "ethboot.h"
 #include "nandboot.h"
+#include "norboot.h"
 #include "bis.h"
 #include "coffwrap.h"
 #include "iblbtbl.h"
 #include "iblblob.h"
 #include "timer.h"
 #include "i2c.h"
+#include "spi_api.h"
 #include "ibl_elf.h"
 #include <string.h>
 
@@ -112,6 +114,106 @@ BOOL iblMacAddrIsZero (uint8 *maddr)
 
 }
 
+/**
+ *  @b Description
+ *  @n
+ *  
+ *  For NAND and NOR boots, configure the specified peripheral or memory interface
+ */
+void iblPmemCfg (int32 interface, int32 port, bool enableNand)
+{
+    int32 ret;
+
+    switch (interface)  {
+
+        case ibl_PMEM_IF_GPIO:
+                ret = devicePowerPeriph (TARGET_PWR_GPIO);
+                break;
+
+
+        #if (!defined(EXCLUDE_NOR_SPI) && !defined(EXCLUDE_NAND_SPI))
+
+            case ibl_PMEM_IF_SPI:  {
+
+                    Uint32      v;
+                    spiConfig_t cfg;
+
+                    ret = devicePowerPeriph (TARGET_PWR_SPI);
+                    if (ret != 0)
+                        break;
+
+                    cfg.port      = port;
+                    cfg.mode      = ibl.spiConfig.mode;
+                    cfg.addrWidth = ibl.spiConfig.addrWidth;
+                    cfg.npin      = ibl.spiConfig.nPins;
+                    cfg.csel      = ibl.spiConfig.csel;
+                    cfg.c2tdelay  = ibl.spiConfig.c2tdelay;
+
+                    /* On c661x devices the PLL module has a built in divide by 6, and the SPI
+                     * has a maximum clock divider value of 0xff */
+                    v = ibl.pllConfig[ibl_MAIN_PLL].pllOutFreqMhz / (DEVICE_SPI_MOD_DIVIDER * ibl.spiConfig.busFreqMHz);
+                    if (v > 0xff)
+                        v = 0xff;
+
+                    cfg.clkdiv =  (UINT16) v;
+
+                    ret = hwSpiConfig (&cfg);
+                    if (ret != 0)  {
+                        iblStatus.iblFail = ibl_FAIL_CODE_SPI_PARAMS;
+                        return;
+                    }
+
+                }
+                break;
+        #endif
+
+        #if (!defined(EXCLUDE_NOR_EMIF) || !defined(EXCLUDE_NAND_EMIF))
+
+            case ibl_PMEM_IF_CHIPSEL_2:
+            case ibl_PMEM_IF_CHIPSEL_3:
+            case ibl_PMEM_IF_CHIPSEL_4:
+            case ibl_PMEM_IF_CHIPSEL_5:  {
+
+                    int i;
+
+                    /* Locate the configuration corresponding to this chip select space */
+                    for (i = 0; i < ibl_MAX_EMIF_PMEM; i++) 
+                        if (ibl.emifConfig[i].csSpace == interface)
+                            break;
+                        
+                    if (i == ibl_MAX_EMIF_PMEM)  {
+                        iblStatus.iblFail = ibl_FAIL_CODE_NO_EMIF_CFG;
+                        return;
+                    }
+
+                    ret = devicePowerPeriph (TARGET_PWR_EMIF);
+                    if (ret != 0)
+                        break;
+
+                    if (hwEmif25Init (interface, ibl.emifConfig[i].busWidth, ibl.emifConfig[i].waitEnable, enableNand) != 0)
+                        iblStatus.iblFail = ibl_FAIL_CODE_EMIF_CFG_FAIL;
+
+                }
+                break;
+
+            #endif
+
+            default:
+
+
+
+                iblStatus.iblFail = ibl_FAIL_CODE_INVALID_NAND_PERIPH;
+                return;
+    }
+
+    if (ret != 0)  {
+        iblStatus.iblFail = ibl_FAIL_CODE_PERIPH_POWER_UP;
+        return;
+    }
+
+}
+
+
 
 /**
  * @b Description
@@ -141,13 +243,14 @@ void main (void)
     timer_init ();
 
     /* Load default mac addresses for ethernet boot if requested */
-    for (i = 0; i < ibl_N_ETH_PORTS; i++)  {
+    for (i = 0; i < ibl_N_BOOT_MODES; i++)  {
 
-        if ( (iblPriorityIsValid (ibl.ethConfig[i].ethPriority)       )   &&
-             (iblMacAddrIsZero   (ibl.ethConfig[i].ethInfo.hwAddress) )   )
+        if (ibl.bootModes[i].bootMode == ibl_BOOT_MODE_TFTP)  {
 
-            deviceLoadDefaultEthAddress (ibl.ethConfig[i].ethInfo.hwAddress);
+            if (iblMacAddrIsZero (ibl.bootModes[i].u.ethBoot.ethInfo.hwAddress))
 
+                deviceLoadDefaultEthAddress (ibl.bootModes[i].u.ethBoot.ethInfo.hwAddress);
+        }
     }
 
 
@@ -157,29 +260,47 @@ void main (void)
     /* Try booting forever */
     for (;;)  {
 
-        /* Start looping through the boot modes to find the one with the lowest priority
-         * value, and try to boot it. If a boot mode is not supported the function
-         * statement is simply defined to be a void statement */
+        /* Start looping through the boot modes to find the one with the highest priority
+         * value, and try to boot it. */
         for (i = ibl_HIGHEST_PRIORITY; i < ibl_LOWEST_PRIORITY; i++)  {
 
-#ifndef EXCLUDE_ETH
-            for (j = 0; j < ibl_N_ETH_PORTS; j++)  {
-                if (ibl.ethConfig[j].ethPriority == i)  {
-                    iblStatus.activePeriph = ibl_ACTIVE_PERIPH_ETH;
-                    memcpy (&iblStatus.ethParams, &ibl.ethConfig[j].ethInfo, sizeof (iblEthBootInfo_t));
-                    iblEthBoot (j);
-                }
-            }
-#endif
+            for (j = 0; j < ibl_N_BOOT_MODES; j++)  {
 
-#ifndef EXCLUDE_NAND
-            if (ibl.nandConfig.nandPriority == i)  {
-                iblStatus.activePeriph = ibl_ACTIVE_PERIPH_NAND;
-                iblNandBoot ();
-            }
-#endif
+                if (ibl.bootModes[j].priority == i)  {
+
+                    iblStatus.activeBoot = ibl.bootModes[j].bootMode;
+
+                    switch (ibl.bootModes[j].bootMode)  {
+
+
+                        #ifndef EXCLUDE_ETH
+                            case ibl_BOOT_MODE_TFTP:
+                                    iblStatus.activeDevice = ibl_ACTIVE_DEVICE_ETH;
+                                    iblMemcpy (&iblStatus.ethParams, &ibl.bootModes[j].u.ethBoot.ethInfo, sizeof(iblEthBootInfo_t));
+                                    iblEthBoot (j);
+                                    break;
+                        #endif
+
+                        #if (!defined(EXCLUDE_NAND_EMIF) && !defined(EXCLUDE_NAND_SPI) && !defined(EXCLUDE_NAND_GPIO))
+                            case ibl_BOOT_MODE_NAND:
+                                    iblPmemCfg (ibl.bootModes[j].u.nandBoot.interface, ibl.bootModes[j].port, TRUE);
+                                    iblNandBoot (j);
+                                    break;
+                        #endif
+
+                        #if (!defined(EXCLUDE_NOR_EMIF) && !defined(EXCLUDE_NOR_SPI))
+                            case ibl_BOOT_MODE_NOR:
+                                    iblPmemCfg (ibl.bootModes[j].u.norBoot.interface, ibl.bootModes[j].port, TRUE);
+                                    iblNorBoot (j);
+                                    break;
+                        #endif
+
+                    }
+                }
 
             iblStatus.heartBeat += 1;
+
+            }
         }
 
     }
@@ -238,7 +359,7 @@ Uint32 iblBoot (BOOT_MODULE_FXN_TABLE *bootFxn, Int32 dataFormat, void *formatPa
     }        
 
 
-    iblStatus.activeFormat = dataFormat;
+    iblStatus.activeFileFormat = dataFormat;
 
 
     /* Invoke the parser */

@@ -189,7 +189,7 @@ int32 devicePowerPeriph (int32 modNum)
  *
  *  @details  
  */
-#ifndef EXCLUDE_NAND
+#ifndef EXCLUDE_NAND_GPIO
 int32 deviceConfigureForNand(void)
 {
     return (0);
@@ -215,7 +215,7 @@ void deviceLoadDefaultEthAddress (uint8 *maddr)
  *  @brief  Return the NAND interface call table. Only GPIO is supported on c6455
  */
 
-#ifndef EXCLUDE_NAND
+#ifndef EXCLUDE_NAND_GPIO
 nandCtbl_t nandCtbl =  {
 
     nandHwDriverInit,

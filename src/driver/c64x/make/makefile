@@ -63,7 +63,11 @@ TIMSRC= timer.c
 NANDDIR= nand
 NANDSRC= nand.c
 
-CSRC= $(ETHSRC) $(STRMSRC) $(TIMSRC) $(NANDSRC)
+# The nor dirver
+NORDIR= nor
+NORSRC= nor.c
+
+CSRC= $(ETHSRC) $(STRMSRC) $(TIMSRC) $(NANDSRC) $(NORSRC)
 
 
 .PHONY: driver
@@ -79,6 +83,7 @@ C6X_C_DIR+= ;$(STDINC)
 C6X_C_DIR+= ;$(IBL_ROOT)/driver/timer
 C6X_C_DIR+= ;$(IBL_ROOT)/driver/stream
 C6X_C_DIR+= ;$(IBL_ROOT)/driver/nand
+C6X_C_DIR+= ;$(IBL_ROOT)/driver/nor
 C6X_C_DIR+= ;$(IBL_ROOT)/cfg/$(TARGET)
 C6X_C_DIR+= ;$(IBL_ROOT)/hw/timer
 C6X_C_DIR+= ;$(IBL_ROOT)/hw/nands
@@ -86,7 +91,7 @@ C6X_C_DIR+= ;$(IBL_ROOT)/device
 C6X_C_DIR+= ;$(IBL_ROOT)/device/$(TARGET)
 export C6X_C_DIR
 
-vpath % $(subst ;,$(PATHSEP), $(ECODIR)/$(ETHDIR); $(ECODIR)/$(STRMDIR); $(ECODIR)/$(TIMDIR); $(ECODIR)/$(NANDDIR) )
+vpath % $(subst ;,$(PATHSEP), $(ECODIR)/$(ETHDIR); $(ECODIR)/$(STRMDIR); $(ECODIR)/$(TIMDIR); $(ECODIR)/$(NANDDIR); $(ECODIR)/$(NORDIR) )
 
 
 driver: gen_cdefdep makefile $(OBJS)

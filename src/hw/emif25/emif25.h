@@ -33,66 +33,24 @@
  *
 */
 
+#ifndef _EMIF25_H
+#define _EMIF25_H
 
-
-/*********************************************************************************** 
- * FILE PURPOSE: The NAND boot wrapper
- ***********************************************************************************
- * FILE NAME: nandboot.c
+/**
+ *  @file emif25.h
  *
- * DESCRIPTION: This file provides the nand boot wrapper used by IBL modules
- *
- * @file nandboot.c
- *
- * @brief
- *		The nand boot wrapper
- *
- ************************************************************************************/
-#include "types.h"
-#include "ibl.h"
-#include "iblloc.h"
-#include "nand.h"
-#include "device.h"
-
-/** 
- * @brief
- *   Nandboot is disabled through iblcfg.h. Disable the definition for the compilation
+ *  @brief
+ *		Defines the emif25 api
  */
-#ifdef iblNandBoot
- #undef iblNandBoot
-#endif
+#include "types.h"
+ 
+Int32 hwEmif25Init (int32 cs, int32 busWidth, bool wait, bool nand);
 
+/* return values */
+#define EMIF25_INVALID_CS         -300
+#define EMIF25_INVALID_BUS_WIDTH  -301
 
-void iblNandBoot (int32 eIdx)
-{
-    Uint32 entry;
-    Int32  ret;
-    void   (*exit)();
-
-
-
-    /* Perform any device specific configurations */
-    if (deviceConfigureForNand() < 0)
-        return;
-
-
-    /* Open the nand driver */
-    if ((*nand_boot_module.open) ((void *)&ibl.bootModes[eIdx].u.nandBoot, NULL))
-        return;
-
-
-    entry = iblBoot (&nand_boot_module, ibl.bootModes[eIdx].u.nandBoot.bootFormat, &ibl.bootModes[eIdx].u.nandBoot.blob);
-
-    (*nand_boot_module.close)();
-
-    if (entry != 0)  {
-
-        iblStatus.exitAddress = entry;
-        exit = (void (*)())entry;
-        (*exit)();
-            
-    }
-
-} 
-
-
+ 
+ 
+ 
+#endif /* _EMIF25_H */

@@ -52,7 +52,7 @@
  *  @details 
  *		The IBL will attempt to boot over the NAND interface
  */
-void iblNandBoot (void);
+void iblNandBoot (int32 eIdx);
 
 
 #endif /* NANDBOOT_H */

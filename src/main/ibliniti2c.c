@@ -42,6 +42,7 @@
 #include "iblinit.h"
 #include <string.h>
 
+#ifndef EXCLUDE_I2C
 /**
  *  @brief
  *      A global value is used to track the read through the i2c during
@@ -280,3 +281,4 @@ BOOT_MODULE_FXN_TABLE *iblInitI2c (void)
 
 }
 
+#endif /* EXCLUDE_I2C */

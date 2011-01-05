@@ -45,7 +45,7 @@
 ../hw/c64x/make/mdio.ENDIAN_TAG.oc
 #endif
 
-#ifndef EXCLUDE_NAND
+#ifndef EXCLUDE_NAND_GPIO
 ../nandboot/c64x/make/nandboot.ENDIAN_TAG.oc
 ../driver/c64x/make/nand.ENDIAN_TAG.oc
 ../ecc/c64x/make/3byte_ecc.ENDIAN_TAG.oc

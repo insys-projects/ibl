@@ -382,7 +382,9 @@ Int32 nand_query (void)
 Int32 nand_close (void)
 {
     if (nandmcb.nand_if != NULL)
-        nandHwDriverClose ();
+        (*nandmcb.nand_if->nct_driverClose)();
+
+    nandmcb.nand_if = NULL;
 
     return (nand_free_return (0));
 

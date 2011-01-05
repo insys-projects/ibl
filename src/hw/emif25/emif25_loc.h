@@ -33,66 +33,24 @@
  *
 */
 
+#ifndef _EMIF25_LOC_H
+#define _EMIF25_LOC_H
 
+/* Register offsets */
+#define EMIF25_ASYNC_CFG_REG(x)       (0x10 + (((x)-2)*4))
+#define EMIF25_FLASH_CTL_REG          0x60
+#define EMIF25_FLASH_ECC_REG(x)       (0xc0 + (((x)-2)*4))
 
-/*********************************************************************************** 
- * FILE PURPOSE: The NAND boot wrapper
- ***********************************************************************************
- * FILE NAME: nandboot.c
- *
- * DESCRIPTION: This file provides the nand boot wrapper used by IBL modules
- *
- * @file nandboot.c
- *
- * @brief
- *		The nand boot wrapper
- *
- ************************************************************************************/
-#include "types.h"
-#include "ibl.h"
-#include "iblloc.h"
-#include "nand.h"
-#include "device.h"
+/* Setting the bus width in the async config register */
+#define EMIF25_SET_ASYNC_WID(x,v)     BOOT_SET_BITFIELD((x),(v),1,0)
 
-/** 
- * @brief
- *   Nandboot is disabled through iblcfg.h. Disable the definition for the compilation
- */
-#ifdef iblNandBoot
- #undef iblNandBoot
-#endif
+/* Setting the wait in the async config register */
+#define EMIF25_SET_ASYNC_WAIT(x,v)    BOOT_SET_BITFIELD((x),(v),30,30)
 
-
-void iblNandBoot (int32 eIdx)
-{
-    Uint32 entry;
-    Int32  ret;
-    void   (*exit)();
+/* Setting the nand enable/disable in the flash control register */
+#define EMIF25_SET_FLASH_CTL_NAND_ENABLE(x,v,cs)   BOOT_SET_BITFIELD((x),(v),((cs)-2),((cs)-2))
 
 
 
-    /* Perform any device specific configurations */
-    if (deviceConfigureForNand() < 0)
-        return;
 
-
-    /* Open the nand driver */
-    if ((*nand_boot_module.open) ((void *)&ibl.bootModes[eIdx].u.nandBoot, NULL))
-        return;
-
-
-    entry = iblBoot (&nand_boot_module, ibl.bootModes[eIdx].u.nandBoot.bootFormat, &ibl.bootModes[eIdx].u.nandBoot.blob);
-
-    (*nand_boot_module.close)();
-
-    if (entry != 0)  {
-
-        iblStatus.exitAddress = entry;
-        exit = (void (*)())entry;
-        (*exit)();
-            
-    }
-
-} 
-
-
+#endif /* _EMIF25_LOCK_H */

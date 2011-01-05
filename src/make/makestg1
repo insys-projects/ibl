@@ -12,6 +12,7 @@
 
 IBLS_C6X= c6455 c6472 c6474 c6474l c6457 c661x
 
+
 # Excluding functions from the build reduces the I2C eeprom memory used and
 # speeds the initial boot time. Note that boot table cannot be excluded
 # because it is required for the two stage I2C load process
@@ -30,15 +31,76 @@ else
  endif
 endif
 
+EXCLUDES= $(CEXCLUDES)
+
 
 # The default i2c size. This is used only for the i2c writer utility
 ifndef I2C_SIZE_BYTES
  I2C_SIZE_BYTES=0x20000
 endif
 
+# exclusions based on device capability
+ifeq ($(TARGET),c6455)
+ C64X_EXCLUDES=yes
+endif
+
+ifeq ($(TARGET),c6457)
+ C64X_EXCLUDES=yes
+endif
+ 
+ifeq ($(TARGET),c6472)
+ C64X_EXCLUDES=yes
+endif
+
+ifeq ($(TARGET),c6474)
+ C64X_EXCLUDES=yes
+endif
+
+ifeq ($(C64X_EXCLUDES),yes)
+
+ ifeq (,$(findstring SPI, $(EXCLUDES)))
+  EXCLUDES+= SPI
+ endif
+
+ ifeq (,$(findstring NOR_SPI, $(EXCLUDES)))
+  EXCLUDES+= NOR_SPI
+ endif
+
+ ifeq (,$(findstring NOR_EMIF, $(EXCLUDES)))
+  EXCLUDES+= NOR_EMIF
+ endif
+
+ ifeq (,$(findstring NAND_SPI, $(EXCLUDES)))
+  EXCLUDES+= NAND_SPI
+ endif
+
+ ifeq (,$(findstring NAND_EMIF, $(EXCLUDES)))
+  EXCLUDES+= NAND_EMIF
+ endif
+
+endif
+
+ifeq ($(TARGET),c661x)
+ EXCLUDES+= NAND_GPIO
+endif
+
+
+# Prevent I2C/SPI rom creation based on defines
+ROMS=
+
+ifeq (,$(findstring I2C, $(EXCLUDES)))
+ ROMS+= i2cRom
+endif
+
+ifeq (,$(findstring SPI, $(EXCLUDES)))
+ ROMS+= spiRom
+endif
+
 
 # Excludes identify which components are not part of the build
 export EXCLUDES
+
+.PHONY: all be_target le_target compare $(IBLS_C6X)
 
 all:
 	@echo must specify a target [ $(IBLS_C6X) ]
@@ -46,6 +108,7 @@ all:
 
 
 be_target:
+	@echo EXCLUDES= $(EXCLUDES)
 	make -f makestg2 ARCH=c64x TARGET=$(TARGET) ENDIAN=big    I2C_SIZE_BYTES=$(I2C_SIZE_BYTES) I2C_BUS_ADDR=$(I2C_BUS_ADDR) SPI_DEFS='$(SPI_DEFS)' utils
 	make -f makestg2 ARCH=c64x TARGET=$(TARGET) ENDIAN=big    I2C_SIZE_BYTES=$(I2C_SIZE_BYTES) I2C_BUS_ADDR=$(I2C_BUS_ADDR) SPI_DEFS='$(SPI_DEFS)' $(TARGET)
 
@@ -58,8 +121,7 @@ compare:
 
 
 $(IBLS_C6X): $(STAGE1_TARGET)
-	make -f makestg2 ARCH=c64x TARGET=$@ I2CROM=$(I2CROM) I2C_BUS_ADDR=$(I2C_BUS_ADDR) COMPACT_I2C=$(COMPACT_I2C) SPI_DEFS='$(SPI_DEFS)' i2cRom
-
+	make -f makestg2 ARCH=c64x TARGET=$@ I2CROM=$(I2CROM) I2C_BUS_ADDR=$(I2C_BUS_ADDR) COMPACT_I2C=$(COMPACT_I2C) SPI_DEFS='$(SPI_DEFS)' $(ROMS)
 
 
 

@@ -33,12 +33,53 @@
  *
 */
 
-#ifndef _NAND_EMIF25_LOC_H
-#define _NAND_EMIF25_LOC_H
+/**
+ *  @file norspi.c
+ *
+ *  @brief This file implements a translation layer from the nor boot
+ *         to the SPI driver. This is used to present a common api
+ *         for nor reads for SPI and EMIF access.
+ */
 
-/* Register offsets */
-#define NAND_FLASH_CTL_REG  0x60
-#define NAND_FLASH_ECC_REG(x)       (0xc0 + (((x)-2)*4))
+#include "types.h"
+#include "ibl.h"
+#include "iblcfg.h"
+#include "nor_api.h"
+#include "target.h"
+#include "spi_api.h"
 
 
-#endif /* _NAND_EMIF25_LOCK_H */
+/**
+ *  @brief
+ *      No intermediate context must be stored, so this function just returns 0
+ */
+Int32 norHwSpiDriverInit (int32 cs)
+{
+    return (0);
+
+}
+
+
+/**
+ *  @brief
+ *      Read data from the SPI
+ */
+Int32 norHwSpiDriverReadBytes (uint8 *data, Uint32 nbytes, Uint32 address)
+{
+    if (hwSpiRead (address, nbytes, data) != 0)
+        return (-1);
+
+    return (0);
+
+}
+
+/**
+ *  @brief
+ *      Close the driver. Nothing to do
+ */
+Int32 norHwSpiDriverClose (void)
+{
+    return (0);
+
+}
+

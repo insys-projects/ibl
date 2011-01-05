@@ -138,14 +138,20 @@
  *  @brief
  *    The PSC number for NAND depends on the device
  */
-#define TARGET_PWR_NAND         deviceNandPscNum()
-#define TARGET_PWR_NAND_C6618   3
+#define TARGET_PWR_EMIF         deviceEmifPscNum()
+#define TARGET_PWR_EMIF_C6618   3
 
 /*
  *  @brief
  *     The PSC number for SPI depends on the device
  */
 #define TARGET_PWR_SPI      deviceSpiPscNum()
+
+/**
+ *  @brief
+ *      The PSC number for GPIO. GPIO is in the always on domain
+ */
+#define TARGET_PWR_GPIO     -1
 
 /**
  * @brief
@@ -326,6 +332,13 @@ Int32 targetMacRcv (void *ptr_device, UINT8 *buffer);
 
 #define ROM_BOOT_PARAMS_ADDR_C6618   0x873680
 #define ROM_BOOT_PARAMS_ADDR_C6616   0x8f3680
+
+/**
+ *  @brief
+ *      No device specific configuration required for NOR boot, so
+ *      the function call is defined to return success.
+ */
+#define deviceConfigureForNor()    0
 
 
 #endif /* _TARGET_H */

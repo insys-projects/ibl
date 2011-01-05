@@ -62,16 +62,11 @@
 #include "serdes_api.h"
 #include "net.h"
 #include "nandhwapi.h"
+#include "nor_api.h"
 #include "spi_api.h"
 #include <string.h>
 
 extern cregister unsigned int DNUM;
-
-/* Excluding NAND exclused both SPI and EMIF nand */
-#ifdef EXCLUDE_NAND
- #define EXCLUDE_NAND_EMIF
- #define EXCLUDE_NAND_SPI
-#endif
 
 /**
  *  @brief Determine if an address is local
@@ -168,55 +163,30 @@ int32 devicePowerPeriph (int32 modNum)
         
 }
 
+/**
+ *  @brief return the PSC module number for SPI
+ */
+int32 deviceSpiPscNum (void)
+{
+    uint32 v;
+
+    /* SPI is module number 3 only on the c6618. On the c6616 the SPI is in the
+     * always on domain */
+    v = *((Uint32 *)DEVICE_JTAG_ID_REG);
+    if (v == DEVICE_C6618_JTAG_ID_VAL)
+        return (3);
+
+    return (-1);  /* A negative number indicates the always on domain */
+}
+
+
 
 /**
  *  @brief  Enable EMIF25 or SPI interface to the NAND
  *
  */
-#ifndef EXCLUDE_NAND
 int32 deviceConfigureForNand(void)
 {
-
-#ifndef EXCLUDE_NAND_SPI
-
-    if (ibl.nandConfig.interface == ibl_NAND_IF_SPI)  {
-
-        spiConfig_t spiCfg;
-        uint32      v;
-        SINT16      ret;
-
-        /* SPI is module number 3 only on the c6618. On the c6616 the SPI is in the
-         * always on domain */
-        v = *((Uint32 *)DEVICE_JTAG_ID_REG);
-        if (v == DEVICE_C6618_JTAG_ID_VAL)
-            devicePowerPeriph (3);
-
-        /* Translate to the low level driver */
-        spiCfg.port      = 0;
-        spiCfg.mode      = ibl.spiConfig.mode;
-        spiCfg.addrWidth = ibl.spiConfig.addrWidth;
-        spiCfg.npin      = ibl.spiConfig.nPins;
-        spiCfg.csel      = ibl.spiConfig.csel;
-        spiCfg.c2tdelay  = ibl.spiConfig.c2tdelay;
-
-        /* On c661x devices the PLL module has a built in divide by 6, and the SPI
-         * has a maximum clock divider value of 0xff */
-        v = ibl.pllConfig[ibl_MAIN_PLL].pllOutFreqMhz / (DEVICE_SPI_MOD_DIVIDER * ibl.spiConfig.busFreqMHz);
-        if (v > 0xff)
-            v = 0xff;
-
-        spiCfg.clkdiv =  (UINT16) v;
-
-        ret = hwSpiConfig (&spiCfg);
-
-        if (ret != 0)  {
-            iblStatus.iblFail = ibl_FAIL_CODE_SPI_PARAMS;
-            return (-1);
-        }
-
-    }
-
-#endif
 
     return (0);
 
@@ -224,9 +194,9 @@ int32 deviceConfigureForNand(void)
 
 /**
  *  @brief
- *      Return the base memory address for NAND in a given chip select space
+ *      Return the base memory address for emif25 in a given chip select space
  */
-uint32 deviceNandMemBase (int32 cs)
+uint32 deviceEmif25MemBase (int32 cs)
 {
     switch (cs)  {
 
@@ -244,25 +214,24 @@ uint32 deviceNandMemBase (int32 cs)
 
 }
 
+
 /**
  *  @brief
- *      Return the PSC number for NAND. Only 6618 has NAND
+ *      Return the PSC number for NAND/NOR through emif. Only 6618 has the emif
  */
-Int32 deviceNandPscNum (void)
+Int32 deviceEmifPscNum (void)
 {
     Uint32 v;
 
     v = *((Uint32 *)DEVICE_JTAG_ID_REG);
     if (v == DEVICE_C6618_JTAG_ID_VAL)
-        return (TARGET_PWR_NAND_C6618);
+        return (TARGET_PWR_EMIF_C6618);
 
     /* Return a negative number to indicate no PSC module is associated with NAND */
     return (-1);
 
 }
 
-
-#endif
 
 
 /**
@@ -604,13 +573,14 @@ nandCtbl_t *deviceGetNandCtbl (int32 interface)
 
 #ifndef EXCLUDE_NAND_SPI
 
-    if (interface == ibl_NAND_IF_SPI)
+    if (interface == ibl_PMEM_IF_SPI)
         return (&nandSpiCtbl);
 
 #endif
 
 #ifndef EXCLUDE_NAND_EMIF
-    if ((interface >= ibl_NAND_IF_CHIPSEL_2) && (interface <= ibl_NAND_IF_CHIPSEL_5))
+
+    if ((interface >= ibl_PMEM_IF_CHIPSEL_2) && (interface <= ibl_PMEM_IF_CHIPSEL_5))
         return (&nandEmifCtbl);
 
 #endif
@@ -618,6 +588,58 @@ nandCtbl_t *deviceGetNandCtbl (int32 interface)
     return (NULL);
 
 }
+
+
+/**
+ * @brief
+ *      Get the nor call table for the specified nor interface
+ */
+
+#ifndef EXCLUDE_NOR_EMIF
+norCtbl_t norEmifCtbl = {
+    
+    norHwEmifDriverInit,
+    norHwEmifDriverReadBytes,
+    norHwEmifDriverClose
+
+};
+
+#endif
+
+#ifndef EXCLUDE_NOR_SPI
+
+norCtbl_t norSpiCtbl = {
+    
+    norHwSpiDriverInit,
+    norHwSpiDriverReadBytes,
+    norHwSpiDriverClose
+
+};
+
+#endif
+
+norCtbl_t *deviceGetNorCtbl (int32 interface)
+{
+
+#ifndef EXCLUDE_NOR_SPI
+    
+    if (interface == ibl_PMEM_IF_SPI)
+        return (&norSpiCtbl);
+
+#endif
+
+#ifndef EXCLUDE_NOR_EMIF
+   
+    if ((interface >= ibl_PMEM_IF_CHIPSEL_2) && (interface <= ibl_PMEM_IF_CHIPSEL_5))
+        return (&norEmifCtbl);
+
+#endif
+
+    return (NULL);
+
+}
+    
+
 
     
 

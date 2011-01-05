@@ -33,66 +33,21 @@
  *
 */
 
+#ifndef _NOR_H
+#define _NOR_H
 
-
-/*********************************************************************************** 
- * FILE PURPOSE: The NAND boot wrapper
- ***********************************************************************************
- * FILE NAME: nandboot.c
+/**
+ *  @file nor.h
  *
- * DESCRIPTION: This file provides the nand boot wrapper used by IBL modules
- *
- * @file nandboot.c
- *
- * @brief
- *		The nand boot wrapper
- *
- ************************************************************************************/
-#include "types.h"
-#include "ibl.h"
-#include "iblloc.h"
-#include "nand.h"
-#include "device.h"
-
-/** 
- * @brief
- *   Nandboot is disabled through iblcfg.h. Disable the definition for the compilation
+ *  @brief
+ *      Defines the API for the nor boot driver
  */
-#ifdef iblNandBoot
- #undef iblNandBoot
-#endif
+ 
+#include "iblloc.h"
 
-
-void iblNandBoot (int32 eIdx)
-{
-    Uint32 entry;
-    Int32  ret;
-    void   (*exit)();
+extern BOOT_MODULE_FXN_TABLE nor_boot_module;
 
 
 
-    /* Perform any device specific configurations */
-    if (deviceConfigureForNand() < 0)
-        return;
-
-
-    /* Open the nand driver */
-    if ((*nand_boot_module.open) ((void *)&ibl.bootModes[eIdx].u.nandBoot, NULL))
-        return;
-
-
-    entry = iblBoot (&nand_boot_module, ibl.bootModes[eIdx].u.nandBoot.bootFormat, &ibl.bootModes[eIdx].u.nandBoot.blob);
-
-    (*nand_boot_module.close)();
-
-    if (entry != 0)  {
-
-        iblStatus.exitAddress = entry;
-        exit = (void (*)())entry;
-        (*exit)();
-            
-    }
-
-} 
-
+#endif  /* _NOR_H */
 

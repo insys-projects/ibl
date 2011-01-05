@@ -33,66 +33,27 @@
  *
 */
 
+#ifndef _NOR_API_H
+#define _NOR_API_H
 
-
-/*********************************************************************************** 
- * FILE PURPOSE: The NAND boot wrapper
- ***********************************************************************************
- * FILE NAME: nandboot.c
+/**
+ *  @file nor_api.h
  *
- * DESCRIPTION: This file provides the nand boot wrapper used by IBL modules
- *
- * @file nandboot.c
- *
- * @brief
- *		The nand boot wrapper
- *
- ************************************************************************************/
-#include "types.h"
-#include "ibl.h"
-#include "iblloc.h"
-#include "nand.h"
-#include "device.h"
-
-/** 
- * @brief
- *   Nandboot is disabled through iblcfg.h. Disable the definition for the compilation
+ *  @brief
+ *      Describes the API used to boot through nor
  */
-#ifdef iblNandBoot
- #undef iblNandBoot
-#endif
-
-
-void iblNandBoot (int32 eIdx)
-{
-    Uint32 entry;
-    Int32  ret;
-    void   (*exit)();
+ 
+#include "types.h"
 
 
 
-    /* Perform any device specific configurations */
-    if (deviceConfigureForNand() < 0)
-        return;
+Int32 norHwEmifDriverInit (int32 cs);
+Int32 norHwEmifDriverReadBytes (Uint8 *data, Uint32 nbytes, Uint32 address);
+Int32 norHwEmifDriverClose (void);
 
 
-    /* Open the nand driver */
-    if ((*nand_boot_module.open) ((void *)&ibl.bootModes[eIdx].u.nandBoot, NULL))
-        return;
+Int32 norHwSpiDriverInit (int32 cs);
+Int32 norHwSpiDriverReadBytes (uint8 *data, Uint32 nbytes, Uint32 address);
+Int32 norHwSpiDriverClose (void);
 
-
-    entry = iblBoot (&nand_boot_module, ibl.bootModes[eIdx].u.nandBoot.bootFormat, &ibl.bootModes[eIdx].u.nandBoot.blob);
-
-    (*nand_boot_module.close)();
-
-    if (entry != 0)  {
-
-        iblStatus.exitAddress = entry;
-        exit = (void (*)())entry;
-        (*exit)();
-            
-    }
-
-} 
-
-
+#endif /* _NOR_API_H */

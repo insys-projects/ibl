@@ -33,66 +33,68 @@
  *
 */
 
-
-
-/*********************************************************************************** 
- * FILE PURPOSE: The NAND boot wrapper
- ***********************************************************************************
- * FILE NAME: nandboot.c
+/**
+ *  @file emif25.c
  *
- * DESCRIPTION: This file provides the nand boot wrapper used by IBL modules
- *
- * @file nandboot.c
- *
- * @brief
- *		The nand boot wrapper
- *
- ************************************************************************************/
-#include "types.h"
-#include "ibl.h"
-#include "iblloc.h"
-#include "nand.h"
-#include "device.h"
-
-/** 
- * @brief
- *   Nandboot is disabled through iblcfg.h. Disable the definition for the compilation
+ *  @brief
+ *		Emif25 driver
  */
-#ifdef iblNandBoot
- #undef iblNandBoot
-#endif
+
+#include "types.h"
+#include "target.h"
+#include "emif25.h"
+#include "emif25_loc.h"
 
 
-void iblNandBoot (int32 eIdx)
+/**
+ *  @brief
+ *      Initialize the interface. 
+ */
+Int32 hwEmif25Init (int32 cs, int32 busWidth, bool wait, bool nand)
 {
-    Uint32 entry;
-    Int32  ret;
-    void   (*exit)();
+    Uint32 reg;
+    Uint32 v;
 
+    /* Bound check the chip select */
+    if ((cs < 2) || (cs > 5))
+        return (EMIF25_INVALID_CS);
 
+    /* Check for a valid bus width */
+    if (busWidth == 8) 
+        v = 0;
+    else if (busWidth == 16)
+        v = 1;
+    else if (busWidth -= 32)
+        v = 2;
+    else
+        return (EMIF25_INVALID_BUS_WIDTH);
+    
+    /* Setup the bus width. The macro uses the actual chip select value, 2-5 */
+    reg = DEVICE_REG32_R (DEVICE_EMIF25_BASE + EMIF25_ASYNC_CFG_REG(cs));
+    reg = EMIF25_SET_ASYNC_WID(reg, v);
 
-    /* Perform any device specific configurations */
-    if (deviceConfigureForNand() < 0)
-        return;
+    /* Enable extended wait if requested */
+    if (wait)
+        v = 1;
+    else
+        v = 0;
 
+    reg = EMIF25_SET_ASYNC_WAIT(reg, v);
 
-    /* Open the nand driver */
-    if ((*nand_boot_module.open) ((void *)&ibl.bootModes[eIdx].u.nandBoot, NULL))
-        return;
+    DEVICE_REG32_W (DEVICE_EMIF25_BASE + EMIF25_ASYNC_CFG_REG(cs), reg);
 
+    /* Nand enable */
+    if (nand)
+        v = 1;
+    else
+        v = 0;
 
-    entry = iblBoot (&nand_boot_module, ibl.bootModes[eIdx].u.nandBoot.bootFormat, &ibl.bootModes[eIdx].u.nandBoot.blob);
+    reg = DEVICE_REG32_R (DEVICE_EMIF25_BASE + EMIF25_FLASH_CTL_REG);
+    reg = EMIF25_SET_FLASH_CTL_NAND_ENABLE(reg, v, cs);
+    DEVICE_REG32_W (DEVICE_EMIF25_BASE + EMIF25_FLASH_CTL_REG, reg);
 
-    (*nand_boot_module.close)();
+    return (0);
 
-    if (entry != 0)  {
-
-        iblStatus.exitAddress = entry;
-        exit = (void (*)())entry;
-        (*exit)();
-            
-    }
-
-} 
+}
 
 

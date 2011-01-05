@@ -69,6 +69,35 @@
  */
 #define ibl_VERSION  ibl_MAKE_VERSION(1,0,0,0)
 
+
+/**
+ * @defgroup iblBootModes  Defines the boot modes supported by the IBL
+ *
+ * @ingroup iblBootModes
+ * @{
+ *
+ *  @def ibl_BOOT_MODE_TFTP */
+ #define ibl_BOOT_MODE_TFTP     10      /* Boot through a tftp interface */
+ 
+ /* @def ibl_BOOT_MODE_NAND */
+#define  ibl_BOOT_MODE_NAND     11      /* Boot through a nand interface */
+
+/* @def  ibl_BOOT_MODE_NOR */
+#define  ibl_BOOT_MODE_NOR      12      /* Boot through a nor (or flash) interface */
+
+/* @def  ibl_BOOT_MODE_NONE */
+#define  ibl_BOOT_MODE_NONE     13      /* Boot mode selection is inactive */
+
+/* @} */
+
+/**
+ *  @brief
+ *      Define the number of different boot modes which can be configured for
+ *      a single execution of the IBL.
+ */
+#define ibl_N_BOOT_MODES        2
+
+ 
 /* Information used to make generate a bootp request */
 /**
  * @brief
@@ -358,8 +387,6 @@ typedef struct iblBinBlob_s
  */
 typedef struct iblEth_s
 {
-    uint32   ethPriority;       /**< The ethernet boot priority. @ref iblPeriphPriority */
-    int32    port;              /**< The ethernet port to use, or @ref ibl_ETH_PORT_FROM_RBL */
     bool     doBootp;           /**< If true a bootp request is generated. If false the @ref iblEthBootInfo_t
                                      table must be populated before the ibl begins execution */
     bool     useBootpServerIp;  /**< If TRUE then the server IP received from the bootp server
@@ -384,11 +411,12 @@ typedef struct iblEth_s
  */
 typedef struct iblSgmii_s
 {
-    uint32  adviseAbility;      /**< The advise ability register */
-    uint32  control;            /**< The control register        */
-    uint32  txConfig;           /**< Serdes Tx config            */
-    uint32  rxConfig;           /**< Serdes Rx config            */
-    uint32  auxConfig;          /**< Serdes Aux config           */
+    bool    configure;          /**< Set to false to disable configuration */
+    uint32  adviseAbility;      /**< The advise ability register           */
+    uint32  control;            /**< The control register                  */
+    uint32  txConfig;           /**< Serdes Tx config                      */
+    uint32  rxConfig;           /**< Serdes Rx config                      */
+    uint32  auxConfig;          /**< Serdes Aux config                     */
   
 } iblSgmii_t;
 
@@ -464,9 +492,9 @@ typedef struct nandDevInfo_s
 typedef struct iblNand_s
 {
 
-    uint32   nandPriority;      /**< The nand boot priority. @ref iblPeriphPriority */
     int32    bootFormat;        /**< The format of the boot data file. @ref iblBootFormats */                            
-    int32    interface;         /**< The nand interface @ref iblNandIf */
+    uint32   bootAddress;       /**< The start address for booting */
+    int32    interface;         /**< The nand interface @ref iblPmemf */
     iblBinBlob_t blob;          /**< Used only if the format is ibl_BOOT_FORMAT_BBLOB */
     
     
@@ -475,32 +503,64 @@ typedef struct iblNand_s
 } iblNand_t;
 
 /**
- * @defgroup iblNandIf defines the interface used for NAND memory. Not all values
- *           are valid for all devices.
+ *  @brief
+ *      Nor boot configuration. 
+ */
+typedef struct iblNor_s
+{
+    int32   bootFormat;         /**<  The format of the boot data file. @ref iblBootFormats */
+    uint32  bootAddress;        /**<  The start address for booting */
+    int32   interface;          /**<  The nor interface. @ref iblPmemIf */
+    iblBinBlob_t blob;          /**<  Used only if the format is ibl_BOOT_FORMAT_BBLOB */
+    
+} iblNor_t;    
+
+/**
+ * @defgroup iblPmemIf defines the interfaces used for NOR memory. Not all values are
+ *           valid for all devices
  *
- * @ingroup iblNandIf
+ * @ingroup iblPmemIf
  * @{
  */
-/** @def ibl_NAND_IF_GPIO - GPIO interface */
-#define  ibl_NAND_IF_GPIO           0
+ 
+/** @def ibl_PMEM_IF_GPIO - GPIO interface */
+#define  ibl_PMEM_IF_GPIO         0
 
-/** @def ibl_NAND_IF_CHIPSEL_2 - EMIF interface using chip select 2 */
-#define  ibl_NAND_IF_CHIPSEL_2      2
+/** @def ibl_PMEM_IF_CHIPSEL_2 */
+#define  ibl_PMEM_IF_CHIPSEL_2    2   /* EMIF interface using chip select 2, no wait enabled */
 
-/** @def ibl_NAND_IF_CHIPSEL_3 - EMIF interface using chip select 3 */
-#define ibl_NAND_IF_CHIPSEL_3       3
+/** @def ibl_PMEM_IF_CHIPSEL_3 */
+#define  ibl_PMEM_IF_CHIPSEL_3    3   /* EMIF interface using chip select 3, no wait enabled */
 
-/** @def ibl_NAND_IF_CHIPSEL_4 - EMIF interface using chip select 4 */
-#define ibl_NAND_IF_CHIPSEL_4       4
+/** @def ibl_PMEM_IF_CHIPSEL_4 */
+#define  ibl_PMEM_IF_CHIPSEL_4    4   /* EMIF interface using chip select 4 */
 
-/** @def ibl_NAND_IF_CHIPSEL_5 - EMIF interface using chip select 5 */
-#define ibl_NAND_IF_CHIPSEL_5       5
+/** @def ibl_PMEM_IF_CHIPSEL_5 */
+#define  ibl_PMEM_IF_CHIPSEL_5    5   /* EMIF interface using chip select 5 */
 
-/** @def ibl_NAND_IF_SPI - NAND interface through SPI */
-#define  ibl_NAND_IF_SPI            100
+/** @def ibl_PMEM_IF_SPI */
+#define  ibl_PMEM_IF_SPI          100 /* Interface through SPI */
+    
+/* @} */    
+    
+    
+/**
+ *  @brief
+ *      EMIF (nand/nor) configuration
+ */
+typedef struct iblEmif_s {
 
+    int16  csSpace;           /**< Chip select space, @ref iblPmemIf */
+    int16  busWidth;          /**< Bus width, bits */
+    bool   waitEnable;        /**< Valid only for NOR devices */
+    
+} iblEmif_t;
 
-/* @} */
+/**
+ *  @brief
+ *      The maximum number of chip select spaces for emif boot (not ddr) configuration
+ */
+#define ibl_MAX_EMIF_PMEM   2
 
 
 /**
@@ -568,7 +628,34 @@ typedef struct iblPll_s  {
 /* @} */
     
 
+/**
+ *  @def iblBoot_t
+ *      Configures an ibl boot attempt
+ *
+ *  @details
+ *      The ibl allows for the configuration for multiple boot attempts. This structure is
+ *      used to configure the ibl boot attempt.
+ */    
+typedef struct iblBoot_s
+{
 
+    int32   bootMode;           /**< Identifies the boot mode @ref iblBootModes */
+
+    uint32  priority;           /**< The boot priority. @ref iblPeriphPriority */
+    int32   port;               /**< The port to use, or @ref ibl_PORT_FROM_RBL */
+    
+    union  {
+    
+        iblEth_t   ethBoot;      /**< Ethernet boot configuration. @ref iblEth_t */
+    
+        iblNand_t  nandBoot;     /**< NAND boot configuration @ref iblNand_t */
+    
+        iblNor_t   norBoot;      /**< NOR boot configuration  @ref iblNor_t */
+        
+    } u;
+    
+} iblBoot_t;
+    
 
 /**
  * @def ibl_MAGIC_VALUE
@@ -592,23 +679,23 @@ typedef struct iblPll_s  {
  */
 typedef struct ibl_s
 {
-    uint32   iblMagic;                       /**< @ref ibl_MAGIC_VALUE */
+    uint32     iblMagic;                      /**< @ref ibl_MAGIC_VALUE */
     
-    iblPll_t  pllConfig[ibl_N_PLL_CFGS];     /**< PLL Configuration. @ref iblPll_t */
+    iblPll_t   pllConfig[ibl_N_PLL_CFGS];     /**< PLL Configuration. @ref iblPll_t */
     
-    iblDdr_t  ddrConfig;                     /**< DDR configuration @ref iblDdr_t  */
+    iblDdr_t   ddrConfig;                     /**< DDR configuration @ref iblDdr_t  */
     
-    iblEth_t  ethConfig[ibl_N_ETH_PORTS];    /**< Ethernet boot configuration. @ref iblEth_t */
+    iblSgmii_t sgmiiConfig[ibl_N_ETH_PORTS];  /**< SGMII boot configuration. @ref iblSgmii_t */
     
-    iblSgmii_t sgmiiConfig[ibl_N_ETH_PORTS]; /**< SGMII boot configuration. @ref iblSgmii_t */
+    iblMdio_t  mdioConfig;                    /**< MDIO configuration. @ref iblMdio_t */
     
-    iblMdio_t mdioConfig;                    /**< MDIO configuration. @ref iblMdio_t */
+    iblSpi_t   spiConfig;                     /**< SPI configuration @ref iblSpi_s */
     
-    iblNand_t nandConfig;                    /**< NAND configuration @ref iblNand_t */
+    iblEmif_t  emifConfig[ibl_MAX_EMIF_PMEM]; /**< EMIF (nand/nor, not ddr) configuration. @ref iblEmif_t */
     
-    iblSpi_t  spiConfig;                     /**< SPI configuration @ref iblSpi_s */
+    iblBoot_t  bootModes[ibl_N_BOOT_MODES];   /**< Boot configuration */
     
-    uint16    chkSum;                        /**< Ones complement checksum over the whole config structure */
+    uint16     chkSum;                        /**< Ones complement checksum over the whole config structure */
     
     
      
@@ -618,30 +705,29 @@ typedef struct ibl_s
 extern ibl_t ibl;
 
 
-
 /**
- * @defgroup iblActivePeriph
+ * @defgroup iblActiveDevice
  *
- * @ingroup iblActivePeriph
+ * @ingroup iblActiveDevice
  * @{
- *    @def  ibl_ACTIVE_PERIPH_ETH
+ *    @def  ibl_ACTIVE_DEVICE_ETH
  */
-#define ibl_ACTIVE_PERIPH_ETH     100     /**< An ethernet boot in progress */
+#define ibl_ACTIVE_DEVICE_ETH     100     /**< Data received through an ethernet interface */
 
 /**
- *  @def ibl_ACTIVE_PERIPH_NAND
+ *  @def ibl_ACTIVE_DEVICE_EMIF
  */
-#define ibl_ACTIVE_PERIPH_NAND    101     /**< A nand boot in progress */
+#define ibl_ACTIVE_DEVICE_EMIF    101     /**< Data read through an EMIF interface */
 
 /**
- *  @def ibl_ACTIVE_PERIPH_I2C
+ *  @def ibl_ACTIVE_DEVICE_I2C
  */
-#define ibl_ACTIVE_PERIPH_I2C     102     /**< An i2c boot in progress */
+#define ibl_ACTIVE_DEVICE_I2C     102     /**< Data read through an I2C interface */
 
 /**
- *  @def ibl_ACTIVE_PERIPH_SPI
+ *  @def ibl_ACTIVE_DEVICE_SPI
  */
-#define ibl_ACTIVE_PERIPH_SPI     103     /**< An SPI boot in progress */
+#define ibl_ACTIVE_DEVICE_SPI     103     /**< Data read through an SPI interface */
 
 /* @} */
 
@@ -680,7 +766,27 @@ extern ibl_t ibl;
  *  @def ibl_FAIL_CODE_INVALID_SPI_ADDRESS
  */
 #define ibl_FAIL_CODE_INVALID_SPI_ADDRESS   705     /**< Invalid data address specified on SPI */
- 
+
+/**
+ *  @def ibl_FAIL_CODE_PERIPH_POWER_UP
+ */
+#define ibl_FAIL_CODE_PERIPH_POWER_UP       706     /**< Boot peripheral failed to power up */
+
+/**
+ *  @def ibl_FAIL_CODE_INVALID_NAND_PERIPH
+ */
+#define ibl_FAIL_CODE_INVALID_NAND_PERIPH   707     /**< Invalid nand boot peripheral specified */
+
+/**
+ *  @def ibl_FAIL_CODE_NO_EMIF_CFG
+ */
+#define ibl_FAIL_CODE_NO_EMIF_CFG           708     /**< No emif configuration found to match specified cs space */
+
+/**
+ *  @def ibl_FAIL_CODE_EMIF_CFG_FAIL
+ */
+#define ibl_FAIL_CODE_EMIF_CFG_FAIL         709     /**< Hardware setup of emif failed */
+
  /* @} */
 
 
@@ -712,8 +818,9 @@ typedef struct iblStatus_s
     
     int32  heartBeat;       /**<  An increasing value as long as the boot code is running */
     
-    int32  activePeriph;    /**<  Describes the active boot peripheral @ref iblActivePeriph */
-    int32  activeFormat;    /**<  Describes the format being decoded */
+    int32  activeBoot;        /**<  Describes the active boot mode @ref iblBootModes */
+    int32  activeDevice;      /**<  Describes the active boot peripheral device @ref iblActiveDevice */
+    int32  activeFileFormat;  /**<  Describes the format being decoded */
     
     uint32  autoDetectFailCnt;      /**<  Counts the number of times an auto detect of the data format failed */
     uint32  nameDetectFailCnt;      /**<  Counts the number of times an name detect of the data format failed */

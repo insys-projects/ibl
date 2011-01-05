@@ -146,7 +146,7 @@ int32 devicePowerPeriph (int32 modNum)
  *  @details  On the evm the nand controller is enabled by setting 
  *            gpio 14 high
  */
-#ifndef EXCLUDE_NAND
+#ifndef EXCLUDE_NAND_GPIO
 int32 deviceConfigureForNand(void)
 {
 	hwGpioSetDirection(NAND_MODE_GPIO, GPIO_OUT);
@@ -182,7 +182,7 @@ void deviceLoadDefaultEthAddress (uint8 *maddr)
  *  @brief  Return the NAND interface call table. Only GPIO is supported on c6457
  */
 
-#ifndef EXCLUDE_NAND
+#ifndef EXCLUDE_NAND_GPIO
 nandCtbl_t nandCtbl =  {
 
     nandHwDriverInit,

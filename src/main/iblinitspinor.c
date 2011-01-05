@@ -42,6 +42,7 @@
 #include "iblinit.h"
 #include <string.h>
 
+#if (!defined(EXCLUDE_NOR_SPI) || !defined(EXCLUDE_NAND_SPI))
 
 /**
  *  @brief
@@ -280,6 +281,7 @@ BOOT_MODULE_FXN_TABLE *iblInitSpiNor (void)
 }
 
 
+#endif /* (!defined(EXCLUDE_NOR_SPI) || !defined(EXCLUDE_NAND_SPI)) */
 
 
 

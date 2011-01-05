@@ -64,7 +64,7 @@ else
     CSRC= c6474l.c
    else
     ifeq ($(TARGET),c6457)
-     CSRC= c6457.c
+     CSRC= c6457.c c6457init.c
 	else
 	 ifeq ($(TARGET),c661x)
 	  CSRC= c661x.c c661xinit.c c661xutil.c
@@ -98,6 +98,7 @@ C6X_C_DIR+= ;$(IBL_ROOT)/hw/cpdma
 C6X_C_DIR+= ;$(IBL_ROOT)/hw/pa
 C6X_C_DIR+= ;$(IBL_ROOT)/hw/serdes
 C6X_C_DIR+= ;$(IBL_ROOT)/hw/nands
+C6X_C_DIR+= ;$(IBL_ROOT)/hw/nors
 C6X_C_DIR+= ;$(IBL_ROOT)/driver/eth
 C6X_C_DIR+= ;$(IBL_ROOT)/hw/spi
 export C6X_C_DIR

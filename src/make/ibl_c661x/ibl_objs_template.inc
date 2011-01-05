@@ -54,7 +54,10 @@
 ../hw/c64x/make/gmacsl.ENDIAN_TAG.oc
 #endif
 
-#ifndef EXCLUDE_NAND
+
+/* -------------- */
+#if (!defined(EXCLUDE_NAND_EMIF) || !defined(EXCLUDE_NAND_SPI))
+
 ../nandboot/c64x/make/nandboot.ENDIAN_TAG.oc
 ../driver/c64x/make/nand.ENDIAN_TAG.oc
 ../ecc/c64x/make/3byte_ecc.ENDIAN_TAG.oc
@@ -68,7 +71,29 @@
  #endif
 
 #endif
+/* -------------- */
 
-#ifndef EXCLUDE_SPI
+
+
+/* -------------- */
+#if (!defined(EXCLUDE_NOR_EMIF) || !defined(EXCLUDE_NOR_SPI))
+
+../norboot/c64x/make/norboot.ENDIAN_TAG.oc
+../driver/c64x/make/nor.ENDIAN_TAG.oc
+../hw/c64x/make/emif25.ENDIAN_TAG.oc
+
+ #ifndef EXCLUDE_NOR_SPI
+ ../hw/c64x/make/norspi.ENDIAN_TAG.oc
+ #endif
+
+ #ifndef EXCLUDE_NOR_EMIF
+ ../hw/c64x/make/noremif25.ENDIAN_TAG.oc
+ #endif
+
+#endif
+/* -------------- */
+
+
+#if (!defined(EXCLUDE_NOR_SPI) || !defined(EXCLUDE_NAND_SPI))
 ../hw/c64x/make/spi.ENDIAN_TAG.oc
 #endif

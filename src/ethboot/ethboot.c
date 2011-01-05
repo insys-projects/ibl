@@ -117,7 +117,7 @@ void iblEthBoot (Int32 eIdx)
 
 
     /* Power up the device. No action is taken if the device is already powered up */
-    if (devicePowerPeriph (TARGET_PWR_ETH(ibl.ethConfig[eIdx].port)) < 0)
+    if (devicePowerPeriph (TARGET_PWR_ETH(ibl.bootModes[eIdx].port)) < 0)
         return;
 
     /* Do any mdio configuration */
@@ -128,15 +128,11 @@ void iblEthBoot (Int32 eIdx)
 
     /* SGMII configuration. If sgmii is not present this statement is defined
      * to void in target.h */
-    if (ibl.ethConfig[eIdx].port == ibl_PORT_SWITCH_ALL)  {
-        for (n = 0; n < TARGET_EMAC_N_PORTS; n++)
+    for (n = 0; n < ibl_N_ETH_PORTS; n++)  {
+        if (ibl.sgmiiConfig[eIdx].configure == TRUE)
             hwSgmiiConfig (n, &ibl.sgmiiConfig[n]);
-
-    }  else  {
-
-        hwSgmiiConfig (ibl.ethConfig[eIdx].port, &ibl.sgmiiConfig[eIdx]);
     }
-            
+
 
 #ifdef DEVICE_CPSW
     /* On chip switch configuration */
@@ -161,7 +157,7 @@ void iblEthBoot (Int32 eIdx)
 #ifdef DEVICE_PA
     /* Packet accelerator configuration. If PA is not present this statement is defined
      * to void in target.h */
-    targetPaConfig(ibl.ethConfig[eIdx].ethInfo.hwAddress);
+    targetPaConfig(ibl.bootModes[eIdx].u.ethBoot.ethInfo.hwAddress);
 #endif
 
 
@@ -171,27 +167,27 @@ void iblEthBoot (Int32 eIdx)
     hwConfigStreamingSwitch();
 #endif
 
-    nDevice.port_num = ibl.ethConfig[eIdx].port;
+    nDevice.port_num = ibl.bootModes[eIdx].port;
 
     /* Simple transation to initialize the driver */
-    netMemcpy (nDevice.mac_address, ibl.ethConfig[eIdx].ethInfo.hwAddress, sizeof(nDevice.mac_address));
+    netMemcpy (nDevice.mac_address, ibl.bootModes[eIdx].u.ethBoot.ethInfo.hwAddress, sizeof(nDevice.mac_address));
 
-    nl = FORM_IPN(ibl.ethConfig[eIdx].ethInfo.ipAddr);
-    if (ibl.ethConfig[eIdx].doBootp == TRUE)
+    nl = FORM_IPN(ibl.bootModes[eIdx].u.ethBoot.ethInfo.ipAddr);
+    if (ibl.bootModes[eIdx].u.ethBoot.doBootp == TRUE)
         nDevice.ip_address = 0;
     else
         nDevice.ip_address = htonl(nl);
 
-    nl = FORM_IPN(ibl.ethConfig[eIdx].ethInfo.netmask);
+    nl = FORM_IPN(ibl.bootModes[eIdx].u.ethBoot.ethInfo.netmask);
     nDevice.net_mask  = htonl(nl);
 
-    nl = FORM_IPN(ibl.ethConfig[eIdx].ethInfo.serverIp);
+    nl = FORM_IPN(ibl.bootModes[eIdx].u.ethBoot.ethInfo.serverIp);
     nDevice.server_ip           = htonl(nl);
-    nDevice.use_bootp_server_ip = ibl.ethConfig[eIdx].useBootpServerIp;
+    nDevice.use_bootp_server_ip = ibl.bootModes[eIdx].u.ethBoot.useBootpServerIp;
 
     /* Note - the file name structure in nDevice is only 64 bytes, but 128 in ethInfo */
-    netMemcpy (nDevice.file_name, ibl.ethConfig[eIdx].ethInfo.fileName, sizeof(nDevice.file_name));
-    nDevice.use_bootp_file_name = ibl.ethConfig[eIdx].useBootpFileName;
+    netMemcpy (nDevice.file_name, ibl.bootModes[eIdx].u.ethBoot.ethInfo.fileName, sizeof(nDevice.file_name));
+    nDevice.use_bootp_file_name = ibl.bootModes[eIdx].u.ethBoot.useBootpFileName;
 
 
     nDevice.start    = cpmac_drv_start;
@@ -219,7 +215,7 @@ void iblEthBoot (Int32 eIdx)
         }
     }
 
-    format = ibl.ethConfig[eIdx].bootFormat;
+    format = ibl.bootModes[eIdx].u.ethBoot.bootFormat;
 
     /* If the data format was based on the name extension, determine
      * the boot data format */
@@ -266,7 +262,7 @@ void iblEthBoot (Int32 eIdx)
     }
 
 
-    entry = iblBoot (&net_boot_module, format, &ibl.ethConfig[eIdx].blob);
+    entry = iblBoot (&net_boot_module, format, &ibl.bootModes[eIdx].u.ethBoot.blob);
 
 
     /* Before closing the module read any remaining data. In the coff boot mode the boot may

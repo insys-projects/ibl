@@ -64,10 +64,10 @@ else
 	else
 	 ifeq ($(TARGET),c661x)
 	  CSRC= t64.c pll.c cfgpll.c cfgpll2.c mdio.c i2c.c psc.c cpsw.c qm.c cpdma.c pa.c sgmii.c serdes.c gmacsl.c emif4.c
-	  CSRC+= nandemif25.c spi.c nandspi.c
+	  CSRC+= nandemif25.c spi.c nandspi.c noremif25.c norspi.c emif25.c
      else
       CSRC= t64.c cpmacdrv.c pll.c psc.c emif31.c mdio.c gpio.c nandgpio.c i2c.c nandwrgpio.c sgmii.c cfgpll.c cfgpll2.c
-	  CSRC+= qm.c cpdma.c pa.c serdes.c gmacsl.c emif4.c nandemif25.c spi.c nandspi.c
+	  CSRC+= qm.c cpdma.c pa.c serdes.c gmacsl.c emif4.c nandemif25.c spi.c nandspi.c noremif25.c norspi.c emif25.c
      endif
     endif
    endif
@@ -108,6 +108,8 @@ C6X_C_DIR+= ;$(IBL_ROOT)/hw/cpsw
 C6X_C_DIR+= ;$(IBL_ROOT)/hw/cpdma
 C6X_C_DIR+= ;$(IBL_ROOT)/hw/pa
 C6X_C_DIR+= ;$(IBL_ROOT)/hw/spi
+C6X_C_DIR+= ;$(IBL_ROOT)/hw/nors
+C6X_C_DIR+= ;$(IBL_ROOT)/hw/emif25
 C6X_C_DIR+= ;$(IBL_ROOT)/ecc
 export C6X_C_DIR
 
@@ -187,6 +189,9 @@ ifeq ($(TARGET),c661x)
  vpath % $(ECODIR)/nands/emif25
  vpath % $(ECODIR)/nands/spi
  vpath % $(ECODIR)/spi
+ vpath % $(ECODIR)/nors/emif25
+ vpath % $(ECODIR)/nors/spi
+ vpath % $(ECODIR)/emif25
 endif
 
 

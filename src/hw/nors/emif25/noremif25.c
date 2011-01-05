@@ -33,48 +33,35 @@
  *
 */
 
+/**
+ *  @file noremif25.c
+ *
+ *	@brief
+ *		This file implements a translation layer from the nor boot
+ *		to the emif driver. This is used to present a common api
+ *		for the nor reads for the SPI and EMIF access
+ */
+
 #include "types.h"
 #include "ibl.h"
 #include "iblcfg.h"
-#include "nandhwapi.h"
-#include "ecc.h"
+#include "nor_api.h"
+#include "emif25.h"
+#include "emif25_loc.h"
 #include "target.h"
-#include "spi_api.h"
 
-nandDevInfo_t *hwSpiDevInfo;  /* Pointer to the NAND configuration */
 
-/**
- *  @brief
- *      Initialize the NAND SPI configuration. The SPI interface
- *      must be initialized seperately at a higher level 
- */
-Int32 nandHwSpiDriverInit (int32 cs, void *vdevInfo)
-{
-
-    nandDevInfo_t *devInfo = (nandDevInfo_t *)vdevInfo;
-
-    hwSpiDevInfo = devInfo;
-
-    return (0);
-
-}
-
+uint32 nmemBase; /* The base address of the device in the memory map  */
 
 /**
  *  @brief
- *      Read bytes without ECC correction
+ *      Initialize the interface. 
  */
-Int32 nandHwSpiDriverReadBytes (Uint32 block, Uint32 page, Uint32 byte, Uint32 nbytes, uint8 *data)
+Int32 norHwEmifDriverInit (int32 cs)
 {
-    Uint32 uAddr;
 
-    uAddr = (block << hwSpiDevInfo->blockOffset) + (page << hwSpiDevInfo->pageOffset) + 
-            (byte  << hwSpiDevInfo->columnOffset);
-
+    nmemBase = deviceEmif25MemBase (cs);
     
-    if (hwSpiRead (uAddr, nbytes, data) != 0)
-        return (-1);
-
     return (0);
 
 }
@@ -82,37 +69,19 @@ Int32 nandHwSpiDriverReadBytes (Uint32 block, Uint32 page, Uint32 byte, Uint32 n
 
 /**
  *  @brief
- *      Read a complete page of data
+ *      Read bytes. Not using memcpy to avoid a second copy (along with iblinit).
  */
-Int32 nandHwSpiDriverReadPage (Uint32 block, Uint32 page, Uint8 *data)
+Int32 norHwEmifDriverReadBytes (Uint8 *data, Uint32 nbytes, Uint32 address)
 {
-    Int32   i;
-    Int32   nSegs;
-    Uint8  *blockp;
-    Uint8  *eccp;
-    Uint8   eccCalc[3];
+
+    Int32 i;
+    Uint8 * restrict src;
+
+    src = (Uint8 *)(nmemBase + address);
 
 
-    /* Read the entire page, including the extra bytes. The array data
-     * has been sized to handle the full page */
-    if (nandHwSpiDriverReadBytes (block, page, 0, hwSpiDevInfo->pageSizeBytes + hwSpiDevInfo->pageEccBytes, data))
-        return (NAND_READ_FAILURE);
-
-
-
-    /* Break the page into segments of 256 bytes for ECC correction */
-    nSegs = hwSpiDevInfo->pageSizeBytes >> 8;
-
-    for (i = 0; i < nSegs; i++)  {
-
-        blockp = &data[i << 8];
-        eccp   = &data[hwSpiDevInfo->pageSizeBytes + hwSpiDevInfo->pageEccBytes - ((nSegs - i) * 3)];
-        eccComputeECC (blockp, eccCalc);
-
-        if (eccCorrectData (blockp, eccp, eccCalc) != ECC_SUCCESS)
-            return (NAND_ECC_FAILURE);
-
-    }
+    for (i = 0; i < nbytes; i++)
+        data[i] = src[i];
 
     return (0);
 
@@ -122,13 +91,8 @@ Int32 nandHwSpiDriverReadPage (Uint32 block, Uint32 page, Uint8 *data)
  *  @brief
  *      Close the driver
  */
-int32 nandHwSpiDriverClose (void)
+Int32 norHwEmifDriverClose (void)
 {
     return (0);
 
 }
-
-
-
-
-

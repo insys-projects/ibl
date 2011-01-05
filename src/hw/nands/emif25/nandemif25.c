@@ -37,35 +37,26 @@
 #include "ibl.h"
 #include "iblcfg.h"
 #include "nandhwapi.h"
-#include "nandemif25_loc.h"
+#include "emif25.h"
+#include "emif25_loc.h"
 #include "ecc.h"
 #include "target.h"
 
 int32          gCs;        /* The chip select space */
 uint32         memBase;    /* Base address in device memory map */
-nandDevInfo_t *hwDevInfo;  /* Pointer to the device configuraiton */
+nandDevInfo_t *hwDevInfo;  /* Pointer to the device configuration */
 
 /**
  *  @brief
  *      Initialize the Nand emif interface 
  */
-Int32 nandHwDriverInit (int32 cs, nandDevInfo_t *devInfo)
+Int32 nandHwDriverInit (int32 cs, void *vdevInfo)
 {
-    /* Bound check the chip select */
-    if ((cs < 2) || (cs > 5))
-        return (NAND_INVALID_CS);
-
-    /* Check the bus width */
-    if ((hwDevInfo->busWidthBits != 8) && (hwDevInfo->busWidthBits != 16))
-        return (NAND_INVALID_ADDR_SIZE);
-
+    nandDevInfo_t *devInfo = (nandDevInfo_t *)vdevInfo;
+    
     gCs       = cs;
     hwDevInfo = devInfo;
-
-    memBase = deviceNandMemBase (cs);
-
-    /* Enable NAND on the specified chip select, all other bits set to 0 */
-    DEVICE_REG32_W (DEVICE_EMIF25_BASE + NAND_FLASH_CTL_REG, (1 << (cs - 2)));
+    memBase   = deviceEmif25MemBase (cs);
 
     return (0);
 
@@ -151,17 +142,17 @@ Int32 nandHwDriverReadPage (Uint32 block, Uint32 page, Uint8 *data)
 
 
         /* Reset the hardware ECC correction by reading the ECC status register */
-        v = DEVICE_REG32_R (DEVICE_EMIF25_BASE + NAND_FLASH_ECC_REG(gCs));
+        v = DEVICE_REG32_R (DEVICE_EMIF25_BASE + EMIF25_FLASH_ECC_REG(gCs));
 
         /* Enable ECC */
-        v = DEVICE_REG32_R (DEVICE_EMIF25_BASE + NAND_FLASH_CTL_REG);
+        v = DEVICE_REG32_R (DEVICE_EMIF25_BASE + EMIF25_FLASH_CTL_REG);
         v = v | (1 << (gCs + 8 - 2));
-        DEVICE_REG32_W (DEVICE_EMIF25_BASE + NAND_FLASH_CTL_REG, v);
+        DEVICE_REG32_W (DEVICE_EMIF25_BASE + EMIF25_FLASH_CTL_REG, v);
 
         nandHwDriverReadBytes (block, page, i << 8, 256, blockp);
 
         /* Read the ECC value computed by the hardware */
-        v = DEVICE_REG32_R (DEVICE_EMIF25_BASE + NAND_FLASH_ECC_REG(gCs));
+        v = DEVICE_REG32_R (DEVICE_EMIF25_BASE + EMIF25_FLASH_ECC_REG(gCs));
 
         /* Format the ecc values to match what the software is looking for */
         nand_format_ecc (eccv, eccFlash);
@@ -187,7 +178,7 @@ Int32 nandHwDriverClose (void)
     int32 v;
 
     /* Simply read the ECC to clear the ECC calculation */
-    v = DEVICE_REG32_R (DEVICE_EMIF25_BASE + NAND_FLASH_ECC_REG(gCs));
+    v = DEVICE_REG32_R (DEVICE_EMIF25_BASE + EMIF25_FLASH_ECC_REG(gCs));
 
     return (0);
 

@@ -12,7 +12,7 @@ ifndef IBL_ROOT
 endif
 
 CFG_MODULES= main device
-MODULES= ethboot nandboot driver hw interp ecc
+MODULES= ethboot nandboot driver hw interp ecc norboot
 
 # Note that the Hw module is a two stage clean and handled seperately
 CLEAN_MODULES=$(addprefix clean_,$(subst hw,,$(MODULES)))
@@ -52,6 +52,9 @@ include $(IBL_ROOT)/make/$(ARCH)/makedefs.mk
 
 export ARCH
 export TARGET
+
+.PHONY:  $(TARGETS) i2cRom spiRom compare iblInit iblMain $(MODULES) $(CFG_MODULES)
+.PHONY:  utils clean clean_modules hwClean cleant
 
 $(TARGETS): iblMain
 
@@ -97,6 +100,8 @@ i2cRom:
 	$(CP) i2crom.ccs ibl_$(TARGET)/$@.dat
 	$(RM) i2crom.ccs ibl_le.b ibl.b
 
+spiRom:
+	@echo Making SPI ROM
 
 
 
@@ -152,15 +157,15 @@ $(MODULES):
 	make -C $(IBL_ROOT)/$@/$(ARCH)/make $@
 
 $(CFG_MODULES):
-	@echo making $@ SPI_CFG=$(SPI_CFG)
+	@echo making $@ SPI_CFG=$(SPI_CFG) CDEFS=$(CDEFS) EXCLUDES=$(EXCLUDES)
 	make -C $(IBL_ROOT)/$@/$(ARCH)/make CDEFS='$(MAINDEFS) $(SPI_CFG)' $@
 
 utils:
 	make -C $(IBL_ROOT)/util/btoccs
 	make -C $(IBL_ROOT)/util/romparse TARGET=$(TARGET)
 	make -C $(IBL_ROOT)/util/i2cRead  TARGET=$(TARGET) $(TARGET) 
-	make -C $(IBL_ROOT)/util/i2cWrite TARGET=$(TARGET) I2C_SIZE_BYTES=$(I2C_SIZE_BYTES) MAINDEFS='$(MAINDEFS) -DEXCLUDE_SPI' $(TARGET)
-	make -C $(IBL_ROOT)/util/i2cConfig $(TARGET) MAINDEFS='$(MAINDEFS) -DEXCLUDE_SPI'
+	make -C $(IBL_ROOT)/util/i2cWrite TARGET=$(TARGET) I2C_SIZE_BYTES=$(I2C_SIZE_BYTES) MAINDEFS='$(MAINDEFS) $(SPI_CFG)' $(TARGET)
+	make -C $(IBL_ROOT)/util/i2cConfig $(TARGET) MAINDEFS='$(MAINDEFS) $(SPI_CFG)' 
 	make -C $(IBL_ROOT)/util/bconvert
 
 clean: $(CLEAN_MODULES) hwClean

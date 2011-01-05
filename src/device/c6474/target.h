@@ -135,6 +135,13 @@
 #define TARGET_PWR_NAND     -1
 
 /**
+ *  @brief
+ *      The PSC number for GPIO. GPIO is in the always on domain
+ */
+#define TARGET_PWR_GPIO     -1
+
+
+/**
  * @brief
  *  Flag to indicate timer 0 power up requested. The time is always on in the 6474
  */
@@ -198,4 +205,10 @@
 #define BOOT_READ_BITFIELD(z,x,y)   (((UINT32)z) & BOOTBITMASK(x,y)) >> (y)
 #define BOOT_SET_BITFIELD(z,f,x,y)  (((UINT32)z) & ~BOOTBITMASK(x,y)) | ( (((UINT32)f) << (y)) & BOOTBITMASK(x,y) )
 
+
+/**
+ *  @brief
+ *      The c6474 supports only booting the ibl from i2c
+ */
+#define deviceReadBootDevice()  BOOT_DEVICE_I2C
 

@@ -165,7 +165,7 @@ void chipDelay32 (uint32 nCycles);
  *
  *  @details
  *      Some devices support multiple NAND interface at once (EMIF25 and SPI).
- *      This function returns to the lower level driver the pointer to the
+ *      This function returns a pointer to the lower level function
  *      table to use. The table is selected in the ibl configuration.
  */
 typedef struct nandCtbl_s  {
@@ -182,9 +182,23 @@ nandCtbl_t *deviceGetNandCtbl (int32 interface);
 
 /**
  *  @brief
- *      Return the boot device for the second part of the loader
+ *      Return the NOR interface function table
+ *
+ *  @details
+ *      NOR is supported through both SPI and EMIF. This function returns a pointer
+ *      to the lower level function table to use during boot.
  */
-Int32 deviceReadBootDevice(void);
+typedef struct norCtbl_s  {
+
+    Int32 (*nct_driverInit)         (int32 cs);
+    Int32 (*nct_driverReadBytes)    (Uint8 *data, Uint32 nbytes, Uint32 address);
+    Int32 (*nct_driverClose)        (void);
+    
+} norCtbl_t;
+
+norCtbl_t *deviceGetNorCtbl (int32 interface);
+    
+
 
 /**
  *  @brief
