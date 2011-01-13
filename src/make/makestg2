@@ -207,6 +207,7 @@ cleant:
 	rm -rf ibl_$(TARGET)/i2crom_0x51.dat
 	rm -rf ibl_$(TARGET)/i2crom.map.pp
 	rm -rf ibl_$(TARGET)/ibl_init_objs.inc
+	rm -rf ibl_$(TARGET)/ibl_init_objs.pp
 	rm -rf ibl_$(TARGET)/ibl_init_symbols.inc
 	rm -rf ibl_$(TARGET)/ibl_objs.inc
 	rm -rf ibl_$(TARGET)/ibl_objs.pp

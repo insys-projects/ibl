@@ -13,7 +13,7 @@
 section 
 {
   param_index    = 0
-  boot_mode      = 257
+  boot_mode      = 40
   sw_pll_prediv	 = 1
   sw_pll_mult    = 16
   sw_pll_postdiv = 2

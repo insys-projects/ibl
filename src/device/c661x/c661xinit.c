@@ -106,18 +106,20 @@ int32 deviceReadBootDevice (void)
     else
         params = (BOOT_PARAMS_COMMON_T *)ROM_BOOT_PARAMS_ADDR_C6616;
 
-
     switch (params->boot_mode)  {
 
 #ifndef EXCLUDE_I2C
         case BOOT_MODE_I2C:   w = BOOT_DEVICE_I2C;
+                              break;
 #endif
 
 #ifndef EXCLUDE_NOR_SPI
         case BOOT_MODE_SPI:   w = BOOT_DEVICE_SPI_NOR;
+                              break;
 #endif
 
         default:              w = BOOT_DEVICE_INVALID;
+                              break;
     
     }
 

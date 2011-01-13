@@ -7,10 +7,18 @@
 #define ibl_LOWEST_PRIORITY     10
 #define ibl_DEVICE_NOBOOT       20
 
+#define ibl_PORT_SWITCH_ALL     -2
+
 #define SETIP(array,i0,i1,i2,i3)      array[0]=(i0);  \
                                       array[1]=(i1);  \
                                       array[2]=(i2);  \
                                       array[3]=(i3)
+
+#define  ibl_BOOT_MODE_TFTP     10
+#define  ibl_BOOT_MODE_NAND     11
+#define  ibl_BOOT_MODE_NOR      12
+#define  ibl_BOOT_MODE_NONE     13
+
 
 #define ibl_BOOT_FORMAT_AUTO    0
 #define ibl_BOOT_FORMAT_NAME    1
@@ -24,6 +32,33 @@
 #define ibl_DDR_PLL     1
 #define ibl_NET_PLL     2
 
+#define ibl_EMIF4_ENABLE_sdRamConfig                  (1 <<  0)
+#define  ibl_EMIF4_ENABLE_sdRamConfig2                (1 <<  1)
+#define  ibl_EMIF4_ENABLE_sdRamRefreshCtl             (1 <<  2)
+#define  ibl_EMIF4_ENABLE_sdRamTiming1                (1 <<  3)
+#define  ibl_EMIF4_ENABLE_sdRamTiming2                (1 <<  4)
+#define  ibl_EMIF4_ENABLE_sdRamTiming3                (1 <<  5)
+#define  ibl_EMIF4_ENABLE_lpDdrNvmTiming              (1 <<  6)
+#define  ibl_EMIF4_ENABLE_powerManageCtl              (1 <<  7)
+#define  ibl_EMIF4_ENABLE_iODFTTestLogic              (1 <<  8)
+#define  ibl_EMIF4_ENABLE_performCountCfg             (1 <<  9)
+#define  ibl_EMIF4_ENABLE_performCountMstRegSel       (1 << 10)
+#define  ibl_EMIF4_ENABLE_readIdleCtl                 (1 << 11)
+#define  ibl_EMIF4_ENABLE_sysVbusmIntEnSet            (1 << 12)
+#define  ibl_EMIF4_ENABLE_sdRamOutImpdedCalCfg        (1 << 13)
+#define  ibl_EMIF4_ENABLE_tempAlterCfg                (1 << 14)
+#define  ibl_EMIF4_ENABLE_ddrPhyCtl1                  (1 << 15)
+#define  ibl_EMIF4_ENABLE_ddrPhyCtl2                  (1 << 16)
+#define  ibl_EMIF4_ENABLE_priClassSvceMap             (1 << 17)
+#define  ibl_EMIF4_ENABLE_mstId2ClsSvce1Map           (1 << 18)
+#define  ibl_EMIF4_ENABLE_mstId2ClsSvce2Map           (1 << 11)
+#define  ibl_EMIF4_ENABLE_eccCtl                      (1 << 19)
+#define  ibl_EMIF4_ENABLE_eccRange1                   (1 << 20)
+#define  ibl_EMIF4_ENABLE_eccRange2                   (1 << 21)
+#define  ibl_EMIF4_ENABLE_rdWrtExcThresh              (1 << 22)
+#define  ibl_BOOT_EMIF4_ENABLE_ALL                    0x007fffff
+    
+/* @} */  
 
 menuitem "EVM c6472 IBL";
 
@@ -609,3 +644,141 @@ hotmenu setConfig_c6455()
 }
 
 
+menuitem "EVM c6608 IBL";
+
+hotmenu setConfig_c6608()
+{
+	ibl.iblMagic = ibl_MAGIC_VALUE;
+
+	/* Main PLL: 100 MHz reference, 1GHz output */
+	ibl.pllConfig[ibl_MAIN_PLL].doEnable      = 1;
+	ibl.pllConfig[ibl_MAIN_PLL].prediv        = 1;
+	ibl.pllConfig[ibl_MAIN_PLL].mult          = 20;
+	ibl.pllConfig[ibl_MAIN_PLL].postdiv       = 2;
+	ibl.pllConfig[ibl_MAIN_PLL].pllOutFreqMhz = 1000;
+
+	/* DDR PLL: 66.66 MHz reference, 400 MHz output, for an 800MHz DDR rate */
+	ibl.pllConfig[ibl_DDR_PLL].doEnable       = 1; 
+	ibl.pllConfig[ibl_DDR_PLL].prediv         = 1;
+	ibl.pllConfig[ibl_DDR_PLL].mult           = 12;
+	ibl.pllConfig[ibl_DDR_PLL].postdiv        = 2;
+	ibl.pllConfig[ibl_DDR_PLL].pllOutFreqMhz  = 400;
+
+    /* Net PLL: 100 MHz reference, 1050 MHz output (followed by a built in divide by 3 to give 350 MHz to PA) */
+	ibl.pllConfig[ibl_NET_PLL].doEnable       = 1;
+	ibl.pllConfig[ibl_NET_PLL].prediv         = 1;
+	ibl.pllConfig[ibl_NET_PLL].mult			  = 21;
+	ibl.pllConfig[ibl_NET_PLL].postdiv        = 2;
+	ibl.pllConfig[ibl_NET_PLL].pllOutFreqMhz  = 1050;
+
+
+	ibl.ddrConfig.configDdr = 1;
+	ibl.ddrConfig.uEmif.emif4p0.registerMask = ibl_EMIF4_ENABLE_sdRamConfig | ibl_EMIF4_ENABLE_sdRamRefreshCtl | ibl_EMIF4_ENABLE_sdRamTiming1 | ibl_EMIF4_ENABLE_sdRamTiming2 | ibl_EMIF4_ENABLE_sdRamTiming3 | ibl_EMIF4_ENABLE_ddrPhyCtl1;
+
+	ibl.ddrConfig.uEmif.emif4p0.sdRamConfig				= 0x63C452B2;
+	ibl.ddrConfig.uEmif.emif4p0.sdRamConfig2			= 0;
+	ibl.ddrConfig.uEmif.emif4p0.sdRamRefreshCtl			= 0x000030D4;
+	ibl.ddrConfig.uEmif.emif4p0.sdRamTiming1			= 0x0AAAE51B;
+	ibl.ddrConfig.uEmif.emif4p0.sdRamTiming2			= 0x2A2F7FDA;
+	ibl.ddrConfig.uEmif.emif4p0.sdRamTiming3 			= 0x057F82B8;
+	ibl.ddrConfig.uEmif.emif4p0.lpDdrNvmTiming			= 0;
+	ibl.ddrConfig.uEmif.emif4p0.powerManageCtl			= 0;
+	ibl.ddrConfig.uEmif.emif4p0.iODFTTestLogic			= 0;
+	ibl.ddrConfig.uEmif.emif4p0.performCountCfg			= 0;
+	ibl.ddrConfig.uEmif.emif4p0.performCountMstRegSel	= 0;
+	ibl.ddrConfig.uEmif.emif4p0.readIdleCtl				= 0;
+	ibl.ddrConfig.uEmif.emif4p0.sysVbusmIntEnSet		= 0;
+	ibl.ddrConfig.uEmif.emif4p0.sdRamOutImpdedCalCfg	= 0;
+	ibl.ddrConfig.uEmif.emif4p0.tempAlterCfg			= 0;
+	ibl.ddrConfig.uEmif.emif4p0.ddrPhyCtl1 				= 0x0010010d;
+	ibl.ddrConfig.uEmif.emif4p0.ddrPhyCtl2				= 0;
+	ibl.ddrConfig.uEmif.emif4p0.priClassSvceMap			= 0;
+	ibl.ddrConfig.uEmif.emif4p0.mstId2ClsSvce1Map		= 0;
+	ibl.ddrConfig.uEmif.emif4p0.mstId2ClsSvce2Map		= 0;
+	ibl.ddrConfig.uEmif.emif4p0.eccCtl					= 0;
+	ibl.ddrConfig.uEmif.emif4p0.eccRange1				= 0;
+	ibl.ddrConfig.uEmif.emif4p0.eccRange2				= 0;
+	ibl.ddrConfig.uEmif.emif4p0.rdWrtExcThresh			= 0;
+
+
+	ibl.sgmiiConfig[0].configure     = 1;
+	ibl.sgmiiConfig[0].adviseAbility = 1;
+	ibl.sgmiiConfig[0].control		 = 1;
+	ibl.sgmiiConfig[0].txConfig      = 0x108a1;
+	ibl.sgmiiConfig[0].rxConfig      = 0x700621;
+	ibl.sgmiiConfig[0].auxConfig	 = 0x41;
+
+	ibl.sgmiiConfig[1].configure     = 1;
+	ibl.sgmiiConfig[1].adviseAbility = 1;
+	ibl.sgmiiConfig[1].control		 = 1;
+	ibl.sgmiiConfig[1].txConfig      = 0x108a1;
+	ibl.sgmiiConfig[1].rxConfig      = 0x700621;
+	ibl.sgmiiConfig[1].auxConfig	 = 0x41;
+
+	ibl.mdioConfig.nMdioOps = 0;
+
+	ibl.spiConfig.addrWidth  = 0;
+	ibl.spiConfig.nPins      = 0;
+	ibl.spiConfig.mode       = 0;
+	ibl.spiConfig.csel       = 0;
+	ibl.spiConfig.c2tdelay   = 0;
+	ibl.spiConfig.busFreqMHz = 0;
+
+	ibl.emifConfig[0].csSpace    = 0;
+	ibl.emifConfig[0].busWidth   = 0;
+	ibl.emifConfig[0].waitEnable = 0;
+
+	ibl.emifConfig[1].csSpace    = 0;
+	ibl.emifConfig[1].busWidth   = 0;
+	ibl.emifConfig[1].waitEnable = 0;
+
+	ibl.bootModes[0].bootMode = ibl_BOOT_MODE_TFTP;
+	ibl.bootModes[0].priority = ibl_HIGHEST_PRIORITY;
+	ibl.bootModes[0].port     = ibl_PORT_SWITCH_ALL;
+
+	ibl.bootModes[0].u.ethBoot.doBootp          = FALSE;
+	ibl.bootModes[0].u.ethBoot.useBootpServerIp = FALSE;
+	ibl.bootModes[0].u.ethBoot.useBootpFileName = FALSE;
+	ibl.bootModes[0].u.ethBoot.bootFormat       = ibl_BOOT_FORMAT_BBLOB;
+
+
+    SETIP(ibl.bootModes[0].u.ethBoot.ethInfo.ipAddr,    158,218,32,118);
+    SETIP(ibl.bootModes[0].u.ethBoot.ethInfo.serverIp,  158,218,32,252);
+    SETIP(ibl.bootModes[0].u.ethBoot.ethInfo.gatewayIp, 158,218,32,2);
+    SETIP(ibl.bootModes[0].u.ethBoot.ethInfo.netmask,   255,255,255,0);
+
+    /* Use the e-fuse value */
+    ibl.bootModes[0].u.ethBoot.ethInfo.hwAddress[0] = 0;
+    ibl.bootModes[0].u.ethBoot.ethInfo.hwAddress[1] = 0;
+    ibl.bootModes[0].u.ethBoot.ethInfo.hwAddress[2] = 0;
+    ibl.bootModes[0].u.ethBoot.ethInfo.hwAddress[3] = 0;
+    ibl.bootModes[0].u.ethBoot.ethInfo.hwAddress[4] = 0;
+    ibl.bootModes[0].u.ethBoot.ethInfo.hwAddress[5] = 0;
+
+
+    ibl.bootModes[0].u.ethBoot.ethInfo.fileName[0]  = 't';
+    ibl.bootModes[0].u.ethBoot.ethInfo.fileName[1]  = 'e';
+    ibl.bootModes[0].u.ethBoot.ethInfo.fileName[2]  = 's';
+    ibl.bootModes[0].u.ethBoot.ethInfo.fileName[3]  = 't';
+    ibl.bootModes[0].u.ethBoot.ethInfo.fileName[4]  = '.';
+    ibl.bootModes[0].u.ethBoot.ethInfo.fileName[5]  = 'b';
+    ibl.bootModes[0].u.ethBoot.ethInfo.fileName[6]  = 'l';
+    ibl.bootModes[0].u.ethBoot.ethInfo.fileName[7]  = 'o';
+    ibl.bootModes[0].u.ethBoot.ethInfo.fileName[8]  = 'b';
+    ibl.bootModes[0].u.ethBoot.ethInfo.fileName[9]  = '\0';
+    ibl.bootModes[0].u.ethBoot.ethInfo.fileName[10] = '\0';
+    ibl.bootModes[0].u.ethBoot.ethInfo.fileName[11] = '\0';
+    ibl.bootModes[0].u.ethBoot.ethInfo.fileName[12] = '\0';
+    ibl.bootModes[0].u.ethBoot.ethInfo.fileName[13] = '\0';
+    ibl.bootModes[0].u.ethBoot.ethInfo.fileName[14] = '\0';
+
+    ibl.bootModes[0].u.ethBoot.blob.startAddress  = 0x80000000;       /* Base address of DDR2 */
+    ibl.bootModes[0].u.ethBoot.blob.sizeBytes     = 0x20000000;       /* All of DDR2 */
+    ibl.bootModes[0].u.ethBoot.blob.branchAddress = 0x80000000;       /* Base of DDR2 */
+
+
+	ibl.bootModes[1].bootMode = ibl_BOOT_MODE_NONE;
+
+	ibl.chkSum = 0;
+
+}

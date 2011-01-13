@@ -343,16 +343,19 @@ clean:
 	make -f makestg2 cleant  ARCH=c64x TARGET=c6474
 	make -f makestg2 cleant  ARCH=c64x TARGET=c6455
 	make -f makestg2 cleant  ARCH=c64x TARGET=c6457
+	make -f makestg2 cleant  ARCH=c64x TARGET=c661x
 	make -C ../util/bconvert       clean
 	make -C ../util/btoccs         clean
 	make -C ../util/i2cConfig      clean    ARCH=c64x TARGET=c6455
 	make -C ../util/i2cConfig      clean    ARCH=c64x TARGET=c6472
 	make -C ../util/i2cConfig      clean    ARCH=c64x TARGET=c6474
 	make -C ../util/i2cConfig      clean    ARCH=c64x TARGET=c6457
+	make -C ../util/i2cConfig      clean    ARCH=c64x TARGET=c661x
 	make -C ../util/nandwriter     clean    ARCH=c64x TARGET=c6455
 	make -C ../util/nandwriter     clean    ARCH=c64x TARGET=c6472
 	make -C ../util/nandwriter     clean    ARCH=c64x TARGET=c6474
 	make -C ../util/nandwriter     clean    ARCH=c64x TARGET=c6457
+	make -C ../util/nandwriter     clean    ARCH=c64x TARGET=c661x
 	make -C ../util/romparse       clean
 	make -C ../test/test1		   clean
 	make -C ../test/test2		   clean

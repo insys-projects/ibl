@@ -462,6 +462,11 @@ Int32 targetMacSend (void *vptr_device, Uint8* buffer, int num_bytes)
     int             i;
 
 
+    /* Must always setup the descriptor to have the minimum packet length */
+    if (num_bytes < 64)
+        num_bytes = 64;
+
+
     for (i = 0, hd = NULL; hd == NULL; i++, chipDelay32 (1000)) 
         hd = hwQmQueuePop (DEVICE_QM_TX_Q);
     
