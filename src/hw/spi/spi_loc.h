@@ -50,6 +50,12 @@
 
 
 /* Commands */
-#define SPI_COMMAND_READ    3
+#define SPI_COMMAND_WRITE           0x02
+#define SPI_COMMAND_READ            0x03
+#define SPI_COMMAND_READ_STATUS     0x05
+#define SPI_COMMAND_WRITE_ENABLE    0x06
+#define SPI_COMMAND_ERASE_SECTOR    0x20
+
+SINT16 hw_spi_xfer (UINT16 nbytes, UINT8 *dataOut, UINT8 *dataIn, spiConfig_t *cfg, BOOL terminate);
 
 #endif /* _SPI_LOC_H */

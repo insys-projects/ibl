@@ -915,6 +915,10 @@ typedef struct bootEmif4Tbl_s  {
 #define TIBOOT_ERR_HIBERNATION_ADDR_MISALIGNED  -2
 #define TIBOOT_ERR_HIBERNATION_ADDR_INVALID     -3
 
+/* Boot mode values */
+#define BOOT_MODE_I2C               40
+#define BOOT_MODE_SPI               50
+
 
 
 #endif  /* __TIBOOT_H__ */

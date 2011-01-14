@@ -77,18 +77,38 @@ ifeq ($(I2CROM),both)
  I2C_DEFS+= -DPAD_FILE_ID_1=1 
  I2C_DEFS+= -DEXE_FILE_2=$(I2C_BE_FILE) 
  I2C_DEFS+= -DPAD_FILE_ID_2=2 
+
+ SPI_CFG+= -DINIT_EXE_FILE=$(I2C_INIT_LE_FILE)
+ SPI_CFG+= -DEXE_FILE_1=$(I2C_LE_FILE) 
+ SPI_CFG+= -DPAD_FILE_ID_1=1 
+ SPI_CFG+= -DEXE_FILE_2=$(I2C_BE_FILE) 
+ SPI_CFG+= -DPAD_FILE_ID_2=2 
+
 else 
  I2C_DEFS+= -DPAD_FILE_ID_1=1
  I2C_DEFS+= -DPAD_FILE_ID_2=1
+
+ SPI_CFG+= -DPAD_FILE_ID_1=1
+ SPI_CFG+= -DPAD_FILE_ID_2=1
 
  ifeq ($(I2CROM),little_endian)
   I2C_DEFS+= -DINIT_EXE_FILE=$(I2C_INIT_LE_FILE)
   I2C_DEFS+= -DEXE_FILE_1=$(I2C_LE_FILE)
   I2C_DEFS+= -DEXE_FILE_2='""'
+
+  SPI_CFG+= -DINIT_EXE_FILE=$(I2C_INIT_LE_FILE)
+  SPI_CFG+= -DEXE_FILE_1=$(I2C_LE_FILE)
+  SPI_CFG+= -DEXE_FILE_2='""'
+
  else
   I2C_DEFS+= -DINIT_EXE_FILE=$(I2C_INIT_BE_FILE)
   I2C_DEFS+= -DEXE_FILE_1='""'
   I2C_DEFS+= -DEXE_FILE_2=$(I2C_BE_FILE)
+
+  SPI_CFG+= -DINIT_EXE_FILE=$(I2C_INIT_BE_FILE)
+  SPI_CFG+= -DEXE_FILE_1='""'
+  SPI_CFG+= -DEXE_FILE_2=$(I2C_BE_FILE)
+
  endif
 endif
 
@@ -102,6 +122,10 @@ i2cRom:
 
 spiRom:
 	@echo Making SPI ROM
+	$(CC) -ppo -I../cfg/$(TARGET) $(SPI_CFG) ibl_$(TARGET)/$@.map.pre
+	../util/romparse/romparse $(COMPACT) -fill 0xff -rom_base 0 ibl_$(TARGET)/$@.map.pp
+	$(CP) i2crom.ccs ibl_$(TARGET)/$@.ccs
+	$(CP) i2crom.ccs ibl_$(TARGET)/$@.dat
 
 
 
@@ -161,6 +185,8 @@ $(CFG_MODULES):
 	make -C $(IBL_ROOT)/$@/$(ARCH)/make CDEFS='$(MAINDEFS) $(SPI_CFG)' $@
 
 utils:
+	make -C $(IBL_ROOT)/util/spiWrite TARGET=$(TARGET) SPI_DEFS='$(SPI_DEFS)' MAINDEFS='$(MAINDEFS) $(SPI_CFG)' $(TARGET)
+	make -C $(IBL_ROOT)/util/spiConfig TARGET=$(TARGET) SPI_DEFS='$(SPI_DEFS)' MAINDEFS='$(MAINDEFS) $(SPI_CFG)' $(TARGET)
 	make -C $(IBL_ROOT)/util/btoccs
 	make -C $(IBL_ROOT)/util/romparse TARGET=$(TARGET)
 	make -C $(IBL_ROOT)/util/i2cRead  TARGET=$(TARGET) $(TARGET) 

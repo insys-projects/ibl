@@ -184,9 +184,10 @@ BOOT_MODULE_FXN_TABLE *iblInitSpiNor (void)
     /* Read the SPI mapping information from the nor flash */
     for (;;)  {
 
-        if (hwSpiRead (IBL_CFG_SPI_MAP_TABLE_DATA_ADDR,      /* The address on the flash of the data mapping */
-                       sizeof(iblBootMap_t),                 /* The number of bytes to read */
-                       (UINT8 *)&map)                        /* Where to store the data */
+        if (hwSpiRead ((IBL_CFG_SPI_MAP_TABLE_DATA_ADDR_MSW << 16) |   /* The address on the flash of the data mapping */
+                        IBL_CFG_SPI_MAP_TABLE_DATA_ADDR_LSW,
+                       sizeof(iblBootMap_t),                           /* The number of bytes to read */
+                       (UINT8 *)&map)                                  /* Where to store the data */
 
           == 0)  {
 

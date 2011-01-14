@@ -21,6 +21,8 @@ typedef struct spiConfig_s  {
 
 SINT16 hwSpiConfig (spiConfig_t *spiCfg);
 SINT16 hwSpiRead (UINT32 addr, UINT16 sizeBytes, UINT8 *data);
+void hwSpiEnableXfer (UINT32 port);
+void hwSpiDisableXfer (UINT32 port);
 
 /* Return values */
 #define SPI_INVALID_ADDR_WIDTH  -1

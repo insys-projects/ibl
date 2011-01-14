@@ -26,6 +26,7 @@ PLL_PATH= ../../hw/c64x/make
 ifeq ($(TARGET),c661x)
  PLL_OBJS=  $(PLL_PATH)/pll.$(IEXT).oc $(PLL_PATH)/cfgpll.$(IEXT).oc $(PLL_PATH)/cfgpll2.$(IEXT).oc
  PLL_OBJS+= ../../device/c64x/make/c64x.$(IEXT).oa
+ PSC_OBJS= ../../hw/c64x/make/psc.$(IEXT).oc
 else
  PLL_OBJS= $(PLL_PATH)/pll.$(IEXT).oc
 endif
@@ -70,7 +71,7 @@ export TARGET
 
 
 $(DEVICES): gen_cdefdep $(MODULES) $(CFG_MODULES) $(OBJS) i2cWrite.cmd
-	$(LD) -o i2cWrite_$(IEXT).out -m i2cWrite_$(IEXT).map i2cWrite.$(IEXT).oc ../../hw/c64x/make/i2c.$(IEXT).oc $(PLL_OBJS) $(TFILES) i2cWrite.cmd $(RTLIBS)
+	$(LD) -o i2cWrite_$(IEXT).out -m i2cWrite_$(IEXT).map i2cWrite.$(IEXT).oc ../../hw/c64x/make/i2c.$(IEXT).oc $(PLL_OBJS) $(PSC_OBJS) $(TFILES) i2cWrite.cmd $(RTLIBS)
 
 
 $(MODULES):

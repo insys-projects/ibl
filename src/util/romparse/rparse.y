@@ -8,6 +8,7 @@ extern char *yytext;
 %token EXE_FILE PCI_PARMS NEXT_DEV_ADDR NEXT_DEV_ADDR_EXT ADDRESS_DELAY SWPLL
 %token DEV_ADDR_EXT DEV_ADDR LAYOUT ALIGN PAD LENGTH PAD_FILE_ID
 %token SWPLL_PREDIV SWPLL_MULT SWPLL_POSTDIV SWPLL_FLAGS
+%token ADDR_WIDTH N_PINS MODE C2T_DELAY BUS_FREQ_MHZ BUS_FREQ_KHZ CSEL
 %%
 
 promspec   : segment
@@ -65,6 +66,13 @@ keyword    : BOOT_MODE		     {  $$=$1;  }
 		   | SWPLL_MULT			 {  $$=$1;  }
 		   | SWPLL_POSTDIV		 {  $$=$1;  }
 		   | SWPLL_FLAGS		 {  $$=$1;  }
+		   | ADDR_WIDTH          {  $$=$1;  }
+		   | N_PINS				 {  $$=$1;  }
+		   | MODE                {  $$=$1;  }
+		   | C2T_DELAY           {  $$=$1;  }
+		   | BUS_FREQ_MHZ        {  $$=$1;  }
+		   | BUS_FREQ_KHZ        {  $$=$1;  }
+		   | CSEL				 {  $$=$1;  }
 		   ;
 
 %%

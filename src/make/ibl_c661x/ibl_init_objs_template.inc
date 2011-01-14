@@ -13,6 +13,7 @@
 ../interp/c64x/make/btblwrap.ENDIAN_TAG.oc
 ../interp/c64x/make/btblpr.ENDIAN_TAG.oc
 ../interp/c64x/make/gem.ENDIAN_TAG.oc
+../hw/c64x/make/psc.ENDIAN_TAG.oc
 
 #ifndef EXCLUDE_I2C
 ../main/c64x/make/ibliniti2c.ENDIAN_TAG.oc

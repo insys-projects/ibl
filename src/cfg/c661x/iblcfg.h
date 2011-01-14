@@ -106,8 +106,12 @@
 /**
  * @brief The default location for the spi map information can be overridden during make
  */
-#ifndef IBL_CFG_SPI_MAP_TABLE_DATA_ADDR
- #define IBL_CFG_SPI_MAP_TABLE_DATA_ADDR     0x400
+#ifndef IBL_CFG_SPI_MAP_TABLE_DATA_ADDR_LSW
+ #define IBL_CFG_SPI_MAP_TABLE_DATA_ADDR_LSW     0x400
+#endif
+
+#ifndef IBL_CFG_SPI_MAP_TABLE_DATA_ADDR_MSW
+ #define IBL_CFG_SPI_MAP_TABLE_DATA_ADDR_MSW     0
 #endif
 
 

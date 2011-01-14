@@ -1,9 +1,9 @@
 #**************************************************************************
-#* FILE PURPOSE: 2nd stage makefile for the i2c parameter writer
+#* FILE PURPOSE: 2nd stage makefile for the spi parameter writer
 #**************************************************************************
 #* FILE NAME: makestg2
 #*
-#* DESCRIPTION: Builds the i2c parameter writer for a specific target
+#* DESCRIPTION: Builds the spi parameter writer for a specific target
 #*
 #**************************************************************************
 
@@ -19,6 +19,8 @@ else
  IEXT=le
 endif
 
+# Add SPI definitions
+SPI_CFG= $(addprefix -D,$(SPI_DEFS))
 
 # The PLL object files are device specific
 PLL_PATH= ../../hw/c64x/make
@@ -33,7 +35,7 @@ endif
 # Device specific helper utilities
 
 
-ECODIR= $(IBL_ROOT)/util/i2cConfig
+ECODIR= $(IBL_ROOT)/util/spiConfig
 ifeq ($(TARGET),c661x)
  TFILES= ../../device/c64x/make/$(TARGET)util.$(IEXT).oc
 endif
@@ -45,8 +47,9 @@ CLEAN_MODULES=$(addprefix clean_,$(MODULES))
 CLEAN_MODULES+=$(addprefix clean_,$(CFG_MODULES))
 
 
-CSRC= i2cparam.c
+CSRC= spiparam.c spiUtil.c
 
+CDEFS+= $(SPI_CFG)
 
 # enable debug info in the compile
 UTIL=yes
@@ -54,22 +57,23 @@ UTIL=yes
 include $(IBL_ROOT)/make/$(ARCH)/makeeco.mk
 
 C6X_C_DIR=  $(IBL_ROOT)
-C6X_C_DIR+=;$(IBL_ROOT)/hw/i2c
+C6X_C_DIR+=;$(IBL_ROOT)/hw/spi
 C6X_C_DIR+=;$(IBL_ROOT)/hw/plls
 C6X_C_DIR+=;$(STDINC)
 C6X_C_DIR+=;$(IBL_ROOT)/cfg/$(TARGET)
 C6X_C_DIR+=;$(IBL_ROOT)/device/$(TARGET)
 C6X_C_DIR+=;$(IBL_ROOT)/arch/$(ARCH)
+C6X_C_DIR+=;$(IBL_ROOT)/util/spiWrite
 export C6X_C_DIR
 
 
 export ARCH
 export TARGET
 
-.PHONY: i2cparam.cmd
+.PHONY: spiparam.cmd
 
-$(DEVICES): gen_cdefdep $(MODULES) $(CFG_MODULES) $(OBJS) i2cparam.cmd
-	$(LD) -o i2cparam_$(TARGET)_$(IEXT).out -m i2cparam_$(TARGET)_$(IEXT).map i2cparam.$(IEXT).oc ../../hw/c64x/make/i2c.$(IEXT).oc $(PLL_OBJS) $(PSC_OBJS) $(TFILES) i2cparam.cmd $(RTLIBS)
+$(DEVICES): gen_cdefdep $(MODULES) $(CFG_MODULES) $(OBJS) spiparam.cmd
+	$(LD) -o spiparam_$(TARGET)_$(IEXT).out -m spiparam_$(TARGET)_$(IEXT).map spiparam.$(IEXT).oc ../spiWrite/spiutil.$(IEXT).oc ../../hw/c64x/make/spi.$(IEXT).oc ../../hw/c64x/make/spiutil.$(IEXT).oc $(PLL_OBJS) $(PSC_OBJS) $(TFILES) spiparam.cmd $(RTLIBS)
 
 $(MODULES):
 	@echo making $@

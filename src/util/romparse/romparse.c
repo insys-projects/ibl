@@ -135,6 +135,12 @@ int romBase = DATA_BASE;
 char *inputFile;
 int   compact = 0;
 
+/*************************************************************************************
+ * Declaration: The value used to fill gaps in the file. For some devices this
+ *              value must be set to 0xff so subsequent writing to these gaps will work
+ *************************************************************************************/
+unsigned char fillVal = 0;
+
 
 /*************************************************************************************
  * FUNCTION PURPOSE: flex/bison required support functions.
@@ -305,7 +311,16 @@ void section (void)
 
   /* The length must be set. Currently this program only supports I2C mode, so the
    * length is fixed */
+
   current_table.common.length   = 30;
+
+  #ifdef c661x
+    if (current_table.common.boot_mode == BOOT_MODE_SPI)
+        current_table.common.length   = sizeof(BOOT_PARAMS_SPI_T);
+    else
+        current_table.common.length   = sizeof(BOOT_PARAMS_I2C_T);
+  #endif
+       
   current_table.common.checksum = 0;
 
   /* Copy the table */
@@ -458,7 +473,15 @@ void assignKeyVal (int field, int value)
         case MY_I2C_ID:        current_table.i2c.my_i2c_id = value;
                                break;
 
-        case CORE_FREQ_MHZ:    current_table.i2c.core_freq_mhz = value;
+        case CORE_FREQ_MHZ:    
+                               #ifdef c661x
+                                   if (current_table.common.boot_mode = BOOT_MODE_SPI)  {
+                                        current_table.spi.cpuFreqMhz = value;
+                                        break;
+                                   }
+                               #endif
+        
+                               current_table.i2c.core_freq_mhz = value;
                                break;
 
         case I2C_CLK_FREQ_KHZ: current_table.i2c.i2c_clk_freq_khz = value;
@@ -480,20 +503,20 @@ void assignKeyVal (int field, int value)
 #endif
 
 #ifdef c661x
-        case SWPLL_PREDIV:    current_table.i2c.swPllCfg_lsw &= 0x00ff;
-                              current_table.i2c.swPllCfg_lsw |= ((value & 0xff) << 16);
+        case SWPLL_PREDIV:    current_table.common.swPllCfg_lsw &= 0x00ff;
+                              current_table.common.swPllCfg_lsw |= ((value & 0xff) << 16);
                               break;
 
-        case SWPLL_MULT:      current_table.i2c.swPllCfg_msw &= 0xc000;
-                              current_table.i2c.swPllCfg_msw |= (value & 0x3fff);
+        case SWPLL_MULT:      current_table.common.swPllCfg_msw &= 0xc000;
+                              current_table.common.swPllCfg_msw |= (value & 0x3fff);
                               break;
 
-        case SWPLL_POSTDIV:   current_table.i2c.swPllCfg_lsw &= 0xff00;
-                              current_table.i2c.swPllCfg_lsw |= (value & 0xff);
+        case SWPLL_POSTDIV:   current_table.common.swPllCfg_lsw &= 0xff00;
+                              current_table.common.swPllCfg_lsw |= (value & 0xff);
                               break;
 
-        case SWPLL_FLAGS:     current_table.i2c.swPllCfg_msw &= 0x3fff;
-                              current_table.i2c.swPllCfg_msw |= ((value & 0x3) << 14);
+        case SWPLL_FLAGS:     current_table.common.swPllCfg_msw &= 0x3fff;
+                              current_table.common.swPllCfg_msw |= ((value & 0x3) << 14);
                               break;
 
 #endif
@@ -504,6 +527,30 @@ void assignKeyVal (int field, int value)
         case DEV_ADDR:         current_table.i2c.dev_addr = value;
                                break;
 
+
+#ifdef c661x
+        case N_PINS:           current_table.spi.nPins = value;
+                               break;
+
+        case MODE:             current_table.spi.mode = value;
+                               break;
+
+        case C2T_DELAY:        current_table.spi.c2tdelay = value;
+                               break;
+
+        case BUS_FREQ_MHZ:     current_table.spi.busFreqMhz = value;
+                               break;
+
+        case BUS_FREQ_KHZ:     current_table.spi.busFreqKhz = value;
+                               break;
+
+        case ADDR_WIDTH:       current_table.spi.addrWidth = value;
+                               break;
+
+        case CSEL:             current_table.spi.csel = value;
+                               break;
+
+#endif
 
         default:
             fprintf (stderr, "romparse: Invalid assignment in section specification (line %d)\n", line);
@@ -738,7 +785,7 @@ unsigned int imagePad (unsigned int base, unsigned int start, unsigned char *ima
   }
 
   for (i = base; i < desired; i++)
-    image[i-start] = 0;
+    image[i-start] = fillVal;
 
   return (desired);
 
@@ -849,8 +896,18 @@ void createOutput (void)
    * been tagged it means that this is an i2c program load */
   for (i = 0; i < NUM_BOOT_PARAM_TABLES; i++)  {
     for (j = 0; j < NUM_BOOT_PARAM_TABLES; j++)  {
-      if (progFile[i].tag[j] >= 0)
+      if (progFile[i].tag[j] >= 0)  {
+        
+        #ifdef c661x
+          if (boot_params[progFile[i].tag[j]].common.boot_mode == BOOT_MODE_SPI)  {
+            boot_params[progFile[i].tag[j]].spi.read_addr_lsw = (progFile[i].addressBytes & 0xffff);
+            boot_params[progFile[i].tag[j]].spi.read_addr_msw = (progFile[i].addressBytes  >> 16) & 0xffff;
+            continue;
+          }
+        #endif
+
         boot_params[progFile[i].tag[j]].i2c.dev_addr = (progFile[i].addressBytes & 0xffff);
+      }
     }
   }
 
@@ -869,6 +926,8 @@ void createOutput (void)
     fprintf (stderr, "romparse: malloc failed creating the output image\n");
     exit (-1);
   }
+
+  memset (image, fillVal, (base - i2cRomStart));
 
   /* Write out the boot parameter tables. 0x80 bytes will be written out.
    * There are 16 bits in every parameter field, which is why the index
@@ -986,7 +1045,7 @@ int parseIt (int argc, char *argv[])
   int i;
 
   if (argc < 2)  {
-     fprintf (stderr, "usage: %s [-compact] [-rom_base x] inputfile\n", argv[0]);
+     fprintf (stderr, "usage: %s [-compact] [-rom_base x] [-fill <fillval>] inputfile\n", argv[0]);
      return (-1);
   }
 
@@ -1002,10 +1061,14 @@ int parseIt (int argc, char *argv[])
       i2cRomBase = readVal (argv[i+1]);
       i += 2;
 
+    } else if (!strcmp (argv[i], "-fill"))  {
+      fillVal = readVal (argv[i+1]);
+      i += 2;
+
     } else  {
 
       if (inputFile != NULL)  {
-        fprintf (stderr, "usage: %s [-compact] inputfile\n", argv[0]);
+        fprintf (stderr, "usage: %s [-compact] [-rom_base x] [-fill <fillval>] inputfile\n", argv[0]);
         return (-1);
       }
 

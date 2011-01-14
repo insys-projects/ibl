@@ -82,6 +82,16 @@ SINT16 hwPllSetPll (UINT32 pllNum, UINT32 prediv, UINT32 mult, UINT32 postdiv)
   secctl = secctl | PLL_REG_SECCTL_FIELD_BYPASS;
   DEVICE_REG32_W (pllBase + PLL_REG_SECCTL, secctl);
 
+
+  /* Reset the PLL, wait at least 5 us, release reset */
+  ctl = ctl | 2;
+  DEVICE_REG32_W (pllBase + PLL_REG_CTL, ctl);
+  hw_pll_delay (500 * 5 * 20);
+
+  ctl = ctl & ~2;
+  DEVICE_REG32_W (pllBase + PLL_REG_CTL, ctl);
+  hw_pll_delay (500 * 5 * 20);
+
   /* Reset the PLL */
   ctl = ctl | PLL_REG_CTL_FIELD_PLLRST;
   DEVICE_REG32_W (pllBase + PLL_REG_CTL, ctl);

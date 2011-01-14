@@ -30,10 +30,17 @@ sw_pll			  { yylval = SWPLL;				                 return (SWPLL);			 }
 align			  { yylval = ALIGN;							     return (ALIGN);             }
 len				  { yylval = LENGTH;							 return (LENGTH);			 }
 pad_file_id       { yylval = PAD_FILE_ID;						 return (PAD_FILE_ID);		 }
-sw_pll_prediv	  { yylval = SWPLL_PREDIV;						 return (SWPLL_PREDIV); }
-sw_pll_mult	      { yylval = SWPLL_MULT;						 return (SWPLL_MULT); }
-sw_pll_postdiv    { yylval = SWPLL_POSTDIV;     				 return (SWPLL_POSTDIV); }
-sw_pll_flags      { yylval = SWPLL_FLAGS;						 return (SWPLL_FLAGS); }
+sw_pll_prediv	  { yylval = SWPLL_PREDIV;						 return (SWPLL_PREDIV);      }
+sw_pll_mult	      { yylval = SWPLL_MULT;						 return (SWPLL_MULT);        }
+sw_pll_postdiv    { yylval = SWPLL_POSTDIV;     				 return (SWPLL_POSTDIV);     }
+sw_pll_flags      { yylval = SWPLL_FLAGS;						 return (SWPLL_FLAGS);       }
+addr_width        { yylval = ADDR_WIDTH;						 return (ADDR_WIDTH);        }
+n_pins            { yylval = N_PINS;							 return (N_PINS);			 }
+mode              { yylval = MODE;								 return (MODE);				 }
+c2t_delay		  { yylval = C2T_DELAY;							 return (C2T_DELAY);		 }
+bus_freq_mhz	  { yylval = BUS_FREQ_MHZ;					     return (BUS_FREQ_MHZ);	     }
+bus_freq_khz      { yylval = BUS_FREQ_KHZ;						 return (BUS_FREQ_KHZ);		 }
+csel			  { yylval = CSEL;								 return (CSEL);				 }
 
 
 [0-9]+ 		 { yylval = atoi(yytext); return (VALUE);  }

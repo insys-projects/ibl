@@ -1,11 +1,12 @@
-#**************************************************************************
-#* FILE PURPOSE: 2nd stage makefile for the i2c parameter writer
-#**************************************************************************
+#*********************************************************************************
+#* FILE PURPOSE: Build the SPI EEPROM writer 
+#*********************************************************************************
 #* FILE NAME: makestg2
 #*
-#* DESCRIPTION: Builds the i2c parameter writer for a specific target
+#* DESCRIPTION: Builds the spi writer
 #*
-#**************************************************************************
+#*********************************************************************************
+
 
 DEVICES= c6455 c6472 c6474 c6474l c6457 c661x
 
@@ -19,33 +20,37 @@ else
  IEXT=le
 endif
 
+# Add SPI definitions
+SPI_CFG= $(addprefix -D,$(SPI_DEFS))
 
 # The PLL object files are device specific
 PLL_PATH= ../../hw/c64x/make
 ifeq ($(TARGET),c661x)
  PLL_OBJS=  $(PLL_PATH)/pll.$(IEXT).oc $(PLL_PATH)/cfgpll.$(IEXT).oc $(PLL_PATH)/cfgpll2.$(IEXT).oc
  PLL_OBJS+= ../../device/c64x/make/c64x.$(IEXT).oa
- PSC_OBJS= ../../hw/c64x/make/psc.$(IEXT).oc
+ PSC_OBJS+= ../../hw/c64x/make/psc.$(IEXT).oc
 else
  PLL_OBJS= $(PLL_PATH)/pll.$(IEXT).oc
 endif
 
-# Device specific helper utilities
 
-
-ECODIR= $(IBL_ROOT)/util/i2cConfig
 ifeq ($(TARGET),c661x)
  TFILES= ../../device/c64x/make/$(TARGET)util.$(IEXT).oc
 endif
 
-MODULES= hw 
+
+
+ECODIR= $(IBL_ROOT)/util/spiWrite
+
+MODULES= hw
 CFG_MODULES= device
 
 CLEAN_MODULES=$(addprefix clean_,$(MODULES))
 CLEAN_MODULES+=$(addprefix clean_,$(CFG_MODULES))
 
+CSRC= spiWrite.c spiUtil.c
 
-CSRC= i2cparam.c
+CDEFS+= $(SPI_CFG)
 
 
 # enable debug info in the compile
@@ -53,23 +58,23 @@ UTIL=yes
 
 include $(IBL_ROOT)/make/$(ARCH)/makeeco.mk
 
-C6X_C_DIR=  $(IBL_ROOT)
-C6X_C_DIR+=;$(IBL_ROOT)/hw/i2c
-C6X_C_DIR+=;$(IBL_ROOT)/hw/plls
-C6X_C_DIR+=;$(STDINC)
-C6X_C_DIR+=;$(IBL_ROOT)/cfg/$(TARGET)
-C6X_C_DIR+=;$(IBL_ROOT)/device/$(TARGET)
-C6X_C_DIR+=;$(IBL_ROOT)/arch/$(ARCH)
+C6X_C_DIR=   $(IBL_ROOT)/hw/spi
+C6X_C_DIR+= ;$(IBL_ROOT)/hw/plls
+C6X_C_DIR+= ;$(IBL_ROOT)/cfg/$(TARGET)
+C6X_C_DIR+= ;$(IBL_ROOT)/device/$(TARGET)
+C6X_C_DIR+= ;$(IBL_ROOT)/arch/$(ARCH)
+C6X_C_DIR+= ;$(STDINC)
 export C6X_C_DIR
-
 
 export ARCH
 export TARGET
 
-.PHONY: i2cparam.cmd
 
-$(DEVICES): gen_cdefdep $(MODULES) $(CFG_MODULES) $(OBJS) i2cparam.cmd
-	$(LD) -o i2cparam_$(TARGET)_$(IEXT).out -m i2cparam_$(TARGET)_$(IEXT).map i2cparam.$(IEXT).oc ../../hw/c64x/make/i2c.$(IEXT).oc $(PLL_OBJS) $(PSC_OBJS) $(TFILES) i2cparam.cmd $(RTLIBS)
+
+
+$(DEVICES): gen_cdefdep $(MODULES) $(CFG_MODULES) $(OBJS) spiWrite.cmd
+	$(LD) -o spiWrite_$(IEXT).out -m spiWrite_$(IEXT).map spiWrite.$(IEXT).oc spiUtil.$(IEXT).oc ../../hw/c64x/make/spi.$(IEXT).oc ../../hw/c64x/make/spiutil.$(IEXT).oc $(PLL_OBJS) $(PSC_OBJS) $(TFILES) spiWrite.cmd $(RTLIBS)
+
 
 $(MODULES):
 	@echo making $@
@@ -83,24 +88,16 @@ $(CFG_MODULES):
 clean2: $(CLEAN_MODULES)
 	@rm -f $(OBJS)
 	@rm -f $(subst .c,.dc,$(CSRC))
-	
 
 $(CLEAN_MODULES):
 	@echo cleaning $(subst clean_, ,$@)
-	make -C $(IBL_ROOT)/$(subst clean_,,$@)/$(ARCH)/make clean
-
+	make -C $(IBL_ROOT)/$(subst clean,,$@)/$(ARCH)/make clean
 
 $(OBJS): cdefdep
 
 
 gen_cdefdep:
 	@echo Checking command line dependencies
-	@echo $(TARGET) $(ARCH) > cdefdep.tmp
+	@echo $(ARCH) $(TARGET) $(SPI_DEFS) > cdefdep.tmp
 	@sh -c 'if diff -q cdefdep.tmp cdefdep ; then echo same ; else $(CP) cdefdep.tmp cdefdep ; fi '
-
-	
-
-
-
-
 
