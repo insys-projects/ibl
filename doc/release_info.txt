@@ -8,16 +8,20 @@ November 2010
     - C6455
     - C6472
     - C6474
+    - C661x
 2) Supported ENDIAN
     - big
     - little
 3) Required toolset
-    - TI CGEN compiler CGT_C6000_7.2.0A10218
+    - TI CGEN compiler CGT_C6000_7.2.0
 4) Build Instructions
+
     - Change directory to ibl\src\make
-    - Modify the setupenvLnx.sh script to match the tool environment
-    - Set the environment by running "source setupenvLnx.sh"
+    - Modify the setupenv.bat or setupenvLnx.sh script to match the tool environment
+    - Set the environment by running "setupenv.bat" or "source setupenvLnx.sh"
     - For building run:
+        make evm_c6678_i2c ENDIAN=little I2C_BUS_ADDR=0x51
+      or:
         make <TARGET>  ENDIAN=[little|big]
         make c6455 ENDIAN=liitle
         make c6455 ENDIAN=big
