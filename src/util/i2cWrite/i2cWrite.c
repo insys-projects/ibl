@@ -54,7 +54,7 @@
 #include <string.h>
 
 #ifndef I2C_SIZE_BYTES
- #define I2C_SIZE_BYTES  0x20000
+ #define I2C_SIZE_BYTES  0x10000
 #endif
 
 /* Run time configuration */
@@ -63,12 +63,12 @@ unsigned int   prediv        = 1;       /* Pre-divider  */
 unsigned int   mult          = 20;      /* Multiplier   */
 unsigned int   postdiv       = 1;       /* Post-divider */
 
-unsigned int   busAddress    = 0x50;
+unsigned int   busAddress    = IBL_CFG_I2C_MAP_TABLE_DATA_BUS_ADDR;
 unsigned int   i2cBlockSize  = 64;
 unsigned int   nbytes        = I2C_SIZE_BYTES;
 unsigned int   dataAddress   = 0;
 
-#define I2C_DATA_ADDRESS_MASK   0x0fffff        /* 20 bits specifiy the address (4 msb roll into dev address) */
+#define I2C_DATA_ADDRESS_MASK   0xffff          /* 16 bits specifiy the address (4 msb roll into dev address) */
 
 
 #pragma DATA_SECTION(i2cData, ".i2cData")

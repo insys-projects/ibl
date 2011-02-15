@@ -28,6 +28,8 @@
 #define ibl_BOOT_FORMAT_BBLOB   5
 #define ibl_BOOT_FORMAT_BTBL    6
 
+#define  ibl_PMEM_IF_SPI        100 
+
 #define ibl_MAIN_PLL    0
 #define ibl_DDR_PLL     1
 #define ibl_NET_PLL     2
@@ -644,9 +646,9 @@ hotmenu setConfig_c6455()
 }
 
 
-menuitem "EVM c6608 IBL";
+menuitem "EVM c6678 IBL";
 
-hotmenu setConfig_c6608()
+hotmenu setConfig_c6678()
 {
 	ibl.iblMagic = ibl_MAGIC_VALUE;
 
@@ -717,12 +719,12 @@ hotmenu setConfig_c6608()
 
 	ibl.mdioConfig.nMdioOps = 0;
 
-	ibl.spiConfig.addrWidth  = 0;
-	ibl.spiConfig.nPins      = 0;
-	ibl.spiConfig.mode       = 0;
-	ibl.spiConfig.csel       = 0;
-	ibl.spiConfig.c2tdelay   = 0;
-	ibl.spiConfig.busFreqMHz = 0;
+	ibl.spiConfig.addrWidth  = 24;
+	ibl.spiConfig.nPins      = 5;
+	ibl.spiConfig.mode       = 1;
+	ibl.spiConfig.csel       = 2;
+	ibl.spiConfig.c2tdelay   = 1;
+	ibl.spiConfig.busFreqMHz = 20;
 
 	ibl.emifConfig[0].csSpace    = 0;
 	ibl.emifConfig[0].busWidth   = 0;
@@ -732,52 +734,60 @@ hotmenu setConfig_c6608()
 	ibl.emifConfig[1].busWidth   = 0;
 	ibl.emifConfig[1].waitEnable = 0;
 
-	ibl.bootModes[0].bootMode = ibl_BOOT_MODE_TFTP;
+	ibl.bootModes[0].bootMode = ibl_BOOT_MODE_NOR;
 	ibl.bootModes[0].priority = ibl_HIGHEST_PRIORITY;
-	ibl.bootModes[0].port     = ibl_PORT_SWITCH_ALL;
+	ibl.bootModes[0].port     = 0;
 
-	ibl.bootModes[0].u.ethBoot.doBootp          = FALSE;
-	ibl.bootModes[0].u.ethBoot.useBootpServerIp = FALSE;
-	ibl.bootModes[0].u.ethBoot.useBootpFileName = FALSE;
-	ibl.bootModes[0].u.ethBoot.bootFormat       = ibl_BOOT_FORMAT_BBLOB;
+	ibl.bootModes[0].u.norBoot.bootFormat	= ibl_BOOT_FORMAT_ELF;
+	ibl.bootModes[0].u.norBoot.bootAddress	= 0;
+	ibl.bootModes[0].u.norBoot.interface	= ibl_PMEM_IF_SPI;
+    ibl.bootModes[1].u.norBoot.blob.startAddress  = 0x80000000;       /* Base address of DDR2 */
+    ibl.bootModes[1].u.norBoot.blob.sizeBytes     = 0x20000000;       /* All of DDR2 */
+    ibl.bootModes[1].u.norBoot.blob.branchAddress = 0x80000000;       /* Base of DDR2 */
+
+	ibl.bootModes[1].bootMode = ibl_BOOT_MODE_TFTP;
+	ibl.bootModes[1].priority = ibl_HIGHEST_PRIORITY+1;
+	ibl.bootModes[1].port     = ibl_PORT_SWITCH_ALL;
+
+	ibl.bootModes[1].u.ethBoot.doBootp          = FALSE;
+	ibl.bootModes[1].u.ethBoot.useBootpServerIp = FALSE;
+	ibl.bootModes[1].u.ethBoot.useBootpFileName = FALSE;
+	ibl.bootModes[1].u.ethBoot.bootFormat       = ibl_BOOT_FORMAT_ELF;
 
 
-    SETIP(ibl.bootModes[0].u.ethBoot.ethInfo.ipAddr,    158,218,32,118);
-    SETIP(ibl.bootModes[0].u.ethBoot.ethInfo.serverIp,  158,218,32,252);
-    SETIP(ibl.bootModes[0].u.ethBoot.ethInfo.gatewayIp, 158,218,32,2);
-    SETIP(ibl.bootModes[0].u.ethBoot.ethInfo.netmask,   255,255,255,0);
+    SETIP(ibl.bootModes[1].u.ethBoot.ethInfo.ipAddr,    192,168,1,100);
+    SETIP(ibl.bootModes[1].u.ethBoot.ethInfo.serverIp,  192,168,1,101);
+    SETIP(ibl.bootModes[1].u.ethBoot.ethInfo.gatewayIp, 192,168,1,1);
+    SETIP(ibl.bootModes[1].u.ethBoot.ethInfo.netmask,   255,255,255,0);
 
     /* Use the e-fuse value */
-    ibl.bootModes[0].u.ethBoot.ethInfo.hwAddress[0] = 0;
-    ibl.bootModes[0].u.ethBoot.ethInfo.hwAddress[1] = 0;
-    ibl.bootModes[0].u.ethBoot.ethInfo.hwAddress[2] = 0;
-    ibl.bootModes[0].u.ethBoot.ethInfo.hwAddress[3] = 0;
-    ibl.bootModes[0].u.ethBoot.ethInfo.hwAddress[4] = 0;
-    ibl.bootModes[0].u.ethBoot.ethInfo.hwAddress[5] = 0;
+    ibl.bootModes[1].u.ethBoot.ethInfo.hwAddress[0] = 0;
+    ibl.bootModes[1].u.ethBoot.ethInfo.hwAddress[1] = 0;
+    ibl.bootModes[1].u.ethBoot.ethInfo.hwAddress[2] = 0;
+    ibl.bootModes[1].u.ethBoot.ethInfo.hwAddress[3] = 0;
+    ibl.bootModes[1].u.ethBoot.ethInfo.hwAddress[4] = 0;
+    ibl.bootModes[1].u.ethBoot.ethInfo.hwAddress[5] = 0;
 
 
-    ibl.bootModes[0].u.ethBoot.ethInfo.fileName[0]  = 't';
-    ibl.bootModes[0].u.ethBoot.ethInfo.fileName[1]  = 'e';
-    ibl.bootModes[0].u.ethBoot.ethInfo.fileName[2]  = 's';
-    ibl.bootModes[0].u.ethBoot.ethInfo.fileName[3]  = 't';
-    ibl.bootModes[0].u.ethBoot.ethInfo.fileName[4]  = '.';
-    ibl.bootModes[0].u.ethBoot.ethInfo.fileName[5]  = 'b';
-    ibl.bootModes[0].u.ethBoot.ethInfo.fileName[6]  = 'l';
-    ibl.bootModes[0].u.ethBoot.ethInfo.fileName[7]  = 'o';
-    ibl.bootModes[0].u.ethBoot.ethInfo.fileName[8]  = 'b';
-    ibl.bootModes[0].u.ethBoot.ethInfo.fileName[9]  = '\0';
-    ibl.bootModes[0].u.ethBoot.ethInfo.fileName[10] = '\0';
-    ibl.bootModes[0].u.ethBoot.ethInfo.fileName[11] = '\0';
-    ibl.bootModes[0].u.ethBoot.ethInfo.fileName[12] = '\0';
-    ibl.bootModes[0].u.ethBoot.ethInfo.fileName[13] = '\0';
-    ibl.bootModes[0].u.ethBoot.ethInfo.fileName[14] = '\0';
+    ibl.bootModes[1].u.ethBoot.ethInfo.fileName[0]  = 't';
+    ibl.bootModes[1].u.ethBoot.ethInfo.fileName[1]  = 'e';
+    ibl.bootModes[1].u.ethBoot.ethInfo.fileName[2]  = 's';
+    ibl.bootModes[1].u.ethBoot.ethInfo.fileName[3]  = 't';
+    ibl.bootModes[1].u.ethBoot.ethInfo.fileName[4]  = '.';
+    ibl.bootModes[1].u.ethBoot.ethInfo.fileName[5]  = 'o';
+    ibl.bootModes[1].u.ethBoot.ethInfo.fileName[6]  = 'u';
+    ibl.bootModes[1].u.ethBoot.ethInfo.fileName[7]  = 't';
+    ibl.bootModes[1].u.ethBoot.ethInfo.fileName[8]  = '\0';
+    ibl.bootModes[1].u.ethBoot.ethInfo.fileName[9]  = '\0';
+    ibl.bootModes[1].u.ethBoot.ethInfo.fileName[10] = '\0';
+    ibl.bootModes[1].u.ethBoot.ethInfo.fileName[11] = '\0';
+    ibl.bootModes[1].u.ethBoot.ethInfo.fileName[12] = '\0';
+    ibl.bootModes[1].u.ethBoot.ethInfo.fileName[13] = '\0';
+    ibl.bootModes[1].u.ethBoot.ethInfo.fileName[14] = '\0';
 
-    ibl.bootModes[0].u.ethBoot.blob.startAddress  = 0x80000000;       /* Base address of DDR2 */
-    ibl.bootModes[0].u.ethBoot.blob.sizeBytes     = 0x20000000;       /* All of DDR2 */
-    ibl.bootModes[0].u.ethBoot.blob.branchAddress = 0x80000000;       /* Base of DDR2 */
-
-
-	ibl.bootModes[1].bootMode = ibl_BOOT_MODE_NONE;
+    ibl.bootModes[1].u.ethBoot.blob.startAddress  = 0x80000000;       /* Base address of DDR2 */
+    ibl.bootModes[1].u.ethBoot.blob.sizeBytes     = 0x20000000;       /* All of DDR2 */
+    ibl.bootModes[1].u.ethBoot.blob.branchAddress = 0x80000000;       /* Base of DDR2 */
 
 	ibl.chkSum = 0;
 

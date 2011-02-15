@@ -62,7 +62,7 @@
  * Declaration: The base address of the i2c ROM being created. This is just
  *              the I2C bus address. The default is 0x50
  *************************************************************************************/
-int i2cRomBase = 0x50;
+int i2cRomBase = IBL_CFG_I2C_MAP_TABLE_DATA_BUS_ADDR;
 
 /*************************************************************************************
  * Declaration: The flex input file is assigned based on the command line
@@ -475,7 +475,7 @@ void assignKeyVal (int field, int value)
 
         case CORE_FREQ_MHZ:    
                                #ifdef c661x
-                                   if (current_table.common.boot_mode = BOOT_MODE_SPI)  {
+                                   if (current_table.common.boot_mode == BOOT_MODE_SPI)  {
                                         current_table.spi.cpuFreqMhz = value;
                                         break;
                                    }

@@ -129,8 +129,8 @@
  *   The PSC numbers for EMIF16 and SPI vary between devices. The devices are run time
  *   identified by reading the JTAG ID register 
  */
-#define DEVICE_C6616_JTAG_ID_VAL    0x9d02f
-#define DEVICE_C6618_JTAG_ID_VAL    0x9e02f
+#define DEVICE_C6616_JTAG_ID_VAL    0x9d02f     /* C6670 */
+#define DEVICE_C6618_JTAG_ID_VAL    0x9e02f     /* C6678 */     
 #define DEVICE_JTAG_ID_REG          0x2620018
 
 
@@ -212,6 +212,12 @@ uint32 deviceNandMemBase (int32 cs);
 #define DEVICE_I2C_BASE                 0x02530000
 #define DEVICE_I2C_MODULE_DIVISOR       6
  
+/**
+ * @brief
+ *      The address of the DEVSTAT register
+ */
+#define DEVICE_REG_DEVSTAT              0x02620020
+
 /**
  * @brief
  *     Prototypes for the PLL functions handled outside the main PLL registers
@@ -340,5 +346,11 @@ Int32 targetMacRcv (void *ptr_device, UINT8 *buffer);
  */
 #define deviceConfigureForNor()    0
 
+
+/**
+ *  @brief
+ *      Support for PLL workaround to re-enter ROM boot loader.
+ */
+#define IBL_REENTER_ROM            1
 
 #endif /* _TARGET_H */

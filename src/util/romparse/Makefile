@@ -41,7 +41,7 @@ endif
 all: gen_cdefdep romparse
 
 romparse: cdefdep rparse.tab.o lex.yy.o romparse.c
-	gcc -o romparse -g romparse.c rparse.tab.o lex.yy.o -I../.. -I. -I../../device/$(TARGET) -D$(TARGET)
+	gcc -DIBL_CFG_I2C_MAP_TABLE_DATA_BUS_ADDR=$(I2C_BUS_ADDR) -o romparse -g romparse.c rparse.tab.o lex.yy.o -I../.. -I. -I../../device/$(TARGET) -D$(TARGET)
 
 
 rparse.tab.o: rparse.y

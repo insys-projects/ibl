@@ -460,6 +460,11 @@ void main (void)
     /* Pll configuration is device specific */
     devicePllConfig ();
 
+    /* iblReEnterRom () */
+    if (IBL_REENTER_ROM)
+    {
+        iblReEnterRom ();
+    }
 
     /* Pass control to the boot table processor */
     iblBootBtbl (bFxnTbl, &entry);

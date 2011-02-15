@@ -919,7 +919,8 @@ typedef struct bootEmif4Tbl_s  {
 #define BOOT_MODE_I2C               40
 #define BOOT_MODE_SPI               50
 
-
+/* ROM boot loader re-enter address */
+#define BOOT_ROM_REENTER_ADDRESS    0x20b00008
 
 #endif  /* __TIBOOT_H__ */
 

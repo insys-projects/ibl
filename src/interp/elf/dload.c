@@ -2411,9 +2411,8 @@ int32_t DLOAD_load(LOADER_FILE_DESC *fd, int argc, char** argv, int32_t *entry)
    /*------------------------------------------------------------------------*/
    *entry = 0;
    if (!dyn_module->relocatable)  {
-      return (dload_static_executable(fd, dyn_module));
       *entry = dyn_module->fhdr.e_entry;
-      return (0); 
+      return (dload_static_executable(fd, dyn_module));
    }
 
 #if 0

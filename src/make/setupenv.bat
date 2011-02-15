@@ -31,7 +31,7 @@ REM  Setup the ibl build environment
 REM Modify following lines based on target environment for the toolset installed 
 REM Dependency is related to path for Cygwin and CGEN installed
 
-set PATH=t:\gen\gnu\99-11-01\cygwin-b20\H-i586-cygwin32\bin;C:\PROGRA~1\TEXASI~1\C6000C~1.12\bin
+set PATH=t:\gen\gnu\99-11-01\cygwin-b20\H-i586-cygwin32\bin;C:\PROGRA~1\TEXASI~1\C6000C~.2.0\bin
 set PATH=%PATH%;%SystemRoot%\system32;%SystemRoot%;
 
 set PERL=//t/gen/perl/activestate/5_6_1_635/bin/perl
@@ -39,11 +39,11 @@ set PERLDOS=t:\gen\perl\activestate\5_6_1_635\bin\perl
 
 set CYGWINPATH=//t/gen/gnu/99-11-01/cygwin-b20/H-i586-cygwin32/bin
 set BISONSKEL=t:\gen\gnu\99-11-01\cygwin-b20\share\bison.simple
-set TOOLSC6X=C:/PROGRA~1/TEXASI~1/C6000C~1.12
-set TOOLSC6XDOS=C:\PROGRA~1\TEXASI~1\C6000C~1.12
+set TOOLSC6X=C:/PROGRA~1/TEXASI~1/C6000C~.2.0
+set TOOLSC6XDOS=C:\PROGRA~1\TEXASI~1\C6000C~.2.0
 
-set TOOLC6XSRC=t:\c6xx\cgen6_1_12\c6000\cgtools
-set TOOLC6XDST=C:\PROGRA~1\TEXASI~1\C6000C~1.12
+set TOOLC6XSRC=t:\c6xx\cgen_7_2_0\c6000\cgtools
+set TOOLC6XDST=C:\PROGRA~1\TEXASI~1\C6000C~.2.0
 
 
 rem ************************* Tools Copy/Validation **************************

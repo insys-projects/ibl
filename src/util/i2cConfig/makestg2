@@ -47,6 +47,7 @@ CLEAN_MODULES+=$(addprefix clean_,$(CFG_MODULES))
 
 CSRC= i2cparam.c
 
+CDEFS+= -DIBL_CFG_I2C_MAP_TABLE_DATA_BUS_ADDR=$(I2C_BUS_ADDR) 
 
 # enable debug info in the compile
 UTIL=yes

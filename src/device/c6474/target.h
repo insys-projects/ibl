@@ -212,3 +212,6 @@
  */
 #define deviceReadBootDevice()  BOOT_DEVICE_I2C
 
+#define IBL_REENTER_ROM         0
+#define iblReEnterRom()     
+

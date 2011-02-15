@@ -48,7 +48,7 @@
  *      A global value is used to track the read through the i2c during
  *      the program load.
  */
-uint32 i2cReadAddress;
+uint32 i2cReadAddress, i2cBusAddress;
 
 /**
  *  @brief
@@ -64,7 +64,7 @@ void i2cReadBlock (void)
         while (hwI2cMasterRead (i2cReadAddress & 0xffff,    /* The address on the eeprom of the table */
                                 4,                          /* The number of bytes to read */
                                 iData,                      /* Where to store the bytes */
-                                i2cReadAddress >> 16,       /* The bus address of the eeprom */
+                                i2cBusAddress,              /* The bus address of the eeprom */
                                 IBL_CFG_I2C_ADDR_DELAY)     /* The delay between sending the address and reading data */
     
              != I2C_RET_OK)  {
@@ -83,7 +83,7 @@ void i2cReadBlock (void)
         while (hwI2cMasterRead (i2cReadAddress & 0xffff,    /* The address on the eeprom of the table */
                                 len,                        /* The number of bytes to read */
                                 iData,                      /* Where to store the bytes */
-                                i2cReadAddress >> 16,       /* The bus address of the eeprom */
+                                i2cBusAddress,              /* The bus address of the eeprom */
                                 IBL_CFG_I2C_ADDR_DELAY)     /* The delay between sending the address and reading data */
     
              != I2C_RET_OK)  {
@@ -210,6 +210,7 @@ BOOT_MODULE_FXN_TABLE *iblInitI2c (void)
 
                 }
 
+                i2cBusAddress = i2cReadAddress >>16;
 
                 if (map.length != sizeof(iblBootMap_t))  {
                     iblStatus.mapSizeFail += 1;

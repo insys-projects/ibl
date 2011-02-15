@@ -10,6 +10,7 @@
 #include "device.h"
 #include "pllapi.h"
 #include "spi_api.h"
+#include "spi_loc.h"
 #include "tiboot_c661x.h"       
 
 
@@ -125,6 +126,63 @@ int32 deviceReadBootDevice (void)
 
     return (w);
 }
+
+#define FPGA_BOOT_MODE_REG              0
+#define FPGA_READ_BOOT_MODE_REG_CMD     ((FPGA_BOOT_MODE_REG | 0x80) << 8)
+/**
+ *  @brief
+ *      Re-enter the ROM boot loader if the FPGA boot register
+ *      indicates it was not I2C or SPI boot, this is necessary
+ *      to apply the PLL workaround for ROM boot modes
+ */
+void iblReEnterRom ()
+{
+    uint32      reg =  DEVICE_REG32_R (DEVICE_REG_DEVSTAT);
+    uint32      v;
+    void        (*exit)();
+
+    /* Reset */
+    DEVICE_REG32_W (DEVICE_SPI_BASE(0) + SPI_REG_SPIGCR0, SPI_REG_VAL_SPIGCR0_RESET);
+
+    /* Release Reset */
+    DEVICE_REG32_W (DEVICE_SPI_BASE(0) + SPI_REG_SPIGCR0, SPI_REG_VAL_SPIGCR0_ENABLE);
+
+    /* CS1, CLK, in and out are functional pins, FPGA uses SPI CS1 */
+    DEVICE_REG32_W (DEVICE_SPI_BASE(0) + SPI_REG_SPIPC0, 0xe02);
+
+    /* prescale=7, char len=16 */
+    DEVICE_REG32_W (DEVICE_SPI_BASE(0) + SPI_REG_SPIFMT(0), 0x710);
+
+    /* C2TDELAY=0x6, T2CDELAY=0x3 */
+    DEVICE_REG32_W (DEVICE_SPI_BASE(0) + SPI_REG_SPIDELAY, 0x6030000);
+
+    /* Clear the SPIDAT0 */
+    //DEVICE_REG32_R (DEVICE_SPI_BASE(0) + SPI_REG_SPIDAT0);
+
+    /* Master mode, enable SPI */
+    DEVICE_REG32_W (DEVICE_SPI_BASE(0) + SPI_REG_SPIGCR1, 0x01000003);
+
+    /* Send the read register address to FPGA */
+	DEVICE_REG32_W(DEVICE_SPI_BASE(0) + 0x38, FPGA_READ_BOOT_MODE_REG_CMD);
+
+    chipDelay32(10000);
+
+    /* Check if received the data */
+    v = DEVICE_REG32_R(DEVICE_SPI_BASE(0) + SPI_REG_SPIFLG);
+    if ( v & 0x100)
+    {
+        v = DEVICE_REG32_R(DEVICE_SPI_BASE(0) + SPI_REG_SPIBUF) & 0xff;
+
+        /* Add code to check the boot mode in FPGA register, if not I2C, configure the 
+           devstat with the actual boot mode and re-enter ROM boot loader */
+#if 0
+        exit = (void (*)())BOOT_ROM_REENTER_ADDRESS;
+        (*exit)();
+#endif
+    }
+
+}
+
 
 
 #if (!defined(EXCLUDE_NOR_SPI) || !defined(EXCLUDE_NAND_SPI))

@@ -14,6 +14,7 @@
 #define SPI_REG_SPIGCR1         0x04
 #define SPI_REG_SPIFLG          0x10
 #define SPI_REG_SPIPC0          0x14
+#define SPI_REG_SPIDAT0         0x38
 #define SPI_REG_SPIDAT1         0x3c
 #define SPI_REG_SPIBUF          0x40
 #define SPI_REG_SPIDELAY        0x48

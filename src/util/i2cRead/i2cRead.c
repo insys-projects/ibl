@@ -54,7 +54,7 @@
 
 /* Run time configuration */
 unsigned int   deviceFreqMhz = 1000;
-unsigned short busAddress    = 0x50;
+unsigned short busAddress    = IBL_CFG_I2C_MAP_TABLE_DATA_BUS_ADDR;
 unsigned int   nbytes        = I2C_SIZE_BYTES;
 unsigned int   firstByte     = 0;
 
