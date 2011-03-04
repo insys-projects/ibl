@@ -64,7 +64,7 @@ Int32 hwEmif25Init (int32 cs, int32 busWidth, bool wait, bool nand)
         v = 0;
     else if (busWidth == 16)
         v = 1;
-    else if (busWidth -= 32)
+    else if (busWidth == 32)
         v = 2;
     else
         return (EMIF25_INVALID_BUS_WIDTH);

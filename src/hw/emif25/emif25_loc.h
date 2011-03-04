@@ -37,9 +37,9 @@
 #define _EMIF25_LOC_H
 
 /* Register offsets */
-#define EMIF25_ASYNC_CFG_REG(x)       (0x10 + (((x)-2)*4))
+#define EMIF25_ASYNC_CFG_REG(x)       (0x10 + (x)*4)
 #define EMIF25_FLASH_CTL_REG          0x60
-#define EMIF25_FLASH_ECC_REG(x)       (0xc0 + (((x)-2)*4))
+#define EMIF25_FLASH_ECC_REG(x)       (0xc0 + (x)*4)
 
 /* Setting the bus width in the async config register */
 #define EMIF25_SET_ASYNC_WID(x,v)     BOOT_SET_BITFIELD((x),(v),1,0)

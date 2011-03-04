@@ -12,6 +12,53 @@
 #include "emif4_loc.h"
 #include "device.h"
 
+#define CHIP_LEVEL_REG  0x02620000
+
+#define KICK0			*(volatile unsigned int*)(CHIP_LEVEL_REG + 0x0038)
+#define KICK1			*(volatile unsigned int*)(CHIP_LEVEL_REG + 0x003C)
+
+#define DDR3PLLCTL0		*(volatile unsigned int*)(CHIP_LEVEL_REG + 0x0330)
+
+// DDR3 definitions
+#define DDR_BASE_ADDR 0x21000000
+
+#define DDR_MIDR               (*(volatile unsigned int*)(DDR_BASE_ADDR + 0x00000000))
+#define DDR_SDCFG              (*(volatile unsigned int*)(DDR_BASE_ADDR + 0x00000008))
+#define DDR_SDRFC              (*(volatile unsigned int*)(DDR_BASE_ADDR + 0x00000010))
+#define DDR_SDTIM1             (*(volatile unsigned int*)(DDR_BASE_ADDR + 0x00000018))
+#define DDR_SDTIM2             (*(volatile unsigned int*)(DDR_BASE_ADDR + 0x00000020))
+#define DDR_SDTIM3             (*(volatile unsigned int*)(DDR_BASE_ADDR + 0x00000028))
+#define DDR_PMCTL              (*(volatile unsigned int*)(DDR_BASE_ADDR + 0x00000038))
+#define DDR_RDWR_LVL_RMP_CTRL  (*(volatile unsigned int*)(DDR_BASE_ADDR + 0x000000D8))
+#define DDR_RDWR_LVL_CTRL      (*(volatile unsigned int*)(DDR_BASE_ADDR + 0x000000DC))
+#define DDR_DDRPHYC            (*(volatile unsigned int*)(DDR_BASE_ADDR + 0x000000E4))
+
+#define DATA0_GTLVL_INIT_RATIO	(*(volatile unsigned int*)(0x0262043C))
+#define DATA1_GTLVL_INIT_RATIO	(*(volatile unsigned int*)(0x02620440))
+#define DATA2_GTLVL_INIT_RATIO	(*(volatile unsigned int*)(0x02620444))
+#define DATA3_GTLVL_INIT_RATIO	(*(volatile unsigned int*)(0x02620448))
+#define DATA4_GTLVL_INIT_RATIO	(*(volatile unsigned int*)(0x0262044C))
+#define DATA5_GTLVL_INIT_RATIO	(*(volatile unsigned int*)(0x02620450))
+#define DATA6_GTLVL_INIT_RATIO	(*(volatile unsigned int*)(0x02620454))
+#define DATA7_GTLVL_INIT_RATIO	(*(volatile unsigned int*)(0x02620458))
+#define DATA8_GTLVL_INIT_RATIO	(*(volatile unsigned int*)(0x0262045C))
+
+#define RDWR_INIT_RATIO_0	(*(volatile unsigned int*)(0x0262040C))
+#define RDWR_INIT_RATIO_1	(*(volatile unsigned int*)(0x02620410))
+#define RDWR_INIT_RATIO_2	(*(volatile unsigned int*)(0x02620414))
+#define RDWR_INIT_RATIO_3	(*(volatile unsigned int*)(0x02620418))
+#define RDWR_INIT_RATIO_4	(*(volatile unsigned int*)(0x0262041C))
+#define RDWR_INIT_RATIO_5	(*(volatile unsigned int*)(0x02620420))
+#define RDWR_INIT_RATIO_6	(*(volatile unsigned int*)(0x02620424))
+#define RDWR_INIT_RATIO_7	(*(volatile unsigned int*)(0x02620428))
+#define RDWR_INIT_RATIO_8	(*(volatile unsigned int*)(0x0262042C))
+
+#define DDR3_CONFIG_REG_0   (*(volatile unsigned int*)(0x02620404))
+#define DDR3_CONFIG_REG_12  (*(volatile unsigned int*)(0x02620434))
+#define DDR3_CONFIG_REG_13  (*(volatile unsigned int*)(0x02620460))
+#define DDR3_CONFIG_REG_23  (*(volatile unsigned int*)(0x02620460))
+#define DDR3_CONFIG_REG_24  (*(volatile unsigned int*)(0x02620464))
+
 /*************************************************************************************************
  * FUNCTION PUROPSE: Initial EMIF4 setup
  *************************************************************************************************
@@ -21,6 +68,7 @@ SINT16 hwEmif4p0Enable (iblEmif4p0_t *cfg)
 {
     UINT32 v;
 
+#if 0
     /* If the config registers or refresh control registers are being written
      * disable the initialization sequence until they are all setup */
     if ((cfg->registerMask & EMIF4_INIT_SEQ_MASK) != 0)  {
@@ -107,6 +155,66 @@ SINT16 hwEmif4p0Enable (iblEmif4p0_t *cfg)
     v = cfg->sdRamRefreshCtl;
     EMIF_REG_VAL_SDRAM_REF_CTL_SET_INITREF_DIS(v,0);
     DEVICE_REG32_W (DEVICE_EMIF4_BASE + EMIF_REG_SDRAM_REF_CTL, v);
+#endif
+    KICK0 = 0x83E70B13;
+    KICK1 = 0x95A4F1E0;
+    
+    DDR3PLLCTL0 = 0x100807C1;
+
+    DDR_SDTIM1   = 0x0CCF369B;
+    DDR_SDTIM2   = 0x3A3F7FDA;
+    DDR_SDTIM3   = 0x057F83A8;
+    DDR_PMCTL   |= (0x9 << 4); // Set up SR_TIM to Enter self-refresh after 4096 clocks
+   
+    DDR_DDRPHYC  = 0x0010010B;
+   
+    DDR_SDRFC = 0x00004111; //500us
+
+    
+    DDR_SDCFG    = 0x63C51A32; //0x63C51A32;    //row-col = 13-10
+   
+	
+	//Values with invertclkout = 0
+	DATA0_GTLVL_INIT_RATIO = 0x3C;
+	DATA1_GTLVL_INIT_RATIO = 0x3C;
+	DATA2_GTLVL_INIT_RATIO = 0x23;
+	DATA3_GTLVL_INIT_RATIO = 0x2D;
+	DATA4_GTLVL_INIT_RATIO = 0x13;
+	DATA5_GTLVL_INIT_RATIO = 0x11;
+	DATA6_GTLVL_INIT_RATIO = 0x9;
+	DATA7_GTLVL_INIT_RATIO = 0xC;
+	//DATA8_GTLVL_INIT_RATIO = 0x21; //ECC byte lane. Don't care as long as you don't enable ECC by software
+	
+	//Values with invertclkout = 0	
+	RDWR_INIT_RATIO_0 = 0x0;
+	RDWR_INIT_RATIO_1 = 0x0;
+	RDWR_INIT_RATIO_2 = 0x0;
+	RDWR_INIT_RATIO_3 = 0x0;
+	RDWR_INIT_RATIO_4 = 0x0;
+	RDWR_INIT_RATIO_5 = 0x0;
+	RDWR_INIT_RATIO_6 = 0x0;
+	RDWR_INIT_RATIO_7 = 0x0;
+	//RDWR_INIT_RATIO_8 = 0x0; //ECC byte lane. Don't care as long as you don't enable ECC by software
+	
+	
+	
+	//GEL_TextOut("\nProgrammed initial ratios.\n");
+	
+	DDR3_CONFIG_REG_0 = DDR3_CONFIG_REG_0 | 0xF;
+	
+	//DDR3_CONFIG_REG_23 = RD_DQS_SLAVE_RATIO_1066 | (WR_DQS_SLAVE_RATIO_1066 << 10) | (WR_DATA_SLAVE_RATIO_1066 << 20);
+
+	DDR3_CONFIG_REG_23 |= 0x00000200; //Set bit 9 = 1 to use forced ratio leveling for read DQS
+	//GEL_TextOut("\nSet bit 9 = 1 for forced ratio read eye leveling.\n");
+
+	DDR_RDWR_LVL_RMP_CTRL = 0x80000000; //enable full leveling
+    DDR_RDWR_LVL_CTRL = 0x80000000; //Trigger full leveling - This ignores read DQS leveling result and uses ratio forced value 							//(0x34) instead
+	//GEL_TextOut("\n Triggered full leveling.\n");
+
+   	DDR_SDTIM1; //Read MMR to ensure full leveling is complete
+    
+    	DDR_SDRFC    = 0x00001040; //Refresh rate = Round[7.8*666.5MHz] = 0x1450
+	
 
     return (0);
 

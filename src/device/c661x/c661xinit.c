@@ -127,21 +127,49 @@ int32 deviceReadBootDevice (void)
     return (w);
 }
 
-#define FPGA_BOOT_MODE_REG              0
-#define FPGA_READ_BOOT_MODE_REG_CMD     ((FPGA_BOOT_MODE_REG | 0x80) << 8)
+#define L1PEDCMD	    0x01846408
+#define L2EDCEN		    0x01846030
+#define L2EDCMD		    0x01846008
+#define SMEDCC		    0x0BC00010
 /**
  *  @brief
- *      Re-enter the ROM boot loader if the FPGA boot register
- *      indicates it was not I2C or SPI boot, this is necessary
- *      to apply the PLL workaround for ROM boot modes
+ *      Enable the EDC for the local memory 
  */
-void iblReEnterRom ()
+void iblEnableEDC ()
+{
+    /* Enable L1P EDC */
+    *(volatile unsigned int *)(L1PEDCMD) = 0x1;	//Set EN(bit0)=1	
+
+    /* Enable EDC L2EDCEN, set DL2CEN(bit0),PL2CEN(bit1),DL2SEN(bit2),PL2SEN(bit3),SDMAEN(bit4)=1 */
+	*(volatile unsigned int *)(L2EDCEN) |= 0x1F;	
+
+    /* Enalble L2 EDC */
+    *(volatile unsigned int *)(L2EDCMD) = 0x1;
+
+    /* Enalbe MSMC EDC */
+    *(volatile unsigned int *)(SMEDCC) &= 0x7FFFFFFF;	//Clear SEN(bit31)=0	
+	*(volatile unsigned int *)(SMEDCC) |= 0x40000000;	//Set ECM(bit30)=1	
+}
+
+#define FPGA_BM_GPI_STATUS_LO_REG           4   /* Boot Mode GPI Status (07-00 Low Byte) Register */
+#define FPGA_BM_GPI_STATUS_HI_REG           5   /* Boot Mode GPI Status (15-08 High Byte) Register */
+#define FPGA_READ_REG_CMD(x)                ((x | 0x80) << 8)
+/**
+ * @brief
+ *      Enter the ROM boot loader if the FPGA boot register
+ *      indicates it was not I2C address 0x51 boot, this is necessary
+ *      to apply the PLL workaround for non-I2C boot modes
+ */
+void iblEnterRom ()
 {
     uint32      reg =  DEVICE_REG32_R (DEVICE_REG_DEVSTAT);
-    uint32      v;
+    uint32      v, dev_stat, bm_lo, bm_hi;
     void        (*exit)();
 
-    /* Reset */
+    /* Power up the SPI */
+    devicePowerPeriph (TARGET_PWR_SPI);
+
+    /* Reset SPI */
     DEVICE_REG32_W (DEVICE_SPI_BASE(0) + SPI_REG_SPIGCR0, SPI_REG_VAL_SPIGCR0_RESET);
 
     /* Release Reset */
@@ -162,28 +190,61 @@ void iblReEnterRom ()
     /* Master mode, enable SPI */
     DEVICE_REG32_W (DEVICE_SPI_BASE(0) + SPI_REG_SPIGCR1, 0x01000003);
 
-    /* Send the read register address to FPGA */
-	DEVICE_REG32_W(DEVICE_SPI_BASE(0) + 0x38, FPGA_READ_BOOT_MODE_REG_CMD);
-
+    /* Read the BM status lo register */
+	DEVICE_REG32_W(DEVICE_SPI_BASE(0) + 0x38, FPGA_READ_REG_CMD(FPGA_BM_GPI_STATUS_LO_REG));
     chipDelay32(10000);
-
-    /* Check if received the data */
     v = DEVICE_REG32_R(DEVICE_SPI_BASE(0) + SPI_REG_SPIFLG);
     if ( v & 0x100)
     {
-        v = DEVICE_REG32_R(DEVICE_SPI_BASE(0) + SPI_REG_SPIBUF) & 0xff;
-
-        /* Add code to check the boot mode in FPGA register, if not I2C, configure the 
-           devstat with the actual boot mode and re-enter ROM boot loader */
-#if 0
-        exit = (void (*)())BOOT_ROM_REENTER_ADDRESS;
-        (*exit)();
-#endif
+        bm_lo = DEVICE_REG32_R(DEVICE_SPI_BASE(0) + SPI_REG_SPIBUF) & 0xff;
+    }
+    else
+    {
+        return;
     }
 
+    /* Read the BM status hi register */
+	DEVICE_REG32_W(DEVICE_SPI_BASE(0) + 0x38, FPGA_READ_REG_CMD(FPGA_BM_GPI_STATUS_HI_REG));
+    chipDelay32(10000);
+    v = DEVICE_REG32_R(DEVICE_SPI_BASE(0) + SPI_REG_SPIFLG);
+    if ( v & 0x100)
+    {
+        bm_hi = DEVICE_REG32_R(DEVICE_SPI_BASE(0) + SPI_REG_SPIBUF) & 0xff;
+    }
+    else
+    {
+        return;
+    }
+
+    /* Reset SPI */
+    DEVICE_REG32_W (DEVICE_SPI_BASE(0) + SPI_REG_SPIGCR0, SPI_REG_VAL_SPIGCR0_RESET);
+
+    if ( (BOOT_READ_BITFIELD(bm_lo,3,1) != 0x5)     ||
+         (BOOT_READ_BITFIELD(bm_hi,3,3) == 0x0) )    
+    { 
+        /* Not i2c boot or i2c boot with address 0x50 */
+
+        /* Update the DEVSTAT to v1 */
+        dev_stat = DEVICE_REG32_R(DEVICE_REG_DEVSTAT );
+        dev_stat &= ~(0x0000080E);
+        dev_stat |= ((bm_hi << 8) | bm_lo);
+#if 0        
+        /* Unlock Boot Config */
+        *((volatile Uint32 *)0x2620038) = 0x83e70b13;
+        *((volatile Uint32 *)0x262003c) = 0x95a4f1e0;
+#endif
+        
+        /* Update the DEVSTAT register for the intended Boot Device and i2c Addr */
+        DEVICE_REG32_W (DEVICE_REG_DEVSTAT, dev_stat);
+#if 0        
+        /* Lock Boot Config */
+        *((volatile Uint32 *)0x2620038) = 0;
+        *((volatile Uint32 *)0x262003c) = 0;
+#endif        
+        exit = (void (*)())BOOT_ROM_ENTER_ADDRESS;
+        (*exit)();        
+    }
 }
-
-
 
 #if (!defined(EXCLUDE_NOR_SPI) || !defined(EXCLUDE_NAND_SPI))
 /**

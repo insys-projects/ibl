@@ -123,7 +123,7 @@ Uint32 deviceLocalAddrToGlobal (Uint32 addr)
 void deviceDdrConfig (void)
 {
     /* The emif registers must be made visible. MPAX mapping 2 is used */
-    DEVICE_REG_XMPAX_L(2) =  0x10000000 | 0xf6;     /* replacement addr + perm*/
+    DEVICE_REG_XMPAX_L(2) =  0x10000000 | 0xff;     /* replacement addr + perm*/
     DEVICE_REG_XMPAX_H(2) =  0x2100000B;         /* base addr + seg size (64KB)*/	
 
     if (ibl.ddrConfig.configDdr != 0)
@@ -497,18 +497,34 @@ void targetFreeQs (void)
     
 }    
 
-
+extern nandCtbl_t nandEmifCtbl;
 /**
- *  @brief Return the NAND interface (EMIF25 or SPI) used based on the value
+ *  @brief Return the NAND interface (GPIO, EMIF25 or SPI) used based on the value
  *         of interface
  */
+#ifndef EXCLUDE_NAND_GPIO
+nandCtbl_t nandGpioCtbl =  {
+
+    nandHwGpioDriverInit,
+    nandHwGpioDriverReadBytes,
+    nandHwGpioDriverReadPage,
+    nandHwGpioDriverClose
+
+};
+#endif
+
 #ifndef EXCLUDE_NAND_EMIF
+extern Int32 nandHwEmifDriverInit (int32 cs, void *vdevInfo);
+extern Int32 nandHwEmifDriverReadBytes (Uint32 block, Uint32 page, Uint32 byte, Uint32 nbytes, Uint8 *data);
+extern Int32 nandHwEmifDriverReadPage (Uint32 block, Uint32 page, Uint8 *data);
+extern Int32 nandHwEmifDriverClose (void);
+
 nandCtbl_t nandEmifCtbl =  {
 
-    nandHwDriverInit,
-    nandHwDriverReadBytes,
-    nandHwDriverReadPage,
-    nandHwDriverClose
+    nandHwEmifDriverInit,
+    nandHwEmifDriverReadBytes,
+    nandHwEmifDriverReadPage,
+    nandHwEmifDriverClose
 
 };
 #endif
@@ -527,6 +543,12 @@ nandCtbl_t nandSpiCtbl =  {
 
 nandCtbl_t *deviceGetNandCtbl (int32 interface)
 {
+#ifndef EXCLUDE_NAND_GPIO
+
+    if (interface == ibl_PMEM_IF_GPIO)
+        return (&nandGpioCtbl);
+
+#endif
 
 #ifndef EXCLUDE_NAND_SPI
 

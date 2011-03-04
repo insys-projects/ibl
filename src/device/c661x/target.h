@@ -351,6 +351,12 @@ Int32 targetMacRcv (void *ptr_device, UINT8 *buffer);
  *  @brief
  *      Support for PLL workaround to re-enter ROM boot loader.
  */
-#define IBL_REENTER_ROM            1
+#define IBL_ENTER_ROM              1
+
+/**
+ *  @brief
+ *      Support for enabling EDC for internal memory.
+ */
+#define IBL_ENABLE_EDC             1 
 
 #endif /* _TARGET_H */

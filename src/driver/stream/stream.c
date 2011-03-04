@@ -171,7 +171,7 @@ Int32 stream_open (Uint32 chunk_size)
  */
 Int32 stream_read_peek (Uint8* ptr_data, Int32 num_bytes, Int32 op)
 {
-    Int32 index;
+    Int32 index, read_index;
     Int32 num_bytes_to_read;
     
     /* Determine the number of bytes which can be read. */
@@ -193,8 +193,11 @@ Int32 stream_read_peek (Uint8* ptr_data, Int32 num_bytes, Int32 op)
     {
         /* Copy the data to the "write" index. */
         if (ptr_data != NULL)
-            *(ptr_data + index) = *(stream_mcb.buffer + stream_mcb.read_idx + index);
-
+        {
+            read_index = stream_mcb.read_idx + index;
+            read_index = read_index % MAX_SIZE_STREAM_BUFFER;
+            *(ptr_data + index) = *(stream_mcb.buffer + read_index);
+        }
     }
 
     /* Increment the read index. 

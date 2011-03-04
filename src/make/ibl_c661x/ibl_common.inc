@@ -10,7 +10,7 @@
 
 -c
 -stack 0x800
--heap  0x6000
+-heap  0x8000
 
 
 MEMORY
@@ -18,15 +18,15 @@ MEMORY
 	TEXT_INIT :  origin = 0x800000, length = 0x4000
 	TEXT      :  origin = 0x804000, length = 0xc000
 	STACK     :  origin = 0x810000, length = 0x0800
-	HEAP      :  origin = 0x810800, length = 0x6000
-	DATA_INIT :  origin = 0x816800, length = 0x0400
-	DATA      :  origin = 0x816c00, length = 0x2c00
-	CFG       :  origin = 0x819800, length = 0x0300
-	STAT      :  origin = 0x819b00, length = 0x0200
+	HEAP      :  origin = 0x810800, length = 0x8000
+	DATA_INIT :  origin = 0x818800, length = 0x0400
+	DATA      :  origin = 0x818c00, length = 0x2c00
+	CFG       :  origin = 0x81b800, length = 0x0300
+	STAT      :  origin = 0x81bb00, length = 0x0200
 
-	LINKRAM   :  origin = 0x10819d00, length = 0x0200
-	CPPIRAM   :  origin = 0x10819f00, length = 0x0200
-	PKTRAM    :  origin = 0x1081a100, length = 0x0800
+	LINKRAM   :  origin = 0x1081bd00, length = 0x0200
+	CPPIRAM   :  origin = 0x1081bf00, length = 0x0200
+	PKTRAM    :  origin = 0x1081c100, length = 0x0800
 }
 
 

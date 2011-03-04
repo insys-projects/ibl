@@ -457,6 +457,15 @@ typedef struct iblMdio_s
 
 } iblMdio_t;
 
+/**
+ *  @def ibl_N_ECC_BYTES
+ */
+#define ibl_N_ECC_BYTES             6  /**< The number of ECC bytes to be computed for each page */
+
+/**
+ *  @def ibl_N_BAD_BLOCK_MARKER
+ */
+#define ibl_N_BAD_BLOCK_PAGE      2  /**< The number of pages in each block that has the bad block marker */
 
 /** 
  *  @brief
@@ -476,6 +485,11 @@ typedef struct nandDevInfo_s
     uint32  pageOffset;         /**< Address bits which specify the page number */
     uint32  columnOffset;       /**< Address bits which specify the column number */
     
+    uint32  eccBytesIdx[ibl_N_ECC_BYTES]; 
+                                /**< Index of each ECC byte in each page data */
+    uint32  badBlkMarkIdx[ibl_N_BAD_BLOCK_PAGE]; 
+                                /**< Index of bad block marker in each page data */
+
     uint8   resetCommand;       /**< The command to reset the flash */
     uint8   readCommandPre;     /**< The read command sent before the address */
     uint8   readCommandPost;    /**< The read command sent after the address */

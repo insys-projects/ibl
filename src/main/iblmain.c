@@ -126,10 +126,12 @@ void iblPmemCfg (int32 interface, int32 port, bool enableNand)
 
     switch (interface)  {
 
+        #if (!defined(EXCLUDE_NAND_GPIO))
+
         case ibl_PMEM_IF_GPIO:
                 ret = devicePowerPeriph (TARGET_PWR_GPIO);
                 break;
-
+        #endif
 
         #if (!defined(EXCLUDE_NOR_SPI) && !defined(EXCLUDE_NAND_SPI))
 
@@ -281,7 +283,8 @@ void main (void)
                                     break;
                         #endif
 
-                        #if (!defined(EXCLUDE_NAND_EMIF) && !defined(EXCLUDE_NAND_SPI) && !defined(EXCLUDE_NAND_GPIO))
+                        //#if (!defined(EXCLUDE_NAND_EMIF) && !defined(EXCLUDE_NAND_SPI) && !defined(EXCLUDE_NAND_GPIO))
+                        #if ((!defined(EXCLUDE_NAND_EMIF)) )                                    
                             case ibl_BOOT_MODE_NAND:
                                     iblPmemCfg (ibl.bootModes[j].u.nandBoot.interface, ibl.bootModes[j].port, TRUE);
                                     iblNandBoot (j);

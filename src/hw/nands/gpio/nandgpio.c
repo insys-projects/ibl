@@ -159,7 +159,7 @@ void ptNandConfig (void)
  *  @brief Initialize the driver
  *
  */
-Int32 nandHwDriverInit (int32 cs, void *vdevInfo)
+Int32 nandHwGpioDriverInit (int32 cs, void *vdevInfo)
 {
 	Uint32 cmd;
     nandDevInfo_t *devInfo = (nandDevInfo_t *)vdevInfo;
@@ -246,7 +246,7 @@ Uint32 swapBytes (Uint32 v)
  *     Read a complete page including the extra page bytes.
  */  
 
-Int32 nandHwDriverReadBytes (Uint32 block, Uint32 page, Uint32 byte, Uint32 nbytes, Uint8 *data)
+Int32 nandHwGpioDriverReadBytes (Uint32 block, Uint32 page, Uint32 byte, Uint32 nbytes, Uint8 *data)
 {
 
 	Uint32 addr;
@@ -316,7 +316,7 @@ Int32 nandHwDriverReadBytes (Uint32 block, Uint32 page, Uint32 byte, Uint32 nbyt
  *  @brief
  *     Read a complete page including the extra page bytes
  */  
-Int32 nandHwDriverReadPage(Uint32 block, Uint32 page, Uint8 *data)
+Int32 nandHwGpioDriverReadPage(Uint32 block, Uint32 page, Uint8 *data)
 {
     Int32  ret;
     Int32  i;
@@ -326,7 +326,7 @@ Int32 nandHwDriverReadPage(Uint32 block, Uint32 page, Uint8 *data)
     Uint8  eccCalc[3];
 
     /* Read the page, including the extra bytes */
-    ret = nandHwDriverReadBytes (block, page, 0, hwDevInfo->pageSizeBytes + hwDevInfo->pageEccBytes, data);
+    ret = nandHwGpioDriverReadBytes (block, page, 0, hwDevInfo->pageSizeBytes + hwDevInfo->pageEccBytes, data);
     if (ret < 0)
         return (ret);
 
@@ -356,7 +356,7 @@ Int32 nandHwDriverReadPage(Uint32 block, Uint32 page, Uint8 *data)
  *  @brief
  *      Close the driver
  */
-int32 nandHwDriverClose (void)
+int32 nandHwGpioDriverClose (void)
 {
     return (0);
 

@@ -25,10 +25,18 @@
 #define ibl_BOOT_FORMAT_BIS     2
 #define ibl_BOOT_FORMAT_COFF    3
 #define ibl_BOOT_FORMAT_ELF     4
-#define ibl_BOOT_FORMAT_BBLOB   5
+#define ibl_BOOT_FORMAT_BLOB    5
 #define ibl_BOOT_FORMAT_BTBL    6
 
-#define  ibl_PMEM_IF_SPI        100 
+#define  ibl_PMEM_IF_GPIO         0
+
+#define  ibl_PMEM_IF_CHIPSEL_2    2   /* EMIF interface using chip select 2, no wait enabled */
+#define  ibl_PMEM_IF_CHIPSEL_3    3   /* EMIF interface using chip select 3, no wait enabled */
+#define  ibl_PMEM_IF_CHIPSEL_4    4   /* EMIF interface using chip select 4 */
+#define  ibl_PMEM_IF_CHIPSEL_5    5   /* EMIF interface using chip select 5 */
+
+#define  ibl_PMEM_IF_SPI          100 /* Interface through SPI */
+
 
 #define ibl_MAIN_PLL    0
 #define ibl_DDR_PLL     1
@@ -726,8 +734,8 @@ hotmenu setConfig_c6678()
 	ibl.spiConfig.c2tdelay   = 1;
 	ibl.spiConfig.busFreqMHz = 20;
 
-	ibl.emifConfig[0].csSpace    = 0;
-	ibl.emifConfig[0].busWidth   = 0;
+	ibl.emifConfig[0].csSpace    = 2;
+	ibl.emifConfig[0].busWidth   = 8;
 	ibl.emifConfig[0].waitEnable = 0;
 
 	ibl.emifConfig[1].csSpace    = 0;
@@ -741,9 +749,9 @@ hotmenu setConfig_c6678()
 	ibl.bootModes[0].u.norBoot.bootFormat	= ibl_BOOT_FORMAT_ELF;
 	ibl.bootModes[0].u.norBoot.bootAddress	= 0;
 	ibl.bootModes[0].u.norBoot.interface	= ibl_PMEM_IF_SPI;
-    ibl.bootModes[1].u.norBoot.blob.startAddress  = 0x80000000;       /* Base address of DDR2 */
-    ibl.bootModes[1].u.norBoot.blob.sizeBytes     = 0x20000000;       /* All of DDR2 */
-    ibl.bootModes[1].u.norBoot.blob.branchAddress = 0x80000000;       /* Base of DDR2 */
+    ibl.bootModes[0].u.norBoot.blob.startAddress  = 0x80000000;       /* Base address of DDR2 */
+    ibl.bootModes[0].u.norBoot.blob.sizeBytes     = 0x80000;          /* 512 KB */
+    ibl.bootModes[0].u.norBoot.blob.branchAddress = 0x80000000;       /* Base address of DDR2 */
 
 	ibl.bootModes[1].bootMode = ibl_BOOT_MODE_TFTP;
 	ibl.bootModes[1].priority = ibl_HIGHEST_PRIORITY+1;
@@ -791,4 +799,48 @@ hotmenu setConfig_c6678()
 
 	ibl.chkSum = 0;
 
+}
+
+menuitem "EVM c6678 NAND Boot IBL";
+
+hotmenu setConfig_c6678_nand()
+{
+    /* Nand boot is higher priority */
+    ibl.bootModes[0].bootMode = ibl_BOOT_MODE_NAND;
+    ibl.bootModes[0].priority = ibl_HIGHEST_PRIORITY;
+    ibl.bootModes[0].port     = 0;
+
+    ibl.bootModes[0].u.nandBoot.bootFormat        = ibl_BOOT_FORMAT_ELF;
+    ibl.bootModes[0].u.nandBoot.bootAddress	  = 0;
+    ibl.bootModes[0].u.nandBoot.interface         = ibl_PMEM_IF_CHIPSEL_2;
+    ibl.bootModes[0].u.nandBoot.blob.startAddress  = 0x80000000;       /* Base address of DDR2 */
+    ibl.bootModes[0].u.nandBoot.blob.sizeBytes     = 0x80000;          /* 512 KB */
+    ibl.bootModes[0].u.nandBoot.blob.branchAddress = 0x80000000;       /* Base address of DDR2 */
+
+    ibl.bootModes[0].u.nandBoot.nandInfo.busWidthBits  = 8;
+    ibl.bootModes[0].u.nandBoot.nandInfo.pageSizeBytes = 512;
+    ibl.bootModes[0].u.nandBoot.nandInfo.pageEccBytes  = 16;
+    ibl.bootModes[0].u.nandBoot.nandInfo.pagesPerBlock = 32;
+    ibl.bootModes[0].u.nandBoot.nandInfo.totalBlocks   = 4096;
+
+    ibl.bootModes[0].u.nandBoot.nandInfo.addressBytes  = 4;
+    ibl.bootModes[0].u.nandBoot.nandInfo.lsbFirst      = TRUE;
+    ibl.bootModes[0].u.nandBoot.nandInfo.blockOffset   = 14;
+    ibl.bootModes[0].u.nandBoot.nandInfo.pageOffset    = 9;
+    ibl.bootModes[0].u.nandBoot.nandInfo.columnOffset  = 0;
+
+    ibl.bootModes[0].u.nandBoot.nandInfo.eccBytesIdx[0]  = 0; 
+    ibl.bootModes[0].u.nandBoot.nandInfo.eccBytesIdx[1]  = 1; 
+    ibl.bootModes[0].u.nandBoot.nandInfo.eccBytesIdx[2]  = 2; 
+    ibl.bootModes[0].u.nandBoot.nandInfo.eccBytesIdx[3]  = 3; 
+    ibl.bootModes[0].u.nandBoot.nandInfo.eccBytesIdx[4]  = 6; 
+    ibl.bootModes[0].u.nandBoot.nandInfo.eccBytesIdx[5]  = 7; 
+
+    ibl.bootModes[0].u.nandBoot.nandInfo.badBlkMarkIdx[0]= 5;
+    ibl.bootModes[0].u.nandBoot.nandInfo.badBlkMarkIdx[1]= 0xffff;
+
+    ibl.bootModes[0].u.nandBoot.nandInfo.resetCommand    = 0xff;
+    ibl.bootModes[0].u.nandBoot.nandInfo.readCommandPre  = 0;
+    ibl.bootModes[0].u.nandBoot.nandInfo.readCommandPost = 0;
+    ibl.bootModes[0].u.nandBoot.nandInfo.postCommand     = FALSE;
 }

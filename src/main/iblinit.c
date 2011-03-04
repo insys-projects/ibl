@@ -434,6 +434,8 @@ void main (void)
     iblStatus.iblVersion   = ibl_VERSION;
     iblStatus.activeDevice = ibl_ACTIVE_DEVICE_I2C;
 
+    /* Pll configuration is device specific */
+    devicePllConfig ();
 
     /* Determine the boot device to read from */
     bootDevice = deviceReadBootDevice();
@@ -457,13 +459,16 @@ void main (void)
     }
     
 
-    /* Pll configuration is device specific */
-    devicePllConfig ();
-
-    /* iblReEnterRom () */
-    if (IBL_REENTER_ROM)
+    /* Enable the EDC for local memory */
+    if (IBL_ENABLE_EDC)
     {
-        iblReEnterRom ();
+        iblEnableEDC ();
+    }
+
+    /* Check if need to enter Rom boot loader again */
+    if (IBL_ENTER_ROM)
+    {
+        iblEnterRom ();
     }
 
     /* Pass control to the boot table processor */

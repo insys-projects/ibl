@@ -16,7 +16,7 @@
  *
  * $Log: $
  *
- * (C) Copyright 2004 TELOGY Networks, Inc. 
+ * (C) Copyright 2004 TELOGY Networks, Inc.
  ******************************************************************************/
 #include "types.h"
 
@@ -44,7 +44,7 @@
 enum {
   BOOT_NOERR                = 0,
   BOOT_GEN_ERROR            = 1,    /* General error */
-  BOOT_INVALID_BOOT_MODE    = 2,    
+  BOOT_INVALID_BOOT_MODE    = 2,
   BOOT_INVALID_I2C_DEV_ADDR = 3,
   BOOT_INVALID_CHECKSUM     = 4,    /* Invalid checksum of the boot parameters */
   BOOT_INVALID_PARAMS_SIZE  = 5,    /* the size of boot parameters is too big */
@@ -60,7 +60,7 @@ enum {
   BOOT_PERIPH_POWER         = 15,   /* peripheral failed to powerup */
   BOOT_MAIN_FAIL            = 16,   /* Failed in initial boot setup (wrong core) */
   BOOT_SK_REGISTERSCWP      = 17,   /* Failed at SK_registerSCWP */
-  BOOT_SK_ALLOCSC           = 18,   /* Failed at SK_allocSC */       
+  BOOT_SK_ALLOCSC           = 18,   /* Failed at SK_allocSC */
   BOOT_CPSGMII_CONFIGINDEX  = 19,   /* Failed at wrong CPSGMII config index */
   BOOT_SRIO_CONFIGINDEX     = 20,   /* Failed at wrong SRIO config index */
   BOOT_RETURN_FROM_CHAIN    = 21,   /* Code returned from boot main chaining, should never happen */
@@ -74,18 +74,18 @@ void bootError (UINT16 errorCode);
 /* Error code = (module ID *  100) + module specific error */
 #define BOOT_ERROR_CODE(id, code)     ((UINT16)((id<<8) + code))
 #define BOOT_EXCEPTION(error_code)     bootException(error_code)
-#define BOOT_ERROR(error_code)         bootError(error_code) 
+#define BOOT_ERROR(error_code)         bootError(error_code)
 
 /*******************************************************************************
  * Begin Boot Parameter definitions
  ******************************************************************************/
 
 /*******************************************************************************
- * Boot Parameter Common 
+ * Boot Parameter Common
  ******************************************************************************/
 typedef struct boot_params_common_s{
    UINT16 length;       /* size of the entire boot parameters in bytes */
-   UINT16 checksum;     /* non-zero: 1's complement checksum of the boot 
+   UINT16 checksum;     /* non-zero: 1's complement checksum of the boot
                          *           parameters
                          * zero: checksum is not applicable
                          */
@@ -93,7 +93,7 @@ typedef struct boot_params_common_s{
    UINT16 portNum;
    UINT16 swPllCfg_msw;  /* CPU PLL configuration, MSW */
    UINT16 swPllCfg_lsw;  /* CPU PLL configuration, LSW */
-   
+
    /*                                swPllCfg
     *
     *   /----------------------------------------------------------------\
@@ -101,7 +101,7 @@ typedef struct boot_params_common_s{
     *   |      PLL Ctl     |  multiplier  |  pre-divider  | post divider |
     *   \----------------------------------------------------------------/
     */
-    
+
 #define BOOT_PARAMS_PLL_CFG_CTL_MASK                0xc000
 #define BOOT_PARAMS_PLL_CFG_CTL_SHIFT               14
 
@@ -119,7 +119,7 @@ typedef struct boot_params_common_s{
 
 #define BOOT_PARAMS_PLL_CFG_LSW_POSTDIV_MASK  0x00ff
 #define BOOT_PARAMS_PLL_CFG_LSW_POSTDIV_SHIFT 0
-   
+
 } BOOT_PARAMS_COMMON_T;
 
 typedef struct boot_params_ethernet_s{
@@ -131,7 +131,7 @@ typedef struct boot_params_ethernet_s{
     UINT16 portNum;
     UINT16 swPllCfg_msw;  /* CPU PLL configuration, MSW */
     UINT16 swPllCfg_lsw;  /* CPU PLL configuration, LSW */
-     
+
     /* Etherent specific portion of the Boot Parameters */
     UINT16 options;
     /*
@@ -147,20 +147,20 @@ typedef struct boot_params_ethernet_s{
      *      110 - RMII 10Mbs
      *      111 - RMII 100Mbs
      *
-     * Bit 3: HD:                                      
-     *        0 - Full Duplex                          
-     *        1 - Half Duplex                          
-     * Bit 4: SKIP TX                                           
-     *        0 - Send the Ethernet Ready Frame 
-     *        1 - Skip sending the Ethernet Ready Frame                                              
+     * Bit 3: HD:
+     *        0 - Full Duplex
+     *        1 - Half Duplex
+     * Bit 4: SKIP TX
+     *        0 - Send the Ethernet Ready Frame
+     *        1 - Skip sending the Ethernet Ready Frame
      * Bits 6:5 - Ethernet Initialization
      *      00 - Entire system configured
      *      01 - No initialization of peripherals that are already enabled and running
      *      10 - Reserved
      *      11 - No initialization at all
      *
-     * Other bits:  Reserved 
-     */ 
+     * Other bits:  Reserved
+     */
      #define BOOT_PARAMS_ETH_OPTIONS_MII        0x0000
      #define BOOT_PARAMS_ETH_OPTIONS_RMII       0x0001
      #define BOOT_PARAMS_ETH_OPTIONS_GMII       0x0002
@@ -169,45 +169,45 @@ typedef struct boot_params_ethernet_s{
      #define BOOT_PARAMS_ETH_OPTIONS_S3MII      0x0005
      #define BOOT_PARAMS_ETH_OPTIONS_RMII_10    0x0006
      #define BOOT_PARAMS_ETH_OPTIONS_RMII_100   0x0007
-	
+
 	/* Faraday only supports SGMII */
      #define BOOT_PARAMS_ETH_OPTIONS_SGMII      0x0006
-     
+
      #define BOOT_PARAMS_ETH_OPTIONS_HD         0x0008
      #define BOOT_PARAMS_ETH_OPTIONS_SKIP_TX    0x0010
-    
+
      #define BOOT_PARAMS_ETH_OPTIONS_INIT_MASK  0x0060
      #define BOOT_PARAMS_ETH_OPTIONS_INIT_SHIFT 5
      #define BOOT_PARAMS_ETH_OPTIONS_INIT(x)    (((x) & BOOT_PARAMS_ETH_OPTIONS_INIT_MASK) >> BOOT_PARAMS_ETH_OPTIONS_INIT_SHIFT)
-     
+
      #define BOOT_PARAMS_ETH_OPTIONS_INIT_FULL      0
      #define BOOT_PARAMS_ETH_OPTIONS_INIT_PARTIAL   1
      #define BOOT_PARAMS_ETH_OPTIONS_INIT_NONE      3
-     
-     /* 
+
+     /*
       * he device MAC address to be used for Boot:
       * All zero mac address indicates that the device E-fuse address should
       *  be used.
-      */ 
+      */
      UINT16 mac_addr_h;
      UINT16 mac_addr_m;
      UINT16 mac_addr_l;
-     
-     /* 
+
+     /*
       * The multicast or broadcast MAC address which should be accepted as
       * a destination MAC address for boot table frames
       */
      UINT16 mmac_addr_h;
      UINT16 mmac_addr_m;
      UINT16 mmac_addr_l;
-        
+
      UINT16 src_port;     /* Source UDP port number to be used during boot process */
                           /* 0: allow any SRC UDP port */
      UINT16 dest_port;    /* Destination UDP port number to be used during boot process */
-     
+
      /* The Device ID to be included in the boot ready announcement frame */
-     UINT16 device_id_12;   
-     UINT16 device_id_34;   
+     UINT16 device_id_12;
+     UINT16 device_id_34;
      #define BOOT_PARAMS_DEVICE_ID_HIGH_MASK     0xFF00
      #define BOOT_PARAMS_DEVICE_ID_HIGH_SHIFT    8
      #define BOOT_PARAMS_DEVICE_ID_LOW_MASK      0x00FF
@@ -216,8 +216,8 @@ typedef struct boot_params_ethernet_s{
                (((device_id) & BOOT_PARAMS_DEVICE_ID_HIGH_MASK) > BOOT_PARAMS_DEVICE_ID_HIGH_SHIFT)
      #define BOOT_PARAMS_GET_DEVICE_ID_24(device_id)    \
                (((device_id) & BOOT_PARAMS_DEVICE_ID_LOW_MASK) > BOOT_PARAMS_DEVICE_ID_LOW_SHIFT)
- 
-     /* 
+
+     /*
       * The destination MAC address used for the boot ready announce frame
       */
      UINT16 hmac_addr_h;
@@ -234,7 +234,7 @@ typedef struct boot_params_ethernet_s{
      #define BOOT_PARAMS_SGMII_CONFIG_DIRECT_CONFIG  (1<<4)   /* set to use direct configurations */
      #define BOOT_PARAMS_SGMII_CONFIG_NO_CONFIG      (1<<5)   /* set to bypass CPSGMII config  */
 
-	 UINT16 sgmiiControl;  
+	 UINT16 sgmiiControl;
      #define BOOT_PARAMS_SGMII_CONTROL_MASK 0x7F
 
 	 UINT16 sgmiiMr_Adv_Ability;
@@ -247,10 +247,10 @@ typedef struct boot_params_ethernet_s{
 	 UINT16 sgmiiRx_Cfg_l;
 	 UINT16 sgmiiAux_Cfg_h;
 	 UINT16 sgmiiAux_Cfg_l;
-     
+
      UINT16 pktPllCfg_msw;      /* Packet subsystem PLL configuration */
      UINT16 pktPllCfg_lsw;
-     
+
 }   BOOT_PARAMS_ETHERNET_T;
 
 /**************************************************************************************
@@ -265,9 +265,9 @@ typedef struct boot_params_utopia_s{
     UINT16 portNum;
     UINT16 swPllCfg_msw;  /* CPU PLL configuration, MSW */
     UINT16 swPllCfg_lsw;  /* CPU PLL configuration, LSW */
-     
+
     /* Utopia specific portion of the Boot Parameters */
-    /* Options 
+    /* Options
      *  ---------------------------------------------------------------
      * | 15                          3  |    2    |    1    |    0    |
      * ----------------------------------------------------------------
@@ -279,17 +279,17 @@ typedef struct boot_params_utopia_s{
      *                                           1 = skip port init
      */
     UINT16 options;
-    
+
     #define BOOT_PARAMS_UTOPIA_SINGLE_PHY    (1<<0)
     #define BOOT_PARAMS_UTOPIA_16BIT         (1<<1)
     #define BOOT_PARAMS_UTOPIA_SKIP_INIT     (1<<2)
-    
+
     UINT16 cellSizeBytes;    /* Cell Size */
     UINT16 busWidthBits;     /* Bus width (8 or 16) */
     UINT16 slid;             /* Slave ID  */
     UINT16 coreFreqMhz;      /* CPU frequency after pll mult */
-     
-    
+
+
 } BOOT_PARAMS_UTOPIA_T;
 
 typedef struct boot_params_i2c_s{
@@ -301,75 +301,75 @@ typedef struct boot_params_i2c_s{
     UINT16 portNum;
     UINT16 swPllCfg_msw;  /* CPU PLL configuration, MSW */
     UINT16 swPllCfg_lsw;  /* CPU PLL configuration, LSW */
-    
+
     /* I2C specific portion of the Boot Parameters */
     UINT16 options;
     /*
      * I2C Specific Options
-     * Bit 01-00: BT:                                      
-     *            00 - Boot Parameter Mode                            
-     *            01 - Boot Table Mode                     
+     * Bit 01-00: BT:
+     *            00 - Boot Parameter Mode
+     *            01 - Boot Table Mode
      *            10 - Boot Config mode
      *            11 - Slave receive boot config
-     * Bit 04-02: EETYPE: EEPROM type             
-     * Other bits:  Reserved 
-     */ 
+     * Bit 04-02: EETYPE: EEPROM type
+     * Other bits:  Reserved
+     */
      #define BOOT_PARAMS_I2C_OPTIONS_BP             0x0000
      #define BOOT_PARAMS_I2C_OPTIONS_BT             0x0001
      #define BOOT_PARAMS_I2C_OPTIONS_BC             0x0002
      #define BOOT_PARAMS_I2C_OPTIONS_SLVOPT         0x0003
-     
+
      #define BOOT_PARAMS_I2C_OPTIONS_MASK           0x0003
      #define BOOT_PARAMS_I2C_OPTIONS_SHIFT          0
-     
+
      #define BOOT_PARAMS_I2C_OPTIONS_EETYPE_MASK    0x001C
-     #define BOOT_PARAMS_I2C_OPTIONS_EETYPE_SHIFT   2 
-     
+     #define BOOT_PARAMS_I2C_OPTIONS_EETYPE_SHIFT   2
+
      #define BOOT_PARAMS_I2C_IS_BOOTTBL_MODE(options) \
              (((options) & BOOT_PARAMS_I2C_OPTIONS_MASK) == BOOT_PARAMS_I2C_OPTIONS_BT)
-             
+
      #define BOOT_PARAMS_I2C_IS_BOOTCONFIG_MODE(options) \
              (((options) & BOOT_PARAMS_I2C_OPTIONS_MASK) == BOOT_PARAMS_I2C_OPTIONS_BC)
-             
+
      #define BOOT_PARAMS_I2C_IS_SLAVE_RCV_OPTIONS_MODE(options) \
              (((options) & BOOT_PARAMS_I2C_OPTIONS_MASK) == BOOT_PARAMS_I2C_OPTIONS_SLVOPT)
-             
+
      #define BOOT_PARAMS_I2C_IS_BOOTPARAM_MODE(options) \
              (((options) & BOOT_PARAMS_I2C_OPTIONS_MASK) == BOOT_PARAMS_I2C_OPTIONS_BP)
-             
+
      #define BOOT_PARAMS_I2C_SET_BOOTTBL_MODE(options, mode)               \
              (options) = ((options) & ~BOOT_PARAMS_I2C_OPTIONS_MASK) |     \
                          (((mode)   &  BOOT_PARAMS_I2C_OPTIONS_MASK) <<    \
                                        BOOT_PARAMS_I2C_OPTIONS_SHIFT)
-             
-             
+
+
      #define BOOT_PARAMS_I2C_GET_EETYPE(options)    \
              (((options) & BOOT_PARAMS_I2C_OPTIONS_EETYPE_MASK) >> BOOT_PARAMS_I2C_OPTIONS_EETYPE_SHIFT)
      #define BOOT_PARAMS_I2C_SET_EETYPE(options, ee_type)         \
              (options) = (((options) & ~BOOT_PARAMS_I2C_OPTIONS_EETYPE_MASK) |  \
-                         (((ee_type) << BOOT_PARAMS_I2C_OPTIONS_EETYPE_SHIFT) & BOOT_PARAMS_I2C_OPTIONS_EETYPE_MASK))          
-        
+                         (((ee_type) << BOOT_PARAMS_I2C_OPTIONS_EETYPE_SHIFT) & BOOT_PARAMS_I2C_OPTIONS_EETYPE_MASK))
+
      /* The device address to be used for Boot */
      UINT16 dev_addr;           /* 16-bit device address (low) */
-     UINT16 dev_addr_ext;       /* 16-bit extended device address (high) 
+     UINT16 dev_addr_ext;       /* 16-bit extended device address (high)
                                  * set to zero if not used
-                                 * Note: some I2C device requires 32-bit 
+                                 * Note: some I2C device requires 32-bit
                                  * address
-                                 */ 
+                                 */
      UINT16 multi_i2c_id;      /* Multi device master write boot ID */
      UINT16 my_i2c_id;         /* This parts I2C address            */
-     
+
      UINT16 core_freq_mhz;     /* Core frequency, MHz               */
      UINT16 i2c_clk_freq_khz;  /* Desired I2C clock frequency, kHz  */
-     
+
      UINT16 next_dev_addr;      /* Used only for the boot config mode.         */
      UINT16 next_dev_addr_ext;  /* Copied into dev_addr* after config complete */
-     
+
      UINT16 address_delay;      /* Rough number of cycles delay between address write
                                  * and read to the i2c eeprom */
-     
-     
-} BOOT_PARAMS_I2C_T;   
+
+
+} BOOT_PARAMS_I2C_T;
 
 
 typedef struct boot_params_rapidio_s{
@@ -381,33 +381,33 @@ typedef struct boot_params_rapidio_s{
     UINT16 portNum;
     UINT16 swPllCfg_msw;  /* CPU PLL configuration, MSW */
     UINT16 swPllCfg_lsw;  /* CPU PLL configuration, LSW */
-    
+
     /* Options */
     UINT16 options;
-    
+
     #define BOOT_PARAMS_RIO_OPTIONS_TX_ENABLE    (1<<0)   /* set to enable transmit    */
     #define BOOT_PARAMS_RIO_OPTIONS_BOOT_TABLE   (1<<1)   /* set to use boot tables    */
     #define BOOT_PARAMS_RIO_OPTIONS_NO_CONFIG    (1<<2)   /* set to bypass port config */
     #define BOOT_PARAMS_RIO_OPTIONS_NO_QM_CONFIG (1<<3)   /* set to bypass QM config   */
-    
+
     UINT16 lane_port_setup; /* Lane port configuration                        */
     #define BOOT_PARAMS_RIO_LPS_1X_1X_1X_1X     0       /* 4 ports 1 lane each */
     #define BOOT_PARAMS_RIO_LPS_2X_1X_1X        1       /* 3 ports, lanes 0,1 are a 2 lane port */
     #define BOOT_PARAMS_RIO_LPS_1X_1X_2X        2       /* 3 ports, lanes 2,3 are a 2 lane port */
     #define BOOT_PARAMS_RIO_LPS_2X_2X           3       /* 2 ports, each 2 lanes */
     #define BOOT_PARAMS_RIO_LPS_4X              4       /* 1 port of 4 lanes */
-    
+
     UINT16  cfg_index;      /* The table of base configuration parameters */
-    
-    
-    
+
+
+
     UINT16 node_id;         /* The node id for this device                    */
     UINT16 serdes_ref_clk;  /* The serdes reference clock freq, in hundredths
                              * of MHz (1 MHz would be 100)                    */
     UINT16 link_rate;       /* Data link rate (mega bits per second           */
     UINT16 pf_low;          /* Packet forward range, low                      */
     UINT16 pf_high;         /* Packet forward range, high                     */
-    
+
 } BOOT_PARAMS_RIO_T;
 
 
@@ -420,9 +420,9 @@ typedef struct boot_params_pcie_s
     UINT16 portNum;
     UINT16 swPllCfg_msw;  /* CPU PLL configuration, MSW */
     UINT16 swPllCfg_lsw;  /* CPU PLL configuration, LSW */
-    
+
     UINT16 options;
-    
+
 #define BOOT_PARAMS_PCIE_OPTIONS_COMPUTE_PLL_MASK    (1 << 4)
 #define BOOT_PARAMS_PCIE_OPTIONS_COMPUTE_PLL         (1 << 4)
 #define BOOT_PARAMS_PCIE_OPTIONS_NO_COMPUTE_PLL      (0 << 4)
@@ -444,32 +444,32 @@ typedef struct boot_params_pcie_s
     UINT16 window1Size;     /* Window 1 size */
     UINT16 window2Size;     /* Window 2 size. Valid only if the address width is 32 */
     UINT16 window3Size;     /* Window 3 size. Valid only if the address width is 32 */
-    
+
     UINT16 vendorId;             /* Vendor ID field */
     UINT16 deviceId;             /* Device ID field */
     UINT16 classCodeRevId_Msw;   /* Class code rev ID, MSW */
     UINT16 classCodeRevId_Lsw;   /* Class code rev ID, LSW*/
-    
-    
-    
+
+
+
     UINT16 serdesCfgMsw;    /* Serdes auxillary config, MSW */
     UINT16 serdesCfgLsw;    /* Serdes auxillary config, LSW */
-    
+
     UINT16 serdesCfgLane0Msw;   /* Serdes Lane 0 config, MSW */
     UINT16 serdesCfgLane0Lsw;   /* Serdes Lane 0 config, LSW */
-    
+
     UINT16 serdesCfgLane1Msw;   /* Serdes Lane 1 config, MSW */
     UINT16 serdesCfgLane1Lsw;   /* Serdes Lane 1 config, LSW */
-    
-   
+
+
 } BOOT_PARAMS_PCIE_T;
-    
-    
+
+
 typedef struct boot_params_emif_nor_s  {
     UINT16 waitEnable;
 } boot_params_emif_nor_t;
-    
-    
+
+
 typedef struct boot_params_emif_s
 {
     /* common portion of the Boot parameters */
@@ -479,25 +479,25 @@ typedef struct boot_params_emif_s
     UINT16 portNum;
     UINT16 swPllCfg_msw;  /* CPU PLL configuration, MSW */
     UINT16 swPllCfg_lsw;  /* CPU PLL configuration, LSW */
-    
+
     UINT16 options;
-    
+
     UINT16 type;
 #define BOOT_PARAMS_EMIF_TYPE_NOR  0
 
     UINT16 branchAddrMsw;
     UINT16 branchAddrLsw;
-    
+
     UINT16 csNum;
     UINT16 memWidth;
-    
+
     union  {
       boot_params_emif_nor_t nor;
     } u;
-    
+
 } BOOT_PARAMS_EMIF_T;
-    
-    
+
+
 typedef struct boot_params_vusr_s
 {
     /* common portion of the Boot parameters */
@@ -507,7 +507,7 @@ typedef struct boot_params_vusr_s
     UINT16 portNum;
     UINT16 swPllCfg_msw;  /* CPU PLL configuration, MSW */
     UINT16 swPllCfg_lsw;  /* CPU PLL configuration, LSW */
-    
+
     UINT16 options;
 #define BOOT_PARAMS_VUSR_OPTIONS_NO_INIT_MASK        (1 << 1)
 #define BOOT_PARAMS_VUSR_OPTIONS_NO_INIT             (1 << 1)
@@ -516,42 +516,42 @@ typedef struct boot_params_vusr_s
 #define BOOT_PARAMS_VUSR_OPTIONS_BOOT_TABLE_MASK     (1 << 0)
 #define BOOT_PARAMS_VUSR_OPTIONS_BOOT_TABLE          (1 << 0)
 #define BOOT_PARAMS_VUSR_OPTIONS_HOST_BOOT           (0 << 0)
-    
+
     UINT16 nLanes;          /* The number of lanes to configure */
-    
+
     UINT16 serdesCfgMsw;    /* Serdes auxillary config, MSW */
     UINT16 serdesCfgLsw;    /* Serdes auxillary config, LSW */
-    
+
     UINT16 serdesCfgRxLane0Msw;   /* Serdes Rx Lane 0 config, MSW */
     UINT16 serdesCfgRxLane0Lsw;   /* Serdes Rx Lane 0 config, LSW */
-    
+
     UINT16 serdesCfgTxLane0Msw;   /* Serdes Tx Lane 0 config, MSW */
     UINT16 serdesCfgTxLane0Lsw;   /* Serdes Tx Lane 0 config, LSW */
-    
-    
-    
+
+
+
     UINT16 serdesCfgRxLane1Msw;   /* Serdes Rx Lane 1 config, MSW */
     UINT16 serdesCfgRxLane1Lsw;   /* Serdes Rx Lane 1 config, LSW */
-    
+
     UINT16 serdesCfgTxLane1Msw;   /* Serdes Tx Lane 1 config, MSW */
     UINT16 serdesCfgTxLane1Lsw;   /* Serdes Tx Lane 1 config, LSW */
-    
-    
+
+
     UINT16 serdesCfgRxLane2Msw;   /* Serdes Rx Lane 2 config, MSW */
     UINT16 serdesCfgRxLane2Lsw;   /* Serdes Rx Lane 2 config, LSW */
-    
+
     UINT16 serdesCfgTxLane2Msw;   /* Serdes Tx Lane 2 config, MSW */
     UINT16 serdesCfgTxLane2Lsw;   /* Serdes Tx Lane 2 config, LSW */
-    
-    
+
+
 
     UINT16 serdesCfgRxLane3Msw;   /* Serdes Rx Lane 3 config, MSW */
     UINT16 serdesCfgRxLane3Lsw;   /* Serdes Rx Lane 3 config, LSW */
-    
+
     UINT16 serdesCfgTxLane3Msw;   /* Serdes Tx Lane 3 config, MSW */
     UINT16 serdesCfgTxLane3Lsw;   /* Serdes Tx Lane 3 config, LSW */
-    
-} BOOT_PARAMS_VUSR_T;    
+
+} BOOT_PARAMS_VUSR_T;
 
 typedef struct boot_params_spi_s
 {
@@ -562,58 +562,58 @@ typedef struct boot_params_spi_s
     UINT16 portNum;
     UINT16 swPllCfg_msw;  /* CPU PLL configuration, MSW */
     UINT16 swPllCfg_lsw;  /* CPU PLL configuration, LSW */
-    
+
     UINT16 options;
     /*
      * SPI Specific Options
-     * Bit 01-00: BT:                                      
-     *            00 - Boot Parameter Mode                            
-     *            01 - Boot Table Mode                     
+     * Bit 01-00: BT:
+     *            00 - Boot Parameter Mode
+     *            01 - Boot Table Mode
      *            10 - Boot Config mode
      *            11 - Reserved, but if seen will act as boot parameter table
-     * Other bits:  Reserved 
-     */ 
+     * Other bits:  Reserved
+     */
      #define BOOT_PARAMS_SPI_OPTIONS_BP             0x0000
      #define BOOT_PARAMS_SPI_OPTIONS_BT             0x0001
      #define BOOT_PARAMS_SPI_OPTIONS_BC             0x0002
-     
+
      #define BOOT_PARAMS_SPI_OPTIONS_MASK           0x0003
      #define BOOT_PARAMS_SPI_OPTIONS_SHIFT          0
-     
+
      #define BOOT_PARAMS_SPI_IS_BOOTTBL_MODE(options) \
              (((options) & BOOT_PARAMS_SPI_OPTIONS_MASK) == BOOT_PARAMS_SPI_OPTIONS_BT)
-             
+
      #define BOOT_PARAMS_SPI_IS_BOOTCONFIG_MODE(options) \
              (((options) & BOOT_PARAMS_SPI_OPTIONS_MASK) == BOOT_PARAMS_SPI_OPTIONS_BC)
-             
+
      #define BOOT_PARAMS_SPI_IS_BOOTPARAM_MODE(options) \
              (((options) & BOOT_PARAMS_SPI_OPTIONS_MASK) == BOOT_PARAMS_SPI_OPTIONS_BP)
-             
-             
+
+
      #define BOOT_PARAMS_SPI_SET_BOOTTBL_MODE(options, mode)               \
              (options) = ((options) & ~BOOT_PARAMS_SPI_OPTIONS_MASK) |     \
                          (((mode)   &  BOOT_PARAMS_SPI_OPTIONS_MASK) <<    \
                                        BOOT_PARAMS_SPI_OPTIONS_SHIFT)
-             
-             
+
+
      UINT16 addrWidth;          /* 16 or 24 are the only valid values */
      UINT16 nPins;              /* 4 or 5 pins are the only valid values */
      UINT16 csel;               /* only values 0b10 (cs0 low) or 0b01 (cs1 low) are valid */
      UINT16 mode;               /* Clock phase/polarity. These are the standard SPI modes 0-3 */
      UINT16 c2tdelay;           /* Setup time between chip select assert and the transaction */
-     
+
      UINT16 cpuFreqMhz;         /* Speed the CPU is running after PLL configuration */
      UINT16 busFreqMhz;         /* The speed of the SPI bus, the megahertz portion */
      UINT16 busFreqKhz;         /* The KHz portion of the bus frequency. A frequency of 1.5 MHz would have the value 5 here */
-     
+
      UINT16 read_addr_msw;      /* The base address to read from the SPI, upper 16 bits */
      UINT16 read_addr_lsw;      /* The base address to read from the SPI, lower 16 bits */
-     
+
      UINT16 next_csel;          /* The next chip select to use if in boot config mode, when the config is complete */
      UINT16 next_read_addr_msw; /* The next read address to use if in boot config mode */
      UINT16 next_read_addr_lsw; /* The next read address to use if in boot config mode */
-             
-} BOOT_PARAMS_SPI_T;             
+
+} BOOT_PARAMS_SPI_T;
 
 
 /*
@@ -621,10 +621,10 @@ typedef struct boot_params_spi_s
  * Note: We need to make sure that the structures genertaed by the C-compiler
  *       match with the boot parameter table data format i.e. a set of 16-bit
  *       data array.
- */ 
+ */
 #define BOOT_PARAMS_SIZE_IN_BYTES       128
 typedef union {
-   BOOT_PARAMS_COMMON_T    common;  
+   BOOT_PARAMS_COMMON_T    common;
    BOOT_PARAMS_ETHERNET_T  eth;
    BOOT_PARAMS_I2C_T       i2c;
    BOOT_PARAMS_UTOPIA_T    utopia;
@@ -633,23 +633,23 @@ typedef union {
    BOOT_PARAMS_EMIF_T      emif;
    BOOT_PARAMS_VUSR_T      vusr;
    BOOT_PARAMS_SPI_T       spi;
-   UINT16                  parameter[BOOT_PARAMS_SIZE_IN_BYTES/2]; 
+   UINT16                  parameter[BOOT_PARAMS_SIZE_IN_BYTES/2];
 } BOOT_PARAMS_T;
 
 
 /*******************************************************************************
- * Definition: The time stamp and version number are placed into the stats. 
+ * Definition: The time stamp and version number are placed into the stats.
  *             This will be two characters packed per 16bits . The length
  *             value must be 32 bit divisible
  *******************************************************************************/
-#define BOOT_VERSION_LEN_UINT16    32 
+#define BOOT_VERSION_LEN_UINT16    32
 typedef struct BOOT_VERSION_S {
 
   UINT16 vstring[BOOT_VERSION_LEN_UINT16];
-  
+
 } BOOT_VERSION_T;
 extern BOOT_VERSION_T bootVersion;
-  
+
 
 /*******************************************************************************
  * Definition: Runs time stats that are not initialized on cold boot entry
@@ -670,19 +670,19 @@ typedef struct BOOT_STATS_NONINIT_S {
   #define BOOT_STAGE_DISABLE_CACHE             10
   #define BOOT_STAGE_CHCHE_DISABLED            11
   #define BOOT_STAGE_EXIT                      12
-  #define BOOT_STAGE_ERROR_LOOP                13  
+  #define BOOT_STAGE_ERROR_LOOP                13
   #define BOOT_STAGE_I2C_BOOTCONFIG_LOOP       14
   #define BOOT_STAGE_I2C_SLV_RCV_OPTIONS_LOOP  15
   #define BOOT_STAGE_UTOPIA_MAIN_LOOP          16
   UINT16  coldBootEntries;
-  
+
 } BOOT_STATS_NONINIT_T;
 
 /*******************************************************************************
- * Definition: Run time statistics and error counts. These stats are 
+ * Definition: Run time statistics and error counts. These stats are
  *             initialized on cold boot entry.
  ******************************************************************************/
- 
+
 typedef struct BOOT_STATS_COMMON_S  {
   UINT32    bootStatus;
   UINT16    nColdBootEntries;
@@ -690,11 +690,11 @@ typedef struct BOOT_STATS_COMMON_S  {
   UINT16    nPllWarns;
   UINT16    nResetWarns;
 } BOOT_STATS_COMMON_T;
- 
- 
+
+
 typedef struct BOOT_STATS_MAIN_S {
   UINT16  errorCode;        /* (module ID <<8 ) + module specific error */
-  
+
   /* I2C operation related statistics */
   UINT16  numI2Cpkts;       /* number of I2C boot table packets processed */
   UINT16  numI2CchksumError;/* number of I2C checksum errors */
@@ -703,14 +703,14 @@ typedef struct BOOT_STATS_MAIN_S {
   UINT16  numI2Cretrys;     /* number of I2C retrys due to read access errors */
   UINT16  numI2cWrites;     /* number of I2C master writes to passive devices */
   UINT16  numI2cWriteError; /* number of I2C master write errors              */
-  
+
   UINT16  warmBootEntry;    /* Count of entries into warm boot routine   */
 } BOOT_STATS_MAIN_T;
 
 
 
 /*****************************************************************************
- * Definition: I2C stats, Boot table and Ethernrt stats initialized 
+ * Definition: I2C stats, Boot table and Ethernrt stats initialized
  *             on cold boot entry
  *****************************************************************************/
 typedef struct I2C_STATS_tag
@@ -738,34 +738,34 @@ typedef struct BTBL_STATS_tag
 typedef struct ETH_STATS_tag
 {
   /* MAC packets related statistics */
-  UINT16  uniMacPkts;       /* Count of packets received with valid unicast mac 
+  UINT16  uniMacPkts;       /* Count of packets received with valid unicast mac
                                address   */
   UINT16  multiMacPkts;     /* Count of packets received with valid multicast or
                                broadcast mac address   */
-  UINT16  invalidMacPkts;   /* Count of packets received with invalid mac 
+  UINT16  invalidMacPkts;   /* Count of packets received with invalid mac
                                address   */
   UINT16  invalidLLCPkts;   /* Count of 802.3 packets with wrong LLC/SNAP header */
-  UINT16  nonIpPkts;        /* Count of non-IP packets received with valid 
+  UINT16  nonIpPkts;        /* Count of non-IP packets received with valid
                                MAC address   */
-                               
-  /* IP packets related statistics */                             
+
+  /* IP packets related statistics */
   UINT16  nEra;             /* Number of ERA packets transmitted */
   UINT16  nonIP4Pkts;       /* Count of non-IP4 packets        */
   UINT16  ipfragments;      /* Count of IP fragments received      */
   UINT16  ipTruncatedError; /* Count of truncated IP frame */
   UINT16  nonUDPPkts;       /* Count of IP packets with non-UDP paylaod  */
-  
+
   /* UDP packets related statistics */
   UINT16  udpSizeError;     /* Count of UDP packet with invalid (odd) size */
   UINT16  udpPortError;     /* Count of UDP packets with invalid port number */
   UINT16  udpChksumError;   /* Count of UDP packets with checksum error */
-  
+
   /* Boot table packets related statistics */
   UINT16  nonBtblPkts;      /* Count of UDP packets with invalid boot table paylaod */
-  UINT16  outSeqPkts;       /* Count of out of sequence boot table packets received       
+  UINT16  outSeqPkts;       /* Count of out of sequence boot table packets received
                                i.e. packets with unexpected seq_num      */
   UINT16  expSeqNum;        /* Expected Sequence Number */
-  UINT16  lastSeqNum;       /* Last sequence number received */                             
+  UINT16  lastSeqNum;       /* Last sequence number received */
 
   /* Driver errors */
   UINT16  sizeZeroPackets;  /* Count of packets arriving with 0 size */
@@ -841,7 +841,7 @@ extern volatile UINT32 *p_boot_entry_addr;
 typedef struct bootEmif4Tbl_s  {
 
     UINT32  configSelect;               /* Bit map defining which registers to set */
-    
+
     UINT32  pllPrediv;                  /* Values of all 0s will disable the pll */
     UINT32  pllMult;
     UINT32  pllPostDiv;
@@ -870,10 +870,10 @@ typedef struct bootEmif4Tbl_s  {
     UINT32  eccRange1;
     UINT32  eccRange2;
     UINT32  rdWrtExcThresh;
-    
+
 } BOOT_EMIF4_TBL_T;
 
-#define BOOT_EMIF4_ENABLE_pllCtl                      (1 <<  0)  
+#define BOOT_EMIF4_ENABLE_pllCtl                      (1 <<  0)
 
 #define BOOT_EMIF4_ENABLE_sdRamConfig                 (1 <<  2)
 #define BOOT_EMIF4_ENABLE_sdRamConfig2                (1 <<  3)
@@ -901,11 +901,11 @@ typedef struct bootEmif4Tbl_s  {
 #define BOOT_EMIF4_ENABLE_rdWrtExcThresh              (1 << 25)
 
 #define BOOT_EMIF4_ENABLE_ALL                         0x00ffffff
-    
-    
-    
-    
-/* Hibernation function control */    
+
+
+
+
+/* Hibernation function control */
 #define TIBOOT_CTL_HIBERNATION_MODE1        1
 #define TIBOOT_CTL_HIBERNATION_MODE2        2
 
@@ -919,8 +919,8 @@ typedef struct bootEmif4Tbl_s  {
 #define BOOT_MODE_I2C               40
 #define BOOT_MODE_SPI               50
 
-/* ROM boot loader re-enter address */
-#define BOOT_ROM_REENTER_ADDRESS    0x20b00008
+/* ROM boot loader enter address */
+#define BOOT_ROM_ENTER_ADDRESS      0x20b00000
 
 #endif  /* __TIBOOT_H__ */
 

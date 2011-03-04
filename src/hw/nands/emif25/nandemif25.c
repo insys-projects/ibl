@@ -42,93 +42,139 @@
 #include "ecc.h"
 #include "target.h"
 
+#define NAND_DATA_OFFSET    0x0     /* Data register offset */
+#define NAND_ALE_OFFSET     0x2000  /* Address latch enable register offset */
+#define NAND_CMD_OFFSET     0x4000  /* Command latch enable register offset */
+
+#define NAND_DELAY          50000 
+
+extern void chipDelay32 (uint32 del);
+extern uint32 deviceEmif25MemBase (int32 cs);
+
 int32          gCs;        /* The chip select space */
 uint32         memBase;    /* Base address in device memory map */
 nandDevInfo_t *hwDevInfo;  /* Pointer to the device configuration */
+
+void 
+nandAleSet
+(   
+    Uint32    addr
+)
+{
+    DEVICE_REG32_W (memBase + NAND_ALE_OFFSET, addr);
+}
+
+void 
+nandCmdSet
+(   
+    Uint32    cmd
+)
+{
+    DEVICE_REG32_W (memBase + NAND_CMD_OFFSET, cmd);
+}
+
+void 
+nandReadDataBytes
+(
+    Uint32      nbytes,
+    Uint8*      data
+)
+{
+    Int32   i;
+
+    if (hwDevInfo->busWidthBits == 8)  
+    {
+        for (i = 0; i < nbytes; i++)
+            data[i] = *(volatile Uint8 *)memBase;
+
+    }  else  {
+
+        for (i = 0; i < (nbytes+1) >> 1; i++)
+            data[i] = *(volatile Uint16 *)memBase;
+    }
+}
 
 /**
  *  @brief
  *      Initialize the Nand emif interface 
  */
-Int32 nandHwDriverInit (int32 cs, void *vdevInfo)
+Int32 nandHwEmifDriverInit (int32 cs, void *vdevInfo)
 {
-    nandDevInfo_t *devInfo = (nandDevInfo_t *)vdevInfo;
-    
     gCs       = cs;
-    hwDevInfo = devInfo;
+    hwDevInfo = (nandDevInfo_t *)vdevInfo;
     memBase   = deviceEmif25MemBase (cs);
 
     return (0);
-
 }
 
 /**
  *  @brief
  *      Read bytes without ecc correction
  */
-
-Int32 nandHwDriverReadBytes (Uint32 block, Uint32 page, Uint32 byte, Uint32 nbytes, Uint8 *data)
+Int32 nandHwEmifDriverReadBytes (Uint32 block, Uint32 page, Uint32 byte, Uint32 nbytes, Uint8 *data)
 {
-    Int32   i;
-    Uint32  uAddr;
-    Uint8  *v8Addr;
-    Uint16 *v16Addr;
-    Uint16 *vData;
+    Uint32  addr;
+    Uint32  cmd;
 
-    /* Form the base address */
-    uAddr = memBase + (block << hwDevInfo->blockOffset)  + (page << hwDevInfo->pageOffset) +
-                      (byte  << hwDevInfo->columnOffset);
+    addr = (block << hwDevInfo->blockOffset) | (page << hwDevInfo->pageOffset) | ((byte & 0xff) << hwDevInfo->columnOffset);   
 
-    if (hwDevInfo->busWidthBits == 8)  {
-
-        v8Addr = (Uint8 *)uAddr;
-        for (i = 0; i < nbytes; i++)
-            data[i] = v8Addr[i];
-
-    }  else  {
-
-        v16Addr = (Uint16 *)uAddr;
-        vData   = (Uint16 *)data;
-
-        for (i = 0; i < (nbytes+1) >> 1; i++)
-            vData[i] = v16Addr[i];
-
+    if (byte < 256)
+    {
+        cmd = hwDevInfo->readCommandPre;
+    }
+    else if (byte < 512)
+    {
+        cmd = hwDevInfo->readCommandPre + 1;
+    }
+    else
+    {
+        cmd = 0x50;
     }
 
+    nandCmdSet(cmd); // First cycle send 0
+
+    /* 4 address cycles */
+    nandAleSet((addr >> 0) & 0xFF);     /* A0-A7   1st Cycle, column addr       */
+    nandAleSet((addr >> 9) & 0xFF);     /* A9-A16  2nd Cycle, page addr & blk   */
+    nandAleSet((addr >> 17) & 0xFF);    /* A17-A24 3rd Cycle, block addr        */
+    nandAleSet((addr >> 25) & 0x1);     /* A25-A26 4th Cycle, plane addr        */
+
+    chipDelay32 (NAND_DELAY);
+
+    nandReadDataBytes(nbytes, data);
+
     return (0);
-
-}
-
-/**
- *  @brief
- *      Convert the 32 bit ecc format used by the emif25 into the 3 byte values used by the software
- *      ecc algorithm
- */
-void nand_format_ecc (uint32 v32, Uint8 *v8)
-{
-    /* An intrinsic is used for devices that support the shfl instruction */
-    v32 = TARGET_SHFL(v32);
-
-    v8[0] = (v32 >>  0) & 0xff;
-    v8[1] = (v32 >>  8) & 0xff;
-    v8[1] = (v32 >> 16) & 0x3f;   /* p2048o and p2048e are unused and must be masked out */
-
 }
 
 /**
  *  @brief
  *      Read a complete page of data
  */
-Int32 nandHwDriverReadPage (Uint32 block, Uint32 page, Uint8 *data)
+Int32 nandHwEmifDriverReadPage (Uint32 block, Uint32 page, Uint8 *data)
 {
-    Int32   i;
-    Int32   nSegs;
-    Uint32  v;
-    Uint8  *blockp;
-    Uint32  eccv;
-    Uint8   eccHw[3];
+    Int32   i, j, nSegs;
+    Int32   addr;
+    Uint8  *blockp, *pSpareArea;
+    Uint8   eccCompute[3];
     Uint8   eccFlash[3];
 
+    addr = (block << hwDevInfo->blockOffset) | (page << hwDevInfo->pageOffset);   
+
+    /* Send the read command */
+    nandCmdSet(hwDevInfo->readCommandPre); 
+     
+    /* 4 address cycles */
+    nandAleSet((addr >> 0) & 0xFF);     /* A0-A7   1st Cycle, column addr       */
+    nandAleSet((addr >> 9) & 0xFF);     /* A9-A16  2nd Cycle, page addr & blk   */
+    nandAleSet((addr >> 17) & 0xFF);    /* A17-A24 3rd Cycle, block addr        */
+    nandAleSet((addr >> 25) & 0x1);     /* A25-A26 4th Cycle, plane addr        */
+
+    chipDelay32 (NAND_DELAY);
+
+    /* Read the data */
+    nandReadDataBytes(hwDevInfo->pageSizeBytes + hwDevInfo->pageEccBytes, data);
+    pSpareArea = &data[hwDevInfo->pageSizeBytes];
+     
     /* Break the page into segments of 256 bytes, each with its own ECC */
     nSegs = hwDevInfo->pageSizeBytes >> 8;
 
@@ -136,31 +182,17 @@ Int32 nandHwDriverReadPage (Uint32 block, Uint32 page, Uint8 *data)
         
         blockp = &data[i << 8];
 
-
-        /* Read the ecc bytes stored in the extra page data */
-        nandHwDriverReadBytes (block, page, hwDevInfo->pageSizeBytes + hwDevInfo->pageEccBytes - ((nSegs - i) * 4), 4, (Uint8 *)eccv);
-
-
-        /* Reset the hardware ECC correction by reading the ECC status register */
-        v = DEVICE_REG32_R (DEVICE_EMIF25_BASE + EMIF25_FLASH_ECC_REG(gCs));
-
-        /* Enable ECC */
-        v = DEVICE_REG32_R (DEVICE_EMIF25_BASE + EMIF25_FLASH_CTL_REG);
-        v = v | (1 << (gCs + 8 - 2));
-        DEVICE_REG32_W (DEVICE_EMIF25_BASE + EMIF25_FLASH_CTL_REG, v);
-
-        nandHwDriverReadBytes (block, page, i << 8, 256, blockp);
-
-        /* Read the ECC value computed by the hardware */
-        v = DEVICE_REG32_R (DEVICE_EMIF25_BASE + EMIF25_FLASH_ECC_REG(gCs));
-
         /* Format the ecc values to match what the software is looking for */
-        nand_format_ecc (eccv, eccFlash);
-        nand_format_ecc (v,    eccHw);
+        for (j = 0; j < 3; j++)
+        {
+            eccFlash[j] = pSpareArea[hwDevInfo->eccBytesIdx[i*3+j]];
+        }
 
-        if (eccCorrectData (blockp, eccFlash, eccHw))
+        eccComputeECC(blockp, eccCompute);
+        if (eccCorrectData (blockp, eccFlash, eccCompute))
+        {
             return (NAND_ECC_FAILURE);
-
+        }
     }
 
     return (0);
@@ -173,19 +205,15 @@ Int32 nandHwDriverReadPage (Uint32 block, Uint32 page, Uint8 *data)
  *  @brief
  *      Close the low level driver
  */
-Int32 nandHwDriverClose (void)
+Int32 nandHwEmifDriverClose (void)
 {
-    int32 v;
-
     /* Simply read the ECC to clear the ECC calculation */
-    v = DEVICE_REG32_R (DEVICE_EMIF25_BASE + EMIF25_FLASH_ECC_REG(gCs));
+    DEVICE_REG32_R (DEVICE_EMIF25_BASE + EMIF25_FLASH_ECC_REG(gCs));
 
     return (0);
 
 }
         
-
-
 
 
 
