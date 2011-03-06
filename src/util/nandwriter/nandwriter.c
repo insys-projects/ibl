@@ -419,7 +419,7 @@ int main (void)
     deviceConfigureForNand();
     
     /* Initialize the programming interface */
-    ret = nandHwDriverInit (&devInfo);
+    ret = nandHwEmifDriverInit (&devInfo);
     if (ret != 0)  {
         printf ("nandHwDriverInit failed with error code %d\n", ret);
         free (data);

@@ -283,7 +283,6 @@ void main (void)
                                     break;
                         #endif
 
-                        //#if (!defined(EXCLUDE_NAND_EMIF) && !defined(EXCLUDE_NAND_SPI) && !defined(EXCLUDE_NAND_GPIO))
                         #if ((!defined(EXCLUDE_NAND_EMIF)) )                                    
                             case ibl_BOOT_MODE_NAND:
                                     iblPmemCfg (ibl.bootModes[j].u.nandBoot.interface, ibl.bootModes[j].port, TRUE);

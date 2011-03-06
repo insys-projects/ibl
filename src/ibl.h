@@ -67,7 +67,7 @@
  * @brief
  *  The version number, 1.0.0.0
  */
-#define ibl_VERSION  ibl_MAKE_VERSION(1,0,0,0)
+#define ibl_VERSION  ibl_MAKE_VERSION(1,0,0,1)
 
 
 /**

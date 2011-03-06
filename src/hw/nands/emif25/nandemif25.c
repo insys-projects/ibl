@@ -46,7 +46,13 @@
 #define NAND_ALE_OFFSET     0x2000  /* Address latch enable register offset */
 #define NAND_CMD_OFFSET     0x4000  /* Command latch enable register offset */
 
-#define NAND_DELAY          50000 
+#define NAND_DELAY          50000
+
+#define DEVICE_REG8_W(x,y)  *(volatile Uint8 *)(x)=(y)
+#define DEVICE_REG8_R(x)    (*(volatile Uint8 *)(x))
+
+#define DEVICE_REG16_W(x,y) *(volatile Uint16 *)(x)=(y)
+#define DEVICE_REG16_R(x)   (*(volatile Uint16 *)(x))
 
 extern void chipDelay32 (uint32 del);
 extern uint32 deviceEmif25MemBase (int32 cs);
@@ -61,7 +67,7 @@ nandAleSet
     Uint32    addr
 )
 {
-    DEVICE_REG32_W (memBase + NAND_ALE_OFFSET, addr);
+    DEVICE_REG8_W (memBase + NAND_ALE_OFFSET, addr);
 }
 
 void 
@@ -70,7 +76,7 @@ nandCmdSet
     Uint32    cmd
 )
 {
-    DEVICE_REG32_W (memBase + NAND_CMD_OFFSET, cmd);
+    DEVICE_REG8_W (memBase + NAND_CMD_OFFSET, cmd);
 }
 
 void 
@@ -81,16 +87,20 @@ nandReadDataBytes
 )
 {
     Int32   i;
+    Uint16  *data16;
 
     if (hwDevInfo->busWidthBits == 8)  
     {
         for (i = 0; i < nbytes; i++)
-            data[i] = *(volatile Uint8 *)memBase;
+            data[i] = DEVICE_REG8_R(memBase);
 
-    }  else  {
+    }  
+    else  
+    {
+        data16 = (Uint16 *)data;
 
         for (i = 0; i < (nbytes+1) >> 1; i++)
-            data[i] = *(volatile Uint16 *)memBase;
+            data16[i] = DEVICE_REG16_R(memBase);
     }
 }
 
@@ -103,6 +113,9 @@ Int32 nandHwEmifDriverInit (int32 cs, void *vdevInfo)
     gCs       = cs;
     hwDevInfo = (nandDevInfo_t *)vdevInfo;
     memBase   = deviceEmif25MemBase (cs);
+
+    nandCmdSet(hwDevInfo->resetCommand);
+    chipDelay32 (NAND_DELAY);
 
     return (0);
 }
@@ -118,19 +131,7 @@ Int32 nandHwEmifDriverReadBytes (Uint32 block, Uint32 page, Uint32 byte, Uint32 
 
     addr = (block << hwDevInfo->blockOffset) | (page << hwDevInfo->pageOffset) | ((byte & 0xff) << hwDevInfo->columnOffset);   
 
-    if (byte < 256)
-    {
-        cmd = hwDevInfo->readCommandPre;
-    }
-    else if (byte < 512)
-    {
-        cmd = hwDevInfo->readCommandPre + 1;
-    }
-    else
-    {
-        cmd = 0x50;
-    }
-
+    cmd = hwDevInfo->readCommandPre;
     nandCmdSet(cmd); // First cycle send 0
 
     /* 4 address cycles */

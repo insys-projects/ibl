@@ -228,19 +228,10 @@ void iblEnterRom ()
         dev_stat = DEVICE_REG32_R(DEVICE_REG_DEVSTAT );
         dev_stat &= ~(0x0000080E);
         dev_stat |= ((bm_hi << 8) | bm_lo);
-#if 0        
-        /* Unlock Boot Config */
-        *((volatile Uint32 *)0x2620038) = 0x83e70b13;
-        *((volatile Uint32 *)0x262003c) = 0x95a4f1e0;
-#endif
         
         /* Update the DEVSTAT register for the intended Boot Device and i2c Addr */
         DEVICE_REG32_W (DEVICE_REG_DEVSTAT, dev_stat);
-#if 0        
-        /* Lock Boot Config */
-        *((volatile Uint32 *)0x2620038) = 0;
-        *((volatile Uint32 *)0x262003c) = 0;
-#endif        
+
         exit = (void (*)())BOOT_ROM_ENTER_ADDRESS;
         (*exit)();        
     }

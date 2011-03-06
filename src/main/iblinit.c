@@ -434,8 +434,6 @@ void main (void)
     iblStatus.iblVersion   = ibl_VERSION;
     iblStatus.activeDevice = ibl_ACTIVE_DEVICE_I2C;
 
-    /* Pll configuration is device specific */
-    devicePllConfig ();
 
     /* Determine the boot device to read from */
     bootDevice = deviceReadBootDevice();
@@ -458,6 +456,9 @@ void main (void)
 
     }
     
+
+    /* Pll configuration is device specific */
+    devicePllConfig ();
 
     /* Enable the EDC for local memory */
     if (IBL_ENABLE_EDC)
