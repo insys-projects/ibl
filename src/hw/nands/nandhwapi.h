@@ -78,10 +78,10 @@ typedef struct nandProgramInfo_s
 
 
 /* Driver functions, EMIF and GPIO interface */
-Int32 nandHwDriverInit (int32 cs, void *devInfo);
-Int32 nandHwDriverReadBytes (Uint32 block, Uint32 page, Uint32 byte, Uint32 nbytes, Uint8 *data);
-Int32 nandHwDriverReadPage(Uint32 block, Uint32 page, Uint8 *data);
-Int32 nandHwDriverClose (void);
+Int32 nandHwGpioDriverInit (int32 cs, void *devInfo);
+Int32 nandHwGpioDriverReadBytes (Uint32 block, Uint32 page, Uint32 byte, Uint32 nbytes, Uint8 *data);
+Int32 nandHwGpioDriverReadPage(Uint32 block, Uint32 page, Uint8 *data);
+Int32 nandHwGpioDriverClose (void);
 
 Int32 nandHwDriverWritePage  (Uint32 block, Uint32 page, Uint8 *data, nandProgramInfo_t *winfo);
 Int32 nandHwDriverBlockErase (Uint32 uiBlockNumber, nandProgramInfo_t *winfo);

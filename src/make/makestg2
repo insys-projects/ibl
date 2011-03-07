@@ -53,12 +53,16 @@ include $(IBL_ROOT)/make/$(ARCH)/makedefs.mk
 export ARCH
 export TARGET
 
-.PHONY:  $(TARGETS) i2cRom spiRom compare iblInit iblMain $(MODULES) $(CFG_MODULES)
+.PHONY:  $(TARGETS) i2crom spiRom compare iblInit iblMain $(MODULES) $(CFG_MODULES)
 .PHONY:  utils clean clean_modules hwClean cleant
 
 $(TARGETS): iblMain
 
-
+ifeq ($(TARGET),c661x)
+    HAS_SPI=1
+else
+    HAS_SPI=0
+endif
 
 # The I2C creation options. The I2C map file is run through the C pre-processor to generate
 # the desired I2C mapping. There are three possible configurations - an i2c which has
@@ -113,8 +117,11 @@ else
  endif
 endif
 
+ifeq ($(HAS_SPI),0)
+    SPI_CFG=    
+endif
 
-i2cRom:
+i2crom:
 	$(CC) -ppo -I../cfg/$(TARGET) $(I2C_DEFS) ibl_$(TARGET)/$@.map.pre
 	../util/romparse/romparse $(COMPACT) -rom_base $(I2C_BUS_ADDR) ibl_$(TARGET)/$@.map.pp
 	$(CP) i2crom.ccs ibl_$(TARGET)/$@.ccs
@@ -186,8 +193,10 @@ $(CFG_MODULES):
 	make -C $(IBL_ROOT)/$@/$(ARCH)/make CDEFS='$(MAINDEFS) $(SPI_CFG)' $@
 
 utils:
+ifeq ($(HAS_SPI),1)
 	make -C $(IBL_ROOT)/util/spiWrite TARGET=$(TARGET) SPI_DEFS='$(SPI_DEFS)' MAINDEFS='$(MAINDEFS) $(SPI_CFG)' $(TARGET)
 	make -C $(IBL_ROOT)/util/spiConfig TARGET=$(TARGET) SPI_DEFS='$(SPI_DEFS)' MAINDEFS='$(MAINDEFS) $(SPI_CFG)' $(TARGET)
+endif
 	make -C $(IBL_ROOT)/util/btoccs
 	make -C $(IBL_ROOT)/util/romparse TARGET=$(TARGET)
 	make -C $(IBL_ROOT)/util/i2cRead  TARGET=$(TARGET) $(TARGET) 

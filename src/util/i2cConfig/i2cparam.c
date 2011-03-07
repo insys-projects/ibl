@@ -60,7 +60,7 @@ ibl_t ibl;
 /* The configAddress must be programmed. On images which support both endians
  * there can be two seperate configurations, one for big endian, and one for little */
 unsigned int configBusAddress = I2C_BUS_ADDR;
-unsigned int configAddress    = I2C_MAP_ADDR;
+unsigned int configAddress = I2C_MAP_ADDR;
 
 
 /**

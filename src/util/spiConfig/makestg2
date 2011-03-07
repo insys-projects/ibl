@@ -73,7 +73,7 @@ export TARGET
 .PHONY: spiparam.cmd
 
 $(DEVICES): gen_cdefdep $(MODULES) $(CFG_MODULES) $(OBJS) spiparam.cmd
-	$(LD) -o spiparam_$(TARGET)_$(IEXT).out -m spiparam_$(TARGET)_$(IEXT).map spiparam.$(IEXT).oc ../spiWrite/spiutil.$(IEXT).oc ../../hw/c64x/make/spi.$(IEXT).oc ../../hw/c64x/make/spiutil.$(IEXT).oc $(PLL_OBJS) $(PSC_OBJS) $(TFILES) spiparam.cmd $(RTLIBS)
+	$(LD) -o spiparam_$(TARGET)_$(IEXT).out -m spiparam_$(TARGET)_$(IEXT).map spiparam.$(IEXT).oc ../spiWrite/spiUtil.$(IEXT).oc ../../hw/c64x/make/spi.$(IEXT).oc ../../hw/c64x/make/spiutil.$(IEXT).oc $(PLL_OBJS) $(PSC_OBJS) $(TFILES) spiparam.cmd $(RTLIBS)
 
 $(MODULES):
 	@echo making $@

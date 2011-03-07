@@ -218,10 +218,10 @@ void deviceLoadDefaultEthAddress (uint8 *maddr)
 #ifndef EXCLUDE_NAND_GPIO
 nandCtbl_t nandCtbl =  {
 
-    nandHwDriverInit,
-    nandHwDriverReadBytes,
-    nandHwDriverReadPage,
-    nandHwDriverClose
+    nandHwGpioDriverInit,
+    nandHwGpioDriverReadBytes,
+    nandHwGpioDriverReadPage,
+    nandHwGpioDriverClose
 
 };
 

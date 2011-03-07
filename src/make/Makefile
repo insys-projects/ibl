@@ -67,6 +67,7 @@
 #*          [ENDIAN= both | big | little] 		/* Selects the endian of the build */
 #*          [I2C_BUS_ADDR= 0x50 | 0x51] 		/* The initial I2C bus address */
 #*          [COMPACT_I2C=yes]					/* Mimimizes the size of the I2C */
+#*          [I2C_MAP_ADDR= 0x500 | 0x800] 		/* The IBL configuration parameter offset */
 #*			
 #*
 #* or to make a board specific configuraiton
@@ -190,6 +191,7 @@ else
   ENDIAN_MODE=little
  else
   ENDIAN_MODE=both
+  I2C_MAP_ADDR=0x800
  endif
 endif
 
@@ -198,6 +200,15 @@ endif
 ifndef I2C_BUS_ADDR
  I2C_BUS_ADDR=0x50
 endif
+
+ifndef I2C_MAP_ADDR
+ifeq ($(ENDIAN),big)
+  I2C_MAP_ADDR=0x800
+ else
+  I2C_MAP_ADDR=0x500
+ endif
+endif
+
 
 # The SPI configuration parameters
 ifndef SPI_MODE
@@ -255,29 +266,23 @@ export DEBUG
 
 
 $(IBLS_C6X): 
-	make -f makestg1 ARCH=c64x TARGET=$@ I2C_BUS_ADDR=$(I2C_BUS_ADDR) COMPACT_I2C=$(COMPACT_I2C) ENDIAN_MODE=$(ENDIAN_MODE) CEXCLUDES='$(CEXCLUDES)' SPI_DEFS='$(SPI_DEFS)' $@
+	make -f makestg1 ARCH=c64x TARGET=$@ I2C_BUS_ADDR=$(I2C_BUS_ADDR) I2C_MAP_ADDR=$(I2C_MAP_ADDR) COMPACT_I2C=$(COMPACT_I2C) ENDIAN_MODE=$(ENDIAN_MODE) CEXCLUDES='$(CEXCLUDES)' SPI_DEFS='$(SPI_DEFS)' $@
 
 
 # Configurations for individual evms
-# The c455 EVM has a 128k eeprom (64k at 0x50, 64k at 0x51), so both endians are built with full functionality
+# The c6455 EVM has a 128k eeprom (64k at 0x50, 64k at 0x51), so both endians are built with full functionality
 evm_c6455:
 	make -f makestg1 ARCH=c64x TARGET=c6455 I2C_BUS_ADDR=0x50 COMPACT_I2C=no ENDIAN_MODE=both CEXCLUDES= c6455
 
 # The c6472 EVM has a 128k eeprom (64k at 0x50, 64k at 0x51), so both endians are built with full functionality
 evm_c6472:
-	make -f makestg1 ARCH=c64x TARGET=c6472 I2C_BUS_ADDR=0x50 COMPACT_I2C=no ENDIAN_MODE=both CEXCLUDES= c6472
+	make -f makestg1 ARCH=c64x TARGET=c6472 I2C_BUS_ADDR=0x50 I2C_MAP_ADDR=$(I2C_MAP_ADDR) COMPACT_I2C=no ENDIAN_MODE=both CEXCLUDES= c6472
 
 # The 6474 EVM has a 32k eeprom. A stripped down version is build with only one endian.
 evm_c6474:
-<<<<<<< HEAD:src/make/Makefile
-	make -f makestg1 ARCH=c64x TARGET=c6474 I2C_BUS_ADDR=0x50 COMPACT_I2C=yes ENDIAN_MODE=little CEXCLUDES='ELF NAND_GPIO BIS' I2C_SIZE_BYTES=0x8000 c6474
+	make -f makestg1 ARCH=c64x TARGET=c6474 I2C_BUS_ADDR=0x50 I2C_MAP_ADDR=0x200 COMPACT_I2C=yes ENDIAN_MODE=little CEXCLUDES='ELF NAND_GPIO BIS' I2C_SIZE_BYTES=0x8000 c6474
 	cp ibl_c6474/i2crom.dat ibl_c6474/i2crom_0x50_le.dat
-	make -f makestg1 ARCH=c64x TARGET=c6474 I2C_BUS_ADDR=0x50 COMPACT_I2C=yes ENDIAN_MODE=big CEXCLUDES='ELF NAND_GPIO BIS' I2C_SIZE_BYTES=0x8000 c6474
-=======
-	make -f makestg1 ARCH=c64x TARGET=c6474 I2C_BUS_ADDR=0x50 I2C_MAP_ADDR=0x200 COMPACT_I2C=yes ENDIAN_MODE=little EXCLUDES='ELF NAND BIS' I2C_SIZE_BYTES=0x8000 c6474
-	cp ibl_c6474/i2crom.dat ibl_c6474/i2crom_0x50_le.dat
-	make -f makestg1 ARCH=c64x TARGET=c6474 I2C_BUS_ADDR=0x50 I2C_MAP_ADDR=0x200 COMPACT_I2C=yes ENDIAN_MODE=big EXCLUDES='ELF NAND BIS' I2C_SIZE_BYTES=0x8000 c6474
->>>>>>> 1d09767... C6474: Adding i2c map address to the top level Makefile:src/make/Makefile
+	make -f makestg1 ARCH=c64x TARGET=c6474 I2C_BUS_ADDR=0x50 I2C_MAP_ADDR=0x200 COMPACT_I2C=yes ENDIAN_MODE=big CEXCLUDES='ELF NAND_GPIO BIS' I2C_SIZE_BYTES=0x8000 c6474
 	cp ibl_c6474/i2crom.dat ibl_c6474/i2crom_0x50_be.dat
 
 evm_c6474l:
@@ -297,16 +302,16 @@ evm_c6457:
 EVM_6608_SPI_DEFS= SPI_MODE=1 SPI_ADDR_WIDTH=24 SPI_NPIN=5 SPI_CSEL=2 SPI_C2TDEL=1 SPI_CLKDIV=8 SPI_ROM=1
 
 evm_c6608:
-	make -f makestg1 ARCH=c64x TARGET=c661x I2C=no I2C_BUS_ADDR=0x50 ENDIAN_MODE=little CEXCLUDES=I2C SPI_DEFS='$(EVM_6608_SPI_DEFS)' c661x
+	make -f makestg1 ARCH=c64x TARGET=c661x I2C=no I2C_BUS_ADDR=0x50 I2C_MAP_ADDR=0x500 ENDIAN_MODE=little CEXCLUDES=I2C SPI_DEFS='$(EVM_6608_SPI_DEFS)' c661x
 
 # The 6678 EVM SPI/NOR Boot
 EVM_6678_SPI_DEFS= SPI_MODE=1 SPI_ADDR_WIDTH=24 SPI_NPIN=5 SPI_CSEL=2 SPI_C2TDEL=1 SPI_CLKDIV=8 SPI_ROM=1
 
 evm_c6678_spi:
-	make -f makestg1 ARCH=c64x TARGET=c661x I2C=no I2C_BUS_ADDR=0x51 ENDIAN_MODE=little CEXCLUDES=I2C SPI_DEFS='$(EVM_6608_SPI_DEFS)' c661x
+	make -f makestg1 ARCH=c64x TARGET=c661x I2C=no I2C_BUS_ADDR=0x51 I2C_MAP_ADDR=0x500 ENDIAN_MODE=little CEXCLUDES=I2C SPI_DEFS='$(EVM_6608_SPI_DEFS)' c661x
 
 evm_c6678_i2c:
-	make -f makestg1 I2C_BUS_ADDR=$(I2C_BUS_ADDR) ENDIAN_MODE=$(ENDIAN) ARCH=c64x TARGET=c661x SPI=no SPI_DEFS='$(EVM_6608_SPI_DEFS)' c661x
+	make -f makestg1 I2C_BUS_ADDR=$(I2C_BUS_ADDR) I2C_MAP_ADDR=$(I2C_MAP_ADDR) ENDIAN_MODE=$(ENDIAN) ARCH=c64x TARGET=c661x SPI=no SPI_DEFS='$(EVM_6608_SPI_DEFS)' c661x
 
 test_c661x:
 	make -f makestg1 ARCH=c64x TARGET=c661x ENDIAN_MODE=both CEXCLUDES='NOR_SPI' SPI_DEFS='SPI_ROM=1 SPI_MODE=3 SPI_ADDR_WIDTH=24 SPI_NPIN=5 SPI_CSEL=2 SPI_C2TDEL=8 SPI_CLKDIV=0x20' I2C_BUS_ADDR=0x50 COMPACT_I2C=no c661x

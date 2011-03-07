@@ -89,7 +89,7 @@ endif
 ROMS=
 
 ifeq (,$(findstring I2C, $(EXCLUDES)))
- ROMS+= i2cRom
+ ROMS+= i2crom
 endif
 
 ifeq (,$(findstring SPI, $(EXCLUDES)))
