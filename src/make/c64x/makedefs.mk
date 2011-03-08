@@ -42,7 +42,8 @@ ifeq ($(OS),Linux)
     DIRSEP=/
     PATHSEP=:
 else
-    DIRSEP=$(subst /,\,/)
+#DIRSEP=$(subst /,\,/)
+    DIRSEP=/
     PATHSEP=;
 endif
 
@@ -56,7 +57,8 @@ else
   ALLFARLIB       = $(TOOLSC6XDOS)/lib/rts64plus.lib
 endif
 
-RTLIBS     = $(subst /,$(DIRSEP),$(ALLFARLIB))
+#RTLIBS     = $(subst /,$(DIRSEP),$(ALLFARLIB))
+RTLIBS     = $(subst \,/,$(ALLFARLIB))
 
 # Common compilation flags
 # -c     : disable linker

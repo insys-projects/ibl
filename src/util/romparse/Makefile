@@ -54,7 +54,7 @@ lex.yy.o: rparse.flex
 
 
 clean:
-	rm -f romparse.exe rparse.tab.o lex.yy.o lex.yy.c rparse.tab.c rparse.tab.h
+	rm -f romparse rparse.tab.o lex.yy.o lex.yy.c rparse.tab.c rparse.tab.h
 
 gen_cdefdep:
 	@echo Checking command line dependencies

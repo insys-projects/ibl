@@ -45,7 +45,7 @@ bconvert64x: bconvert64x.c
 
 
 clean:
-	rm -rf bconvert.exe bconvert64x.exe
+	rm -rf bconvert bconvert64x
 
 
 

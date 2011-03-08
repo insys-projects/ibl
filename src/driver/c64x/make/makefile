@@ -91,8 +91,11 @@ C6X_C_DIR+= ;$(IBL_ROOT)/device
 C6X_C_DIR+= ;$(IBL_ROOT)/device/$(TARGET)
 export C6X_C_DIR
 
-vpath % $(subst ;,$(PATHSEP), $(ECODIR)/$(ETHDIR); $(ECODIR)/$(STRMDIR); $(ECODIR)/$(TIMDIR); $(ECODIR)/$(NANDDIR); $(ECODIR)/$(NORDIR) )
-
+vpath % $(ECODIR)/$(ETHDIR)
+vpath % $(ECODIR)/$(STRMDIR)
+vpath % $(ECODIR)/$(TIMDIR)
+vpath % $(ECODIR)/$(NANDDIR)
+vpath % $(ECODIR)/$(NORDIR)
 
 driver: gen_cdefdep makefile $(OBJS)
 
@@ -103,9 +106,5 @@ gen_cdefdep:
 	@echo Checking command line dependencies
 	@echo $(TARGET) $(CDEFS) $(DEBUG) > cdefdep.tmp
 	@sh -c 'if diff -q cdefdep.tmp cdefdep ; then echo same ; else $(CP) cdefdep.tmp cdefdep ; fi '
-
-
-
-
 
 

@@ -57,4 +57,4 @@ ccs2bin.exe: ccs2bin.c
 
 
 clean:
-	-rm -f b2ccs.exe b2i2c.exe ccs2b.exe bfaddsect.exe bfmerge.exe ccs2bin.exe
+	-rm -f b2ccs.exe b2i2c.exe ccs2b.exe bfaddsect.exe bfmerge.exe ccs2bin.exe ccs2bin

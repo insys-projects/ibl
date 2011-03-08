@@ -64,6 +64,16 @@ else
     HAS_SPI=0
 endif
 
+ifeq (EXCLUDE_SPI, $(strip $(findstring EXCLUDE_SPI, $(MAINDEFS))))
+    HAS_SPI=0
+endif
+
+ifeq (EXCLUDE_I2C, $(strip $(findstring EXCLUDE_I2C, $(MAINDEFS))))
+    HAS_I2C=0
+else 
+   HAS_I2C=1
+endif
+
 # The I2C creation options. The I2C map file is run through the C pre-processor to generate
 # the desired I2C mapping. There are three possible configurations - an i2c which has
 # both endians present, or an I2C with only one of the endians
@@ -199,9 +209,11 @@ ifeq ($(HAS_SPI),1)
 endif
 	make -C $(IBL_ROOT)/util/btoccs
 	make -C $(IBL_ROOT)/util/romparse TARGET=$(TARGET)
+ifeq ($(HAS_I2C),1)
 	make -C $(IBL_ROOT)/util/i2cRead  TARGET=$(TARGET) $(TARGET) 
 	make -C $(IBL_ROOT)/util/i2cWrite TARGET=$(TARGET) I2C_SIZE_BYTES=$(I2C_SIZE_BYTES) MAINDEFS='$(MAINDEFS) $(SPI_CFG)' $(TARGET)
 	make -C $(IBL_ROOT)/util/i2cConfig $(TARGET) MAINDEFS='$(MAINDEFS) $(SPI_CFG)' 
+endif
 	make -C $(IBL_ROOT)/util/bconvert
 
 clean: $(CLEAN_MODULES) hwClean
@@ -248,6 +260,8 @@ cleant:
 	rm -rf ibl_$(TARGET)/ibl_objs.inc
 	rm -rf ibl_$(TARGET)/ibl_objs.pp
 	rm -rf ibl_$(TARGET)/ibl_objs.tmp
+	rm -rf ibl_$(TARGET)/spiRom.dat
+	rm -rf ibl_$(TARGET)/spiRom.map.pp
 	
 
 
