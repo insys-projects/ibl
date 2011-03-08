@@ -178,11 +178,6 @@ ifeq ($(EMIF),no)
 
 endif
 
-
-
-
-
-
 # The endian of the build. The default target builds a single ROM image with both endians present
 ifeq ($(ENDIAN),big)
  ENDIAN_MODE=big
@@ -191,7 +186,6 @@ else
   ENDIAN_MODE=little
  else
   ENDIAN_MODE=both
-  I2C_MAP_ADDR=0x800
  endif
 endif
 
@@ -268,11 +262,10 @@ export DEBUG
 $(IBLS_C6X): 
 	make -f makestg1 ARCH=c64x TARGET=$@ I2C_BUS_ADDR=$(I2C_BUS_ADDR) I2C_MAP_ADDR=$(I2C_MAP_ADDR) COMPACT_I2C=$(COMPACT_I2C) ENDIAN_MODE=$(ENDIAN_MODE) CEXCLUDES='$(CEXCLUDES)' SPI_DEFS='$(SPI_DEFS)' $@
 
-
 # Configurations for individual evms
 # The c6455 EVM has a 128k eeprom (64k at 0x50, 64k at 0x51), so both endians are built with full functionality
 evm_c6455:
-	make -f makestg1 ARCH=c64x TARGET=c6455 I2C_BUS_ADDR=0x50 COMPACT_I2C=no ENDIAN_MODE=both CEXCLUDES= c6455
+	make -f makestg1 ARCH=c64x TARGET=c6455 I2C_BUS_ADDR=0x50 I2C_MAP_ADDR=$(I2C_MAP_ADDR) COMPACT_I2C=no ENDIAN_MODE=both CEXCLUDES= c6455
 
 # The c6472 EVM has a 128k eeprom (64k at 0x50, 64k at 0x51), so both endians are built with full functionality
 evm_c6472:
@@ -281,9 +274,9 @@ evm_c6472:
 # The 6474 EVM has a 32k eeprom. A stripped down version is build with only one endian.
 evm_c6474:
 	make -f makestg1 ARCH=c64x TARGET=c6474 I2C_BUS_ADDR=0x50 I2C_MAP_ADDR=0x200 COMPACT_I2C=yes ENDIAN_MODE=little CEXCLUDES='ELF NAND_GPIO BIS' I2C_SIZE_BYTES=0x8000 c6474
-	cp ibl_c6474/i2crom.dat ibl_c6474/i2crom_0x50_le.dat
+	cp ibl_c6474/i2crom.dat ibl_c6474/i2crom_0x50_c6474_le.dat
 	make -f makestg1 ARCH=c64x TARGET=c6474 I2C_BUS_ADDR=0x50 I2C_MAP_ADDR=0x200 COMPACT_I2C=yes ENDIAN_MODE=big CEXCLUDES='ELF NAND_GPIO BIS' I2C_SIZE_BYTES=0x8000 c6474
-	cp ibl_c6474/i2crom.dat ibl_c6474/i2crom_0x50_be.dat
+	cp ibl_c6474/i2crom.dat ibl_c6474/i2crom_0x50_c6474_be.dat
 
 evm_c6474l:
 	make -f makestg1 ARCH=c64x TARGET=c6474 I2C_BUS_ADDR=0x50 I2C_MAP_ADDR=0x200 COMPACT_I2C=yes ENDIAN_MODE=little CEXCLUDES='ELF NAND_GPIO BIS' c6474
