@@ -61,7 +61,7 @@ void i2cReadBlock (void)
     uint32 v;
 
     for (;;) {
-        while (hwI2cMasterRead (i2cReadAddress & 0xffff,    /* The address on the eeprom of the table */
+        while (hwI2cMasterRead (i2cReadAddress,             /* The address on the eeprom of the table */
                                 4,                          /* The number of bytes to read */
                                 iData,                      /* Where to store the bytes */
                                 i2cBusAddress,              /* The bus address of the eeprom */
@@ -80,7 +80,7 @@ void i2cReadBlock (void)
             continue;
 
 
-        while (hwI2cMasterRead (i2cReadAddress & 0xffff,    /* The address on the eeprom of the table */
+        while (hwI2cMasterRead (i2cReadAddress,             /* The address on the eeprom of the table */
                                 len,                        /* The number of bytes to read */
                                 iData,                      /* Where to store the bytes */
                                 i2cBusAddress,              /* The bus address of the eeprom */

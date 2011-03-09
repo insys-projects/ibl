@@ -159,7 +159,7 @@ void hwI2Cinit (UINT16 coreFreqMhz, UINT16 moduleDivisor, UINT16 clkFreqKhz, UIN
  *              of bytes. The byte stream arrives packed in the 16 bit
  *              data stream, and are sent most significant byte first.
  ****************************************************************************/
-I2C_RET hwI2cMasterWrite (UINT16 eeprom_i2c_id, UINT8 *eData, UINT16 nbytes, UINT16 endBusState, BOOL busIsMine)
+I2C_RET hwI2cMasterWrite (UINT32 eeprom_i2c_id, UINT8 *eData, UINT32 nbytes, UINT32 endBusState, BOOL busIsMine)
 {
   UINT32 timeoutCount;
   UINT32 polling;
@@ -303,8 +303,8 @@ I2C_RET hwI2cMasterRead (
   UINT32           byte_addr,
   UINT32           byte_len,
   UINT8           *p_packed_bytes,
-  UINT16           eeprom_i2c_id,
-  UINT16           address_delay)
+  UINT32           eeprom_i2c_id,
+  UINT32           address_delay)
 {
 
   UINT32  str;  
