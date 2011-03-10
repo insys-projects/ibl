@@ -380,6 +380,8 @@ clean:
 	make -C ../util/romparse       clean
 	make -C ../test/test1		   clean
 	make -C ../test/test2		   clean
+	find ../ -name *.oc | xargs rm -f
+	find ../ -name *.dc | xargs rm -f
 
 
 
