@@ -12,7 +12,7 @@
 
 const unsigned int idle_c1 = 0x0001e000;   /* This is an idle instruction */
 
-#pragma DATA_SECTION(idle_c2, "idle_c2")
+#pragma DATA_SECTION(idle_c2, ".idle_c2")
 
 const unsigned int idle_c2 = 0x0001e000;   /* This is an idle instruction */
 
