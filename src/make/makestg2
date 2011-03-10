@@ -176,7 +176,9 @@ iblInit: $(CFG_MODULES) $(MODULES)
 	../util/btoccs/b2i2c ibl_$(TARGET)/ibl.b ibl_$(TARGET)/ibl.i2c.b
 	../util/btoccs/b2ccs ibl_$(TARGET)/ibl.i2c.b ibl_$(TARGET)/ibl_init.i2c.$(IEXT).ccs
 
-	bash ../util/symExtract/symExtract ibl_$(TARGET)/ibl_$(TARGET)_init.map ibl_$(TARGET)/ibl_init_symbols.inc $(COMMON_SYMBOLS)
+	sed -e 's/\\r//' ../util/symExtract/symExtract > ../util/symExtract/symExtract_unix
+	bash ../util/symExtract/symExtract_unix ibl_$(TARGET)/ibl_$(TARGET)_init.map ibl_$(TARGET)/ibl_init_symbols.inc $(COMMON_SYMBOLS)
+	rm -f ../util/symExtract/symExtract_unix
 
 	
 iblMain: iblInit $(CFG_MODULES) $(MODULES)

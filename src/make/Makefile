@@ -382,6 +382,8 @@ clean:
 	make -C ../test/test2		   clean
 	find ../ -name *.oc | xargs rm -f
 	find ../ -name *.dc | xargs rm -f
+	find ../ -name *.oa | xargs rm -f
+	find ../ -name *.da | xargs rm -f
 
 
 
