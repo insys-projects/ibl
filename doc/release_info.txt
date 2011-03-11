@@ -1,7 +1,7 @@
 =====================================================
 C6x Bootloader Release Note
-Version: 0.5.2
-November 2010
+Version: 1.0.0.1
+March 2011
 =====================================================
 
 1) Supported TARGETS:
@@ -25,3 +25,4 @@ November 2010
         make <TARGET>  ENDIAN=[little|big]
         make c6455 ENDIAN=liitle
         make c6455 ENDIAN=big
+
