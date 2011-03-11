@@ -726,7 +726,12 @@ hotmenu setConfig_c6678()
     ibl.bootModes[1].u.ethBoot.blob.branchAddress = 0x80000000;       /* Base of DDR2 */
 
 	ibl.chkSum = 0;
+}
 
+hotmenu setConfig_c6678_emac()
+{
+    ibl.bootModes[0].priority = ibl_HIGHEST_PRIORITY+1;
+    ibl.bootModes[1].priority = ibl_HIGHEST_PRIORITY;
 }
 
 menuitem "EVM c6678 NAND Boot IBL";

@@ -78,9 +78,11 @@ ifneq ($(UTIL),yes)
  ifeq ($(DEBUG),yes)
   CFLAGS  = -c -k -mi200 -ml3 -ms3 -o2 -pm -pds1111 -pds827 -pds824 -pds837 -pds1037 -pds195 -pds97 -pden -pdr $(CPUFLAGS)
  else
-  CFLAGS  = -c -k -mi200 -ml0 -ms3 -o3 -pm -pds1111 -pds827 -pds824 -pds837 -pds1037 -pds195 -pds97 -pden -pdr $(CPUFLAGS)
+# Always compile with -o2 as -o3 can possibly break endian neutral code */
+  CFLAGS  = -c -k -mi200 -ml0 -ms3 -o2 -pm -pds1111 -pds827 -pds824 -pds837 -pds1037 -pds195 -pds97 -pden -pdr $(CPUFLAGS)
  endif
 else
+# Always compile with -o2 as -o3 can possibly break endian neutral code */
  CFLAGS  = -c -k -mi200 -ml3 -ms3 -o2 -pm -pds1111 -pds827 -pds824 -pds837 -pds1037 -pds195 -pds97 -pden -pdr $(CPUFLAGS)
 endif
 
