@@ -584,7 +584,7 @@ hotmenu setConfig_c6455()
 
 menuitem "EVM c6678 IBL";
 
-hotmenu setConfig_c6678()
+hotmenu setConfig_c6678_main()
 {
 	ibl.iblMagic = ibl_MAGIC_VALUE;
 
@@ -705,18 +705,18 @@ hotmenu setConfig_c6678()
     ibl.bootModes[1].u.ethBoot.ethInfo.hwAddress[5] = 0;
 
 
-    ibl.bootModes[1].u.ethBoot.ethInfo.fileName[0]  = 'c';
-    ibl.bootModes[1].u.ethBoot.ethInfo.fileName[1]  = '6';
-    ibl.bootModes[1].u.ethBoot.ethInfo.fileName[2]  = '6';
-    ibl.bootModes[1].u.ethBoot.ethInfo.fileName[3]  = '7';
-    ibl.bootModes[1].u.ethBoot.ethInfo.fileName[4]  = '8';
-    ibl.bootModes[1].u.ethBoot.ethInfo.fileName[5]  = '-';
-    ibl.bootModes[1].u.ethBoot.ethInfo.fileName[6]  = 'l';
-    ibl.bootModes[1].u.ethBoot.ethInfo.fileName[7]  = 'e';
-    ibl.bootModes[1].u.ethBoot.ethInfo.fileName[8]  = '.';
-    ibl.bootModes[1].u.ethBoot.ethInfo.fileName[9]  = 'b';
-    ibl.bootModes[1].u.ethBoot.ethInfo.fileName[10] = 'i';
-    ibl.bootModes[1].u.ethBoot.ethInfo.fileName[11] = 'n';
+    ibl.bootModes[1].u.ethBoot.ethInfo.fileName[0]  = 'a';
+    ibl.bootModes[1].u.ethBoot.ethInfo.fileName[1]  = 'p';
+    ibl.bootModes[1].u.ethBoot.ethInfo.fileName[2]  = 'p';
+    ibl.bootModes[1].u.ethBoot.ethInfo.fileName[3]  = '.';
+    ibl.bootModes[1].u.ethBoot.ethInfo.fileName[4]  = 'o';
+    ibl.bootModes[1].u.ethBoot.ethInfo.fileName[5]  = 'u';
+    ibl.bootModes[1].u.ethBoot.ethInfo.fileName[6]  = 't';
+    ibl.bootModes[1].u.ethBoot.ethInfo.fileName[7]  = '\0';
+    ibl.bootModes[1].u.ethBoot.ethInfo.fileName[8]  = '\0';
+    ibl.bootModes[1].u.ethBoot.ethInfo.fileName[9]  = '\0';
+    ibl.bootModes[1].u.ethBoot.ethInfo.fileName[10] = '\0';
+    ibl.bootModes[1].u.ethBoot.ethInfo.fileName[11] = '\0';
     ibl.bootModes[1].u.ethBoot.ethInfo.fileName[12] = '\0';
     ibl.bootModes[1].u.ethBoot.ethInfo.fileName[13] = '\0';
     ibl.bootModes[1].u.ethBoot.ethInfo.fileName[14] = '\0';
@@ -733,8 +733,6 @@ hotmenu setConfig_c6678_emac()
     ibl.bootModes[0].priority = ibl_HIGHEST_PRIORITY+1;
     ibl.bootModes[1].priority = ibl_HIGHEST_PRIORITY;
 }
-
-menuitem "EVM c6678 NAND Boot IBL";
 
 hotmenu setConfig_c6678_nand()
 {
