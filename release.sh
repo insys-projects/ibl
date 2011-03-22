@@ -2,9 +2,9 @@
 # Generate the source release tarballs
 export IBL_VERSION="1_0_0_1"
 cd ../
-if [ -f ibl_src_$IBL_VERSION.tar ]; then rm ibl_src_$IBL_VERSION.tar; fi
+if [ -f ibl_src_$IBL_VERSION.tgz ]; then rm ibl_src_$IBL_VERSION.tgz; fi
 
-tar -cvf ibl_src_$IBL_VERSION.tar ibl/src ibl/doc
+tar -czf ibl_src_$IBL_VERSION.tgz ibl/src ibl/doc
 
 cd ibl
 # Create directories for binary builds
@@ -12,12 +12,10 @@ if [ -d ibl_bin_$IBL_VERSION ]; then rm -r ibl_bin_$IBL_VERSION; fi
 
 mkdir ibl_bin_$IBL_VERSION
 mkdir ibl_bin_$IBL_VERSION/c6455/
-mkdir ibl_bin_$IBL_VERSION/c6455/le
-mkdir ibl_bin_$IBL_VERSION/c6455/be
+mkdir ibl_bin_$IBL_VERSION/c6455/le-be
 
 mkdir ibl_bin_$IBL_VERSION/c6472/
-mkdir ibl_bin_$IBL_VERSION/c6472/le
-mkdir ibl_bin_$IBL_VERSION/c6472/be
+mkdir ibl_bin_$IBL_VERSION/c6472/le-be
 
 mkdir ibl_bin_$IBL_VERSION/c6474/
 mkdir ibl_bin_$IBL_VERSION/c6474/be
@@ -43,44 +41,39 @@ source src/make/setupenvLnx.sh
 # Build C6455 EVM
 pushd src/make
 make clean
-make c6455 I2C_BUS_ADDR=0x50 I2C_MAP_ADDR=0x500 COMPACT_I2C=no ENDIAN=little 
+make evm_c6455 I2C_MAP_ADDR=0x500
 popd
 # Copy the files to the Binary package
-cp -f src/make/ibl_c6455/i2crom.dat ibl_bin_$IBL_VERSION/c6455/le/i2crom_0x50_c6455_le.dat
-cp -f src/util/i2cWrite/i2cWrite_le.out ibl_bin_$IBL_VERSION/c6455/le/i2cWrite_c6455_le.out
-cp -f src/util/i2cConfig/i2cparam_c6455_le.out ibl_bin_$IBL_VERSION/c6455/le/i2cparam_c6455_le_0x500.out
+cp -f src/make/ibl_c6455/i2crom.dat ibl_bin_$IBL_VERSION/c6455/le-be/i2crom_0x50_c6455.dat
+cp -f src/util/i2cWrite/i2cWrite_le.out ibl_bin_$IBL_VERSION/c6455/le-be/i2cWrite_c6455_le.out
+cp -f src/util/i2cConfig/i2cparam_c6455_le.out ibl_bin_$IBL_VERSION/c6455/le-be/i2cparam_c6455_le_0x500.out
 
 # Build C6455 EVM BE
 pushd src/make
 make clean
-make c6455 I2C_BUS_ADDR=0x50 I2C_MAP_ADDR=0x800 COMPACT_I2C=no ENDIAN=big 
+make evm_c6455 I2C_MAP_ADDR=0x800
 popd
 # Copy the files to the Binary package
-cp -f src/make/ibl_c6455/i2crom.dat ibl_bin_$IBL_VERSION/c6455/be/i2crom_0x50_c6455_be.dat
-cp -f src/util/i2cWrite/i2cWrite_be.out ibl_bin_$IBL_VERSION/c6455/be/i2cWrite_c6455_be.out
-cp -f src/util/i2cConfig/i2cparam_c6455_be.out ibl_bin_$IBL_VERSION/c6455/be/i2cparam_c6455_be_0x800.out
+cp -f src/util/i2cConfig/i2cparam_c6455_le.out ibl_bin_$IBL_VERSION/c6455/le-be/i2cparam_c6455_le_0x800.out
 
 
 # Build C6472 le
 pushd src/make
 make clean
-make c6472 I2C_BUS_ADDR=0x50 I2C_MAP_ADDR=0x500 COMPACT_I2C=no ENDIAN=little 
+make evm_c6472 I2C_MAP_ADDR=0x500
 popd
 # Copy the files to the Binary package
-cp -f src/make/ibl_c6472/i2crom.dat ibl_bin_$IBL_VERSION/c6472/le/i2crom_0x50_c6472_le.dat
-cp -f src/util/i2cWrite/i2cWrite_le.out   ibl_bin_$IBL_VERSION/c6472/le/i2Write_c6472_le.out
+cp -f src/make/ibl_c6472/i2crom.dat ibl_bin_$IBL_VERSION/c6472/le-be/i2crom_0x50_c6472.dat
+cp -f src/util/i2cWrite/i2cWrite_le.out   ibl_bin_$IBL_VERSION/c6472/le-be/i2Write_c6472_le.out
 cp -f src/util/i2cConfig/i2cparam_c6472_le.out ibl_bin_$IBL_VERSION/c6472/le-be/i2cparam_c6472_le_0x500.out
-
 
 # Build C6472 EVM BE
 pushd src/make
 make clean
-make c6472 I2C_BUS_ADDR=0x50 I2C_MAP_ADDR=0x800 COMPACT_I2C=no ENDIAN=big 
+make evm_c6472 I2C_MAP_ADDR=0x800
 popd
 # Copy the files to the Binary package
-cp -f src/make/ibl_c6472/i2crom.dat ibl_bin_$IBL_VERSION/c6472/be/i2crom_0x50_c6472_be.dat
-cp -f src/util/i2cWrite/i2cWrite_be.out   ibl_bin_$IBL_VERSION/c6472/be/i2Write_c6472_be.out
-cp -f src/util/i2cConfig/i2cparam_c6472_be.out ibl_bin_$IBL_VERSION/c6472/be/i2cparam_c6472_be_0x800.out
+cp -f src/util/i2cConfig/i2cparam_c6472_le.out ibl_bin_$IBL_VERSION/c6472/le-be/i2cparam_c6472_le_0x800.out
 
 # Build c6474 EVM
 pushd src/make

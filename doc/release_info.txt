@@ -9,11 +9,16 @@ March 2011
     - C6472
     - C6474
     - C661x
+
 2) Supported ENDIAN
     - big
     - little
+
 3) Required toolset
     - TI CGEN compiler CGT_C6000_7.2.0
+NOTE: TI CGEN compiler CGT_C6000_6.1.12 has to be used for building IBL with
+ENDIAN mode "both".
+ 
 4) Build Instructions
 
     - Change directory to ibl\src\make

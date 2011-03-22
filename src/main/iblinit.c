@@ -241,7 +241,7 @@ void iblSwap (void)
 
 
     for (i = 0; i < ibl_N_ETH_PORTS; i++)  {
-        ibl.sgmiiConfig[i].configure     = swap32val(ibl.sgmiiConfig[i].configure);
+        ibl.sgmiiConfig[i].configure     = swap16val(ibl.sgmiiConfig[i].configure);
         ibl.sgmiiConfig[i].adviseAbility = swap32val(ibl.sgmiiConfig[i].adviseAbility);
         ibl.sgmiiConfig[i].control       = swap32val(ibl.sgmiiConfig[i].control);
         ibl.sgmiiConfig[i].txConfig      = swap32val(ibl.sgmiiConfig[i].txConfig);
@@ -268,7 +268,7 @@ void iblSwap (void)
     for (i = 0; i < ibl_MAX_EMIF_PMEM; i++)  {
         ibl.emifConfig[i].csSpace    = swap16val(ibl.emifConfig[i].csSpace);
         ibl.emifConfig[i].busWidth   = swap16val(ibl.emifConfig[i].busWidth);
-        ibl.emifConfig[i].waitEnable = swap32val(ibl.emifConfig[i].waitEnable);
+        ibl.emifConfig[i].waitEnable = swap16val(ibl.emifConfig[i].waitEnable);
     }
 
 
@@ -278,9 +278,9 @@ void iblSwap (void)
         ibl.bootModes[i].port     = swap32val(ibl.bootModes[i].port);
 
         if (ibl.bootModes[i].bootMode == ibl_BOOT_MODE_TFTP)  {
-            ibl.bootModes[i].u.ethBoot.doBootp            = swap32val(ibl.bootModes[i].u.ethBoot.doBootp);
-            ibl.bootModes[i].u.ethBoot.useBootpServerIp   = swap32val(ibl.bootModes[i].u.ethBoot.useBootpServerIp);
-            ibl.bootModes[i].u.ethBoot.useBootpFileName   = swap32val(ibl.bootModes[i].u.ethBoot.useBootpFileName);
+            ibl.bootModes[i].u.ethBoot.doBootp            = swap16val(ibl.bootModes[i].u.ethBoot.doBootp);
+            ibl.bootModes[i].u.ethBoot.useBootpServerIp   = swap16val(ibl.bootModes[i].u.ethBoot.useBootpServerIp);
+            ibl.bootModes[i].u.ethBoot.useBootpFileName   = swap16val(ibl.bootModes[i].u.ethBoot.useBootpFileName);
             ibl.bootModes[i].u.ethBoot.bootFormat         = swap32val(ibl.bootModes[i].u.ethBoot.bootFormat);
             ibl.bootModes[i].u.ethBoot.blob.startAddress  = swap32val(ibl.bootModes[i].u.ethBoot.blob.startAddress);
             ibl.bootModes[i].u.ethBoot.blob.sizeBytes     = swap32val(ibl.bootModes[i].u.ethBoot.blob.sizeBytes);
@@ -299,7 +299,7 @@ void iblSwap (void)
             ibl.bootModes[i].u.nandBoot.nandInfo.pagesPerBlock = swap32val(ibl.bootModes[i].u.nandBoot.nandInfo.pagesPerBlock);
             ibl.bootModes[i].u.nandBoot.nandInfo.totalBlocks   = swap32val(ibl.bootModes[i].u.nandBoot.nandInfo.totalBlocks);
             ibl.bootModes[i].u.nandBoot.nandInfo.addressBytes  = swap32val(ibl.bootModes[i].u.nandBoot.nandInfo.addressBytes);
-            ibl.bootModes[i].u.nandBoot.nandInfo.lsbFirst      = swap32val(ibl.bootModes[i].u.nandBoot.nandInfo.lsbFirst);
+            ibl.bootModes[i].u.nandBoot.nandInfo.lsbFirst      = swap16val(ibl.bootModes[i].u.nandBoot.nandInfo.lsbFirst);
             ibl.bootModes[i].u.nandBoot.nandInfo.blockOffset   = swap32val(ibl.bootModes[i].u.nandBoot.nandInfo.blockOffset);
             ibl.bootModes[i].u.nandBoot.nandInfo.pageOffset    = swap32val(ibl.bootModes[i].u.nandBoot.nandInfo.pageOffset);
             ibl.bootModes[i].u.nandBoot.nandInfo.columnOffset  = swap32val(ibl.bootModes[i].u.nandBoot.nandInfo.columnOffset);

@@ -107,6 +107,7 @@ void i2cReadBlock (void)
 
 
     i2cReadAddress += len;
+    i2cBusAddress = i2cReadAddress >>16;
     
     iFifoIn  = len;
     iFifoOut = 4;    /* The i2c header is effectively removed */
