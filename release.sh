@@ -32,6 +32,9 @@ mkdir ibl_bin_$IBL_VERSION/c6457/le
 mkdir ibl_bin_$IBL_VERSION/c6678/
 mkdir ibl_bin_$IBL_VERSION/c6678/le
 
+mkdir ibl_bin_$IBL_VERSION/c6670/
+mkdir ibl_bin_$IBL_VERSION/c6670/le
+
 # Copy i2cConfig GEL file
 cp -f src/util/i2cConfig/i2cConfig.gel ibl_bin_$IBL_VERSION/i2cConfig.gel
 
@@ -123,6 +126,15 @@ popd
 cp -f src/make/ibl_c661x/i2crom.dat ibl_bin_$IBL_VERSION/c6678/le/i2crom_0x51_c6678_le.dat
 cp -f src/util/i2cWrite/i2cWrite_le.out   ibl_bin_$IBL_VERSION/c6678/le/i2cWrite_c6678_le.out
 cp -f src/util/i2cConfig/i2cparam_c661x_le.out ibl_bin_$IBL_VERSION/c6678/le/i2cparam_c6678_le.out
+
+# Build c6670 EVM 
+pushd src/make
+make clean
+make evm_c6670_i2c ENDIAN=little I2C_BUS_ADDR=0x51 
+popd
+cp -f src/make/ibl_c661x/i2crom.dat ibl_bin_$IBL_VERSION/c6670/le/i2crom_0x51_c6670_le.dat
+cp -f src/util/i2cWrite/i2cWrite_le.out   ibl_bin_$IBL_VERSION/c6670/le/i2cWrite_c6670_le.out
+cp -f src/util/i2cConfig/i2cparam_c661x_le.out ibl_bin_$IBL_VERSION/c6670/le/i2cparam_c6670_le.out
 
 # Create Tar archive for binary package
 tar -czf ibl_bin_$IBL_VERSION.tgz ibl_bin_$IBL_VERSION
