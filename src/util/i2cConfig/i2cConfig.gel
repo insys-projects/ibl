@@ -782,7 +782,7 @@ hotmenu setConfig_c6670_main()
 {
 	ibl.iblMagic = ibl_MAGIC_VALUE;
 
-	/* Main PLL: 100 MHz reference, 1GHz output */
+	/* Main PLL: 122.88 MHz reference, 983 MHz output */
 	ibl.pllConfig[ibl_MAIN_PLL].doEnable      = 1;
 	ibl.pllConfig[ibl_MAIN_PLL].prediv        = 1;
 	ibl.pllConfig[ibl_MAIN_PLL].mult          = 16;
@@ -790,18 +790,18 @@ hotmenu setConfig_c6670_main()
 	ibl.pllConfig[ibl_MAIN_PLL].pllOutFreqMhz = 983;
 
 	/* DDR PLL: 66.66 MHz reference, 400 MHz output, for an 800MHz DDR rate */
-	ibl.pllConfig[ibl_DDR_PLL].doEnable       = 0; 
+	ibl.pllConfig[ibl_DDR_PLL].doEnable       = 1; 
 	ibl.pllConfig[ibl_DDR_PLL].prediv         = 1;
 	ibl.pllConfig[ibl_DDR_PLL].mult           = 12;
 	ibl.pllConfig[ibl_DDR_PLL].postdiv        = 2;
 	ibl.pllConfig[ibl_DDR_PLL].pllOutFreqMhz  = 400;
 
-    /* Net PLL: 100 MHz reference, 1050 MHz output (followed by a built in divide by 3 to give 350 MHz to PA) */
-	ibl.pllConfig[ibl_NET_PLL].doEnable       = 0;
+    /* Net PLL: 122.88 MHz reference, 1044 MHz output (followed by a built in divide by 3 to give 348 MHz to PA) */
+	ibl.pllConfig[ibl_NET_PLL].doEnable       = 1;
 	ibl.pllConfig[ibl_NET_PLL].prediv         = 1;
-	ibl.pllConfig[ibl_NET_PLL].mult			  = 21;
+	ibl.pllConfig[ibl_NET_PLL].mult           = 17;
 	ibl.pllConfig[ibl_NET_PLL].postdiv        = 2;
-	ibl.pllConfig[ibl_NET_PLL].pllOutFreqMhz  = 1050;
+	ibl.pllConfig[ibl_NET_PLL].pllOutFreqMhz  = 1044;
 
 
 	ibl.ddrConfig.configDdr = 1;
@@ -845,7 +845,7 @@ hotmenu setConfig_c6670_main()
 	ibl.sgmiiConfig[1].control		 = 1;
 	ibl.sgmiiConfig[1].txConfig      = 0x108a1;
 	ibl.sgmiiConfig[1].rxConfig      = 0x700621;
-	ibl.sgmiiConfig[1].auxConfig	 = 0x41;
+	ibl.sgmiiConfig[1].auxConfig	 = 0x51;
 
 	ibl.mdioConfig.nMdioOps = 0;
 
@@ -920,4 +920,10 @@ hotmenu setConfig_c6670_main()
     ibl.bootModes[1].u.ethBoot.blob.branchAddress = 0x80000000;       /* Base of DDR2 */
 
 	ibl.chkSum = 0;
+}
+
+hotmenu setConfig_c6670_emac()
+{
+    ibl.bootModes[0].priority = ibl_HIGHEST_PRIORITY+1;
+    ibl.bootModes[1].priority = ibl_HIGHEST_PRIORITY;
 }

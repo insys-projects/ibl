@@ -18,6 +18,7 @@
 #define KICK1			*(volatile unsigned int*)(CHIP_LEVEL_REG + 0x003C)
 
 #define DDR3PLLCTL0		*(volatile unsigned int*)(CHIP_LEVEL_REG + 0x0330)
+#define DDR3PLLCTL1		*(unsigned int*)(CHIP_LEVEL_REG + 0x0334)
 
 // DDR3 definitions
 #define DDR_BASE_ADDR 0x21000000
@@ -59,6 +60,11 @@
 #define DDR3_CONFIG_REG_23  (*(volatile unsigned int*)(0x02620460))
 #define DDR3_CONFIG_REG_24  (*(volatile unsigned int*)(0x02620464))
 
+#define RD_DQS_SLAVE_RATIO 0x34
+#define WR_DQS_SLAVE_RATIO 0xA9
+#define WR_DATA_SLAVE_RATIO 0xE9
+#define FIFO_WE_SLAVE_RATIO 0x106
+
 /*************************************************************************************************
  * FUNCTION PUROPSE: Initial EMIF4 setup
  *************************************************************************************************
@@ -66,7 +72,7 @@
  *************************************************************************************************/
 SINT16 hwEmif4p0Enable (iblEmif4p0_t *cfg)
 {
-    UINT32 v;
+    UINT32 v, i;
 
 #if 0
     /* If the config registers or refresh control registers are being written
@@ -146,78 +152,116 @@ SINT16 hwEmif4p0Enable (iblEmif4p0_t *cfg)
     EMIF_REG_VAL_SDRAM_REF_CTL_SET_INITREF_DIS(v,0);
     DEVICE_REG32_W (DEVICE_EMIF4_BASE + EMIF_REG_SDRAM_REF_CTL, v);
 
-    if ((cfg->registerMask & ibl_EMIF4_ENABLE_sdRamConfig) != 0) 
+    if ((cfg->registerMask & ibl_EMIF4_ENABLE_sdRamConfig) != 0)
         DEVICE_REG32_W (DEVICE_EMIF4_BASE + EMIF_REG_SD_RAM_CFG, cfg->sdRamConfig);
 
-    if ((cfg->registerMask & ibl_EMIF4_ENABLE_sdRamConfig2) != 0) 
+    if ((cfg->registerMask & ibl_EMIF4_ENABLE_sdRamConfig2) != 0)
         DEVICE_REG32_W (DEVICE_EMIF4_BASE + EMIF_REG_SD_RAM_CFG2, cfg->sdRamConfig2);
 
     v = cfg->sdRamRefreshCtl;
     EMIF_REG_VAL_SDRAM_REF_CTL_SET_INITREF_DIS(v,0);
     DEVICE_REG32_W (DEVICE_EMIF4_BASE + EMIF_REG_SDRAM_REF_CTL, v);
 #endif
-    KICK0 = 0x83E70B13;
-    KICK1 = 0x95A4F1E0;
-    
-    DDR3PLLCTL0 = 0x100807C1;
 
-    DDR_SDTIM1   = 0x0CCF369B;
-    DDR_SDTIM2   = 0x3A3F7FDA;
-    DDR_SDTIM3   = 0x057F83A8;
-    DDR_PMCTL   |= (0x9 << 4); // Set up SR_TIM to Enter self-refresh after 4096 clocks
-   
-    DDR_DDRPHYC  = 0x0010010B;
-   
-    DDR_SDRFC = 0x00004111; //500us
+    v = DEVICE_REG32_R(DEVICE_JTAG_ID_REG);
 
-    
-    DDR_SDCFG    = 0x63C51A32; //0x63C51A32;    //row-col = 13-10
-   
-	
-	//Values with invertclkout = 0
-	DATA0_GTLVL_INIT_RATIO = 0x3C;
-	DATA1_GTLVL_INIT_RATIO = 0x3C;
-	DATA2_GTLVL_INIT_RATIO = 0x23;
-	DATA3_GTLVL_INIT_RATIO = 0x2D;
-	DATA4_GTLVL_INIT_RATIO = 0x13;
-	DATA5_GTLVL_INIT_RATIO = 0x11;
-	DATA6_GTLVL_INIT_RATIO = 0x9;
-	DATA7_GTLVL_INIT_RATIO = 0xC;
-	//DATA8_GTLVL_INIT_RATIO = 0x21; //ECC byte lane. Don't care as long as you don't enable ECC by software
-	
-	//Values with invertclkout = 0	
-	RDWR_INIT_RATIO_0 = 0x0;
-	RDWR_INIT_RATIO_1 = 0x0;
-	RDWR_INIT_RATIO_2 = 0x0;
-	RDWR_INIT_RATIO_3 = 0x0;
-	RDWR_INIT_RATIO_4 = 0x0;
-	RDWR_INIT_RATIO_5 = 0x0;
-	RDWR_INIT_RATIO_6 = 0x0;
-	RDWR_INIT_RATIO_7 = 0x0;
-	//RDWR_INIT_RATIO_8 = 0x0; //ECC byte lane. Don't care as long as you don't enable ECC by software
-	
-	
-	
-	//GEL_TextOut("\nProgrammed initial ratios.\n");
-	
-	DDR3_CONFIG_REG_0 = DDR3_CONFIG_REG_0 | 0xF;
-	
-	//DDR3_CONFIG_REG_23 = RD_DQS_SLAVE_RATIO_1066 | (WR_DQS_SLAVE_RATIO_1066 << 10) | (WR_DATA_SLAVE_RATIO_1066 << 20);
+    /*KICK0 = 0x83E70B13;
+    KICK1 = 0x95A4F1E0;*/
 
-	DDR3_CONFIG_REG_23 |= 0x00000200; //Set bit 9 = 1 to use forced ratio leveling for read DQS
-	//GEL_TextOut("\nSet bit 9 = 1 for forced ratio read eye leveling.\n");
-
-	DDR_RDWR_LVL_RMP_CTRL = 0x80000000; //enable full leveling
-    DDR_RDWR_LVL_CTRL = 0x80000000; //Trigger full leveling - This ignores read DQS leveling result and uses ratio forced value 							//(0x34) instead
-	//GEL_TextOut("\n Triggered full leveling.\n");
-
-   	DDR_SDTIM1; //Read MMR to ensure full leveling is complete
-    
-    	DDR_SDRFC    = 0x00001040; //Refresh rate = Round[7.8*666.5MHz] = 0x1450
-	
+    if (v == DEVICE_C6618_JTAG_ID_VAL)
+    {
+        DDR3PLLCTL0 = 0x100807C1;
+        
+        DDR_SDTIM1   = 0x0CCF369B;
+        DDR_SDTIM2   = 0x3A3F7FDA;
+        DDR_SDTIM3   = 0x057F83A8;
+        DDR_PMCTL   |= (0x9 << 4); // Set up SR_TIM to Enter self-refresh after 4096 clocks
+        
+        DDR_DDRPHYC  = 0x0010010B;
+        
+        DDR_SDRFC = 0x00004111; //500us
+        
+        
+        DDR_SDCFG    = 0x63C51A32; //0x63C51A32;    //row-col = 13-10
+        
+        
+        //Values with invertclkout = 0
+        DATA0_GTLVL_INIT_RATIO = 0x3C;
+        DATA1_GTLVL_INIT_RATIO = 0x3C;
+        DATA2_GTLVL_INIT_RATIO = 0x23;
+        DATA3_GTLVL_INIT_RATIO = 0x2D;
+        DATA4_GTLVL_INIT_RATIO = 0x13;
+        DATA5_GTLVL_INIT_RATIO = 0x11;
+        DATA6_GTLVL_INIT_RATIO = 0x9;
+        DATA7_GTLVL_INIT_RATIO = 0xC;
+        //DATA8_GTLVL_INIT_RATIO = 0x21; //ECC byte lane. Don't care as long as you don't enable ECC by software
+        
+        //Values with invertclkout = 0
+        RDWR_INIT_RATIO_0 = 0x0;
+        RDWR_INIT_RATIO_1 = 0x0;
+        RDWR_INIT_RATIO_2 = 0x0;
+        RDWR_INIT_RATIO_3 = 0x0;
+        RDWR_INIT_RATIO_4 = 0x0;
+        RDWR_INIT_RATIO_5 = 0x0;
+        RDWR_INIT_RATIO_6 = 0x0;
+        RDWR_INIT_RATIO_7 = 0x0;
+        //RDWR_INIT_RATIO_8 = 0x0; //ECC byte lane. Don't care as long as you don't enable ECC by software
+        
+        
+        
+        //GEL_TextOut("\nProgrammed initial ratios.\n");
+        
+        DDR3_CONFIG_REG_0 = DDR3_CONFIG_REG_0 | 0xF;
+        
+        //DDR3_CONFIG_REG_23 = RD_DQS_SLAVE_RATIO_1066 | (WR_DQS_SLAVE_RATIO_1066 << 10) | (WR_DATA_SLAVE_RATIO_1066 << 20);
+        
+        DDR3_CONFIG_REG_23 |= 0x00000200; //Set bit 9 = 1 to use forced ratio leveling for read DQS
+        //GEL_TextOut("\nSet bit 9 = 1 for forced ratio read eye leveling.\n");
+        
+        DDR_RDWR_LVL_RMP_CTRL = 0x80000000; //enable full leveling
+        DDR_RDWR_LVL_CTRL = 0x80000000; //Trigger full leveling - This ignores read DQS leveling result and uses ratio forced value 							//(0x34) instead
+        //GEL_TextOut("\n Triggered full leveling.\n");
+        
+        DDR_SDTIM1; //Read MMR to ensure full leveling is complete
+        
+        DDR_SDRFC    = 0x00001040; //Refresh rate = Round[7.8*666.5MHz] = 0x1450
+    }
+    else
+    {
+        DDR3PLLCTL1 |= 0x00000040;    //Set ENSAT = 1
+        DDR3PLLCTL1 |= 0x00002000;    //Set RESET bit before programming DDR3PLLCTL0
+        DDR3PLLCTL0 = 0x02000140;
+        
+        for(i=0;i<1000;i++); //Wait atleast 5us
+        DDR3PLLCTL1 &= 0xFFFFDFFF;    //Clear RESET bit
+        
+        DDR_SDRFC    = 0x800030D4;    // inhibit configuration
+        
+        DDR_SDTIM1   = 0x0AAAE4E3;
+        DDR_SDTIM2   = 0x20437FDA;
+        DDR_SDTIM3   = 0x559F83FF;
+        
+        DDR_DDRPHYC  = 0x0010010F;
+        
+        DDR_SDRFC    = 0x000030D4;    // enable configuration
+        
+        DDR_SDCFG    = 0x63222AB2;    // DRAM Mode Register writes occur here - 31.25us long refresh periods
+        
+        DDR3_CONFIG_REG_0 |= 0xF;         // set dll_lock_diff to 15
+        DDR3_CONFIG_REG_0 &= 0xFF801FFF;  // clear ctrl_slave_ratio field
+        DDR3_CONFIG_REG_0 |= 0x00200000;  // set ctrl_slave_ratio field to 256 since INV_CLKOUT = 1
+        
+        DDR3_CONFIG_REG_12 |= 0x08000000; // Set INV_CLKOUT = 1
+        
+        DDR3_CONFIG_REG_23 = RD_DQS_SLAVE_RATIO | (WR_DQS_SLAVE_RATIO << 10) | (WR_DATA_SLAVE_RATIO << 20);
+        DDR3_CONFIG_REG_24 = FIFO_WE_SLAVE_RATIO;
+        
+        
+        DDR_SDRFC    = 0x00000C30; //Refresh rate = Round[7.8*400MHz] = 0x0C30
+    }
 
     return (0);
 
 } /* hwEmif4p0Enable */
 
-    
+
