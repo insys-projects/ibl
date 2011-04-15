@@ -15,13 +15,12 @@ else
  MEXT=le
 endif
 
-CC          = $(TOOLSC6X)/bin/cl6x
-AS          = $(TOOLSC6X)/bin/cl6x
-LD          = $(TOOLSC6X)/bin/cl6x -z
-ARIN        = $(TOOLSC6X)/bin/ar6x -rq
-AROUT       = $(TOOLSC6X)/bin/ar6x -xq 
-HEX6X		= $(TOOLSC6X)/bin/hex6x
-CDBTOOL     = $(COMSPEC) /c $(TOOLSBIOSCDBC6X)\gconfgen
+CC          = cl6x
+AS          = cl6x
+LD          = cl6x -z
+ARIN        = ar6x -rq
+AROUT       = ar6x -xq 
+HEX6X	    = hex6x
 MAKEDEP     = $(MAKEDEPPATH)
 MAKEDEP_OPT = -q
 COBJEXT     = $(MEXT).oc
@@ -121,13 +120,10 @@ PPDEP_FLAGS  = -ppd=$(patsubst %.$(CDEPEXT),%.$(CDEPEXT)_TMP,$@)
 # Include files for standard (non siu) modules.  Also used by linker to find
 # library files.
 FSTDINC  =$(TOOLSC6XDOS)/include;$(TOOLSC6XDOS)/lib
-FSTDINC +=;$(TOOLSC6XDOS)/rtdx/include;$(TOOLSC6XDOS)/rtdx/lib
-FSTDINC +=;$(TOOLSBIOSC6XDOS)/bios/include;$(TOOLSBIOSC6XDOS)/bios/lib
-FSTDINC +=;$(TOOLSBIOSC6XDOS)/xdais/include;;$(TOOLSBIOSC6XDOS)/xdais/src/api
 STDINC =$(subst /,$(DIRSEP),$(FSTDINC))
 
 # Include files for ASM in standard (non siu) modules
-STDAINC =$(subst /,$(DIRSEP),$(TOOLSBIOSC6XDOS)/bios/include;$(GGROOT)/misc/$(CPUDIR))
+STDAINC =$(subst /,$(DIRSEP),$(GGROOT)/misc/$(CPUDIR))
 
 # Include files for this platform.  Change this for test code.
 PLATINC =$(subst /,$(DIRSEP),$(GGROOT)/hw/$(CPUDIR);$(ECODIR)/gg/$(CPUDIR);$(ECODIR)/$(CPUDIR))
