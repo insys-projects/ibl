@@ -66,6 +66,8 @@
 #include "ibl_elf.h"
 #include <string.h>
 
+extern cregister unsigned int IER;
+
 /**
  *  @brief
  *      Data structures shared between the 1st and 2nd stage IBL load
@@ -231,6 +233,7 @@ void iblPmemCfg (int32 interface, int32 port, bool enableNand)
 void main (void)
 {
     int32 i, j;
+    UINT32 v;
 
     /* Initialize the status structure */
     iblMemset (&iblStatus, 0, sizeof(iblStatus_t));
@@ -261,6 +264,15 @@ void main (void)
 
     /* Try booting forever */
     for (;;)  {
+        v = DEVICE_REG32_R(DEVICE_JTAG_ID_REG);
+        if (
+            (v == DEVICE_C6618_JTAG_ID_VAL)         || 
+            (v == DEVICE_C6616_JTAG_ID_VAL)
+           )
+        {
+            /* Disable interrupts, HUA does not work if IER is not cleared */
+            IER = 0;
+        }
 
         /* Start looping through the boot modes to find the one with the highest priority
          * value, and try to boot it. */

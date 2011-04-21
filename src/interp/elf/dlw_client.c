@@ -159,9 +159,14 @@ BOOL DLIF_allocate(struct DLOAD_MEMORY_REQUEST *targ_req)
    /*   load placement or both load and run placement, then we can do the    */
    /*   copy.                                                                */
    /*------------------------------------------------------------------------*/
-   memset(targ_req->host_address, 0, obj_desc->memsz_in_bytes);
-   fseek(f,targ_req->offset,SEEK_SET);
-   fread(targ_req->host_address,obj_desc->objsz_in_bytes,1,f);
+   if (obj_desc->objsz_in_bytes)
+   {
+       /* Do not clear uninitialized data section, so that the section can 
+          be mapped to the same region IBL uses */ 
+       memset(targ_req->host_address, 0, obj_desc->memsz_in_bytes);
+       fseek(f,targ_req->offset,SEEK_SET);
+       fread(targ_req->host_address,obj_desc->objsz_in_bytes,1,f);
+   }
 
    /*------------------------------------------------------------------------*/
    /* Once we have target address for this allocation, add debug information */

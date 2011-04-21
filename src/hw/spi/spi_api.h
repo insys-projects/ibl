@@ -20,7 +20,7 @@ typedef struct spiConfig_s  {
 } spiConfig_t;
 
 SINT16 hwSpiConfig (spiConfig_t *spiCfg);
-SINT16 hwSpiRead (UINT32 addr, UINT16 sizeBytes, UINT8 *data);
+SINT16 hwSpiRead (UINT32 addr, UINT32 sizeBytes, UINT8 *data);
 void hwSpiEnableXfer (UINT32 port);
 void hwSpiDisableXfer (UINT32 port);
 
