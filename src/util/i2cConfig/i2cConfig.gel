@@ -748,12 +748,12 @@ hotmenu setConfig_c6678_main()
 	ibl.bootModes[2].u.ethBoot.doBootp          = FALSE;
 	ibl.bootModes[2].u.ethBoot.useBootpServerIp = FALSE;
 	ibl.bootModes[2].u.ethBoot.useBootpFileName = FALSE;
-	ibl.bootModes[2].u.ethBoot.bootFormat       = ibl_BOOT_FORMAT_ELF;
+	ibl.bootModes[2].u.ethBoot.bootFormat       = ibl_BOOT_FORMAT_BBLOB;
 
 
-    SETIP(ibl.bootModes[2].u.ethBoot.ethInfo.ipAddr,    192,168,1,100);
-    SETIP(ibl.bootModes[2].u.ethBoot.ethInfo.serverIp,  192,168,1,101);
-    SETIP(ibl.bootModes[2].u.ethBoot.ethInfo.gatewayIp, 192,168,1,1);
+    SETIP(ibl.bootModes[2].u.ethBoot.ethInfo.ipAddr,    192,168,2,100);
+    SETIP(ibl.bootModes[2].u.ethBoot.ethInfo.serverIp,  192,168,2,101);
+    SETIP(ibl.bootModes[2].u.ethBoot.ethInfo.gatewayIp, 192,168,2,1);
     SETIP(ibl.bootModes[2].u.ethBoot.ethInfo.netmask,   255,255,255,0);
 
     /* Use the e-fuse value */
@@ -946,12 +946,12 @@ hotmenu setConfig_c6670_main()
 	ibl.bootModes[2].u.ethBoot.doBootp          = FALSE;
 	ibl.bootModes[2].u.ethBoot.useBootpServerIp = FALSE;
 	ibl.bootModes[2].u.ethBoot.useBootpFileName = FALSE;
-	ibl.bootModes[2].u.ethBoot.bootFormat       = ibl_BOOT_FORMAT_ELF;
+	ibl.bootModes[2].u.ethBoot.bootFormat       = ibl_BOOT_FORMAT_BBLOB;
 
 
-    SETIP(ibl.bootModes[2].u.ethBoot.ethInfo.ipAddr,    192,168,1,100);
-    SETIP(ibl.bootModes[2].u.ethBoot.ethInfo.serverIp,  192,168,1,101);
-    SETIP(ibl.bootModes[2].u.ethBoot.ethInfo.gatewayIp, 192,168,1,1);
+    SETIP(ibl.bootModes[2].u.ethBoot.ethInfo.ipAddr,    192,168,2,100);
+    SETIP(ibl.bootModes[2].u.ethBoot.ethInfo.serverIp,  192,168,2,101);
+    SETIP(ibl.bootModes[2].u.ethBoot.ethInfo.gatewayIp, 192,168,2,1);
     SETIP(ibl.bootModes[2].u.ethBoot.ethInfo.netmask,   255,255,255,0);
 
     /* Use the e-fuse value */
