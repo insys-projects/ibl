@@ -48,6 +48,7 @@ make evm_c6455 I2C_MAP_ADDR=0x500
 popd
 # Copy the files to the Binary package
 cp -f src/make/ibl_c6455/i2crom.dat ibl_bin_$IBL_VERSION/c6455/le-be/i2crom_0x50_c6455.dat
+cp -f src/make/ibl_c6455/i2crom.bin ibl_bin_$IBL_VERSION/c6455/le-be/i2crom_0x50_c6455.bin
 cp -f src/util/i2cWrite/i2cWrite_le.out ibl_bin_$IBL_VERSION/c6455/le-be/i2cWrite_c6455_le.out
 cp -f src/util/i2cConfig/i2cparam_c6455_le.out ibl_bin_$IBL_VERSION/c6455/le-be/i2cparam_c6455_le_0x500.out
 
@@ -67,6 +68,7 @@ make evm_c6472 I2C_MAP_ADDR=0x500
 popd
 # Copy the files to the Binary package
 cp -f src/make/ibl_c6472/i2crom.dat ibl_bin_$IBL_VERSION/c6472/le-be/i2crom_0x50_c6472.dat
+cp -f src/make/ibl_c6472/i2crom.bin ibl_bin_$IBL_VERSION/c6472/le-be/i2crom_0x50_c6472.bin
 cp -f src/util/i2cWrite/i2cWrite_le.out   ibl_bin_$IBL_VERSION/c6472/le-be/i2Write_c6472_le.out
 cp -f src/util/i2cConfig/i2cparam_c6472_le.out ibl_bin_$IBL_VERSION/c6472/le-be/i2cparam_c6472_le_0x500.out
 
@@ -85,7 +87,9 @@ make evm_c6474
 popd
 # Copy the files to the Binary package
 cp -f src/make/ibl_c6474/i2crom_0x50_c6474_le.dat ibl_bin_$IBL_VERSION/c6474/le/
+cp -f src/make/ibl_c6474/i2crom.bin ibl_bin_$IBL_VERSION/c6474/le/i2crom_0x50_c6474_le.bin
 cp -f src/make/ibl_c6474/i2crom_0x50_c6474_be.dat ibl_bin_$IBL_VERSION/c6474/be/
+cp -f src/make/ibl_c6474/i2crom.bin ibl_bin_$IBL_VERSION/c6474/be/i2crom_0x50_c6474_be.bin
 cp -f src/util/i2cWrite/i2cWrite_le.out   ibl_bin_$IBL_VERSION/c6474/le/i2cWrite_c6474_le.out
 cp -f src/util/i2cWrite/i2cWrite_be.out   ibl_bin_$IBL_VERSION/c6474/be/i2cWrite_c6474_be.out
 cp -f src/util/i2cConfig/i2cparam_c6474_le.out   ibl_bin_$IBL_VERSION/c6474/le/
@@ -99,7 +103,9 @@ make evm_c6474l
 popd
 # Copy the files to the Binary package
 cp -f src/make/ibl_c6474/i2crom_0x50_c6474l_le.dat ibl_bin_$IBL_VERSION/c6474l/le/
+cp -f src/make/ibl_c6474/i2crom.bin ibl_bin_$IBL_VERSION/c6474l/le/i2crom_0x50_c6474l_le.bin
 cp -f src/make/ibl_c6474/i2crom_0x50_c6474l_be.dat ibl_bin_$IBL_VERSION/c6474l/be/
+cp -f src/make/ibl_c6474/i2crom.bin ibl_bin_$IBL_VERSION/c6474l/be/i2crom_0x50_c6474l_be.bin
 cp -f src/util/i2cWrite/i2cWrite_le.out   ibl_bin_$IBL_VERSION/c6474l/le/i2cWrite_c6474l_le.out
 cp -f src/util/i2cWrite/i2cWrite_be.out   ibl_bin_$IBL_VERSION/c6474l/be/i2cWrite_c6474l_be.out
 cp -f src/util/i2cConfig/i2cparam_c6474_le.out   ibl_bin_$IBL_VERSION/c6474l/le/i2cparam_c6474l_le.out
@@ -112,7 +118,9 @@ make clean
 make evm_c6457 
 popd
 cp -f src/make/ibl_c6457/i2crom_0x50_c6457_le.dat ibl_bin_$IBL_VERSION/c6457/le/
+cp -f src/make/ibl_c6457/i2crom.bin ibl_bin_$IBL_VERSION/c6457/le/i2crom_0x50_c6457_le.bin
 cp -f src/make/ibl_c6457/i2crom_0x50_c6457_be.dat ibl_bin_$IBL_VERSION/c6457/be/
+cp -f src/make/ibl_c6457/i2crom.bin ibl_bin_$IBL_VERSION/c6457/be/i2crom_0x50_c6457_be.bin
 cp -f src/util/i2cWrite/i2cWrite_le.out   ibl_bin_$IBL_VERSION/c6457/le/i2cWrite_c6457_le.out
 cp -f src/util/i2cWrite/i2cWrite_be.out   ibl_bin_$IBL_VERSION/c6457/be/i2cWrite_c6457_be.out
 cp -f src/util/i2cConfig/i2cparam_c6457_le.out   ibl_bin_$IBL_VERSION/c6457/le/
@@ -124,9 +132,11 @@ make clean
 make evm_c667x_i2c ENDIAN=little I2C_BUS_ADDR=0x51 
 popd
 cp -f src/make/ibl_c661x/i2crom.dat ibl_bin_$IBL_VERSION/c6678/le/i2crom_0x51_c6678_le.dat
+cp -f src/make/ibl_c661x/i2crom.bin ibl_bin_$IBL_VERSION/c6678/le/i2crom_0x51_c6678_le.bin
 cp -f src/util/i2cWrite/i2cWrite_le.out   ibl_bin_$IBL_VERSION/c6678/le/i2cWrite_c6678_le.out
 cp -f src/util/i2cConfig/i2cparam_c661x_le.out ibl_bin_$IBL_VERSION/c6678/le/i2cparam_c6678_le.out
 cp -f src/make/ibl_c661x/i2crom.dat ibl_bin_$IBL_VERSION/c6670/le/i2crom_0x51_c6670_le.dat
+cp -f src/make/ibl_c661x/i2crom.bin ibl_bin_$IBL_VERSION/c6670/le/i2crom_0x51_c6670_le.bin
 cp -f src/util/i2cWrite/i2cWrite_le.out   ibl_bin_$IBL_VERSION/c6670/le/i2cWrite_c6670_le.out
 cp -f src/util/i2cConfig/i2cparam_c661x_le.out ibl_bin_$IBL_VERSION/c6670/le/i2cparam_c6670_le.out
 
