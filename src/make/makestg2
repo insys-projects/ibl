@@ -204,14 +204,11 @@ $(CFG_MODULES):
 
 utils:
 ifeq ($(HAS_SPI),1)
-	make -C $(IBL_ROOT)/util/spiWrite TARGET=$(TARGET) SPI_DEFS='$(SPI_DEFS)' MAINDEFS='$(MAINDEFS) $(SPI_CFG)' $(TARGET)
-	make -C $(IBL_ROOT)/util/spiConfig TARGET=$(TARGET) SPI_DEFS='$(SPI_DEFS)' MAINDEFS='$(MAINDEFS) $(SPI_CFG)' $(TARGET)
+#make -C $(IBL_ROOT)/util/spiConfig TARGET=$(TARGET) SPI_DEFS='$(SPI_DEFS)' MAINDEFS='$(MAINDEFS) $(SPI_CFG)' $(TARGET)
 endif
 	make -C $(IBL_ROOT)/util/btoccs
 	make -C $(IBL_ROOT)/util/romparse TARGET=$(TARGET)
 ifeq ($(HAS_I2C),1)
-	make -C $(IBL_ROOT)/util/i2cRead  TARGET=$(TARGET) $(TARGET) 
-	make -C $(IBL_ROOT)/util/i2cWrite TARGET=$(TARGET) I2C_SIZE_BYTES=$(I2C_SIZE_BYTES) MAINDEFS='$(MAINDEFS) $(SPI_CFG)' $(TARGET)
 	make -C $(IBL_ROOT)/util/i2cConfig $(TARGET) MAINDEFS='$(MAINDEFS) $(SPI_CFG)' 
 endif
 	make -C $(IBL_ROOT)/util/bconvert
