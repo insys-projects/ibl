@@ -340,6 +340,7 @@ void iblSwap (void)
 
     }
 
+    ibl.iblEvmType = swap16val (ibl.iblEvmType);
     ibl.chkSum = swap16val (ibl.chkSum);
 }
 

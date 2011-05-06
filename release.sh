@@ -85,9 +85,9 @@ make evm_c6474
 popd
 # Copy the files to the Binary package
 cp -f src/make/ibl_c6474/i2crom_0x50_c6474_le.dat ibl_bin_$IBL_VERSION/c6474/le/
-cp -f src/make/ibl_c6474/i2crom.bin ibl_bin_$IBL_VERSION/c6474/le/i2crom_0x50_c6474_le.bin
+cp -f src/make/ibl_c6474/i2crom_0x50_c6474_le.bin ibl_bin_$IBL_VERSION/c6474/le/
 cp -f src/make/ibl_c6474/i2crom_0x50_c6474_be.dat ibl_bin_$IBL_VERSION/c6474/be/
-cp -f src/make/ibl_c6474/i2crom.bin ibl_bin_$IBL_VERSION/c6474/be/i2crom_0x50_c6474_be.bin
+cp -f src/make/ibl_c6474/i2crom_0x50_c6474_be.bin ibl_bin_$IBL_VERSION/c6474/be/
 cp -f src/util/i2cConfig/i2cparam_c6474_le.out   ibl_bin_$IBL_VERSION/c6474/le/
 cp -f src/util/i2cConfig/i2cparam_c6474_be.out   ibl_bin_$IBL_VERSION/c6474/be/
 
@@ -99,9 +99,9 @@ make evm_c6474l
 popd
 # Copy the files to the Binary package
 cp -f src/make/ibl_c6474/i2crom_0x50_c6474l_le.dat ibl_bin_$IBL_VERSION/c6474l/le/
-cp -f src/make/ibl_c6474/i2crom.bin ibl_bin_$IBL_VERSION/c6474l/le/i2crom_0x50_c6474l_le.bin
+cp -f src/make/ibl_c6474/i2crom_0x50_c6474l_le.bin ibl_bin_$IBL_VERSION/c6474l/le/
 cp -f src/make/ibl_c6474/i2crom_0x50_c6474l_be.dat ibl_bin_$IBL_VERSION/c6474l/be/
-cp -f src/make/ibl_c6474/i2crom.bin ibl_bin_$IBL_VERSION/c6474l/be/i2crom_0x50_c6474l_be.bin
+cp -f src/make/ibl_c6474/i2crom_0x50_c6474l_be.bin ibl_bin_$IBL_VERSION/c6474l/be/
 cp -f src/util/i2cConfig/i2cparam_c6474_le.out   ibl_bin_$IBL_VERSION/c6474l/le/i2cparam_c6474l_le.out
 cp -f src/util/i2cConfig/i2cparam_c6474_be.out   ibl_bin_$IBL_VERSION/c6474l/be/i2cparam_c6474l_be.out
 
@@ -112,9 +112,9 @@ make clean
 make evm_c6457 
 popd
 cp -f src/make/ibl_c6457/i2crom_0x50_c6457_le.dat ibl_bin_$IBL_VERSION/c6457/le/
-cp -f src/make/ibl_c6457/i2crom.bin ibl_bin_$IBL_VERSION/c6457/le/i2crom_0x50_c6457_le.bin
+cp -f src/make/ibl_c6457/i2crom_0x50_c6457_le.bin ibl_bin_$IBL_VERSION/c6457/le/
 cp -f src/make/ibl_c6457/i2crom_0x50_c6457_be.dat ibl_bin_$IBL_VERSION/c6457/be/
-cp -f src/make/ibl_c6457/i2crom.bin ibl_bin_$IBL_VERSION/c6457/be/i2crom_0x50_c6457_be.bin
+cp -f src/make/ibl_c6457/i2crom_0x50_c6457_be.bin ibl_bin_$IBL_VERSION/c6457/be/
 cp -f src/util/i2cConfig/i2cparam_c6457_le.out   ibl_bin_$IBL_VERSION/c6457/le/
 cp -f src/util/i2cConfig/i2cparam_c6457_be.out   ibl_bin_$IBL_VERSION/c6457/be/
 

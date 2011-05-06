@@ -69,9 +69,10 @@
 #define deviceSetEthResetState(x,y)
 
 /* The mac control register values used */
-#define TARGET_MAC_CONTROL     CPMAC_MACCONTROL_RXOWNERSHIP   |      \
-                               CPMAC_MACCONTROL_RXOFFLENBLOCK |      \
-                               CPMAC_MACCONTROL_MIIEN
+#define TARGET_MAC_CONTROL     CPMAC_MACCONTROL_RGMIIEN |  \
+                               CPMAC_MACCONTROL_GIG |      \
+                               CPMAC_MACCONTROL_GMIIEN |   \
+                               CPMAC_MACCONTROL_FULLDUPLEX
 
 /* There is no sgmii on the 6472, so the sgmii config is defined to a void statement */
 #define hwSgmiiConfig(x,y)
