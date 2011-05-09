@@ -896,7 +896,7 @@ hotmenu setConfig_c6670_main()
     ibl.bootModes[1].priority = ibl_HIGHEST_PRIORITY;
     ibl.bootModes[1].port     = 0;
 
-    ibl.bootModes[1].u.nandBoot.bootFormat        = ibl_BOOT_FORMAT_ELF;
+    ibl.bootModes[1].u.nandBoot.bootFormat        = ibl_BOOT_FORMAT_BBLOB;
     ibl.bootModes[1].u.nandBoot.bootAddress[0][0]	  = 0x4000;
     ibl.bootModes[1].u.nandBoot.bootAddress[1][0]	  = 0x4000;
     ibl.bootModes[1].u.nandBoot.interface         = ibl_PMEM_IF_GPIO;
