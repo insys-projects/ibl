@@ -64,6 +64,12 @@ else
     HAS_SPI=0
 endif
 
+ifeq ($(INTERNAL_UTILS), no)
+    HAS_INTERNAL_UTILS = 0
+else
+    HAS_INTERNAL_UTILS = 1
+endif
+
 ifeq (EXCLUDE_SPI, $(strip $(findstring EXCLUDE_SPI, $(MAINDEFS))))
     HAS_SPI=0
 endif
@@ -127,12 +133,16 @@ else
  endif
 endif
 
+ifeq ($(HAS_SPI),0)
+    SPI_CFG=    
+endif
 
 i2crom:
 	$(CC) -ppo -I../cfg/$(TARGET) $(I2C_DEFS) ibl_$(TARGET)/$@.map.pre
 	../util/romparse/romparse $(COMPACT) -rom_base $(I2C_BUS_ADDR) ibl_$(TARGET)/$@.map.pp
 	$(CP) i2crom.ccs ibl_$(TARGET)/$@.ccs
 	$(CP) i2crom.ccs ibl_$(TARGET)/$@.dat
+	../util/btoccs/ccs2bin -swap ibl_$(TARGET)/$@.ccs ibl_$(TARGET)/$@.bin
 	$(RM) i2crom.ccs ibl_le.b ibl.b
 
 spiRom:
@@ -203,14 +213,18 @@ $(CFG_MODULES):
 
 utils:
 ifeq ($(HAS_SPI),1)
+ifeq ($(HAS_INTERNAL_UTILS),1)
 	make -C $(IBL_ROOT)/util/spiWrite TARGET=$(TARGET) SPI_DEFS='$(SPI_DEFS)' MAINDEFS='$(MAINDEFS) $(SPI_CFG)' $(TARGET)
 	make -C $(IBL_ROOT)/util/spiConfig TARGET=$(TARGET) SPI_DEFS='$(SPI_DEFS)' MAINDEFS='$(MAINDEFS) $(SPI_CFG)' $(TARGET)
+endif
 endif
 	make -C $(IBL_ROOT)/util/btoccs
 	make -C $(IBL_ROOT)/util/romparse TARGET=$(TARGET)
 ifeq ($(HAS_I2C),1)
+ifeq ($(HAS_INTERNAL_UTILS),1)
 	make -C $(IBL_ROOT)/util/i2cRead  TARGET=$(TARGET) $(TARGET) 
 	make -C $(IBL_ROOT)/util/i2cWrite TARGET=$(TARGET) I2C_SIZE_BYTES=$(I2C_SIZE_BYTES) MAINDEFS='$(MAINDEFS) $(SPI_CFG)' $(TARGET)
+endif
 	make -C $(IBL_ROOT)/util/i2cConfig $(TARGET) MAINDEFS='$(MAINDEFS) $(SPI_CFG)' 
 endif
 	make -C $(IBL_ROOT)/util/bconvert
@@ -248,19 +262,18 @@ cleant:
 	rm -rf ibl_$(TARGET)/ibl_init.i2c.le.ccs
 	rm -rf ibl_$(TARGET)/ibl_init.le.ccs
 	rm -rf ibl_$(TARGET)/ibl_init.be.ccs
-	rm -rf ibl_$(TARGET)/i2crom.ccs
-	rm -rf ibl_$(TARGET)/i2crom.dat
-	rm -rf ibl_$(TARGET)/i2crom_0x50.dat
-	rm -rf ibl_$(TARGET)/i2crom_0x51.dat
-	rm -rf ibl_$(TARGET)/i2crom.map.pp
+	rm -rf ibl_$(TARGET)/i2crom*.ccs
+	rm -rf ibl_$(TARGET)/i2crom*.dat
+	rm -rf ibl_$(TARGET)/i2crom*.bin
+	rm -rf ibl_$(TARGET)/i2crom*.map.pp
 	rm -rf ibl_$(TARGET)/ibl_init_objs.inc
 	rm -rf ibl_$(TARGET)/ibl_init_objs.pp
 	rm -rf ibl_$(TARGET)/ibl_init_symbols.inc
 	rm -rf ibl_$(TARGET)/ibl_objs.inc
 	rm -rf ibl_$(TARGET)/ibl_objs.pp
 	rm -rf ibl_$(TARGET)/ibl_objs.tmp
-	rm -rf ibl_$(TARGET)/spiRom.dat
-	rm -rf ibl_$(TARGET)/spiRom.map.pp
+	rm -rf ibl_$(TARGET)/spiRom*.dat
+	rm -rf ibl_$(TARGET)/spiRom*.map.pp
 	
 
 

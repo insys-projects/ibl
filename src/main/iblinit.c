@@ -315,15 +315,7 @@ void iblSwap (void)
             ibl.bootModes[i].u.nandBoot.nandInfo.blockOffset   = swap32val(ibl.bootModes[i].u.nandBoot.nandInfo.blockOffset);
             ibl.bootModes[i].u.nandBoot.nandInfo.pageOffset    = swap32val(ibl.bootModes[i].u.nandBoot.nandInfo.pageOffset);
             ibl.bootModes[i].u.nandBoot.nandInfo.columnOffset  = swap32val(ibl.bootModes[i].u.nandBoot.nandInfo.columnOffset);
-            /*for (j = 0; j < ibl_N_ECC_BYTES; j++)
-            {
-                ibl.bootModes[i].u.nandBoot.nandInfo.eccBytesIdx[j] = swap32val(ibl.bootModes[i].u.nandBoot.nandInfo.eccBytesIdx[j]);
-            }
-            for (j = 0; j < ibl_N_BAD_BLOCK_PAGE; j++)
-            {
-                ibl.bootModes[i].u.nandBoot.nandInfo.badBlkMarkIdx[j] = swap32val(ibl.bootModes[i].u.nandBoot.nandInfo.badBlkMarkIdx[j]);
-            }
-            ibl.bootModes[i].u.nandBoot.nandInfo.postCommand      = swap16val(ibl.bootModes[i].u.nandBoot.nandInfo.postCommand);*/
+            ibl.bootModes[i].u.nandBoot.nandInfo.postCommand   = swap16val(ibl.bootModes[i].u.nandBoot.nandInfo.postCommand);
         }  else if (ibl.bootModes[i].bootMode == ibl_BOOT_MODE_NOR)  {
             ibl.bootModes[i].u.norBoot.bootFormat         = swap32val(ibl.bootModes[i].u.norBoot.bootFormat);
             for (j = 0; j < ibl_N_ENDIANS; j++)

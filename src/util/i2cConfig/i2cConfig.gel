@@ -73,6 +73,7 @@
 #define ibl_EVM_C6457L  0x20  	/**< C6457 Low Cost EVM */
 #define ibl_EVM_C6472L  0x30  	/**< C6472 Low Cost EVM */
 #define ibl_EVM_C6474L  0x40  	/**< C6474 Low Cost EVM */
+#define ibl_EVM_C6474M  0x41  	/**< C6474 Mez EVM */
 #define ibl_EVM_C6670L  0x50  	/**< C6670 Low Cost EVM */
 #define ibl_EVM_C6678L  0x60  	/**< C6678 Low Cost EVM */
     
@@ -83,6 +84,7 @@ menuitem "EVM c6472 IBL";
 hotmenu setConfig_c6472()
 {
     ibl.iblMagic = ibl_MAGIC_VALUE;
+    ibl.iblEvmType = ibl_EVM_C6472L;
 
     ibl.pllConfig[ibl_MAIN_PLL].doEnable      = TRUE;
     ibl.pllConfig[ibl_MAIN_PLL].prediv        = 1;
@@ -106,8 +108,8 @@ hotmenu setConfig_c6472()
     ibl.ddrConfig.uEmif.emif3p1.dmcctl = 0x50001906; /* PHY read latency for CAS 5 is 5 + 2 - 1 */
 
     /* SGMII not present */
-	ibl.sgmiiConfig[0].configure = FALSE;
-	ibl.sgmiiConfig[1].configure = FALSE;
+    ibl.sgmiiConfig[0].configure = FALSE;
+    ibl.sgmiiConfig[1].configure = FALSE;
 
     /* MDIO configuration */
     ibl.mdioConfig.nMdioOps = 8;
@@ -127,14 +129,14 @@ hotmenu setConfig_c6472()
     /* spiConfig and emifConfig not needed */
 
     /* Ethernet configuration for Boot mode 0 */
-	ibl.bootModes[0].bootMode = ibl_BOOT_MODE_TFTP;
-	ibl.bootModes[0].priority = ibl_HIGHEST_PRIORITY;
-	ibl.bootModes[0].port     = 0;
+    ibl.bootModes[0].bootMode = ibl_BOOT_MODE_TFTP;
+    ibl.bootModes[0].priority = ibl_HIGHEST_PRIORITY;
+    ibl.bootModes[0].port     = 0;
 
     /* Bootp is disabled. The server and file name are provided here */
     ibl.bootModes[0].u.ethBoot.doBootp          = FALSE;
-    ibl.bootModes[0].u.ethBoot.useBootpServerIp = FALSE;
-    ibl.bootModes[0].u.ethBoot.useBootpFileName = FALSE;
+    ibl.bootModes[0].u.ethBoot.useBootpServerIp = TRUE;
+    ibl.bootModes[0].u.ethBoot.useBootpFileName = TRUE;
     ibl.bootModes[0].u.ethBoot.bootFormat       = ibl_BOOT_FORMAT_BBLOB;
 
     /* Even though the entire range of DDR2 is chosen, the load will
@@ -173,7 +175,7 @@ hotmenu setConfig_c6472()
     ibl.bootModes[0].u.ethBoot.ethInfo.fileName[14] = '\0';
 
     /* Alternative bootMode not configured for now */
-	ibl.bootModes[1].bootMode = ibl_BOOT_MODE_NONE;
+    ibl.bootModes[1].bootMode = ibl_BOOT_MODE_NONE;
 
     ibl.chkSum = 0;
 }
@@ -184,6 +186,7 @@ menuitem "EVM c6474 Mez IBL";
 hotmenu setConfig_c6474()
 {
     ibl.iblMagic = ibl_MAGIC_VALUE;
+    ibl.iblEvmType = ibl_EVM_C6474M;
 
     ibl.pllConfig[ibl_MAIN_PLL].doEnable      = TRUE;
     ibl.pllConfig[ibl_MAIN_PLL].prediv        = 1;
@@ -207,7 +210,7 @@ hotmenu setConfig_c6474()
     ibl.ddrConfig.uEmif.emif3p1.dmcctl = 0x50001906; /* PHY read latency for CAS 5 is 5 + 2 - 1 */
 
     /* SGMII 0 is present */
-	ibl.sgmiiConfig[0].configure = TRUE;
+    ibl.sgmiiConfig[0].configure = TRUE;
     ibl.sgmiiConfig[0].adviseAbility = 0x9801;
     ibl.sgmiiConfig[0].control       = 0x20;
     ibl.sgmiiConfig[0].txConfig      = 0x00000ea3;
@@ -215,7 +218,7 @@ hotmenu setConfig_c6474()
     ibl.sgmiiConfig[0].auxConfig     = 0x0000000b;
 
     /* There is no port 1 on the 6474 */
-	ibl.sgmiiConfig[1].configure = FALSE;
+    ibl.sgmiiConfig[1].configure = FALSE;
 
     /* MDIO configuration */
     ibl.mdioConfig.nMdioOps = 8;
@@ -235,14 +238,14 @@ hotmenu setConfig_c6474()
     /* spiConfig and emifConfig not needed */
 
     /* Ethernet configuration for Boot mode 0 */
-	ibl.bootModes[0].bootMode = ibl_BOOT_MODE_TFTP;
-	ibl.bootModes[0].priority = ibl_HIGHEST_PRIORITY;
-	ibl.bootModes[0].port     = 0;
+    ibl.bootModes[0].bootMode = ibl_BOOT_MODE_TFTP;
+    ibl.bootModes[0].priority = ibl_HIGHEST_PRIORITY;
+    ibl.bootModes[0].port     = 0;
 
     /* Bootp is disabled. The server and file name are provided here */
     ibl.bootModes[0].u.ethBoot.doBootp          = FALSE;
-    ibl.bootModes[0].u.ethBoot.useBootpServerIp = FALSE;
-    ibl.bootModes[0].u.ethBoot.useBootpFileName = FALSE;
+    ibl.bootModes[0].u.ethBoot.useBootpServerIp = TRUE;
+    ibl.bootModes[0].u.ethBoot.useBootpFileName = TRUE;
     ibl.bootModes[0].u.ethBoot.bootFormat       = ibl_BOOT_FORMAT_BBLOB;
 
     SETIP(ibl.bootModes[0].u.ethBoot.ethInfo.ipAddr,    10,218,109,35);
@@ -281,7 +284,7 @@ hotmenu setConfig_c6474()
     ibl.bootModes[0].u.ethBoot.blob.branchAddress = 0x80000000;       /* Base of DDR2 */
 
     /* Alternative bootMode not configured for now */
-	ibl.bootModes[1].bootMode = ibl_BOOT_MODE_NONE;
+    ibl.bootModes[1].bootMode = ibl_BOOT_MODE_NONE;
 
     ibl.chkSum = 0;
 }
@@ -291,6 +294,7 @@ menuitem "EVM c6474 Lite EVM IBL";
 hotmenu setConfig_c6474lite()
 {
     ibl.iblMagic = ibl_MAGIC_VALUE;
+    ibl.iblEvmType = ibl_EVM_C6474L;
 
     ibl.pllConfig[ibl_MAIN_PLL].doEnable      = TRUE;
     ibl.pllConfig[ibl_MAIN_PLL].prediv        = 1;
@@ -314,7 +318,7 @@ hotmenu setConfig_c6474lite()
     ibl.ddrConfig.uEmif.emif3p1.dmcctl = 0x50001906; /* PHY read latency for CAS 5 is 5 + 2 - 1 */
 
     /* SGMII 0 is present */
-	ibl.sgmiiConfig[0].configure = TRUE;
+    ibl.sgmiiConfig[0].configure = TRUE;
     ibl.sgmiiConfig[0].adviseAbility = 0x9801;
     ibl.sgmiiConfig[0].control       = 0x20;
     ibl.sgmiiConfig[0].txConfig      = 0x00000e23;
@@ -322,7 +326,7 @@ hotmenu setConfig_c6474lite()
     ibl.sgmiiConfig[0].auxConfig     = 0x0000000b;
 
     /* There is no port 1 on the 6474 */
-	ibl.sgmiiConfig[1].configure = FALSE;
+    ibl.sgmiiConfig[1].configure = FALSE;
 
     /* MDIO configuration */
     ibl.mdioConfig.nMdioOps = 5;
@@ -339,14 +343,14 @@ hotmenu setConfig_c6474lite()
     /* spiConfig and emifConfig not needed */
 
     /* Ethernet configuration for Boot mode 0 */
-	ibl.bootModes[0].bootMode = ibl_BOOT_MODE_TFTP;
-	ibl.bootModes[0].priority = ibl_HIGHEST_PRIORITY;
-	ibl.bootModes[0].port     = 0;
+    ibl.bootModes[0].bootMode = ibl_BOOT_MODE_TFTP;
+    ibl.bootModes[0].priority = ibl_HIGHEST_PRIORITY;
+    ibl.bootModes[0].port     = 0;
 
     /* Bootp is disabled. The server and file name are provided here */
     ibl.bootModes[0].u.ethBoot.doBootp          = FALSE;
-    ibl.bootModes[0].u.ethBoot.useBootpServerIp = FALSE;
-    ibl.bootModes[0].u.ethBoot.useBootpFileName = FALSE;
+    ibl.bootModes[0].u.ethBoot.useBootpServerIp = TRUE;
+    ibl.bootModes[0].u.ethBoot.useBootpFileName = TRUE;
     ibl.bootModes[0].u.ethBoot.bootFormat       = ibl_BOOT_FORMAT_BBLOB;
 
     SETIP(ibl.bootModes[0].u.ethBoot.ethInfo.ipAddr,    158,218,100,114);
@@ -387,7 +391,7 @@ hotmenu setConfig_c6474lite()
     ibl.bootModes[0].u.ethBoot.blob.branchAddress = 0x80000000;       /* Base of DDR2 */
 
     /* Alternative bootMode not configured for now */
-	ibl.bootModes[1].bootMode = ibl_BOOT_MODE_NONE;
+    ibl.bootModes[1].bootMode = ibl_BOOT_MODE_NONE;
 
     ibl.chkSum = 0;
 }
@@ -397,6 +401,7 @@ menuitem "EVM c6457 EVM IBL";
 hotmenu setConfig_c6457()
 {
     ibl.iblMagic = ibl_MAGIC_VALUE;
+    ibl.iblEvmType = ibl_EVM_C6457L;
 
     ibl.pllConfig[ibl_MAIN_PLL].doEnable      = TRUE;
     ibl.pllConfig[ibl_MAIN_PLL].prediv        = 1;
@@ -420,7 +425,7 @@ hotmenu setConfig_c6457()
     ibl.ddrConfig.uEmif.emif3p1.dmcctl = 0x001800C6;
 
     /* SGMII 0 is present */
-	ibl.sgmiiConfig[0].configure = TRUE;
+    ibl.sgmiiConfig[0].configure = TRUE;
     ibl.sgmiiConfig[0].adviseAbility = 0x9801;
     ibl.sgmiiConfig[0].control       = 0x20;
     ibl.sgmiiConfig[0].txConfig      = 0x00000e21;
@@ -428,7 +433,7 @@ hotmenu setConfig_c6457()
     ibl.sgmiiConfig[0].auxConfig     = 0x0000000b;
 
     /* There is no port 1 on the 6457 */
-	ibl.sgmiiConfig[1].configure = FALSE;
+    ibl.sgmiiConfig[1].configure = FALSE;
 
     /* MDIO configuration */
     ibl.mdioConfig.nMdioOps = 5;
@@ -444,14 +449,14 @@ hotmenu setConfig_c6457()
     /* spiConfig and emifConfig not needed */
 
     /* Ethernet configuration for Boot mode 0 */
-	ibl.bootModes[0].bootMode = ibl_BOOT_MODE_TFTP;
-	ibl.bootModes[0].priority = ibl_HIGHEST_PRIORITY;
-	ibl.bootModes[0].port = 0;
+    ibl.bootModes[0].bootMode = ibl_BOOT_MODE_TFTP;
+    ibl.bootModes[0].priority = ibl_HIGHEST_PRIORITY;
+    ibl.bootModes[0].port = 0;
 
     /* Bootp is disabled. The server and file name are provided here */
     ibl.bootModes[0].u.ethBoot.doBootp          = FALSE;
-    ibl.bootModes[0].u.ethBoot.useBootpServerIp = FALSE;
-    ibl.bootModes[0].u.ethBoot.useBootpFileName = FALSE;
+    ibl.bootModes[0].u.ethBoot.useBootpServerIp = TRUE;
+    ibl.bootModes[0].u.ethBoot.useBootpFileName = TRUE;
     ibl.bootModes[0].u.ethBoot.bootFormat       = ibl_BOOT_FORMAT_BBLOB;
 
     SETIP(ibl.bootModes[0].u.ethBoot.ethInfo.ipAddr,    158,218,100,115);
@@ -491,7 +496,7 @@ hotmenu setConfig_c6457()
     ibl.bootModes[0].u.ethBoot.blob.branchAddress = 0xe0000000;       /* Base of DDR2 */
 
     /* Alternative bootMode not configured for now */
-	ibl.bootModes[1].bootMode = ibl_BOOT_MODE_NONE;
+    ibl.bootModes[1].bootMode = ibl_BOOT_MODE_NONE;
 
     ibl.chkSum = 0;
 }
@@ -501,6 +506,7 @@ menuitem "EVM c6455 IBL";
 hotmenu setConfig_c6455()
 {
     ibl.iblMagic = ibl_MAGIC_VALUE;
+    ibl.iblEvmType = ibl_EVM_C6455L;
 
     ibl.pllConfig[ibl_MAIN_PLL].doEnable      = TRUE;
     ibl.pllConfig[ibl_MAIN_PLL].prediv        = 1;
@@ -524,8 +530,8 @@ hotmenu setConfig_c6455()
     ibl.ddrConfig.uEmif.emif3p1.dmcctl = 0x00000005; /* PHY read latency for CAS 4 is 4 + 2 - 1 */
 
     /* SGMII not present */
-	ibl.sgmiiConfig[0].configure = FALSE;
-	ibl.sgmiiConfig[1].configure = FALSE;
+    ibl.sgmiiConfig[0].configure = FALSE;
+    ibl.sgmiiConfig[1].configure = FALSE;
 
     /* MDIO configuration */
     ibl.mdioConfig.nMdioOps = 0;
@@ -537,14 +543,14 @@ hotmenu setConfig_c6455()
     /* spiConfig and emifConfig not needed */
 
     /* Ethernet configuration for Boot mode 0 */
-	ibl.bootModes[0].bootMode = ibl_BOOT_MODE_TFTP;
-	ibl.bootModes[0].priority = ibl_HIGHEST_PRIORITY;
-	ibl.bootModes[0].port     = 0;
+    ibl.bootModes[0].bootMode = ibl_BOOT_MODE_TFTP;
+    ibl.bootModes[0].priority = ibl_HIGHEST_PRIORITY;
+    ibl.bootModes[0].port     = 0;
 
     /* Bootp is disabled. The server and file name are provided here */
     ibl.bootModes[0].u.ethBoot.doBootp          = FALSE;
-    ibl.bootModes[0].u.ethBoot.useBootpServerIp = FALSE;
-    ibl.bootModes[0].u.ethBoot.useBootpFileName = FALSE;
+    ibl.bootModes[0].u.ethBoot.useBootpServerIp = TRUE;
+    ibl.bootModes[0].u.ethBoot.useBootpFileName = TRUE;
     ibl.bootModes[0].u.ethBoot.bootFormat       = ibl_BOOT_FORMAT_BBLOB;
 
     SETIP(ibl.bootModes[0].u.ethBoot.ethInfo.ipAddr,    158,218,100,118);
@@ -584,7 +590,7 @@ hotmenu setConfig_c6455()
     ibl.bootModes[0].u.ethBoot.blob.branchAddress = 0xe0000000;       /* Base of DDR2 */
 
     /* Alternative bootMode not configured for now */
-	ibl.bootModes[1].bootMode = ibl_BOOT_MODE_NONE;
+    ibl.bootModes[1].bootMode = ibl_BOOT_MODE_NONE;
 
     ibl.chkSum = 0;
 }
@@ -684,31 +690,48 @@ hotmenu setConfig_c6678_main()
 	ibl.bootModes[0].port     = 0;
 
 	ibl.bootModes[0].u.norBoot.bootFormat	= ibl_BOOT_FORMAT_ELF;
-	ibl.bootModes[0].u.norBoot.bootAddress[0][0]	= 0;
-	ibl.bootModes[0].u.norBoot.bootAddress[1][0]	= 0;
+	ibl.bootModes[0].u.norBoot.bootAddress[0][0]	= 0;		/* Image 0 NOR offset byte address in LE mode */ 
+	ibl.bootModes[0].u.norBoot.bootAddress[0][1]	= 0xA00000;	/* Image 1 NOR offset byte address in LE mode  */
+	ibl.bootModes[0].u.norBoot.bootAddress[1][0]	= 0;		/* Image 0 NOR offset byte address in BE mode */ 
+	ibl.bootModes[0].u.norBoot.bootAddress[1][1]	= 0xA00000;	/* Image 1 NOR offset byte address in BE mode  */
 	ibl.bootModes[0].u.norBoot.interface	= ibl_PMEM_IF_SPI;
-    ibl.bootModes[0].u.norBoot.blob[0][0].startAddress  = 0x80000000;       /* Base address of DDR2 */
-    ibl.bootModes[0].u.norBoot.blob[0][0].sizeBytes     = 0xA00000;         /* 10 MB */
-    ibl.bootModes[0].u.norBoot.blob[0][0].branchAddress = 0x80000000;       /* Base address of DDR2 */
-    ibl.bootModes[0].u.norBoot.blob[1][0].startAddress  = 0x80000000;       /* Base address of DDR2 */
-    ibl.bootModes[0].u.norBoot.blob[1][0].sizeBytes     = 0xA00000;         /* 10 MB */
-    ibl.bootModes[0].u.norBoot.blob[1][0].branchAddress = 0x80000000;       /* Base address of DDR2 */
+    ibl.bootModes[0].u.norBoot.blob[0][0].startAddress  = 0x80000000;       /* Image 0 load start address in LE mode */
+    ibl.bootModes[0].u.norBoot.blob[0][0].sizeBytes     = 0xA00000;         /* Image 0 size (10 MB) in LE mode */
+    ibl.bootModes[0].u.norBoot.blob[0][0].branchAddress = 0x80000000;       /* Image 0 branch address after loading in LE mode */
+    ibl.bootModes[0].u.norBoot.blob[0][1].startAddress  = 0x90000000;       /* Image 1 load start address in LE mode */
+    ibl.bootModes[0].u.norBoot.blob[0][1].sizeBytes     = 0xA00000;         /* Image 1 size (10 MB) in LE mode */
+    ibl.bootModes[0].u.norBoot.blob[0][1].branchAddress = 0x90000000;       /* Image 1 branch address after loading in LE mode */
+    ibl.bootModes[0].u.norBoot.blob[1][0].startAddress  = 0x80000000;       /* Image 0 load start address in BE mode */
+    ibl.bootModes[0].u.norBoot.blob[1][0].sizeBytes     = 0xA00000;         /* Image 0 size (10 MB) in BE mode */
+    ibl.bootModes[0].u.norBoot.blob[1][0].branchAddress = 0x80000000;       /* Image 0 branch address after loading in BE mode */
+    ibl.bootModes[0].u.norBoot.blob[1][1].startAddress  = 0x90000000;       /* Image 1 load start address in BE mode */
+    ibl.bootModes[0].u.norBoot.blob[1][1].sizeBytes     = 0xA00000;         /* Image 1 size (10 MB) in BE mode */
+    ibl.bootModes[0].u.norBoot.blob[1][1].branchAddress = 0x90000000;       /* Image 1 branch address after loading in BE mode */
 
     ibl.bootModes[1].bootMode = ibl_BOOT_MODE_NAND;
     ibl.bootModes[1].priority = ibl_HIGHEST_PRIORITY;
     ibl.bootModes[1].port     = 0;
 
     ibl.bootModes[1].u.nandBoot.bootFormat        = ibl_BOOT_FORMAT_BBLOB;
-    ibl.bootModes[1].u.nandBoot.bootAddress[0][0]	  = 0x4000;
-    ibl.bootModes[1].u.nandBoot.bootAddress[1][0]	  = 0x4000;
+    ibl.bootModes[1].u.nandBoot.bootAddress[0][0]	  = 0x4000;         /* Image 0 NAND offset address (block 1) in LE mode */
+    ibl.bootModes[1].u.nandBoot.bootAddress[0][1]	  = 0x2000000;      /* Image 1 NAND offset address (block 2048) in LE mode */
+    ibl.bootModes[1].u.nandBoot.bootAddress[1][0]	  = 0x4000;	    /* Image 0 NAND offset address (block 1) in BE mode */
+    ibl.bootModes[1].u.nandBoot.bootAddress[1][1]	  = 0x2000000;      /* Image 1 NAND offset address (block 2048) in BE mode */
     ibl.bootModes[1].u.nandBoot.interface         = ibl_PMEM_IF_CHIPSEL_2;
 
-    ibl.bootModes[1].u.nandBoot.blob[0][0].startAddress  = 0x80000000;       /* Base address of DDR2 */
-    ibl.bootModes[1].u.nandBoot.blob[0][0].sizeBytes     = 0xA00000;         /* 10 MB */
-    ibl.bootModes[1].u.nandBoot.blob[0][0].branchAddress = 0x80000000;       /* Base address of DDR2 */
-    ibl.bootModes[1].u.nandBoot.blob[1][0].startAddress  = 0x80000000;       /* Base address of DDR2 */
-    ibl.bootModes[1].u.nandBoot.blob[1][0].sizeBytes     = 0xA00000;         /* 10 MB */
-    ibl.bootModes[1].u.nandBoot.blob[1][0].branchAddress = 0x80000000;       /* Base address of DDR2 */
+    ibl.bootModes[1].u.nandBoot.blob[0][0].startAddress  = 0x80000000;       /* Image 0 load start address in LE mode */
+    ibl.bootModes[1].u.nandBoot.blob[0][0].sizeBytes     = 0xA00000;         /* Image 0 size (10 MB) in LE mode */
+    ibl.bootModes[1].u.nandBoot.blob[0][0].branchAddress = 0x80000000;       /* Image 0 branch address after loading in LE mode */
+    ibl.bootModes[1].u.nandBoot.blob[0][1].startAddress  = 0x90000000;       /* Image 1 load start address in LE mode */
+    ibl.bootModes[1].u.nandBoot.blob[0][1].sizeBytes     = 0xA00000;         /* Image 1 size (10 MB) in LE mode */
+    ibl.bootModes[1].u.nandBoot.blob[0][1].branchAddress = 0x90000000;       /* Image 1 branch address after loading in LE mode */
+    ibl.bootModes[1].u.nandBoot.blob[1][0].startAddress  = 0x80000000;       /* Image 0 load start address in BE mode */
+    ibl.bootModes[1].u.nandBoot.blob[1][0].sizeBytes     = 0xA00000;         /* Image 0 size (10 MB) in BE mode */
+    ibl.bootModes[1].u.nandBoot.blob[1][0].branchAddress = 0x80000000;       /* Image 0 branch address after loading in BE mode */
+    ibl.bootModes[1].u.nandBoot.blob[1][1].startAddress  = 0x90000000;       /* Image 1 load start address in BE mode */
+    ibl.bootModes[1].u.nandBoot.blob[1][1].sizeBytes     = 0xA00000;         /* Image 1 size (10 MB) in BE mode */
+    ibl.bootModes[1].u.nandBoot.blob[1][1].branchAddress = 0x90000000;       /* Image 1 branch address after loading in BE mode */
+
 
     ibl.bootModes[1].u.nandBoot.nandInfo.busWidthBits  = 8;
     ibl.bootModes[1].u.nandBoot.nandInfo.pageSizeBytes = 512;
@@ -746,8 +769,8 @@ hotmenu setConfig_c6678_main()
 	ibl.bootModes[2].port     = ibl_PORT_SWITCH_ALL;
 
 	ibl.bootModes[2].u.ethBoot.doBootp          = FALSE;
-	ibl.bootModes[2].u.ethBoot.useBootpServerIp = FALSE;
-	ibl.bootModes[2].u.ethBoot.useBootpFileName = FALSE;
+	ibl.bootModes[2].u.ethBoot.useBootpServerIp = TRUE;
+	ibl.bootModes[2].u.ethBoot.useBootpFileName = TRUE;
 	ibl.bootModes[2].u.ethBoot.bootFormat       = ibl_BOOT_FORMAT_BBLOB;
 
 
@@ -781,11 +804,11 @@ hotmenu setConfig_c6678_main()
     ibl.bootModes[2].u.ethBoot.ethInfo.fileName[13] = '\0';
     ibl.bootModes[2].u.ethBoot.ethInfo.fileName[14] = '\0';
 
-    ibl.bootModes[2].u.ethBoot.blob.startAddress  = 0x80000000;       /* Base address of DDR2 */
-    ibl.bootModes[2].u.ethBoot.blob.sizeBytes     = 0xA00000;         /* 10 MB */
-    ibl.bootModes[2].u.ethBoot.blob.branchAddress = 0x80000000;       /* Base of DDR2 */
+    ibl.bootModes[2].u.ethBoot.blob.startAddress  = 0x80000000;       /* Load start address */
+    ibl.bootModes[2].u.ethBoot.blob.sizeBytes     = 0xA00000;         /* Image size (10 MB) */
+    ibl.bootModes[2].u.ethBoot.blob.branchAddress = 0x80000000;       /* Branch address after loading */
 
-	ibl.chkSum = 0;
+    ibl.chkSum = 0;
 }
 
 menuitem "EVM c6670 IBL";
@@ -882,31 +905,48 @@ hotmenu setConfig_c6670_main()
 	ibl.bootModes[0].port     = 0;
 
 	ibl.bootModes[0].u.norBoot.bootFormat	= ibl_BOOT_FORMAT_ELF;
-	ibl.bootModes[0].u.norBoot.bootAddress[0][0]	= 0;
-	ibl.bootModes[0].u.norBoot.bootAddress[1][0]	= 0;
+	ibl.bootModes[0].u.norBoot.bootAddress[0][0]	= 0;		/* Image 0 NOR offset byte address in LE mode */ 
+	ibl.bootModes[0].u.norBoot.bootAddress[0][1]	= 0xA00000;	/* Image 1 NOR offset byte address in LE mode  */
+	ibl.bootModes[0].u.norBoot.bootAddress[1][0]	= 0;		/* Image 0 NOR offset byte address in BE mode */ 
+	ibl.bootModes[0].u.norBoot.bootAddress[1][1]	= 0xA00000;	/* Image 1 NOR offset byte address in BE mode  */
 	ibl.bootModes[0].u.norBoot.interface	= ibl_PMEM_IF_SPI;
-    ibl.bootModes[0].u.norBoot.blob[0][0].startAddress  = 0x80000000;       /* Base address of DDR2 */
-    ibl.bootModes[0].u.norBoot.blob[0][0].sizeBytes     = 0xA00000;         /* 10 MB */
-    ibl.bootModes[0].u.norBoot.blob[0][0].branchAddress = 0x80000000;       /* Base address of DDR2 */
-    ibl.bootModes[0].u.norBoot.blob[1][0].startAddress  = 0x80000000;       /* Base address of DDR2 */
-    ibl.bootModes[0].u.norBoot.blob[1][0].sizeBytes     = 0xA00000;         /* 10 MB */
-    ibl.bootModes[0].u.norBoot.blob[1][0].branchAddress = 0x80000000;       /* Base address of DDR2 */
+    ibl.bootModes[0].u.norBoot.blob[0][0].startAddress  = 0x80000000;       /* Image 0 load start address in LE mode */
+    ibl.bootModes[0].u.norBoot.blob[0][0].sizeBytes     = 0xA00000;         /* Image 0 size (10 MB) in LE mode */
+    ibl.bootModes[0].u.norBoot.blob[0][0].branchAddress = 0x80000000;       /* Image 0 branch address after loading in LE mode */
+    ibl.bootModes[0].u.norBoot.blob[0][1].startAddress  = 0x90000000;       /* Image 1 load start address in LE mode */
+    ibl.bootModes[0].u.norBoot.blob[0][1].sizeBytes     = 0xA00000;         /* Image 1 size (10 MB) in LE mode */
+    ibl.bootModes[0].u.norBoot.blob[0][1].branchAddress = 0x90000000;       /* Image 1 branch address after loading in LE mode */
+    ibl.bootModes[0].u.norBoot.blob[1][0].startAddress  = 0x80000000;       /* Image 0 load start address in BE mode */
+    ibl.bootModes[0].u.norBoot.blob[1][0].sizeBytes     = 0xA00000;         /* Image 0 size (10 MB) in BE mode */
+    ibl.bootModes[0].u.norBoot.blob[1][0].branchAddress = 0x80000000;       /* Image 0 branch address after loading in BE mode */
+    ibl.bootModes[0].u.norBoot.blob[1][1].startAddress  = 0x90000000;       /* Image 1 load start address in BE mode */
+    ibl.bootModes[0].u.norBoot.blob[1][1].sizeBytes     = 0xA00000;         /* Image 1 size (10 MB) in BE mode */
+    ibl.bootModes[0].u.norBoot.blob[1][1].branchAddress = 0x90000000;       /* Image 1 branch address after loading in BE mode */
 
     ibl.bootModes[1].bootMode = ibl_BOOT_MODE_NAND;
     ibl.bootModes[1].priority = ibl_HIGHEST_PRIORITY;
     ibl.bootModes[1].port     = 0;
 
     ibl.bootModes[1].u.nandBoot.bootFormat        = ibl_BOOT_FORMAT_BBLOB;
-    ibl.bootModes[1].u.nandBoot.bootAddress[0][0]	  = 0x4000;
-    ibl.bootModes[1].u.nandBoot.bootAddress[1][0]	  = 0x4000;
+    ibl.bootModes[1].u.nandBoot.bootAddress[0][0]	  = 0x4000;         /* Image 0 NAND offset address (block 1) in LE mode */
+    ibl.bootModes[1].u.nandBoot.bootAddress[0][1]	  = 0x2000000;      /* Image 1 NAND offset address (block 2048) in LE mode */
+    ibl.bootModes[1].u.nandBoot.bootAddress[1][0]	  = 0x4000;	    /* Image 0 NAND offset address (block 1) in BE mode */
+    ibl.bootModes[1].u.nandBoot.bootAddress[1][1]	  = 0x2000000;      /* Image 1 NAND offset address (block 2048) in BE mode */
     ibl.bootModes[1].u.nandBoot.interface         = ibl_PMEM_IF_GPIO;
 
-    ibl.bootModes[1].u.nandBoot.blob[0][0].startAddress  = 0x80000000;       /* Base address of DDR2 */
-    ibl.bootModes[1].u.nandBoot.blob[0][0].sizeBytes     = 0xA00000;         /* 10 MB */
-    ibl.bootModes[1].u.nandBoot.blob[0][0].branchAddress = 0x80000000;       /* Base address of DDR2 */
-    ibl.bootModes[1].u.nandBoot.blob[1][0].startAddress  = 0x80000000;       /* Base address of DDR2 */
-    ibl.bootModes[1].u.nandBoot.blob[1][0].sizeBytes     = 0xA00000;         /* 10 MB */
-    ibl.bootModes[1].u.nandBoot.blob[1][0].branchAddress = 0x80000000;       /* Base address of DDR2 */
+    ibl.bootModes[1].u.nandBoot.blob[0][0].startAddress  = 0x80000000;       /* Image 0 load start address in LE mode */
+    ibl.bootModes[1].u.nandBoot.blob[0][0].sizeBytes     = 0xA00000;         /* Image 0 size (10 MB) in LE mode */
+    ibl.bootModes[1].u.nandBoot.blob[0][0].branchAddress = 0x80000000;       /* Image 0 branch address after loading in LE mode */
+    ibl.bootModes[1].u.nandBoot.blob[0][1].startAddress  = 0x90000000;       /* Image 1 load start address in LE mode */
+    ibl.bootModes[1].u.nandBoot.blob[0][1].sizeBytes     = 0xA00000;         /* Image 1 size (10 MB) in LE mode */
+    ibl.bootModes[1].u.nandBoot.blob[0][1].branchAddress = 0x90000000;       /* Image 1 branch address after loading in LE mode */
+    ibl.bootModes[1].u.nandBoot.blob[1][0].startAddress  = 0x80000000;       /* Image 0 load start address in BE mode */
+    ibl.bootModes[1].u.nandBoot.blob[1][0].sizeBytes     = 0xA00000;         /* Image 0 size (10 MB) in BE mode */
+    ibl.bootModes[1].u.nandBoot.blob[1][0].branchAddress = 0x80000000;       /* Image 0 branch address after loading in BE mode */
+    ibl.bootModes[1].u.nandBoot.blob[1][1].startAddress  = 0x90000000;       /* Image 1 load start address in BE mode */
+    ibl.bootModes[1].u.nandBoot.blob[1][1].sizeBytes     = 0xA00000;         /* Image 1 size (10 MB) in BE mode */
+    ibl.bootModes[1].u.nandBoot.blob[1][1].branchAddress = 0x90000000;       /* Image 1 branch address after loading in BE mode */
+
 
     ibl.bootModes[1].u.nandBoot.nandInfo.busWidthBits  = 8;
     ibl.bootModes[1].u.nandBoot.nandInfo.pageSizeBytes = 512;
@@ -944,8 +984,8 @@ hotmenu setConfig_c6670_main()
 	ibl.bootModes[2].port     = ibl_PORT_SWITCH_ALL;
 
 	ibl.bootModes[2].u.ethBoot.doBootp          = FALSE;
-	ibl.bootModes[2].u.ethBoot.useBootpServerIp = FALSE;
-	ibl.bootModes[2].u.ethBoot.useBootpFileName = FALSE;
+	ibl.bootModes[2].u.ethBoot.useBootpServerIp = TRUE;
+	ibl.bootModes[2].u.ethBoot.useBootpFileName = TRUE;
 	ibl.bootModes[2].u.ethBoot.bootFormat       = ibl_BOOT_FORMAT_BBLOB;
 
 
@@ -979,10 +1019,10 @@ hotmenu setConfig_c6670_main()
     ibl.bootModes[2].u.ethBoot.ethInfo.fileName[13] = '\0';
     ibl.bootModes[2].u.ethBoot.ethInfo.fileName[14] = '\0';
 
-    ibl.bootModes[2].u.ethBoot.blob.startAddress  = 0x80000000;       /* Base address of DDR2 */
-    ibl.bootModes[2].u.ethBoot.blob.sizeBytes     = 0xA00000;         /* 10 MB */
-    ibl.bootModes[2].u.ethBoot.blob.branchAddress = 0x80000000;       /* Base of DDR2 */
+    ibl.bootModes[2].u.ethBoot.blob.startAddress  = 0x80000000;       /* Load start address */
+    ibl.bootModes[2].u.ethBoot.blob.sizeBytes     = 0xA00000;         /* Image size (10 MB) */
+    ibl.bootModes[2].u.ethBoot.blob.branchAddress = 0x80000000;       /* Branch address after loading */
 
-	ibl.chkSum = 0;
+    ibl.chkSum = 0;
 }
 

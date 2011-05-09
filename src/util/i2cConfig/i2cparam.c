@@ -55,7 +55,7 @@
 #include <stdlib.h>
 #include <stdio.h>
 
-ibl_t ibl;
+ibl_t ibl = {0, };
 
 /* The configAddress must be programmed. On images which support both endians
  * there can be two seperate configurations, one for big endian, and one for little */

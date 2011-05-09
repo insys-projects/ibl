@@ -21,8 +21,8 @@ MEMORY
 	HEAP      :  origin = 0x810800, length = 0x8000
 	DATA_INIT :  origin = 0x818800, length = 0x0400
 	DATA      :  origin = 0x818c00, length = 0x2c00
-	CFG       :  origin = 0x81b800, length = 0x0400
-	STAT      :  origin = 0x81bc00, length = 0x0200
+	CFG       :  origin = 0x81b800, length = 0x0300
+	STAT      :  origin = 0x81bb00, length = 0x0200
 
 	LINKRAM   :  origin = 0x1081be00, length = 0x0200
 	CPPIRAM   :  origin = 0x1081c000, length = 0x0200

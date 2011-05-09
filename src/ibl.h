@@ -65,9 +65,9 @@
 
 /**
  * @brief
- *  The version number, 1.0.0.3
+ *  The version number, 1.0.0.4
  */
-#define ibl_VERSION  ibl_MAKE_VERSION(1,0,0,3)
+#define ibl_VERSION  ibl_MAKE_VERSION(1,0,0,4)
 
 
 /**
@@ -130,7 +130,7 @@ typedef struct iblEthBootInfo_s
     uint8   gatewayIp[4];   /**< The IP address of the gateway */
     uint8   netmask[4];     /**< The IP netmask */
     uint8   hwAddress[6];   /**< The hardware (mac) address of this device */
-    char8   fileName[128];  /**< The file name to load */
+    char8   fileName[64];  /**< The file name to load */
 
 } iblEthBootInfo_t;
 
@@ -698,6 +698,7 @@ typedef struct iblBoot_s
 #define ibl_EVM_C6457L  0x20  	/**< C6457 Low Cost EVM */
 #define ibl_EVM_C6472L  0x30  	/**< C6472 Low Cost EVM */
 #define ibl_EVM_C6474L  0x40  	/**< C6474 Low Cost EVM */
+#define ibl_EVM_C6474M  0x41  	/**< C6474 Mez EVM */
 #define ibl_EVM_C6670L  0x50  	/**< C6670 Low Cost EVM */
 #define ibl_EVM_C6678L  0x60  	/**< C6678 Low Cost EVM */
 
@@ -735,7 +736,7 @@ typedef struct ibl_s
 
     iblBoot_t  bootModes[ibl_N_BOOT_MODES];   /**< Boot configuration */
 
-    uint16     iblEvmType;                    /**< @ref ibl_MAGIC_VALUE */
+    uint16     iblEvmType;                    /**< @ref ibl_EVM_TYPE */
 
     uint16     chkSum;                        /**< Ones complement checksum over the whole config structure */
 

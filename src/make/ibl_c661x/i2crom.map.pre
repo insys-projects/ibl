@@ -56,7 +56,7 @@ pad
   pad_file_id  = 1
   dev_addr     = 0x500
   dev_addr_ext = I2C_BUS_ADDR
-  len          = 0x400
+  len          = 0x300
 }
 
 #if (PAD_FILE_ID_1 != PAD_FILE_ID_2)
@@ -65,7 +65,7 @@ pad
   pad_file_id  = 2
   dev_addr     = 0x800
   dev_addr_ext = I2C_BUS_ADDR
-  len          = 0x400
+  len          = 0x300
 }
 #endif
 

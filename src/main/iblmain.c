@@ -311,7 +311,6 @@ void main (void)
             iblImageIdx == boot_para_idx & (ibl_N_IMAGES - 1);
 
             iblStatus.activeBoot = ibl.bootModes[boot_mode_idx].bootMode;
-#endif
 
             switch (ibl.bootModes[boot_mode_idx].bootMode)  
             {
@@ -341,6 +340,7 @@ void main (void)
             iblStatus.heartBeat += 1;
         }
         else
+#endif
         {
             
            /* For C64x devices, loop through the boot modes to find the one with the highest priority
