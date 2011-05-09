@@ -114,7 +114,7 @@ SINT16 hwSpiConfig (spiConfig_t *cfg)
  *************************************************************************************************
  * DESCRIPTION: A bi-directional transfer is done
  *************************************************************************************************/
-SINT16 hw_spi_xfer (UINT16 nbytes, UINT8 *dataOut, UINT8 *dataIn, spiConfig_t *cfg, BOOL terminate)
+SINT16 hw_spi_xfer (UINT32 nbytes, UINT8 *dataOut, UINT8 *dataIn, spiConfig_t *cfg, BOOL terminate)
 {
     UINT32 v;
     UINT32 i;
@@ -227,7 +227,7 @@ SINT16 hw_spi_xfer (UINT16 nbytes, UINT8 *dataOut, UINT8 *dataIn, spiConfig_t *c
  *************************************************************************************************
  * DESCRIPTION: A single data block of a fixed size is read
  *************************************************************************************************/
-SINT16 hwSpiRead (UINT32 addr, UINT16 sizeBytes, UINT8 *data)
+SINT16 hwSpiRead (UINT32 addr, UINT32 sizeBytes, UINT8 *data)
 {
     UINT32 n;
     UINT8  command[4];

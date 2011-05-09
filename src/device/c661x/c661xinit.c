@@ -235,6 +235,11 @@ void iblEnterRom ()
         exit = (void (*)())BOOT_ROM_ENTER_ADDRESS;
         (*exit)();        
     }
+    else
+    {
+        /* Update the DEVSTAT register for the actual boot configuration */
+        DEVICE_REG32_W (DEVICE_REG_DEVSTAT, ((bm_hi << 8) | bm_lo));
+    }
 }
 
 #if (!defined(EXCLUDE_NOR_SPI) || !defined(EXCLUDE_NAND_SPI))

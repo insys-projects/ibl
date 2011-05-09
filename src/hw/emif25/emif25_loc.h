@@ -39,7 +39,12 @@
 /* Register offsets */
 #define EMIF25_ASYNC_CFG_REG(x)       (0x10 + (x)*4)
 #define EMIF25_FLASH_CTL_REG          0x60
+#define EMIF25_FLASH_STATUS_REG       0x64
+#define EMIF25_FLASH_ECC_LOAD_REG     0xbc
 #define EMIF25_FLASH_ECC_REG(x)       (0xc0 + (x)*4)
+#define EMIF25_FLASH_ECC_LOAD_REG     0xbc
+#define EMIF25_FLASH_ERR_ADDR_REG(x)  (0xd0 + (x)*4)
+#define EMIF25_FLASH_ERR_VALUE_REG(x) (0xd8 + (x)*4)
 
 /* Setting the bus width in the async config register */
 #define EMIF25_SET_ASYNC_WID(x,v)     BOOT_SET_BITFIELD((x),(v),1,0)
@@ -50,7 +55,5 @@
 /* Setting the nand enable/disable in the flash control register */
 #define EMIF25_SET_FLASH_CTL_NAND_ENABLE(x,v,cs)   BOOT_SET_BITFIELD((x),(v),((cs)-2),((cs)-2))
 
-
-
-
 #endif /* _EMIF25_LOCK_H */
+

@@ -185,7 +185,7 @@ Int32 nand_open (void *ptr_driver, void (*asyncComplete)(void *))
 
     /* Initialize the control info */
     iblMemset (&nandmcb, 0, sizeof(nandmcb));
-    iblMemcpy (&nandmcb.devInfo, &ibln->nandInfo, sizeof(iblNand_t));
+    iblMemcpy (&nandmcb.devInfo, &ibln->nandInfo, sizeof(nandDevInfo_t));
 
     nandmcb.page             = NULL;
     nandmcb.logicalToPhysMap = NULL;
@@ -260,8 +260,8 @@ Int32 nand_open (void *ptr_driver, void (*asyncComplete)(void *))
             {
                 ret = (*nandmcb.nand_if->nct_driverReadBytes)(i, 
                     j, 
-                    0, //nandmcb.devInfo.pageSizeBytes, 
-                    nandmcb.devInfo.pageSizeBytes+nandmcb.devInfo.pageEccBytes,//nandmcb.devInfo.pageEccBytes, 
+                    nandmcb.devInfo.pageSizeBytes, 
+                    nandmcb.devInfo.pageEccBytes, 
                     nandmcb.page);
                 if (ret < 0)
                 {
@@ -269,8 +269,7 @@ Int32 nand_open (void *ptr_driver, void (*asyncComplete)(void *))
                     return (-1);
                 }
                 
-                //if (nandmcb.page[nandmcb.devInfo.badBlkMarkIdx[j]] != 0xff)
-                if (nandmcb.page[nandmcb.devInfo.pageSizeBytes+nandmcb.devInfo.badBlkMarkIdx[j]] != 0xff)
+                if (nandmcb.page[nandmcb.devInfo.badBlkMarkIdx[j]] != 0xff)
                 {
                     badBlock = TRUE;
                     break;
@@ -306,8 +305,8 @@ Int32 nand_open (void *ptr_driver, void (*asyncComplete)(void *))
     nandmcb.fpos                = -1;      /* Force a read on the first seek */
     nandmcb.currentLogicalBlock = 0xffffffff;
     nandmcb.currentPage         = 0xffffffff;
-    nand_seek (0, 0);
 
+    nand_seek (ibln->bootAddress[iblEndianIdx][iblImageIdx], 0);
             
     return (0);
 

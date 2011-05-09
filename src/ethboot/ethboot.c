@@ -131,7 +131,7 @@ void iblEthBoot (Int32 eIdx)
     /* SGMII configuration. If sgmii is not present this statement is defined
      * to void in target.h */
     for (n = 0; n < ibl_N_ETH_PORTS; n++)  {
-        if (ibl.sgmiiConfig[eIdx].configure == TRUE)
+        if (ibl.sgmiiConfig[n].configure == TRUE)
             hwSgmiiConfig (n, &ibl.sgmiiConfig[n]);
     }
 

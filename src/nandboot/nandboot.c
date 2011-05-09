@@ -81,7 +81,7 @@ void iblNandBoot (int32 eIdx)
         return;
 
 
-    entry = iblBoot (&nand_boot_module, ibl.bootModes[eIdx].u.nandBoot.bootFormat, &ibl.bootModes[eIdx].u.nandBoot.blob);
+    entry = iblBoot (&nand_boot_module, ibl.bootModes[eIdx].u.nandBoot.bootFormat, &ibl.bootModes[eIdx].u.nandBoot.blob[iblEndianIdx][iblImageIdx]);
 
     (*nand_boot_module.close)();
 

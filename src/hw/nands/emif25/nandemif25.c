@@ -79,6 +79,136 @@ nandCmdSet
     DEVICE_REG8_W (memBase + NAND_CMD_OFFSET, cmd);
 }
 
+
+/* Read raw ECC code after writing to NAND. */
+static void
+NandRead4bitECC
+(
+    Uint32    *code
+)
+{
+    Uint32    mask = 0x03ff03ff;
+
+    code[0] = DEVICE_REG32_R (DEVICE_EMIF25_BASE + EMIF25_FLASH_ECC_REG(0)) & mask;
+    code[1] = DEVICE_REG32_R (DEVICE_EMIF25_BASE + EMIF25_FLASH_ECC_REG(1)) & mask;
+    code[2] = DEVICE_REG32_R (DEVICE_EMIF25_BASE + EMIF25_FLASH_ECC_REG(2)) & mask;
+    code[3] = DEVICE_REG32_R (DEVICE_EMIF25_BASE + EMIF25_FLASH_ECC_REG(3)) & mask;
+}
+
+
+/* Correct up to 4 bits in data we just read, using state left in the
+* hardware plus the ecc_code computed when it was first written.
+*/
+static Int32
+NandCorrect4bitECC
+(
+    Uint8     *data,
+    Uint8     *ecc_code
+)
+{
+    Int32     i;
+    Uint16    ecc10[8];
+    Uint16    *ecc16;
+    Uint32    syndrome[4];
+    Uint32    num_errors, corrected, v;
+
+    /* All bytes 0xff?  It's an erased page; ignore its ECC. */
+    for (i = 0; i < 10; i++) {
+        if (ecc_code[i] != 0xff)
+            goto compare;
+    }
+    return 0;
+
+compare:
+/* Unpack ten bytes into eight 10 bit values.  We know we're
+* little-endian, and use type punning for less shifting/masking.
+    */
+    ecc16 = (Uint16 *)ecc_code;
+
+    ecc10[0] =  (ecc16[0] >>  0) & 0x3ff;
+    ecc10[1] = ((ecc16[0] >> 10) & 0x3f) | ((ecc16[1] << 6) & 0x3c0);
+    ecc10[2] =  (ecc16[1] >>  4) & 0x3ff;
+    ecc10[3] = ((ecc16[1] >> 14) & 0x3)  | ((ecc16[2] << 2) & 0x3fc);
+    ecc10[4] =  (ecc16[2] >>  8)         | ((ecc16[3] << 8) & 0x300);
+    ecc10[5] =  (ecc16[3] >>  2) & 0x3ff;
+    ecc10[6] = ((ecc16[3] >> 12) & 0xf)  | ((ecc16[4] << 4) & 0x3f0);
+    ecc10[7] =  (ecc16[4] >>  6) & 0x3ff;
+
+    /* Tell ECC controller about the expected ECC codes. */
+    for (i = 7; i >= 0; i--)
+    {
+        DEVICE_REG32_W (DEVICE_EMIF25_BASE + EMIF25_FLASH_ECC_LOAD_REG, ecc10[i]);
+    }
+
+    /* Allow time for syndrome calculation ... then read it.
+     * A syndrome of all zeroes 0 means no detected errors.
+     */
+    v = DEVICE_REG32_R (DEVICE_EMIF25_BASE + EMIF25_FLASH_STATUS_REG);
+    NandRead4bitECC(syndrome);
+    if (!(syndrome[0] | syndrome[1] | syndrome[2] | syndrome[3]))
+        return 0;
+
+   /*
+    * Clear any previous address calculation by doing a dummy read of an
+    * error address register.
+    */
+    v = DEVICE_REG32_R (DEVICE_EMIF25_BASE + EMIF25_FLASH_ERR_ADDR_REG(0));
+
+    /* Start address calculation, and wait for it to complete.
+    * We _could_ start reading more data while this is working,
+    * to speed up the overall page read.
+    */
+    v = DEVICE_REG32_R (DEVICE_EMIF25_BASE + EMIF25_FLASH_CTL_REG);
+    DEVICE_REG32_W (DEVICE_EMIF25_BASE + EMIF25_FLASH_CTL_REG, v | (1<<13));
+    for (;;) {
+        Uint32    fsr = DEVICE_REG32_R (DEVICE_EMIF25_BASE + EMIF25_FLASH_STATUS_REG);
+
+        switch ((fsr >> 8) & 0x0f) {
+        case 0:     /* no error, should not happen */
+            v = DEVICE_REG32_R (DEVICE_EMIF25_BASE + EMIF25_FLASH_ERR_VALUE_REG(0));
+            return 0;
+        case 1:     /* five or more errors detected */
+            v = DEVICE_REG32_R (DEVICE_EMIF25_BASE + EMIF25_FLASH_ERR_VALUE_REG(0));
+            return -1;
+        case 2:     /* error addresses computed */
+        case 3:
+            num_errors = 1 + ((fsr >> 16) & 0x03);
+            goto correct;
+        default:    /* still working on it */
+            chipDelay32 (NAND_DELAY);
+            continue;
+        }
+    }
+
+correct:
+    /* correct each error */
+    for (i = 0, corrected = 0; i < num_errors; i++) {
+        int error_address, error_value;
+
+        if (i > 1) {
+            error_address = DEVICE_REG32_R (DEVICE_EMIF25_BASE + EMIF25_FLASH_ERR_ADDR_REG(1));
+            error_value = DEVICE_REG32_R (DEVICE_EMIF25_BASE + EMIF25_FLASH_ERR_VALUE_REG(1));
+        } else {
+            error_address = DEVICE_REG32_R (DEVICE_EMIF25_BASE + EMIF25_FLASH_ERR_ADDR_REG(0));
+            error_value = DEVICE_REG32_R (DEVICE_EMIF25_BASE + EMIF25_FLASH_ERR_VALUE_REG(0));
+        }
+
+        if (i & 1) {
+            error_address >>= 16;
+            error_value >>= 16;
+        }
+        error_address &= 0x3ff;
+        error_address = (512 + 7) - error_address;
+
+        if (error_address < 512) {
+            data[error_address] ^= error_value;
+            corrected++;
+        }
+    }
+
+    return corrected;
+}
+
 void 
 nandReadDataBytes
 (
@@ -131,7 +261,16 @@ Int32 nandHwEmifDriverReadBytes (Uint32 block, Uint32 page, Uint32 byte, Uint32 
 
     addr = (block << hwDevInfo->blockOffset) | (page << hwDevInfo->pageOffset) | ((byte & 0xff) << hwDevInfo->columnOffset);   
 
-    cmd = hwDevInfo->readCommandPre;
+    if (byte < hwDevInfo->pageSizeBytes) 
+    {
+        /* Read page data */
+        cmd = hwDevInfo->readCommandPre;
+    }
+    else
+    {
+        /* Read spare area data */
+        cmd = 0x50;
+    }
     nandCmdSet(cmd); // First cycle send 0
 
     /* 4 address cycles */
@@ -155,9 +294,9 @@ Int32 nandHwEmifDriverReadPage (Uint32 block, Uint32 page, Uint8 *data)
 {
     Int32   i, j, nSegs;
     Int32   addr;
-    Uint8  *blockp, *pSpareArea;
-    Uint8   eccCompute[3];
-    Uint8   eccFlash[3];
+    Uint8  *pSpareArea;
+    Uint8   eccFlash[ibl_N_ECC_BYTES];
+    Uint32  v;
 
     addr = (block << hwDevInfo->blockOffset) | (page << hwDevInfo->pageOffset);   
 
@@ -172,28 +311,31 @@ Int32 nandHwEmifDriverReadPage (Uint32 block, Uint32 page, Uint8 *data)
 
     chipDelay32 (NAND_DELAY);
 
-    /* Read the data */
-    nandReadDataBytes(hwDevInfo->pageSizeBytes + hwDevInfo->pageEccBytes, data);
+    /* Start 4-bit ECC calculation */
+    v = DEVICE_REG32_R (DEVICE_EMIF25_BASE + EMIF25_FLASH_CTL_REG);
+    DEVICE_REG32_W (DEVICE_EMIF25_BASE + EMIF25_FLASH_CTL_REG, v | (1<<12));
+
+    /* Read the page data */
+    nandReadDataBytes(hwDevInfo->pageSizeBytes, data);
+
+   /* After a read, terminate ECC calculation by a dummy read
+    * of some 4-bit ECC register.
+    */
+    v = DEVICE_REG32_R (DEVICE_EMIF25_BASE + EMIF25_FLASH_ECC_REG(0));
+
+    /* Read the spare area data */
     pSpareArea = &data[hwDevInfo->pageSizeBytes];
-     
-    /* Break the page into segments of 256 bytes, each with its own ECC */
-    nSegs = hwDevInfo->pageSizeBytes >> 8;
-
-    for (i = 0; i < nSegs; i++)  {
-        
-        blockp = &data[i << 8];
-
-        /* Format the ecc values to match what the software is looking for */
-        for (j = 0; j < 3; j++)
-        {
-            eccFlash[j] = pSpareArea[hwDevInfo->eccBytesIdx[i*3+j]];
-        }
-
-        eccComputeECC(blockp, eccCompute);
-        if (eccCorrectData (blockp, eccFlash, eccCompute))
-        {
-            return (NAND_ECC_FAILURE);
-        }
+    nandReadDataBytes(hwDevInfo->pageEccBytes, pSpareArea);
+    
+    /* Get the ECC bytes from the spare area data */
+    for (i = 0; i < ibl_N_ECC_BYTES; i++)
+    {
+        eccFlash[i] = pSpareArea[hwDevInfo->eccBytesIdx[i]];
+    }
+    
+    if (NandCorrect4bitECC(data, eccFlash) < 0)
+    {
+        return (NAND_ECC_FAILURE);
     }
 
     return (0);
