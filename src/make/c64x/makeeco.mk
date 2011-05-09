@@ -149,6 +149,11 @@ else
    endif
 endif
 
+CDEPINC = $(subst \,/,-I$(subst ;, -I,$(C6X_C_DIR)))
+ADEPINC = $(subst \,/,-I$(subst ;, -I,$(C6X_A_DIR)))
+
+CFLAGS+=$(CDEPINC)
+
 # how to build .c and .s files on c64x
 FNAMEDEF   = -dTNFNAME=$(notdir $<)
 GGCCOMPILE = $(CC) $(CFLAGS) $(DCFLAGS) $(CDEFS) $(FNAMEDEF) $(FUNCOPTS) $< -eo.$(COBJEXT)
@@ -179,8 +184,6 @@ GGBLOCKEXPNNUMCH = $(BLOCKEXPN) $< $@ $(NUMCH)
 %.$(AOBJEXT): %.s62
 	$(GGACOMPILE)
 
-CDEPINC = $(subst \,/,-I$(subst ;, -I,$(C6X_C_DIR)))
-ADEPINC = $(subst \,/,-I$(subst ;, -I,$(C6X_A_DIR)))
 
 ifeq ($(OS),Linux)
 %.$(CDEPEXT): %.c

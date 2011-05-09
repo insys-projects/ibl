@@ -53,7 +53,6 @@
 #pragma DATA_SECTION(ibl, ".ibl_config_table")
 ibl_t ibl;
 
-
 /**
  * @brief The ibl status table is declared.
  *  

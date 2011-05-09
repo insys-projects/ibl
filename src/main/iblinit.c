@@ -189,7 +189,7 @@ uint16 swap16val (uint16 v)
  */
 void iblSwap (void)
 {
-    int i;
+    int i, j, k;
 
     ibl.iblMagic = swap32val (ibl.iblMagic);
 
@@ -288,11 +288,23 @@ void iblSwap (void)
 
         }  else if (ibl.bootModes[i].bootMode == ibl_BOOT_MODE_NAND)  {
             ibl.bootModes[i].u.nandBoot.bootFormat             = swap32val(ibl.bootModes[i].u.nandBoot.bootFormat);
-            ibl.bootModes[i].u.nandBoot.bootAddress            = swap32val(ibl.bootModes[i].u.nandBoot.bootAddress);
+            for (j = 0; j < ibl_N_ENDIANS; j++)
+            {
+                for (k = 0; k < ibl_N_IMAGES; k++)
+                {
+                    ibl.bootModes[i].u.nandBoot.bootAddress[j][k] = swap32val(ibl.bootModes[i].u.nandBoot.bootAddress[j][k]);
+                }
+            }
             ibl.bootModes[i].u.nandBoot.interface              = swap32val(ibl.bootModes[i].u.nandBoot.interface);
-            ibl.bootModes[i].u.nandBoot.blob.startAddress      = swap32val(ibl.bootModes[i].u.nandBoot.blob.startAddress);
-            ibl.bootModes[i].u.nandBoot.blob.sizeBytes         = swap32val(ibl.bootModes[i].u.nandBoot.blob.sizeBytes);
-            ibl.bootModes[i].u.nandBoot.blob.branchAddress     = swap32val(ibl.bootModes[i].u.nandBoot.blob.branchAddress);
+            for (j = 0; j < ibl_N_ENDIANS; j++)
+            {
+                for (k = 0; k < ibl_N_IMAGES; k++)
+                {
+                    ibl.bootModes[i].u.nandBoot.blob[j][k].startAddress  = swap32val(ibl.bootModes[i].u.nandBoot.blob[j][k].startAddress);
+                    ibl.bootModes[i].u.nandBoot.blob[j][k].sizeBytes     = swap32val(ibl.bootModes[i].u.nandBoot.blob[j][k].sizeBytes);
+                    ibl.bootModes[i].u.nandBoot.blob[j][k].branchAddress = swap32val(ibl.bootModes[i].u.nandBoot.blob[j][k].branchAddress);
+                }
+            }
             ibl.bootModes[i].u.nandBoot.nandInfo.busWidthBits  = swap32val(ibl.bootModes[i].u.nandBoot.nandInfo.busWidthBits);
             ibl.bootModes[i].u.nandBoot.nandInfo.pageSizeBytes = swap32val(ibl.bootModes[i].u.nandBoot.nandInfo.pageSizeBytes);
             ibl.bootModes[i].u.nandBoot.nandInfo.pageEccBytes  = swap32val(ibl.bootModes[i].u.nandBoot.nandInfo.pageEccBytes);
@@ -303,15 +315,34 @@ void iblSwap (void)
             ibl.bootModes[i].u.nandBoot.nandInfo.blockOffset   = swap32val(ibl.bootModes[i].u.nandBoot.nandInfo.blockOffset);
             ibl.bootModes[i].u.nandBoot.nandInfo.pageOffset    = swap32val(ibl.bootModes[i].u.nandBoot.nandInfo.pageOffset);
             ibl.bootModes[i].u.nandBoot.nandInfo.columnOffset  = swap32val(ibl.bootModes[i].u.nandBoot.nandInfo.columnOffset);
-            ibl.bootModes[i].u.nandBoot.nandInfo.postCommand   = swap32val(ibl.bootModes[i].u.nandBoot.nandInfo.postCommand);
-
+            /*for (j = 0; j < ibl_N_ECC_BYTES; j++)
+            {
+                ibl.bootModes[i].u.nandBoot.nandInfo.eccBytesIdx[j] = swap32val(ibl.bootModes[i].u.nandBoot.nandInfo.eccBytesIdx[j]);
+            }
+            for (j = 0; j < ibl_N_BAD_BLOCK_PAGE; j++)
+            {
+                ibl.bootModes[i].u.nandBoot.nandInfo.badBlkMarkIdx[j] = swap32val(ibl.bootModes[i].u.nandBoot.nandInfo.badBlkMarkIdx[j]);
+            }
+            ibl.bootModes[i].u.nandBoot.nandInfo.postCommand      = swap16val(ibl.bootModes[i].u.nandBoot.nandInfo.postCommand);*/
         }  else if (ibl.bootModes[i].bootMode == ibl_BOOT_MODE_NOR)  {
             ibl.bootModes[i].u.norBoot.bootFormat         = swap32val(ibl.bootModes[i].u.norBoot.bootFormat);
-            ibl.bootModes[i].u.norBoot.bootAddress        = swap32val(ibl.bootModes[i].u.norBoot.bootAddress);
+            for (j = 0; j < ibl_N_ENDIANS; j++)
+            {
+                for (k = 0; k < ibl_N_IMAGES; k++)
+                {
+                    ibl.bootModes[i].u.norBoot.bootAddress[j][k] = swap32val(ibl.bootModes[i].u.norBoot.bootAddress[j][k]);
+                }
+            }
             ibl.bootModes[i].u.norBoot.interface          = swap32val(ibl.bootModes[i].u.norBoot.interface);
-            ibl.bootModes[i].u.norBoot.blob.startAddress  = swap32val(ibl.bootModes[i].u.norBoot.blob.startAddress);
-            ibl.bootModes[i].u.norBoot.blob.sizeBytes     = swap32val(ibl.bootModes[i].u.norBoot.blob.sizeBytes);
-            ibl.bootModes[i].u.norBoot.blob.branchAddress = swap32val(ibl.bootModes[i].u.norBoot.blob.branchAddress);
+            for (j = 0; j < ibl_N_ENDIANS; j++)
+            {
+                for (k = 0; k < ibl_N_IMAGES; k++)
+                {
+                    ibl.bootModes[i].u.norBoot.blob[j][k].startAddress  = swap32val(ibl.bootModes[i].u.norBoot.blob[j][k].startAddress);
+                    ibl.bootModes[i].u.norBoot.blob[j][k].sizeBytes     = swap32val(ibl.bootModes[i].u.norBoot.blob[j][k].sizeBytes);
+                    ibl.bootModes[i].u.norBoot.blob[j][k].branchAddress = swap32val(ibl.bootModes[i].u.norBoot.blob[j][k].branchAddress);
+                }
+            }
 
         }
 

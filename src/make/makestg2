@@ -127,9 +127,6 @@ else
  endif
 endif
 
-ifeq ($(HAS_SPI),0)
-    SPI_CFG=    
-endif
 
 i2crom:
 	$(CC) -ppo -I../cfg/$(TARGET) $(I2C_DEFS) ibl_$(TARGET)/$@.map.pre

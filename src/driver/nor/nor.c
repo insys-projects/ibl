@@ -92,7 +92,7 @@ Int32 nor_open (void *ptr_driver, void (*asyncComplete)(void *))
 {
     iblNor_t *ibln = (iblNor_t *)ptr_driver;
 
-    normcb.startPos = normcb.fpos = ibln->bootAddress;
+    normcb.startPos = normcb.fpos = ibln->bootAddress[iblEndianIdx][iblImageIdx];
     normcb.nor_if   = deviceGetNorCtbl (ibln->interface);
 
     return (0);

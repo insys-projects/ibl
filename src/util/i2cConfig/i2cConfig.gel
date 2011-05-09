@@ -1,7 +1,7 @@
 #define TRUE  1
 #define FALSE 0
 
-#define ibl_MAGIC_VALUE  		 0xCEC11EBB
+#define ibl_MAGIC_VALUE  		 0xCEC11EBC
 
 #define ibl_HIGHEST_PRIORITY     1  
 #define ibl_LOWEST_PRIORITY     10
@@ -67,6 +67,14 @@
 #define  ibl_EMIF4_ENABLE_eccRange2                   (1 << 21)
 #define  ibl_EMIF4_ENABLE_rdWrtExcThresh              (1 << 22)
 #define  ibl_BOOT_EMIF4_ENABLE_ALL                    0x007fffff
+
+
+#define ibl_EVM_C6455L  0x10  	/**< C6455 Low Cost EVM */
+#define ibl_EVM_C6457L  0x20  	/**< C6457 Low Cost EVM */
+#define ibl_EVM_C6472L  0x30  	/**< C6472 Low Cost EVM */
+#define ibl_EVM_C6474L  0x40  	/**< C6474 Low Cost EVM */
+#define ibl_EVM_C6670L  0x50  	/**< C6670 Low Cost EVM */
+#define ibl_EVM_C6678L  0x60  	/**< C6678 Low Cost EVM */
     
 /* @} */  
 
@@ -587,6 +595,7 @@ menuitem "EVM c6678 IBL";
 hotmenu setConfig_c6678_main()
 {
 	ibl.iblMagic = ibl_MAGIC_VALUE;
+	ibl.iblEvmType = ibl_EVM_C6678L;
 
 	/* Main PLL: 100 MHz reference, 1GHz output */
 	ibl.pllConfig[ibl_MAIN_PLL].doEnable      = 1;
@@ -675,105 +684,108 @@ hotmenu setConfig_c6678_main()
 	ibl.bootModes[0].port     = 0;
 
 	ibl.bootModes[0].u.norBoot.bootFormat	= ibl_BOOT_FORMAT_ELF;
-	ibl.bootModes[0].u.norBoot.bootAddress	= 0;
+	ibl.bootModes[0].u.norBoot.bootAddress[0][0]	= 0;
+	ibl.bootModes[0].u.norBoot.bootAddress[1][0]	= 0;
 	ibl.bootModes[0].u.norBoot.interface	= ibl_PMEM_IF_SPI;
-    ibl.bootModes[0].u.norBoot.blob.startAddress  = 0x80000000;       /* Base address of DDR2 */
-    ibl.bootModes[0].u.norBoot.blob.sizeBytes     = 0x80000;          /* 512 KB */
-    ibl.bootModes[0].u.norBoot.blob.branchAddress = 0x80000000;       /* Base address of DDR2 */
+    ibl.bootModes[0].u.norBoot.blob[0][0].startAddress  = 0x80000000;       /* Base address of DDR2 */
+    ibl.bootModes[0].u.norBoot.blob[0][0].sizeBytes     = 0xA00000;         /* 10 MB */
+    ibl.bootModes[0].u.norBoot.blob[0][0].branchAddress = 0x80000000;       /* Base address of DDR2 */
+    ibl.bootModes[0].u.norBoot.blob[1][0].startAddress  = 0x80000000;       /* Base address of DDR2 */
+    ibl.bootModes[0].u.norBoot.blob[1][0].sizeBytes     = 0xA00000;         /* 10 MB */
+    ibl.bootModes[0].u.norBoot.blob[1][0].branchAddress = 0x80000000;       /* Base address of DDR2 */
 
-	ibl.bootModes[1].bootMode = ibl_BOOT_MODE_TFTP;
-	ibl.bootModes[1].priority = ibl_HIGHEST_PRIORITY+1;
-	ibl.bootModes[1].port     = ibl_PORT_SWITCH_ALL;
+    ibl.bootModes[1].bootMode = ibl_BOOT_MODE_NAND;
+    ibl.bootModes[1].priority = ibl_HIGHEST_PRIORITY;
+    ibl.bootModes[1].port     = 0;
 
-	ibl.bootModes[1].u.ethBoot.doBootp          = FALSE;
-	ibl.bootModes[1].u.ethBoot.useBootpServerIp = FALSE;
-	ibl.bootModes[1].u.ethBoot.useBootpFileName = FALSE;
-	ibl.bootModes[1].u.ethBoot.bootFormat       = ibl_BOOT_FORMAT_ELF;
+    ibl.bootModes[1].u.nandBoot.bootFormat        = ibl_BOOT_FORMAT_BBLOB;
+    ibl.bootModes[1].u.nandBoot.bootAddress[0][0]	  = 0x4000;
+    ibl.bootModes[1].u.nandBoot.bootAddress[1][0]	  = 0x4000;
+    ibl.bootModes[1].u.nandBoot.interface         = ibl_PMEM_IF_CHIPSEL_2;
+
+    ibl.bootModes[1].u.nandBoot.blob[0][0].startAddress  = 0x80000000;       /* Base address of DDR2 */
+    ibl.bootModes[1].u.nandBoot.blob[0][0].sizeBytes     = 0xA00000;         /* 10 MB */
+    ibl.bootModes[1].u.nandBoot.blob[0][0].branchAddress = 0x80000000;       /* Base address of DDR2 */
+    ibl.bootModes[1].u.nandBoot.blob[1][0].startAddress  = 0x80000000;       /* Base address of DDR2 */
+    ibl.bootModes[1].u.nandBoot.blob[1][0].sizeBytes     = 0xA00000;         /* 10 MB */
+    ibl.bootModes[1].u.nandBoot.blob[1][0].branchAddress = 0x80000000;       /* Base address of DDR2 */
+
+    ibl.bootModes[1].u.nandBoot.nandInfo.busWidthBits  = 8;
+    ibl.bootModes[1].u.nandBoot.nandInfo.pageSizeBytes = 512;
+    ibl.bootModes[1].u.nandBoot.nandInfo.pageEccBytes  = 16;
+    ibl.bootModes[1].u.nandBoot.nandInfo.pagesPerBlock = 32;
+    ibl.bootModes[1].u.nandBoot.nandInfo.totalBlocks   = 4096;
+
+    ibl.bootModes[1].u.nandBoot.nandInfo.addressBytes  = 4;
+    ibl.bootModes[1].u.nandBoot.nandInfo.lsbFirst      = TRUE;
+    ibl.bootModes[1].u.nandBoot.nandInfo.blockOffset   = 14;
+    ibl.bootModes[1].u.nandBoot.nandInfo.pageOffset    = 9;
+    ibl.bootModes[1].u.nandBoot.nandInfo.columnOffset  = 0;
+
+    ibl.bootModes[1].u.nandBoot.nandInfo.eccBytesIdx[0]  = 0; 
+    ibl.bootModes[1].u.nandBoot.nandInfo.eccBytesIdx[1]  = 1; 
+    ibl.bootModes[1].u.nandBoot.nandInfo.eccBytesIdx[2]  = 2; 
+    ibl.bootModes[1].u.nandBoot.nandInfo.eccBytesIdx[3]  = 3; 
+    ibl.bootModes[1].u.nandBoot.nandInfo.eccBytesIdx[4]  = 4; 
+    ibl.bootModes[1].u.nandBoot.nandInfo.eccBytesIdx[5]  = 6; 
+    ibl.bootModes[1].u.nandBoot.nandInfo.eccBytesIdx[6]  = 7; 
+    ibl.bootModes[1].u.nandBoot.nandInfo.eccBytesIdx[7]  = 13; 
+    ibl.bootModes[1].u.nandBoot.nandInfo.eccBytesIdx[8]  = 14; 
+    ibl.bootModes[1].u.nandBoot.nandInfo.eccBytesIdx[9]  = 15; 
+    
+    ibl.bootModes[1].u.nandBoot.nandInfo.badBlkMarkIdx[0]= 5;
+    ibl.bootModes[1].u.nandBoot.nandInfo.badBlkMarkIdx[1]= 0xff;
+
+    ibl.bootModes[1].u.nandBoot.nandInfo.resetCommand    = 0xff;
+    ibl.bootModes[1].u.nandBoot.nandInfo.readCommandPre  = 0;
+    ibl.bootModes[1].u.nandBoot.nandInfo.readCommandPost = 0;
+    ibl.bootModes[1].u.nandBoot.nandInfo.postCommand     = FALSE;
+    
+	ibl.bootModes[2].bootMode = ibl_BOOT_MODE_TFTP;
+	ibl.bootModes[2].priority = ibl_HIGHEST_PRIORITY+1;
+	ibl.bootModes[2].port     = ibl_PORT_SWITCH_ALL;
+
+	ibl.bootModes[2].u.ethBoot.doBootp          = FALSE;
+	ibl.bootModes[2].u.ethBoot.useBootpServerIp = FALSE;
+	ibl.bootModes[2].u.ethBoot.useBootpFileName = FALSE;
+	ibl.bootModes[2].u.ethBoot.bootFormat       = ibl_BOOT_FORMAT_ELF;
 
 
-    SETIP(ibl.bootModes[1].u.ethBoot.ethInfo.ipAddr,    192,168,1,100);
-    SETIP(ibl.bootModes[1].u.ethBoot.ethInfo.serverIp,  192,168,1,101);
-    SETIP(ibl.bootModes[1].u.ethBoot.ethInfo.gatewayIp, 192,168,1,1);
-    SETIP(ibl.bootModes[1].u.ethBoot.ethInfo.netmask,   255,255,255,0);
+    SETIP(ibl.bootModes[2].u.ethBoot.ethInfo.ipAddr,    192,168,1,100);
+    SETIP(ibl.bootModes[2].u.ethBoot.ethInfo.serverIp,  192,168,1,101);
+    SETIP(ibl.bootModes[2].u.ethBoot.ethInfo.gatewayIp, 192,168,1,1);
+    SETIP(ibl.bootModes[2].u.ethBoot.ethInfo.netmask,   255,255,255,0);
 
     /* Use the e-fuse value */
-    ibl.bootModes[1].u.ethBoot.ethInfo.hwAddress[0] = 0;
-    ibl.bootModes[1].u.ethBoot.ethInfo.hwAddress[1] = 0;
-    ibl.bootModes[1].u.ethBoot.ethInfo.hwAddress[2] = 0;
-    ibl.bootModes[1].u.ethBoot.ethInfo.hwAddress[3] = 0;
-    ibl.bootModes[1].u.ethBoot.ethInfo.hwAddress[4] = 0;
-    ibl.bootModes[1].u.ethBoot.ethInfo.hwAddress[5] = 0;
+    ibl.bootModes[2].u.ethBoot.ethInfo.hwAddress[0] = 0;
+    ibl.bootModes[2].u.ethBoot.ethInfo.hwAddress[1] = 0;
+    ibl.bootModes[2].u.ethBoot.ethInfo.hwAddress[2] = 0;
+    ibl.bootModes[2].u.ethBoot.ethInfo.hwAddress[3] = 0;
+    ibl.bootModes[2].u.ethBoot.ethInfo.hwAddress[4] = 0;
+    ibl.bootModes[2].u.ethBoot.ethInfo.hwAddress[5] = 0;
 
 
-    ibl.bootModes[1].u.ethBoot.ethInfo.fileName[0]  = 'a';
-    ibl.bootModes[1].u.ethBoot.ethInfo.fileName[1]  = 'p';
-    ibl.bootModes[1].u.ethBoot.ethInfo.fileName[2]  = 'p';
-    ibl.bootModes[1].u.ethBoot.ethInfo.fileName[3]  = '.';
-    ibl.bootModes[1].u.ethBoot.ethInfo.fileName[4]  = 'o';
-    ibl.bootModes[1].u.ethBoot.ethInfo.fileName[5]  = 'u';
-    ibl.bootModes[1].u.ethBoot.ethInfo.fileName[6]  = 't';
-    ibl.bootModes[1].u.ethBoot.ethInfo.fileName[7]  = '\0';
-    ibl.bootModes[1].u.ethBoot.ethInfo.fileName[8]  = '\0';
-    ibl.bootModes[1].u.ethBoot.ethInfo.fileName[9]  = '\0';
-    ibl.bootModes[1].u.ethBoot.ethInfo.fileName[10] = '\0';
-    ibl.bootModes[1].u.ethBoot.ethInfo.fileName[11] = '\0';
-    ibl.bootModes[1].u.ethBoot.ethInfo.fileName[12] = '\0';
-    ibl.bootModes[1].u.ethBoot.ethInfo.fileName[13] = '\0';
-    ibl.bootModes[1].u.ethBoot.ethInfo.fileName[14] = '\0';
+    ibl.bootModes[2].u.ethBoot.ethInfo.fileName[0]  = 'a';
+    ibl.bootModes[2].u.ethBoot.ethInfo.fileName[1]  = 'p';
+    ibl.bootModes[2].u.ethBoot.ethInfo.fileName[2]  = 'p';
+    ibl.bootModes[2].u.ethBoot.ethInfo.fileName[3]  = '.';
+    ibl.bootModes[2].u.ethBoot.ethInfo.fileName[4]  = 'o';
+    ibl.bootModes[2].u.ethBoot.ethInfo.fileName[5]  = 'u';
+    ibl.bootModes[2].u.ethBoot.ethInfo.fileName[6]  = 't';
+    ibl.bootModes[2].u.ethBoot.ethInfo.fileName[7]  = '\0';
+    ibl.bootModes[2].u.ethBoot.ethInfo.fileName[8]  = '\0';
+    ibl.bootModes[2].u.ethBoot.ethInfo.fileName[9]  = '\0';
+    ibl.bootModes[2].u.ethBoot.ethInfo.fileName[10] = '\0';
+    ibl.bootModes[2].u.ethBoot.ethInfo.fileName[11] = '\0';
+    ibl.bootModes[2].u.ethBoot.ethInfo.fileName[12] = '\0';
+    ibl.bootModes[2].u.ethBoot.ethInfo.fileName[13] = '\0';
+    ibl.bootModes[2].u.ethBoot.ethInfo.fileName[14] = '\0';
 
-    ibl.bootModes[1].u.ethBoot.blob.startAddress  = 0x80000000;       /* Base address of DDR2 */
-    ibl.bootModes[1].u.ethBoot.blob.sizeBytes     = 0x20000000;       /* All of DDR2 */
-    ibl.bootModes[1].u.ethBoot.blob.branchAddress = 0x80000000;       /* Base of DDR2 */
+    ibl.bootModes[2].u.ethBoot.blob.startAddress  = 0x80000000;       /* Base address of DDR2 */
+    ibl.bootModes[2].u.ethBoot.blob.sizeBytes     = 0xA00000;         /* 10 MB */
+    ibl.bootModes[2].u.ethBoot.blob.branchAddress = 0x80000000;       /* Base of DDR2 */
 
 	ibl.chkSum = 0;
-}
-
-hotmenu setConfig_c6678_emac()
-{
-    ibl.bootModes[0].priority = ibl_HIGHEST_PRIORITY+1;
-    ibl.bootModes[1].priority = ibl_HIGHEST_PRIORITY;
-}
-
-hotmenu setConfig_c6678_nand()
-{
-    /* Nand boot is higher priority */
-    ibl.bootModes[0].bootMode = ibl_BOOT_MODE_NAND;
-    ibl.bootModes[0].priority = ibl_HIGHEST_PRIORITY;
-    ibl.bootModes[0].port     = 0;
-
-    ibl.bootModes[0].u.nandBoot.bootFormat        = ibl_BOOT_FORMAT_ELF;
-    ibl.bootModes[0].u.nandBoot.bootAddress	  = 0;
-    ibl.bootModes[0].u.nandBoot.interface         = ibl_PMEM_IF_CHIPSEL_2;
-    ibl.bootModes[0].u.nandBoot.blob.startAddress  = 0x80000000;       /* Base address of DDR2 */
-    ibl.bootModes[0].u.nandBoot.blob.sizeBytes     = 0x80000;          /* 512 KB */
-    ibl.bootModes[0].u.nandBoot.blob.branchAddress = 0x80000000;       /* Base address of DDR2 */
-
-    ibl.bootModes[0].u.nandBoot.nandInfo.busWidthBits  = 8;
-    ibl.bootModes[0].u.nandBoot.nandInfo.pageSizeBytes = 512;
-    ibl.bootModes[0].u.nandBoot.nandInfo.pageEccBytes  = 16;
-    ibl.bootModes[0].u.nandBoot.nandInfo.pagesPerBlock = 32;
-    ibl.bootModes[0].u.nandBoot.nandInfo.totalBlocks   = 4096;
-
-    ibl.bootModes[0].u.nandBoot.nandInfo.addressBytes  = 4;
-    ibl.bootModes[0].u.nandBoot.nandInfo.lsbFirst      = TRUE;
-    ibl.bootModes[0].u.nandBoot.nandInfo.blockOffset   = 14;
-    ibl.bootModes[0].u.nandBoot.nandInfo.pageOffset    = 9;
-    ibl.bootModes[0].u.nandBoot.nandInfo.columnOffset  = 0;
-
-    ibl.bootModes[0].u.nandBoot.nandInfo.eccBytesIdx[0]  = 0; 
-    ibl.bootModes[0].u.nandBoot.nandInfo.eccBytesIdx[1]  = 1; 
-    ibl.bootModes[0].u.nandBoot.nandInfo.eccBytesIdx[2]  = 2; 
-    ibl.bootModes[0].u.nandBoot.nandInfo.eccBytesIdx[3]  = 3; 
-    ibl.bootModes[0].u.nandBoot.nandInfo.eccBytesIdx[4]  = 6; 
-    ibl.bootModes[0].u.nandBoot.nandInfo.eccBytesIdx[5]  = 7; 
-
-    ibl.bootModes[0].u.nandBoot.nandInfo.badBlkMarkIdx[0]= 5;
-    ibl.bootModes[0].u.nandBoot.nandInfo.badBlkMarkIdx[1]= 0xffff;
-
-    ibl.bootModes[0].u.nandBoot.nandInfo.resetCommand    = 0xff;
-    ibl.bootModes[0].u.nandBoot.nandInfo.readCommandPre  = 0;
-    ibl.bootModes[0].u.nandBoot.nandInfo.readCommandPost = 0;
-    ibl.bootModes[0].u.nandBoot.nandInfo.postCommand     = FALSE;
 }
 
 menuitem "EVM c6670 IBL";
@@ -781,6 +793,7 @@ menuitem "EVM c6670 IBL";
 hotmenu setConfig_c6670_main()
 {
 	ibl.iblMagic = ibl_MAGIC_VALUE;
+	ibl.iblEvmType = ibl_EVM_C6670L;
 
 	/* Main PLL: 122.88 MHz reference, 983 MHz output */
 	ibl.pllConfig[ibl_MAIN_PLL].doEnable      = 1;
@@ -869,61 +882,107 @@ hotmenu setConfig_c6670_main()
 	ibl.bootModes[0].port     = 0;
 
 	ibl.bootModes[0].u.norBoot.bootFormat	= ibl_BOOT_FORMAT_ELF;
-	ibl.bootModes[0].u.norBoot.bootAddress	= 0;
+	ibl.bootModes[0].u.norBoot.bootAddress[0][0]	= 0;
+	ibl.bootModes[0].u.norBoot.bootAddress[1][0]	= 0;
 	ibl.bootModes[0].u.norBoot.interface	= ibl_PMEM_IF_SPI;
-    ibl.bootModes[0].u.norBoot.blob.startAddress  = 0x80000000;       /* Base address of DDR2 */
-    ibl.bootModes[0].u.norBoot.blob.sizeBytes     = 0x80000;          /* 512 KB */
-    ibl.bootModes[0].u.norBoot.blob.branchAddress = 0x80000000;       /* Base address of DDR2 */
+    ibl.bootModes[0].u.norBoot.blob[0][0].startAddress  = 0x80000000;       /* Base address of DDR2 */
+    ibl.bootModes[0].u.norBoot.blob[0][0].sizeBytes     = 0xA00000;         /* 10 MB */
+    ibl.bootModes[0].u.norBoot.blob[0][0].branchAddress = 0x80000000;       /* Base address of DDR2 */
+    ibl.bootModes[0].u.norBoot.blob[1][0].startAddress  = 0x80000000;       /* Base address of DDR2 */
+    ibl.bootModes[0].u.norBoot.blob[1][0].sizeBytes     = 0xA00000;         /* 10 MB */
+    ibl.bootModes[0].u.norBoot.blob[1][0].branchAddress = 0x80000000;       /* Base address of DDR2 */
 
-	ibl.bootModes[1].bootMode = ibl_BOOT_MODE_TFTP;
-	ibl.bootModes[1].priority = ibl_HIGHEST_PRIORITY+1;
-	ibl.bootModes[1].port     = ibl_PORT_SWITCH_ALL;
+    ibl.bootModes[1].bootMode = ibl_BOOT_MODE_NAND;
+    ibl.bootModes[1].priority = ibl_HIGHEST_PRIORITY;
+    ibl.bootModes[1].port     = 0;
 
-	ibl.bootModes[1].u.ethBoot.doBootp          = FALSE;
-	ibl.bootModes[1].u.ethBoot.useBootpServerIp = FALSE;
-	ibl.bootModes[1].u.ethBoot.useBootpFileName = FALSE;
-	ibl.bootModes[1].u.ethBoot.bootFormat       = ibl_BOOT_FORMAT_ELF;
+    ibl.bootModes[1].u.nandBoot.bootFormat        = ibl_BOOT_FORMAT_ELF;
+    ibl.bootModes[1].u.nandBoot.bootAddress[0][0]	  = 0x4000;
+    ibl.bootModes[1].u.nandBoot.bootAddress[1][0]	  = 0x4000;
+    ibl.bootModes[1].u.nandBoot.interface         = ibl_PMEM_IF_GPIO;
+
+    ibl.bootModes[1].u.nandBoot.blob[0][0].startAddress  = 0x80000000;       /* Base address of DDR2 */
+    ibl.bootModes[1].u.nandBoot.blob[0][0].sizeBytes     = 0xA00000;         /* 10 MB */
+    ibl.bootModes[1].u.nandBoot.blob[0][0].branchAddress = 0x80000000;       /* Base address of DDR2 */
+    ibl.bootModes[1].u.nandBoot.blob[1][0].startAddress  = 0x80000000;       /* Base address of DDR2 */
+    ibl.bootModes[1].u.nandBoot.blob[1][0].sizeBytes     = 0xA00000;         /* 10 MB */
+    ibl.bootModes[1].u.nandBoot.blob[1][0].branchAddress = 0x80000000;       /* Base address of DDR2 */
+
+    ibl.bootModes[1].u.nandBoot.nandInfo.busWidthBits  = 8;
+    ibl.bootModes[1].u.nandBoot.nandInfo.pageSizeBytes = 512;
+    ibl.bootModes[1].u.nandBoot.nandInfo.pageEccBytes  = 16;
+    ibl.bootModes[1].u.nandBoot.nandInfo.pagesPerBlock = 32;
+    ibl.bootModes[1].u.nandBoot.nandInfo.totalBlocks   = 4096;
+
+    ibl.bootModes[1].u.nandBoot.nandInfo.addressBytes  = 4;
+    ibl.bootModes[1].u.nandBoot.nandInfo.lsbFirst      = TRUE;
+    ibl.bootModes[1].u.nandBoot.nandInfo.blockOffset   = 14;
+    ibl.bootModes[1].u.nandBoot.nandInfo.pageOffset    = 9;
+    ibl.bootModes[1].u.nandBoot.nandInfo.columnOffset  = 0;
+
+    ibl.bootModes[1].u.nandBoot.nandInfo.eccBytesIdx[0]  = 0; 
+    ibl.bootModes[1].u.nandBoot.nandInfo.eccBytesIdx[1]  = 1; 
+    ibl.bootModes[1].u.nandBoot.nandInfo.eccBytesIdx[2]  = 2; 
+    ibl.bootModes[1].u.nandBoot.nandInfo.eccBytesIdx[3]  = 3; 
+    ibl.bootModes[1].u.nandBoot.nandInfo.eccBytesIdx[4]  = 4; 
+    ibl.bootModes[1].u.nandBoot.nandInfo.eccBytesIdx[5]  = 6; 
+    ibl.bootModes[1].u.nandBoot.nandInfo.eccBytesIdx[6]  = 7; 
+    ibl.bootModes[1].u.nandBoot.nandInfo.eccBytesIdx[7]  = 13; 
+    ibl.bootModes[1].u.nandBoot.nandInfo.eccBytesIdx[8]  = 14; 
+    ibl.bootModes[1].u.nandBoot.nandInfo.eccBytesIdx[9]  = 15; 
+
+    ibl.bootModes[1].u.nandBoot.nandInfo.badBlkMarkIdx[0]= 5;
+    ibl.bootModes[1].u.nandBoot.nandInfo.badBlkMarkIdx[1]= 0xff;
+
+    ibl.bootModes[1].u.nandBoot.nandInfo.resetCommand    = 0xff;
+    ibl.bootModes[1].u.nandBoot.nandInfo.readCommandPre  = 0;
+    ibl.bootModes[1].u.nandBoot.nandInfo.readCommandPost = 0;
+    ibl.bootModes[1].u.nandBoot.nandInfo.postCommand     = FALSE;
+    
+	ibl.bootModes[2].bootMode = ibl_BOOT_MODE_TFTP;
+	ibl.bootModes[2].priority = ibl_HIGHEST_PRIORITY+1;
+	ibl.bootModes[2].port     = ibl_PORT_SWITCH_ALL;
+
+	ibl.bootModes[2].u.ethBoot.doBootp          = FALSE;
+	ibl.bootModes[2].u.ethBoot.useBootpServerIp = FALSE;
+	ibl.bootModes[2].u.ethBoot.useBootpFileName = FALSE;
+	ibl.bootModes[2].u.ethBoot.bootFormat       = ibl_BOOT_FORMAT_ELF;
 
 
-    SETIP(ibl.bootModes[1].u.ethBoot.ethInfo.ipAddr,    192,168,1,100);
-    SETIP(ibl.bootModes[1].u.ethBoot.ethInfo.serverIp,  192,168,1,101);
-    SETIP(ibl.bootModes[1].u.ethBoot.ethInfo.gatewayIp, 192,168,1,1);
-    SETIP(ibl.bootModes[1].u.ethBoot.ethInfo.netmask,   255,255,255,0);
+    SETIP(ibl.bootModes[2].u.ethBoot.ethInfo.ipAddr,    192,168,1,100);
+    SETIP(ibl.bootModes[2].u.ethBoot.ethInfo.serverIp,  192,168,1,101);
+    SETIP(ibl.bootModes[2].u.ethBoot.ethInfo.gatewayIp, 192,168,1,1);
+    SETIP(ibl.bootModes[2].u.ethBoot.ethInfo.netmask,   255,255,255,0);
 
     /* Use the e-fuse value */
-    ibl.bootModes[1].u.ethBoot.ethInfo.hwAddress[0] = 0;
-    ibl.bootModes[1].u.ethBoot.ethInfo.hwAddress[1] = 0;
-    ibl.bootModes[1].u.ethBoot.ethInfo.hwAddress[2] = 0;
-    ibl.bootModes[1].u.ethBoot.ethInfo.hwAddress[3] = 0;
-    ibl.bootModes[1].u.ethBoot.ethInfo.hwAddress[4] = 0;
-    ibl.bootModes[1].u.ethBoot.ethInfo.hwAddress[5] = 0;
+    ibl.bootModes[2].u.ethBoot.ethInfo.hwAddress[0] = 0;
+    ibl.bootModes[2].u.ethBoot.ethInfo.hwAddress[1] = 0;
+    ibl.bootModes[2].u.ethBoot.ethInfo.hwAddress[2] = 0;
+    ibl.bootModes[2].u.ethBoot.ethInfo.hwAddress[3] = 0;
+    ibl.bootModes[2].u.ethBoot.ethInfo.hwAddress[4] = 0;
+    ibl.bootModes[2].u.ethBoot.ethInfo.hwAddress[5] = 0;
 
 
-    ibl.bootModes[1].u.ethBoot.ethInfo.fileName[0]  = 'a';
-    ibl.bootModes[1].u.ethBoot.ethInfo.fileName[1]  = 'p';
-    ibl.bootModes[1].u.ethBoot.ethInfo.fileName[2]  = 'p';
-    ibl.bootModes[1].u.ethBoot.ethInfo.fileName[3]  = '.';
-    ibl.bootModes[1].u.ethBoot.ethInfo.fileName[4]  = 'o';
-    ibl.bootModes[1].u.ethBoot.ethInfo.fileName[5]  = 'u';
-    ibl.bootModes[1].u.ethBoot.ethInfo.fileName[6]  = 't';
-    ibl.bootModes[1].u.ethBoot.ethInfo.fileName[7]  = '\0';
-    ibl.bootModes[1].u.ethBoot.ethInfo.fileName[8]  = '\0';
-    ibl.bootModes[1].u.ethBoot.ethInfo.fileName[9]  = '\0';
-    ibl.bootModes[1].u.ethBoot.ethInfo.fileName[10] = '\0';
-    ibl.bootModes[1].u.ethBoot.ethInfo.fileName[11] = '\0';
-    ibl.bootModes[1].u.ethBoot.ethInfo.fileName[12] = '\0';
-    ibl.bootModes[1].u.ethBoot.ethInfo.fileName[13] = '\0';
-    ibl.bootModes[1].u.ethBoot.ethInfo.fileName[14] = '\0';
+    ibl.bootModes[2].u.ethBoot.ethInfo.fileName[0]  = 'a';
+    ibl.bootModes[2].u.ethBoot.ethInfo.fileName[1]  = 'p';
+    ibl.bootModes[2].u.ethBoot.ethInfo.fileName[2]  = 'p';
+    ibl.bootModes[2].u.ethBoot.ethInfo.fileName[3]  = '.';
+    ibl.bootModes[2].u.ethBoot.ethInfo.fileName[4]  = 'o';
+    ibl.bootModes[2].u.ethBoot.ethInfo.fileName[5]  = 'u';
+    ibl.bootModes[2].u.ethBoot.ethInfo.fileName[6]  = 't';
+    ibl.bootModes[2].u.ethBoot.ethInfo.fileName[7]  = '\0';
+    ibl.bootModes[2].u.ethBoot.ethInfo.fileName[8]  = '\0';
+    ibl.bootModes[2].u.ethBoot.ethInfo.fileName[9]  = '\0';
+    ibl.bootModes[2].u.ethBoot.ethInfo.fileName[10] = '\0';
+    ibl.bootModes[2].u.ethBoot.ethInfo.fileName[11] = '\0';
+    ibl.bootModes[2].u.ethBoot.ethInfo.fileName[12] = '\0';
+    ibl.bootModes[2].u.ethBoot.ethInfo.fileName[13] = '\0';
+    ibl.bootModes[2].u.ethBoot.ethInfo.fileName[14] = '\0';
 
-    ibl.bootModes[1].u.ethBoot.blob.startAddress  = 0x80000000;       /* Base address of DDR2 */
-    ibl.bootModes[1].u.ethBoot.blob.sizeBytes     = 0x20000000;       /* All of DDR2 */
-    ibl.bootModes[1].u.ethBoot.blob.branchAddress = 0x80000000;       /* Base of DDR2 */
+    ibl.bootModes[2].u.ethBoot.blob.startAddress  = 0x80000000;       /* Base address of DDR2 */
+    ibl.bootModes[2].u.ethBoot.blob.sizeBytes     = 0xA00000;         /* 10 MB */
+    ibl.bootModes[2].u.ethBoot.blob.branchAddress = 0x80000000;       /* Base of DDR2 */
 
 	ibl.chkSum = 0;
 }
 
-hotmenu setConfig_c6670_emac()
-{
-    ibl.bootModes[0].priority = ibl_HIGHEST_PRIORITY+1;
-    ibl.bootModes[1].priority = ibl_HIGHEST_PRIORITY;
-}

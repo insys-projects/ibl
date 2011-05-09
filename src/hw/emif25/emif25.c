@@ -70,7 +70,7 @@ Int32 hwEmif25Init (int32 cs, int32 busWidth, bool wait, bool nand)
         return (EMIF25_INVALID_BUS_WIDTH);
     
     /* Setup the bus width. The macro uses the actual chip select value, 2-5 */
-    reg = DEVICE_REG32_R (DEVICE_EMIF25_BASE + EMIF25_ASYNC_CFG_REG(cs));
+    reg = DEVICE_REG32_R (DEVICE_EMIF25_BASE + EMIF25_ASYNC_CFG_REG(cs-2));
     reg = EMIF25_SET_ASYNC_WID(reg, v);
 
     /* Enable extended wait if requested */
@@ -81,7 +81,7 @@ Int32 hwEmif25Init (int32 cs, int32 busWidth, bool wait, bool nand)
 
     reg = EMIF25_SET_ASYNC_WAIT(reg, v);
 
-    DEVICE_REG32_W (DEVICE_EMIF25_BASE + EMIF25_ASYNC_CFG_REG(cs), reg);
+    DEVICE_REG32_W (DEVICE_EMIF25_BASE + EMIF25_ASYNC_CFG_REG(cs-2), reg);
 
     /* Nand enable */
     if (nand)

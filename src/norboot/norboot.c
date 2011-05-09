@@ -62,7 +62,7 @@ void iblNorBoot (int32 eIdx)
         return;
 
 
-    entry = iblBoot (&nor_boot_module, ibl.bootModes[eIdx].u.norBoot.bootFormat, &ibl.bootModes[eIdx].u.norBoot.blob);
+    entry = iblBoot (&nor_boot_module, ibl.bootModes[eIdx].u.norBoot.bootFormat, &ibl.bootModes[eIdx].u.norBoot.blob[iblEndianIdx][iblImageIdx]);
 
     (*nor_boot_module.close)();
 
