@@ -118,7 +118,7 @@ cp -f src/make/ibl_c6457/i2crom_0x50_c6457_be.bin ibl_bin_$IBL_VERSION/c6457/be/
 cp -f src/util/i2cConfig/i2cparam_c6457_le.out   ibl_bin_$IBL_VERSION/c6457/le/
 cp -f src/util/i2cConfig/i2cparam_c6457_be.out   ibl_bin_$IBL_VERSION/c6457/be/
 
-# Build c6678 EVM 
+# Build c6678/c6670 EVM 
 pushd src/make
 make clean
 make evm_c667x_i2c ENDIAN=little I2C_BUS_ADDR=0x51 

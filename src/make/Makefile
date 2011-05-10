@@ -276,7 +276,7 @@ evm_c6455:
 # The c6472 EVM has a 128k eeprom (64k at 0x50, 64k at 0x51), so both endians are built with full functionality
 evm_c6472:
 	make -f makestg1 ARCH=c64x TARGET=c6472 I2C_BUS_ADDR=0x50 \
-    I2C_MAP_ADDR=$(I2C_MAP_ADDR) COMPACT_I2C=no ENDIAN_MODE=both CEXCLUDES='ELF BIS MULTI_BOOT' c6472
+    I2C_MAP_ADDR=$(I2C_MAP_ADDR) COMPACT_I2C=no ENDIAN_MODE=both CEXCLUDES='ELF BIS MULTI_BOOT NAND_GPIO' c6472
 
 # The 6474 EVM has a 32k eeprom. A stripped down version is build with only one endian.
 evm_c6474:
@@ -401,13 +401,5 @@ clean:
 	find ../ -name *.da | xargs rm -f
 	find ../ -name *.tmp | xargs rm -f
 	find ../ -name cdefdep | xargs rm -f
-
-
-
-
-
-
-
-
 
 

@@ -1,7 +1,7 @@
 =====================================================
 C6x Bootloader Release Note
-Version: 1.0.0.3
-April 2011
+Version: 1.0.0.4
+May 2011
 =====================================================
 
 1) Supported TARGETS:
@@ -29,8 +29,9 @@ ENDIAN mode "both".
         For building in Linux Bash shell modify setupenvLnx.sh 
     - Set the environment by running "setupenv.bat" or "source setupenvLnx.sh"
       or "source setupenvMsys.sh"
-    - For building run:
-        make evm_c6678_i2c ENDIAN=little I2C_BUS_ADDR=0x51
+    - For building run the following make command:
+    C6678/C6670 EVM:
+        make evm_c667x_i2c ENDIAN=little I2C_BUS_ADDR=0x51 
       or:
         make <TARGET>  ENDIAN=[little|big]
         make c6455 ENDIAN=liitle

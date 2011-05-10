@@ -189,6 +189,8 @@ void main (void)
       return;
     }
 
+    memset(&ibl, 0, sizeof(ibl_t));
+
     printf ("Run the GEL for for the device to be configured, press return to program the I2C\n");
     getchar ();
 
@@ -246,14 +248,4 @@ void main (void)
     printf ("I2c table write complete\n");
 
 }
-
-
-
-        
-
-
-
-
-
-
 

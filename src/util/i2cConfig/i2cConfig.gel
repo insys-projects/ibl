@@ -690,31 +690,48 @@ hotmenu setConfig_c6678_main()
 	ibl.bootModes[0].port     = 0;
 
 	ibl.bootModes[0].u.norBoot.bootFormat	= ibl_BOOT_FORMAT_ELF;
-	ibl.bootModes[0].u.norBoot.bootAddress[0][0]	= 0;
-	ibl.bootModes[0].u.norBoot.bootAddress[1][0]	= 0;
+	ibl.bootModes[0].u.norBoot.bootAddress[0][0]	= 0;		/* Image 0 NOR offset byte address in LE mode */ 
+	ibl.bootModes[0].u.norBoot.bootAddress[0][1]	= 0xA00000;	/* Image 1 NOR offset byte address in LE mode  */
+	ibl.bootModes[0].u.norBoot.bootAddress[1][0]	= 0;		/* Image 0 NOR offset byte address in BE mode */ 
+	ibl.bootModes[0].u.norBoot.bootAddress[1][1]	= 0xA00000;	/* Image 1 NOR offset byte address in BE mode  */
 	ibl.bootModes[0].u.norBoot.interface	= ibl_PMEM_IF_SPI;
-    ibl.bootModes[0].u.norBoot.blob[0][0].startAddress  = 0x80000000;       /* Base address of DDR2 */
-    ibl.bootModes[0].u.norBoot.blob[0][0].sizeBytes     = 0xA00000;         /* 10 MB */
-    ibl.bootModes[0].u.norBoot.blob[0][0].branchAddress = 0x80000000;       /* Base address of DDR2 */
-    ibl.bootModes[0].u.norBoot.blob[1][0].startAddress  = 0x80000000;       /* Base address of DDR2 */
-    ibl.bootModes[0].u.norBoot.blob[1][0].sizeBytes     = 0xA00000;         /* 10 MB */
-    ibl.bootModes[0].u.norBoot.blob[1][0].branchAddress = 0x80000000;       /* Base address of DDR2 */
+    ibl.bootModes[0].u.norBoot.blob[0][0].startAddress  = 0x80000000;       /* Image 0 load start address in LE mode */
+    ibl.bootModes[0].u.norBoot.blob[0][0].sizeBytes     = 0xA00000;         /* Image 0 size (10 MB) in LE mode */
+    ibl.bootModes[0].u.norBoot.blob[0][0].branchAddress = 0x80000000;       /* Image 0 branch address after loading in LE mode */
+    ibl.bootModes[0].u.norBoot.blob[0][1].startAddress  = 0x90000000;       /* Image 1 load start address in LE mode */
+    ibl.bootModes[0].u.norBoot.blob[0][1].sizeBytes     = 0xA00000;         /* Image 1 size (10 MB) in LE mode */
+    ibl.bootModes[0].u.norBoot.blob[0][1].branchAddress = 0x90000000;       /* Image 1 branch address after loading in LE mode */
+    ibl.bootModes[0].u.norBoot.blob[1][0].startAddress  = 0x80000000;       /* Image 0 load start address in BE mode */
+    ibl.bootModes[0].u.norBoot.blob[1][0].sizeBytes     = 0xA00000;         /* Image 0 size (10 MB) in BE mode */
+    ibl.bootModes[0].u.norBoot.blob[1][0].branchAddress = 0x80000000;       /* Image 0 branch address after loading in BE mode */
+    ibl.bootModes[0].u.norBoot.blob[1][1].startAddress  = 0x90000000;       /* Image 1 load start address in BE mode */
+    ibl.bootModes[0].u.norBoot.blob[1][1].sizeBytes     = 0xA00000;         /* Image 1 size (10 MB) in BE mode */
+    ibl.bootModes[0].u.norBoot.blob[1][1].branchAddress = 0x90000000;       /* Image 1 branch address after loading in BE mode */
 
     ibl.bootModes[1].bootMode = ibl_BOOT_MODE_NAND;
     ibl.bootModes[1].priority = ibl_HIGHEST_PRIORITY;
     ibl.bootModes[1].port     = 0;
 
     ibl.bootModes[1].u.nandBoot.bootFormat        = ibl_BOOT_FORMAT_BBLOB;
-    ibl.bootModes[1].u.nandBoot.bootAddress[0][0]	  = 0x4000;
-    ibl.bootModes[1].u.nandBoot.bootAddress[1][0]	  = 0x4000;
+    ibl.bootModes[1].u.nandBoot.bootAddress[0][0]	  = 0x4000;         /* Image 0 NAND offset address (block 1) in LE mode */
+    ibl.bootModes[1].u.nandBoot.bootAddress[0][1]	  = 0x2000000;      /* Image 1 NAND offset address (block 2048) in LE mode */
+    ibl.bootModes[1].u.nandBoot.bootAddress[1][0]	  = 0x4000;	    /* Image 0 NAND offset address (block 1) in BE mode */
+    ibl.bootModes[1].u.nandBoot.bootAddress[1][1]	  = 0x2000000;      /* Image 1 NAND offset address (block 2048) in BE mode */
     ibl.bootModes[1].u.nandBoot.interface         = ibl_PMEM_IF_CHIPSEL_2;
 
-    ibl.bootModes[1].u.nandBoot.blob[0][0].startAddress  = 0x80000000;       /* Base address of DDR2 */
-    ibl.bootModes[1].u.nandBoot.blob[0][0].sizeBytes     = 0xA00000;         /* 10 MB */
-    ibl.bootModes[1].u.nandBoot.blob[0][0].branchAddress = 0x80000000;       /* Base address of DDR2 */
-    ibl.bootModes[1].u.nandBoot.blob[1][0].startAddress  = 0x80000000;       /* Base address of DDR2 */
-    ibl.bootModes[1].u.nandBoot.blob[1][0].sizeBytes     = 0xA00000;         /* 10 MB */
-    ibl.bootModes[1].u.nandBoot.blob[1][0].branchAddress = 0x80000000;       /* Base address of DDR2 */
+    ibl.bootModes[1].u.nandBoot.blob[0][0].startAddress  = 0x80000000;       /* Image 0 load start address in LE mode */
+    ibl.bootModes[1].u.nandBoot.blob[0][0].sizeBytes     = 0xA00000;         /* Image 0 size (10 MB) in LE mode */
+    ibl.bootModes[1].u.nandBoot.blob[0][0].branchAddress = 0x80000000;       /* Image 0 branch address after loading in LE mode */
+    ibl.bootModes[1].u.nandBoot.blob[0][1].startAddress  = 0x90000000;       /* Image 1 load start address in LE mode */
+    ibl.bootModes[1].u.nandBoot.blob[0][1].sizeBytes     = 0xA00000;         /* Image 1 size (10 MB) in LE mode */
+    ibl.bootModes[1].u.nandBoot.blob[0][1].branchAddress = 0x90000000;       /* Image 1 branch address after loading in LE mode */
+    ibl.bootModes[1].u.nandBoot.blob[1][0].startAddress  = 0x80000000;       /* Image 0 load start address in BE mode */
+    ibl.bootModes[1].u.nandBoot.blob[1][0].sizeBytes     = 0xA00000;         /* Image 0 size (10 MB) in BE mode */
+    ibl.bootModes[1].u.nandBoot.blob[1][0].branchAddress = 0x80000000;       /* Image 0 branch address after loading in BE mode */
+    ibl.bootModes[1].u.nandBoot.blob[1][1].startAddress  = 0x90000000;       /* Image 1 load start address in BE mode */
+    ibl.bootModes[1].u.nandBoot.blob[1][1].sizeBytes     = 0xA00000;         /* Image 1 size (10 MB) in BE mode */
+    ibl.bootModes[1].u.nandBoot.blob[1][1].branchAddress = 0x90000000;       /* Image 1 branch address after loading in BE mode */
+
 
     ibl.bootModes[1].u.nandBoot.nandInfo.busWidthBits  = 8;
     ibl.bootModes[1].u.nandBoot.nandInfo.pageSizeBytes = 512;
@@ -787,9 +804,9 @@ hotmenu setConfig_c6678_main()
     ibl.bootModes[2].u.ethBoot.ethInfo.fileName[13] = '\0';
     ibl.bootModes[2].u.ethBoot.ethInfo.fileName[14] = '\0';
 
-    ibl.bootModes[2].u.ethBoot.blob.startAddress  = 0x80000000;       /* Base address of DDR2 */
-    ibl.bootModes[2].u.ethBoot.blob.sizeBytes     = 0xA00000;         /* 10 MB */
-    ibl.bootModes[2].u.ethBoot.blob.branchAddress = 0x80000000;       /* Base of DDR2 */
+    ibl.bootModes[2].u.ethBoot.blob.startAddress  = 0x80000000;       /* Load start address */
+    ibl.bootModes[2].u.ethBoot.blob.sizeBytes     = 0xA00000;         /* Image size (10 MB) */
+    ibl.bootModes[2].u.ethBoot.blob.branchAddress = 0x80000000;       /* Branch address after loading */
 
     ibl.chkSum = 0;
 }
@@ -888,31 +905,48 @@ hotmenu setConfig_c6670_main()
 	ibl.bootModes[0].port     = 0;
 
 	ibl.bootModes[0].u.norBoot.bootFormat	= ibl_BOOT_FORMAT_ELF;
-	ibl.bootModes[0].u.norBoot.bootAddress[0][0]	= 0;
-	ibl.bootModes[0].u.norBoot.bootAddress[1][0]	= 0;
+	ibl.bootModes[0].u.norBoot.bootAddress[0][0]	= 0;		/* Image 0 NOR offset byte address in LE mode */ 
+	ibl.bootModes[0].u.norBoot.bootAddress[0][1]	= 0xA00000;	/* Image 1 NOR offset byte address in LE mode  */
+	ibl.bootModes[0].u.norBoot.bootAddress[1][0]	= 0;		/* Image 0 NOR offset byte address in BE mode */ 
+	ibl.bootModes[0].u.norBoot.bootAddress[1][1]	= 0xA00000;	/* Image 1 NOR offset byte address in BE mode  */
 	ibl.bootModes[0].u.norBoot.interface	= ibl_PMEM_IF_SPI;
-    ibl.bootModes[0].u.norBoot.blob[0][0].startAddress  = 0x80000000;       /* Base address of DDR2 */
-    ibl.bootModes[0].u.norBoot.blob[0][0].sizeBytes     = 0xA00000;         /* 10 MB */
-    ibl.bootModes[0].u.norBoot.blob[0][0].branchAddress = 0x80000000;       /* Base address of DDR2 */
-    ibl.bootModes[0].u.norBoot.blob[1][0].startAddress  = 0x80000000;       /* Base address of DDR2 */
-    ibl.bootModes[0].u.norBoot.blob[1][0].sizeBytes     = 0xA00000;         /* 10 MB */
-    ibl.bootModes[0].u.norBoot.blob[1][0].branchAddress = 0x80000000;       /* Base address of DDR2 */
+    ibl.bootModes[0].u.norBoot.blob[0][0].startAddress  = 0x80000000;       /* Image 0 load start address in LE mode */
+    ibl.bootModes[0].u.norBoot.blob[0][0].sizeBytes     = 0xA00000;         /* Image 0 size (10 MB) in LE mode */
+    ibl.bootModes[0].u.norBoot.blob[0][0].branchAddress = 0x80000000;       /* Image 0 branch address after loading in LE mode */
+    ibl.bootModes[0].u.norBoot.blob[0][1].startAddress  = 0x90000000;       /* Image 1 load start address in LE mode */
+    ibl.bootModes[0].u.norBoot.blob[0][1].sizeBytes     = 0xA00000;         /* Image 1 size (10 MB) in LE mode */
+    ibl.bootModes[0].u.norBoot.blob[0][1].branchAddress = 0x90000000;       /* Image 1 branch address after loading in LE mode */
+    ibl.bootModes[0].u.norBoot.blob[1][0].startAddress  = 0x80000000;       /* Image 0 load start address in BE mode */
+    ibl.bootModes[0].u.norBoot.blob[1][0].sizeBytes     = 0xA00000;         /* Image 0 size (10 MB) in BE mode */
+    ibl.bootModes[0].u.norBoot.blob[1][0].branchAddress = 0x80000000;       /* Image 0 branch address after loading in BE mode */
+    ibl.bootModes[0].u.norBoot.blob[1][1].startAddress  = 0x90000000;       /* Image 1 load start address in BE mode */
+    ibl.bootModes[0].u.norBoot.blob[1][1].sizeBytes     = 0xA00000;         /* Image 1 size (10 MB) in BE mode */
+    ibl.bootModes[0].u.norBoot.blob[1][1].branchAddress = 0x90000000;       /* Image 1 branch address after loading in BE mode */
 
     ibl.bootModes[1].bootMode = ibl_BOOT_MODE_NAND;
     ibl.bootModes[1].priority = ibl_HIGHEST_PRIORITY;
     ibl.bootModes[1].port     = 0;
 
     ibl.bootModes[1].u.nandBoot.bootFormat        = ibl_BOOT_FORMAT_BBLOB;
-    ibl.bootModes[1].u.nandBoot.bootAddress[0][0]	  = 0x4000;
-    ibl.bootModes[1].u.nandBoot.bootAddress[1][0]	  = 0x4000;
+    ibl.bootModes[1].u.nandBoot.bootAddress[0][0]	  = 0x4000;         /* Image 0 NAND offset address (block 1) in LE mode */
+    ibl.bootModes[1].u.nandBoot.bootAddress[0][1]	  = 0x2000000;      /* Image 1 NAND offset address (block 2048) in LE mode */
+    ibl.bootModes[1].u.nandBoot.bootAddress[1][0]	  = 0x4000;	    /* Image 0 NAND offset address (block 1) in BE mode */
+    ibl.bootModes[1].u.nandBoot.bootAddress[1][1]	  = 0x2000000;      /* Image 1 NAND offset address (block 2048) in BE mode */
     ibl.bootModes[1].u.nandBoot.interface         = ibl_PMEM_IF_GPIO;
 
-    ibl.bootModes[1].u.nandBoot.blob[0][0].startAddress  = 0x80000000;       /* Base address of DDR2 */
-    ibl.bootModes[1].u.nandBoot.blob[0][0].sizeBytes     = 0xA00000;         /* 10 MB */
-    ibl.bootModes[1].u.nandBoot.blob[0][0].branchAddress = 0x80000000;       /* Base address of DDR2 */
-    ibl.bootModes[1].u.nandBoot.blob[1][0].startAddress  = 0x80000000;       /* Base address of DDR2 */
-    ibl.bootModes[1].u.nandBoot.blob[1][0].sizeBytes     = 0xA00000;         /* 10 MB */
-    ibl.bootModes[1].u.nandBoot.blob[1][0].branchAddress = 0x80000000;       /* Base address of DDR2 */
+    ibl.bootModes[1].u.nandBoot.blob[0][0].startAddress  = 0x80000000;       /* Image 0 load start address in LE mode */
+    ibl.bootModes[1].u.nandBoot.blob[0][0].sizeBytes     = 0xA00000;         /* Image 0 size (10 MB) in LE mode */
+    ibl.bootModes[1].u.nandBoot.blob[0][0].branchAddress = 0x80000000;       /* Image 0 branch address after loading in LE mode */
+    ibl.bootModes[1].u.nandBoot.blob[0][1].startAddress  = 0x90000000;       /* Image 1 load start address in LE mode */
+    ibl.bootModes[1].u.nandBoot.blob[0][1].sizeBytes     = 0xA00000;         /* Image 1 size (10 MB) in LE mode */
+    ibl.bootModes[1].u.nandBoot.blob[0][1].branchAddress = 0x90000000;       /* Image 1 branch address after loading in LE mode */
+    ibl.bootModes[1].u.nandBoot.blob[1][0].startAddress  = 0x80000000;       /* Image 0 load start address in BE mode */
+    ibl.bootModes[1].u.nandBoot.blob[1][0].sizeBytes     = 0xA00000;         /* Image 0 size (10 MB) in BE mode */
+    ibl.bootModes[1].u.nandBoot.blob[1][0].branchAddress = 0x80000000;       /* Image 0 branch address after loading in BE mode */
+    ibl.bootModes[1].u.nandBoot.blob[1][1].startAddress  = 0x90000000;       /* Image 1 load start address in BE mode */
+    ibl.bootModes[1].u.nandBoot.blob[1][1].sizeBytes     = 0xA00000;         /* Image 1 size (10 MB) in BE mode */
+    ibl.bootModes[1].u.nandBoot.blob[1][1].branchAddress = 0x90000000;       /* Image 1 branch address after loading in BE mode */
+
 
     ibl.bootModes[1].u.nandBoot.nandInfo.busWidthBits  = 8;
     ibl.bootModes[1].u.nandBoot.nandInfo.pageSizeBytes = 512;
@@ -985,9 +1019,9 @@ hotmenu setConfig_c6670_main()
     ibl.bootModes[2].u.ethBoot.ethInfo.fileName[13] = '\0';
     ibl.bootModes[2].u.ethBoot.ethInfo.fileName[14] = '\0';
 
-    ibl.bootModes[2].u.ethBoot.blob.startAddress  = 0x80000000;       /* Base address of DDR2 */
-    ibl.bootModes[2].u.ethBoot.blob.sizeBytes     = 0xA00000;         /* 10 MB */
-    ibl.bootModes[2].u.ethBoot.blob.branchAddress = 0x80000000;       /* Base of DDR2 */
+    ibl.bootModes[2].u.ethBoot.blob.startAddress  = 0x80000000;       /* Load start address */
+    ibl.bootModes[2].u.ethBoot.blob.sizeBytes     = 0xA00000;         /* Image size (10 MB) */
+    ibl.bootModes[2].u.ethBoot.blob.branchAddress = 0x80000000;       /* Branch address after loading */
 
     ibl.chkSum = 0;
 }

@@ -180,7 +180,7 @@ Int32 nand_open (void *ptr_driver, void (*asyncComplete)(void *))
     
     Int32 size;
     Int32 ret;
-    Int32 i, j;
+    Int32 i, j, startBlock;
     Bool  badBlock;
 
     /* Initialize the control info */
@@ -251,7 +251,8 @@ Int32 nand_open (void *ptr_driver, void (*asyncComplete)(void *))
         return (-1);
 
     nandmcb.numBadBlocks = 0;
-    for (i = 0; i < nandmcb.devInfo.totalBlocks; i++)  {
+    startBlock = ibln->bootAddress[iblEndianIdx][iblImageIdx]/(nandmcb.devInfo.pageSizeBytes*nandmcb.devInfo.pagesPerBlock);
+    for (i = startBlock; i < nandmcb.devInfo.totalBlocks; i++)  {
 
         badBlock = FALSE;
         for (j = 0; j < ibl_N_BAD_BLOCK_PAGE; j++)
@@ -287,13 +288,13 @@ Int32 nand_open (void *ptr_driver, void (*asyncComplete)(void *))
     
 
     /* Construct the logical to physical block array */  
-    for (i = j = 0; i < nandmcb.devInfo.totalBlocks; i++)  {
+    for (i = j = startBlock; i < nandmcb.devInfo.totalBlocks; i++)  {
         if (nandmcb.blocks[i] != 0xff)
             nandmcb.logicalToPhysMap[j++] = i;
     }
 
     /* Construct the physical to logical block array */
-    for (i = j = 0; i < nandmcb.devInfo.totalBlocks; i++)  {
+    for (i = j = startBlock; i < nandmcb.devInfo.totalBlocks; i++)  {
         if (nandmcb.blocks[i] == 0xff)
             nandmcb.physToLogicalMap[i] = 0xff;
         else
