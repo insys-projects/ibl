@@ -15,6 +15,8 @@ May 2011
     - little
 
 3) Required toolset
+    - If building in Windows environment - MinGW MSYS v1.0.11
+      (http://downloads.sourceforge.net/mingw/MSYS-1.0.11.exe)
     - TI CGEN compiler CGT_C6000_7.2.0
 NOTE: TI CGEN compiler CGT_C6000_6.1.12 has to be used for building IBL with
 ENDIAN mode "both".
