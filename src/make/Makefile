@@ -88,7 +88,7 @@ EVMS_C6X= evm_c6455 evm_c6472 evm_c6474
 # speeds the initial boot time. Note that boot table cannot be excluded
 # because it is required for the two stage I2C load process
 
-CEXCLUDES=
+CEXCLUDES ?=
 
 ifeq ($(ETH),no)
  CEXCLUDES+= ETH
@@ -324,7 +324,7 @@ evm_c667x_spi:
 
 evm_c667x_i2c:
 	make -f makestg1 I2C_BUS_ADDR=$(I2C_BUS_ADDR) I2C_MAP_ADDR=$(I2C_MAP_ADDR) \
-ENDIAN_MODE=$(ENDIAN) ARCH=c64x TARGET=c661x SPI=no SPI_DEFS='$(EVM_667x_SPI_DEFS)' CEXCLUDES='COFF BIS' c661x
+ENDIAN_MODE=$(ENDIAN) ARCH=c64x TARGET=c661x SPI=no SPI_DEFS='$(EVM_667x_SPI_DEFS)' CEXCLUDES='$(CEXCLUDES)' c661x
 
 test_c661x:
 	make -f makestg1 ARCH=c64x TARGET=c661x ENDIAN_MODE=both CEXCLUDES='NOR_SPI' SPI_DEFS='SPI_ROM=1 SPI_MODE=3 SPI_ADDR_WIDTH=24 SPI_NPIN=5 SPI_CSEL=2 SPI_C2TDEL=8 SPI_CLKDIV=0x20' I2C_BUS_ADDR=0x50 I2C_MAP_ADDR=$(I2C_MAP_ADDR) COMPACT_I2C=no c661x
