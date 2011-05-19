@@ -80,11 +80,6 @@ ifeq ($(C64X_EXCLUDES),yes)
 
 endif
 
-ifeq ($(TARGET),c661x)
- EXCLUDES+= NAND_GPIO
-endif
-
-
 # Prevent I2C/SPI rom creation based on defines
 ROMS=
 
