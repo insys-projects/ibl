@@ -304,8 +304,6 @@ Int32 nandHwGpioDriverReadBytes (Uint32 block, Uint32 page, Uint32 byte, Uint32 
 	 * Page Shift = 9, Bigblock = 0
 	 */
 	addr = PACK_ADDR(0x0, page, block);
-//	addr = (block << hwDevInfo->blockOffset) | (page <<
-//	hwDevInfo->pageOffset) | ((byte & 0xff)// << hwDevInfo->columnOffset); 
 	
 	ptNandAleSet((addr >>  0u) & 0xFF);   /* A0-A7  1st Cycle;  column addr */
 	ndelay(TARGET_NAND_STD_DELAY);
@@ -319,13 +317,8 @@ Int32 nandHwGpioDriverReadBytes (Uint32 block, Uint32 page, Uint32 byte, Uint32 
     
 	// Wait for Ready Busy Pin to go HIGH  
 	ret = ptNandWaitRdy(100000);
-#if 0
-	if (ret != 1)
-		return -1;
-#endif
     
 	ptNandReadDataBytes(nbytes, data);
-//	ptNandReadDataBytes(512, data);
 	
 	// Set Chip enable
 	hwGpioSetOutput(NAND_NCE_GPIO_PIN);	
@@ -351,6 +344,7 @@ Int32 nandHwGpioDriverReadPage(Uint32 block, Uint32 page, Uint8 *data)
     Uint8  eccCalc[3];
     int32 iErrors = ECC_SUCCESS;
     Uint8 *SpareAreaBuf = NULL;
+    Uint8  tempSpareAreaBuf[3];
 
     SpareAreaBuf = data + NAND_BYTES_PER_PAGE;
     
@@ -361,18 +355,30 @@ Int32 nandHwGpioDriverReadPage(Uint32 block, Uint32 page, Uint8 *data)
 
     /* Perform ECC on 256 byte blocks. Three bytes of ecc per 256 byte block are used. The last
      * 3 bytes are used for the last block, the previous three for the block before that, etc */
-#if 0
+
 	for(i = 0; i < NAND_BYTES_PER_PAGE / ECC_BLOCK_SIZE; i++)
 	{ 
 	/* Correct ecc error for each 256 byte blocks */
 	eccComputeECC(data + i * ECC_BLOCK_SIZE, eccCalc);
-	iErrors = eccCorrectData(data + (i * ECC_BLOCK_SIZE), 
-                 (SpareAreaBuf + ECC_SPARE_OFFSET + i * 3), eccCalc);
- 
+	
+	if ( i == 0) {
+		iErrors = eccCorrectData(data + (i * ECC_BLOCK_SIZE), 
+                 (SpareAreaBuf +  (i * 3)), eccCalc);
+	}
+
+	if (i == 1) {
+		tempSpareAreaBuf[0] = SpareAreaBuf[3];
+		tempSpareAreaBuf[1] = SpareAreaBuf[6];
+		tempSpareAreaBuf[2] = SpareAreaBuf[7];
+		
+		iErrors = eccCorrectData(data + (i * ECC_BLOCK_SIZE), 
+                 tempSpareAreaBuf, eccCalc);
+	}
+
 //	if(iErrors != ECC_SUCCESS)
 //		return (NAND_ECC_FAILURE);
 	}
-#endif
+
     return (0);
 
 }
