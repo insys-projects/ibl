@@ -322,7 +322,7 @@ void main (void)
                 break;
 #endif
                 
-#if ((!defined(EXCLUDE_NAND_EMIF)) )                                    
+#if ((!defined(EXCLUDE_NAND_EMIF)) || (!defined(EXCLUDE_NAND_GPIO)))
             case ibl_BOOT_MODE_NAND:
                 iblPmemCfg (ibl.bootModes[boot_mode_idx].u.nandBoot.interface, ibl.bootModes[boot_mode_idx].port, TRUE);
                 memset ((void *)0x80000000, 0, 0x20000000);
@@ -364,7 +364,7 @@ void main (void)
                             break;
 #endif
                             
-#if ((!defined(EXCLUDE_NAND_EMIF)) )                                    
+#if ((!defined(EXCLUDE_NAND_EMIF)) || (!defined(EXCLUDE_NAND_GPIO)))
                         case ibl_BOOT_MODE_NAND:
                             iblPmemCfg (ibl.bootModes[j].u.nandBoot.interface, ibl.bootModes[j].port, TRUE);
                             iblNandBoot (j);

@@ -63,8 +63,8 @@ else
      CSRC= t64.c cpmacdrv.c pll.c emif31.c mdio.c gpio.c nandgpio.c i2c.c nandwrgpio.c
 	else
 	 ifeq ($(TARGET),c661x)
-	  CSRC= t64.c pll.c cfgpll.c cfgpll2.c mdio.c i2c.c psc.c cpsw.c qm.c cpdma.c pa.c sgmii.c serdes.c gmacsl.c emif4.c
-	  CSRC+= nandemif25.c spi.c nandspi.c noremif25.c norspi.c emif25.c spiutil.c
+	  CSRC= t64.c pll.c cfgpll.c cfgpll2.c mdio.c i2c.c psc.c cpsw.c qm.c cpdma.c pa.c sgmii.c serdes.c gmacsl.c emif4.c gpio.c
+	  CSRC+= nandemif25.c nandgpio.c spi.c nandspi.c noremif25.c norspi.c emif25.c spiutil.c
      else
       CSRC= t64.c cpmacdrv.c pll.c psc.c emif31.c mdio.c gpio.c nandgpio.c i2c.c nandwrgpio.c sgmii.c cfgpll.c cfgpll2.c
 	  CSRC+= qm.c cpdma.c pa.c serdes.c gmacsl.c emif4.c nandemif25.c spi.c nandspi.c noremif25.c norspi.c emif25.c spiutil.c
@@ -184,9 +184,11 @@ ifeq ($(TARGET),c661x)
  vpath % $(ECODIR)/pa
  vpath % $(ECODIR)/sgmii
  vpath % $(ECODIR)/serdes
+ vpath % $(ECODIR)/gpio
  vpath % $(ECODIR)/macs/cpmacsl
  vpath % $(ECODIR)/ddrs/emif4
  vpath % $(ECODIR)/nands/emif25
+ vpath % $(ECODIR)/nands/gpio
  vpath % $(ECODIR)/nands/spi
  vpath % $(ECODIR)/spi
  vpath % $(ECODIR)/nors/emif25

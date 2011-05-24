@@ -57,9 +57,18 @@
 #include "target.h"
 #include "nandgpioloc.h"
 
-/* Pointer to the device configuration */
-nandDevInfo_t *hwDevInfo;
+#define NAND_BYTES_PER_PAGE		512
+#define ECC_BLOCK_SIZE			256
+#define NAND_SPARE_BYTES_PER_PAGE	16
+#define ECC_SPARE_OFFSET  (NAND_SPARE_BYTES_PER_PAGE - 3 * (NAND_BYTES_PER_PAGE / ECC_BLOCK_SIZE))
 
+/* NAND address pack macro */
+#define PACK_ADDR(col, page, block) \
+        ((col & 0x000000ff) | ((page & 0x0000001f) << 9) | ((block & 0x00000fff) << 14))
+
+/* Pointer to the device configuration */
+extern volatile cregister Uint32 TSCL;
+nandDevInfo_t *hwDevInfo;
 
 /**
  * @brief
@@ -68,22 +77,31 @@ nandDevInfo_t *hwDevInfo;
 
 void ndelay(Uint32 uiDelay)
 {
-    volatile Uint32 i;
+	Uint32 t;
+	TSCL = 1;
 
-    for (i = 0; i < uiDelay>>3; i++);
+	t = TSCL;
+	while(TSCL < (t + uiDelay));
 }
 
-
-
-/**
- * @brief
- *   a 100us delay
- */
-void ptNandWaitRdy(void) 
+Uint32 ptNandWaitRdy(Uint32 in_timeout) 
 {
-	ndelay(100 * 1000); // 100 usec
-}
+    Uint32 t;
 
+    ndelay(NAND_WAIT_PIN_POLL_ST_DLY);
+
+    TSCL = 1; 
+    t = TSCL;
+     
+    while(!hwGpioReadInput(NAND_BSY_GPIO_PIN))
+    {
+        if( TSCL > (t + in_timeout) )
+        {
+            return 0; /* fail */
+        }
+    }
+    return 1; /* success */
+}
 
 /**
  * @brief
@@ -162,6 +180,7 @@ void ptNandConfig (void)
 Int32 nandHwGpioDriverInit (int32 cs, void *vdevInfo)
 {
 	Uint32 cmd;
+	Uint32 ret;
     nandDevInfo_t *devInfo = (nandDevInfo_t *)vdevInfo;
 
     hwDevInfo = devInfo;
@@ -179,7 +198,9 @@ Int32 nandHwGpioDriverInit (int32 cs, void *vdevInfo)
 	ptNandCmdSet(cmd);
 	hwGpioSetOutput(NAND_NCE_GPIO_PIN);
 		
-	ptNandWaitRdy();
+	ret = ptNandWaitRdy(100000);
+	if (ret != 1)
+		return -1;
 
     return (0);
 }	 
@@ -250,7 +271,8 @@ Int32 nandHwGpioDriverReadBytes (Uint32 block, Uint32 page, Uint32 byte, Uint32 
 {
 
 	Uint32 addr;
-	
+	Uint32 cmd;
+	Uint32 ret;
 	if (data == NULL)
 		return (NAND_NULL_ARG);
 
@@ -262,45 +284,41 @@ Int32 nandHwGpioDriverReadBytes (Uint32 block, Uint32 page, Uint32 byte, Uint32 
 		
 	hwGpioClearOutput(NAND_NCE_GPIO_PIN);
 	ndelay(TARGET_NAND_STD_DELAY*5);
-	
-	ptNandCmdSet(hwDevInfo->readCommandPre); // First cycle send 0
-	
-	// Send address of the block + page to be read
-	// Address cycles = 4, Block shift = 22, Page Shift = 16, Bigblock = 0
-    addr = (block << hwDevInfo->blockOffset)  +
-           (page  << hwDevInfo->pageOffset)   +
-           (byte  << hwDevInfo->columnOffset);
 
-    if (hwDevInfo->lsbFirst == FALSE) 
-        addr = swapBytes (addr);
+	if (byte < hwDevInfo->pageSizeBytes) 
+	{
+		/* Read page data */
+		cmd = hwDevInfo->readCommandPre;
+	}
+	else
+	{
+		/* Read spare area data */
+		cmd = 0x50;
+	}
 
-	ptNandAleSet(addr & 0xFF);				// BIT0-7  1rst Cycle
+	ptNandCmdSet(cmd); // First cycle send 0
+
+	/* 
+	 * Send address of the block + page to be read
+	 * Address cycles = 4, Block shift = 14,
+	 * Page Shift = 9, Bigblock = 0
+	 */
+	addr = PACK_ADDR(0x0, page, block);
+	
+	ptNandAleSet((addr >>  0u) & 0xFF);   /* A0-A7  1st Cycle;  column addr */
+	ndelay(TARGET_NAND_STD_DELAY);
+	ptNandAleSet((addr >>  9u) & 0xFF);   /* A9-A16 2nd Cycle;  page addr & blk */
+	ndelay(TARGET_NAND_STD_DELAY);
+	ptNandAleSet((addr >> 17u) & 0xFF);   /* A17-A24 3rd Cycle; Block addr */
+	ndelay(TARGET_NAND_STD_DELAY);
+	ptNandAleSet((addr >> 25u) & 0x1);    /* A25    4th Cycle;  Plane addr */
 	ndelay(TARGET_NAND_STD_DELAY);
 
-    if (hwDevInfo->addressBytes >= 2)  {
-	    ptNandAleSet((addr >> 8u) & 0x0F);   	// Bits8-11 2nd Cycle
-	    ndelay(TARGET_NAND_STD_DELAY);
-    }
-
-	if (hwDevInfo->addressBytes >= 3)  {
-	    ptNandAleSet((addr >> 16u) & 0xFF);   	// Bits16-23
-	    ndelay(TARGET_NAND_STD_DELAY);
-    }
-
-    if (hwDevInfo->addressBytes >= 4)  {
-	    ptNandAleSet((addr >> 24u) & 0xFF);   	// Bits24-31
-	    ndelay(TARGET_NAND_STD_DELAY);
-    }
-
-    if (hwDevInfo->postCommand == TRUE)
-		ptNandCmdSet(hwDevInfo->readCommandPost);
-
+    
 	// Wait for Ready Busy Pin to go HIGH  
-	ptNandWaitRdy();
-
+	ret = ptNandWaitRdy(100000);
     
 	ptNandReadDataBytes(nbytes, data);
-
 	
 	// Set Chip enable
 	hwGpioSetOutput(NAND_NCE_GPIO_PIN);	
@@ -324,7 +342,12 @@ Int32 nandHwGpioDriverReadPage(Uint32 block, Uint32 page, Uint8 *data)
     Uint8 *blockp;
     Uint8 *eccp;
     Uint8  eccCalc[3];
+    int32 iErrors = ECC_SUCCESS;
+    Uint8 *SpareAreaBuf = NULL;
+    Uint8  tempSpareAreaBuf[3];
 
+    SpareAreaBuf = data + NAND_BYTES_PER_PAGE;
+    
     /* Read the page, including the extra bytes */
     ret = nandHwGpioDriverReadBytes (block, page, 0, hwDevInfo->pageSizeBytes + hwDevInfo->pageEccBytes, data);
     if (ret < 0)
@@ -332,19 +355,29 @@ Int32 nandHwGpioDriverReadPage(Uint32 block, Uint32 page, Uint8 *data)
 
     /* Perform ECC on 256 byte blocks. Three bytes of ecc per 256 byte block are used. The last
      * 3 bytes are used for the last block, the previous three for the block before that, etc */
-    nblocks = hwDevInfo->pageSizeBytes >> 8;
 
-    for (i = 0; i < nblocks; i++)  {
+	for(i = 0; i < NAND_BYTES_PER_PAGE / ECC_BLOCK_SIZE; i++)
+	{ 
+	/* Correct ecc error for each 256 byte blocks */
+	eccComputeECC(data + i * ECC_BLOCK_SIZE, eccCalc);
+	
+	if ( i == 0) {
+		iErrors = eccCorrectData(data + (i * ECC_BLOCK_SIZE), 
+                 (SpareAreaBuf +  (i * 3)), eccCalc);
+	}
 
-        blockp = &data[i * 256];
-        eccp   = &data[hwDevInfo->pageSizeBytes + hwDevInfo->pageEccBytes - ((nblocks - i) * 3)];
+	if (i == 1) {
+		tempSpareAreaBuf[0] = SpareAreaBuf[3];
+		tempSpareAreaBuf[1] = SpareAreaBuf[6];
+		tempSpareAreaBuf[2] = SpareAreaBuf[7];
+		
+		iErrors = eccCorrectData(data + (i * ECC_BLOCK_SIZE), 
+                 tempSpareAreaBuf, eccCalc);
+	}
 
-        eccComputeECC (blockp, eccCalc);
-
-        if (eccCorrectData (blockp, eccp, eccCalc) != ECC_SUCCESS)
-            return (NAND_ECC_FAILURE);
-
-    }
+//	if(iErrors != ECC_SUCCESS)
+//		return (NAND_ECC_FAILURE);
+	}
 
     return (0);
 
