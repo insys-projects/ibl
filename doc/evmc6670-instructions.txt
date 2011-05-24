@@ -43,7 +43,7 @@ Steps to use IBL on the c6670 EVM
     SW4(on, on, on, on), 
     SW5(on, on, on, off),
     SW6(on, on, on, on)
-   This will set the boot para index to 0 to boot the NOR image, by default
+   This will set the boot param index to 0 to boot the NOR image, by default
    the boot configuration table sets the NOR offset address to be 0 and 
    image format to be ELF for image 0.
    
@@ -53,7 +53,7 @@ Steps to use IBL on the c6670 EVM
     SW4(on, off, on, on), 
     SW5(on, on, on, off),
     SW6(on, on, on, on)
-   This will set the boot para index to 2 to boot the NAND image, by default
+   This will set the boot param index to 2 to boot the NAND image, by default
    the boot configuration table sets the NAND offset address to be 16384 
    (start of block 1) and image format to be BBLOB for image 0.
 
@@ -63,7 +63,7 @@ Steps to use IBL on the c6670 EVM
     SW4(on, on, off, on), 
     SW5(on, on, on, off),
     SW6(on, on, on, on)
-   This will set the boot para index to 4 to boot an image from a remote TFTP
+   This will set the boot param index to 4 to boot an image from a remote TFTP
    server, by default the boot configuration table sets the server IP to be 
    192.168.2.101, board IP to be 192.168.2.100 and image format to be BBLOB.
 

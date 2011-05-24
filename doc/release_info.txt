@@ -15,24 +15,31 @@ May 2011
     - little
 
 3) Required toolset
-    - If building in Windows environment - MinGW MSYS v1.0.11
-      (http://downloads.sourceforge.net/mingw/MSYS-1.0.11.exe)
     - TI CGEN compiler CGT_C6000_7.2.0
-NOTE: TI CGEN compiler CGT_C6000_6.1.12 has to be used for building IBL with
-ENDIAN mode "both".
+
+   Requirements for building IBL on Windows:
+   For building on a Windows machine, a GNU development environment is
+   required. MinGW installation is required for this. 
+   MinGW project link: http://www.mingw.org/
+   MinGW installer can be obtained from the following link
+   http://sourceforge.net/projects/mingw/files/Automated%20MinGW%20Installer/mingw-get-inst/mingw-get-inst-20110316/mingw-get-inst-20110316.exe/download
+   While installing MinGW following options have to be chosen:
+    1.  MinGw Compiler Suite
+        -   C Compiler
+    2. MinGW Developer Toolkit 
  
 4) Build Instructions
 
     - Change directory to ibl\src\make
     - Modify the environment setup script to match the tool chain installation
       directory:
-        For building in Cygwin environment modify setupenv.bat 
         For building in MINGW-MSYS Bash shell modify setupenvMsys.sh 
         For building in Linux Bash shell modify setupenvLnx.sh 
-    - Set the environment by running "setupenv.bat" or "source setupenvLnx.sh"
-      or "source setupenvMsys.sh"
+    - Set the environment variables:
+         On a Linux Bash shell run  "source setupenvLnx.sh"
+         On a MinGW-MSYS Bash shell "source setupenvMsys.sh"
     - For building run the following make command:
-    C6678/C6670 EVM:
+    For C6678/C6670 Low Cost EVM:
         make evm_c667x_i2c ENDIAN=little I2C_BUS_ADDR=0x51 
       or:
         make <TARGET>  ENDIAN=[little|big]
