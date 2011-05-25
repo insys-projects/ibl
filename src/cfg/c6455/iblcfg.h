@@ -108,6 +108,7 @@
 #define NAND_CLE_GPIO_PIN 	GPIO_8     // High: Command Cycle occuring
 #define NAND_ALE_GPIO_PIN 	GPIO_9     // High: Address input cycle oddcuring
 #define NAND_NWE_GPIO_PIN 	GPIO_10
+#define NAND_BSY_GPIO_PIN   GPIO_11     /* NAND Ready/Busy pin */
 #define NAND_NRE_GPIO_PIN 	GPIO_12
 #define NAND_NCE_GPIO_PIN 	GPIO_13
 #define NAND_MODE_GPIO		GPIO_14
@@ -117,6 +118,7 @@
  *      The standard NAND delay must be big enough to handle the highest possible
  *      operating frequency of the device */
 #define TARGET_NAND_STD_DELAY				25 // In cpu cycles
+#define NAND_WAIT_PIN_POLL_ST_DLY	(10000)
 
 
 

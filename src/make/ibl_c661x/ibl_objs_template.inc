@@ -56,7 +56,7 @@
 
 
 /* -------------- */
-#if (!defined(EXCLUDE_NAND_EMIF) || !defined(EXCLUDE_NAND_SPI) || !defined(EXCLUDE_NAND_GPIO)
+#if (!defined(EXCLUDE_NAND_EMIF) || !defined(EXCLUDE_NAND_SPI) || !defined(EXCLUDE_NAND_GPIO))
 
 ../nandboot/c64x/make/nandboot.ENDIAN_TAG.oc
 ../driver/c64x/make/nand.ENDIAN_TAG.oc

@@ -129,8 +129,8 @@ Int32 nandHwDriverWritePage (Uint32 block, Uint32 page, Uint8 *data, nandProgram
     if (winfo->pageWritePost == TRUE) 
 	    ptNandCmdSet(winfo->pageWriteCommandPost);
 
-	ptNandWaitRdy();
-	ptNandWaitRdy();
+	ptNandWaitRdy(100000);
+	ptNandWaitRdy(100000);
 	
 	hwGpioSetOutput(NAND_NCE_GPIO_PIN);
 	

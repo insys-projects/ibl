@@ -1,6 +1,6 @@
 #!/bin/sh
 # Generate the source release tarballs
-export IBL_VERSION="1_0_0_4"
+export IBL_VERSION="1_0_0_5"
 cd ../
 if [ -f ibl_src_$IBL_VERSION.tgz ]; then rm ibl_src_$IBL_VERSION.tgz; fi
 
@@ -118,14 +118,23 @@ cp -f src/make/ibl_c6457/i2crom_0x50_c6457_be.bin ibl_bin_$IBL_VERSION/c6457/be/
 cp -f src/util/i2cConfig/i2cparam_c6457_le.out   ibl_bin_$IBL_VERSION/c6457/le/
 cp -f src/util/i2cConfig/i2cparam_c6457_be.out   ibl_bin_$IBL_VERSION/c6457/be/
 
-# Build c6678/c6670 EVM 
+# Build c6678 EVM 
 pushd src/make
 make clean
-make evm_c667x_i2c ENDIAN=little I2C_BUS_ADDR=0x51 
+make evm_c6678_i2c ENDIAN=little I2C_BUS_ADDR=0x51 
 popd
 cp -f src/make/ibl_c661x/i2crom.dat ibl_bin_$IBL_VERSION/c6678/le/i2crom_0x51_c6678_le.dat
 cp -f src/make/ibl_c661x/i2crom.bin ibl_bin_$IBL_VERSION/c6678/le/i2crom_0x51_c6678_le.bin
 cp -f src/util/i2cConfig/i2cparam_c661x_le.out ibl_bin_$IBL_VERSION/c6678/le/i2cparam_c6678_le.out
+cp -f src/make/ibl_c661x/i2crom.dat ibl_bin_$IBL_VERSION/c6670/le/i2crom_0x51_c6670_le.dat
+cp -f src/make/ibl_c661x/i2crom.bin ibl_bin_$IBL_VERSION/c6670/le/i2crom_0x51_c6670_le.bin
+cp -f src/util/i2cConfig/i2cparam_c661x_le.out ibl_bin_$IBL_VERSION/c6670/le/i2cparam_c6670_le.out
+
+# Build c6670 EVM 
+pushd src/make
+make clean
+make evm_c6670_i2c ENDIAN=little I2C_BUS_ADDR=0x51 
+popd
 cp -f src/make/ibl_c661x/i2crom.dat ibl_bin_$IBL_VERSION/c6670/le/i2crom_0x51_c6670_le.dat
 cp -f src/make/ibl_c661x/i2crom.bin ibl_bin_$IBL_VERSION/c6670/le/i2crom_0x51_c6670_le.bin
 cp -f src/util/i2cConfig/i2cparam_c661x_le.out ibl_bin_$IBL_VERSION/c6670/le/i2cparam_c6670_le.out

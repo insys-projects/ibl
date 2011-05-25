@@ -39,9 +39,12 @@ May 2011
          On a Linux Bash shell run  "source setupenvLnx.sh"
          On a MinGW-MSYS Bash shell "source setupenvMsys.sh"
     - For building run the following make command:
-    For C6678/C6670 Low Cost EVM:
-        make evm_c667x_i2c ENDIAN=little I2C_BUS_ADDR=0x51 
-      or:
+        For C6678 Low Cost EVM:
+        make evm_c6678_i2c ENDIAN=little I2C_BUS_ADDR=0x51 
+        For C6670 Low Cost EVM:
+        make evm_c6670_i2c ENDIAN=little I2C_BUS_ADDR=0x51 
+
+      or for generic build option:
         make <TARGET>  ENDIAN=[little|big]
         make c6455 ENDIAN=liitle
         make c6455 ENDIAN=big
