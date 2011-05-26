@@ -1,14 +1,10 @@
 =====================================================
-C6x Bootloader Release Note
-Version: 1.0.0.4
-May 2011
+C6x Bootloader Build Instructions
 =====================================================
 
-1) Supported TARGETS:
-    - C6455
-    - C6472
-    - C6474
-    - C661x
+1) Supported EVM's:
+    - C6678 LC EVM
+    - C6670 LC EVM
 
 2) Supported ENDIAN
     - big
@@ -38,14 +34,24 @@ May 2011
     - Set the environment variables:
          On a Linux Bash shell run  "source setupenvLnx.sh"
          On a MinGW-MSYS Bash shell "source setupenvMsys.sh"
-    - For building run the following make command:
+    - Following are the commands for building IBL:
         For C6678 Low Cost EVM:
         make evm_c6678_i2c ENDIAN=little I2C_BUS_ADDR=0x51 
+        Output images:
+        IBL image: bin/i2crom_0x51_c6678_le.dat (CCS data format)
+                 : bin/i2crom_0x51_c6678_le.bin (raw binary)
+        IBL configuration writer:
+                 : bin/i2cparam_0x51_c6678_le_0x500.out
+        IBL configuration gel script:
+                 : bin/i2cConfig.gel
+
         For C6670 Low Cost EVM:
         make evm_c6670_i2c ENDIAN=little I2C_BUS_ADDR=0x51 
-
-      or for generic build option:
-        make <TARGET>  ENDIAN=[little|big]
-        make c6455 ENDIAN=liitle
-        make c6455 ENDIAN=big
+        Output images:
+        IBL image: bin/i2crom_0x51_c6670_le.dat (CCS data format)
+                 : bin/i2crom_0x51_c6670_le.bin (raw binary)
+        IBL configuration writer:
+                 : bin/i2cparam_0x51_c6670_le_0x500.out
+        IBL configuration gel script:
+                 : bin/i2cConfig.gel
 

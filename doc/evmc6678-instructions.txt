@@ -13,7 +13,7 @@ Steps to use IBL on the c6678 EVM
        boot mode on the EVM (please refer to the EVM technical reference manual
 	   on how to set the boot mode dip switches.
    (b) Open CCSv5 and launch the evmc66xx emulator target configuration and connect to core 0.
-   (c) Load the program i2cparam_c6678_le.out to CCS.
+   (c) Load the program i2cparam_0x51_c6678_le_0x500.out to CCS.
    (d) Run the program and a message "Run the GEL for the device to be configured, 
        press return to program the I2C" will be printed on the CCS console.
    (e) Load i2cConfig.gel (in CCSv5 Tools->GEL Files, right click mouse in GEL Files
