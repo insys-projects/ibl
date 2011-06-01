@@ -248,7 +248,7 @@ SPI_DEFS+= SPI_CLKDIV=$(SPI_CLKDIV)
 SPI_DEFS+= SPI_ROM=$(SPI_ROM)
 
 
-.PHONY: all $(IBLS_C6X) evm_c6455 evm_c6472 evm_c6474 evm_c6457 evm_c6618 
+.PHONY: all $(IBLS_C6X) evm_c6455 evm_c6472 evm_c6474 evm_c6457 evm_c6678_i2c evm_c6670_i2c 
 .PHONY: test_c661x test_c6455 test_c6472 test_c6474 test_c6457 clean
 
 

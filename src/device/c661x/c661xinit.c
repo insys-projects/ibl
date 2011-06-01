@@ -101,11 +101,12 @@ int32 deviceReadBootDevice (void)
 #endif
 
     v = *((Uint32 *)DEVICE_JTAG_ID_REG);
+    v &= DEVICE_JTAG_ID_MASK;
 
-    if (v == DEVICE_C6618_JTAG_ID_VAL)
-        params = (BOOT_PARAMS_COMMON_T *)ROM_BOOT_PARAMS_ADDR_C6618;
+    if (v == DEVICE_C6678_JTAG_ID_VAL)
+        params = (BOOT_PARAMS_COMMON_T *)ROM_BOOT_PARAMS_ADDR_C6678;
     else
-        params = (BOOT_PARAMS_COMMON_T *)ROM_BOOT_PARAMS_ADDR_C6616;
+        params = (BOOT_PARAMS_COMMON_T *)ROM_BOOT_PARAMS_ADDR_C6670;
 
     switch (params->boot_mode)  {
 
@@ -258,11 +259,12 @@ void deviceLoadInitSpiConfig (void *vcfg)
     BOOT_PARAMS_SPI_T    *spip;
 
     v = *((Uint32 *)DEVICE_JTAG_ID_REG);
+    v &= DEVICE_JTAG_ID_MASK;
 
-    if (v == DEVICE_C6618_JTAG_ID_VAL)
-        params = (BOOT_PARAMS_COMMON_T *)ROM_BOOT_PARAMS_ADDR_C6618;
+    if (v == DEVICE_C6678_JTAG_ID_VAL)
+        params = (BOOT_PARAMS_COMMON_T *)ROM_BOOT_PARAMS_ADDR_C6678;
     else
-        params = (BOOT_PARAMS_COMMON_T *)ROM_BOOT_PARAMS_ADDR_C6616;
+        params = (BOOT_PARAMS_COMMON_T *)ROM_BOOT_PARAMS_ADDR_C6670;
 
 
     /* SPI_ROM is a constant defined during make which enables the use of the

@@ -127,11 +127,14 @@
 /** 
  * @brief
  *   The PSC numbers for EMIF16 and SPI vary between devices. The devices are run time
- *   identified by reading the JTAG ID register 
+ *   identified by reading the JTAG ID register,
+ *   NOTE: Have the variant bits as zero while defining the JTAG ID 
  */
-#define DEVICE_C6616_JTAG_ID_VAL    0x9d02f     /* C6670 */
-#define DEVICE_C6618_JTAG_ID_VAL    0x9e02f     /* C6678 */     
+#define DEVICE_C6678_JTAG_ID_VAL   0x9e02f      /* C6678 */     
+#define DEVICE_C6670_JTAG_ID_VAL   0xb94102f    /* C6670 */     
+
 #define DEVICE_JTAG_ID_REG          0x2620018
+#define DEVICE_JTAG_ID_MASK         0x0fffffff /* exclude variant bits(31:28) */
 
 
 /**
@@ -139,7 +142,7 @@
  *    The PSC number for NAND depends on the device
  */
 #define TARGET_PWR_EMIF         deviceEmifPscNum()
-#define TARGET_PWR_EMIF_C6618   3
+#define TARGET_PWR_EMIF_C6678   3
 
 /*
  *  @brief
@@ -351,8 +354,8 @@ Int32 targetMacRcv (void *ptr_device, UINT8 *buffer);
 #define BOOT_MODE_SPI               50
 
 
-#define ROM_BOOT_PARAMS_ADDR_C6618   0x873680
-#define ROM_BOOT_PARAMS_ADDR_C6616   0x8f3680
+#define ROM_BOOT_PARAMS_ADDR_C6678   0x873680
+#define ROM_BOOT_PARAMS_ADDR_C6670   0x8f3680
 
 /**
  *  @brief

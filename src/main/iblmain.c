@@ -270,9 +270,10 @@ void main (void)
 
 #ifndef EXCLUDE_MULTI_BOOT
         v = DEVICE_REG32_R(DEVICE_JTAG_ID_REG);
+        v &= DEVICE_JTAG_ID_MASK;
         if (
-            (v == DEVICE_C6618_JTAG_ID_VAL)         || 
-            (v == DEVICE_C6616_JTAG_ID_VAL)
+            (v == DEVICE_C6678_JTAG_ID_VAL)         || 
+            (v == DEVICE_C6670_JTAG_ID_VAL)
            )
         {
             IER = 0;

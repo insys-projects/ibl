@@ -85,10 +85,11 @@ int32 deviceSpiPscNum (void)
 {
     uint32 v;
 
-    /* SPI is module number 3 only on the c6618. On the c6616 the SPI is in the
+    /* SPI is module number 3 only on the c6678. On the c6670 the SPI is in the
      * always on domain */
     v = *((Uint32 *)DEVICE_JTAG_ID_REG);
-    if (v == DEVICE_C6618_JTAG_ID_VAL)
+    v &= DEVICE_JTAG_ID_MASK;
+    if (v == DEVICE_C6678_JTAG_ID_VAL)
         return (3);
 
     return (-1);  /* A negative number indicates the always on domain */

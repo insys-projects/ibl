@@ -73,7 +73,7 @@ extern cregister unsigned int DNUM;
  *
  *  @details
  *    Examines an input address to determine if it is a local address. Using the largest
- *    L2 size on the 6616.
+ *    L2 size on the C6670.
  */
 bool address_is_local (Uint32 addr)
 {
@@ -169,15 +169,16 @@ uint32 deviceEmif25MemBase (int32 cs)
 
 /**
  *  @brief
- *      Return the PSC number for NAND/NOR through emif. Only 6618 has the emif
+ *      Return the PSC number for NAND/NOR through emif. Only 6678 has the emif
  */
 Int32 deviceEmifPscNum (void)
 {
     Uint32 v;
 
     v = *((Uint32 *)DEVICE_JTAG_ID_REG);
-    if (v == DEVICE_C6618_JTAG_ID_VAL)
-        return (TARGET_PWR_EMIF_C6618);
+    v &= DEVICE_JTAG_ID_MASK;
+    if (v == DEVICE_C6678_JTAG_ID_VAL)
+        return (TARGET_PWR_EMIF_C6678);
 
     /* Return a negative number to indicate no PSC module is associated with NAND */
     return (-1);
