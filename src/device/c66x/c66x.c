@@ -36,13 +36,13 @@
 
 
 /************************************************************************************
- * FILE PURPOSE: C661x Device Specific functions
+ * FILE PURPOSE: C66x Device Specific functions
  ************************************************************************************
- * FILE NAME: c661x.c
+ * FILE NAME: c66x.c
  *
  * DESCRIPTION: Implements the device specific functions for the IBL
  *
- * @file c661x.c
+ * @file c66x.c
  *
  * @brief
  *  This file implements the device specific functions for the IBL
@@ -117,7 +117,7 @@ Uint32 deviceLocalAddrToGlobal (Uint32 addr)
  *   Enable the DDR
  *
  * @details
- *   The DDR controller on the c661x is an emif 4.0. The controller is
+ *   The DDR controller on the c66x is an emif 4.0. The controller is
  *   initialized directly with the supplied values
  */
 void deviceDdrConfig (void)

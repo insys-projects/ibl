@@ -96,7 +96,7 @@
 
 /**
  *  @brief
- *   The c661x devices use a register external to the PLL controller for prediv configuration
+ *   The c66x devices use a register external to the PLL controller for prediv configuration
  */
 #define chipPllExternalPrediv(x)    TRUE
 

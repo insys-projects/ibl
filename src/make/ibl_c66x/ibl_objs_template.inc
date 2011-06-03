@@ -4,8 +4,8 @@
  */
 
 ../main/c64x/make/iblmain.ENDIAN_TAG.oc
-../device/c64x/make/c661x.ENDIAN_TAG.oc
-../device/c64x/make/c661xutil.ENDIAN_TAG.oc
+../device/c64x/make/c66x.ENDIAN_TAG.oc
+../device/c64x/make/c66xutil.ENDIAN_TAG.oc
 ../driver/c64x/make/timer.ENDIAN_TAG.oc
 ../hw/c64x/make/t64.ENDIAN_TAG.oc
 ../hw/c64x/make/psc.ENDIAN_TAG.oc

@@ -1,8 +1,8 @@
 /**
- * @file c661xutil.c
+ * @file c66xutil.c
  *
  * @brief
- *	  c661x functions used by both the ibl and utility programs
+ *	  c66x functions used by both the ibl and utility programs
  */
 
 #include "device.h"

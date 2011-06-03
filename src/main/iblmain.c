@@ -156,7 +156,7 @@ void iblPmemCfg (int32 interface, int32 port, bool enableNand)
                     cfg.csel      = ibl.spiConfig.csel;
                     cfg.c2tdelay  = ibl.spiConfig.c2tdelay;
 
-                    /* On c661x devices the PLL module has a built in divide by 6, and the SPI
+                    /* On c66x devices the PLL module has a built in divide by 6, and the SPI
                      * has a maximum clock divider value of 0xff */
                     v = ibl.pllConfig[ibl_MAIN_PLL].pllOutFreqMhz / (DEVICE_SPI_MOD_DIVIDER * ibl.spiConfig.busFreqMHz);
                     if (v > 0xff)

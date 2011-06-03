@@ -19,7 +19,7 @@ CLEAN_MODULES=$(addprefix clean_,$(subst hw,,$(MODULES)))
 CLEAN_MODULES+=$(addprefix clean_,$(CFG_MODULES))
 
 
-TARGETS= c6472 c6474 c6474l c6455 c6457 c661x
+TARGETS= c6472 c6474 c6474l c6455 c6457 c66x
 
 # The main module needs to know the device address of the i2c where the image map resides
 MAINDEFS=-DIBL_CFG_I2C_MAP_TABLE_DATA_BUS_ADDR=$(I2C_BUS_ADDR)
@@ -58,7 +58,7 @@ export TARGET
 
 $(TARGETS): iblMain
 
-ifeq ($(TARGET),c661x)
+ifeq ($(TARGET),c66x)
     HAS_SPI=1
 else
     HAS_SPI=0

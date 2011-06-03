@@ -45,7 +45,7 @@
  * @file iblcfg.h
  *
  * @brief
- *	 Build time configurations for the c661x ibl are defined
+ *	 Build time configurations for the c66x ibl are defined
  *
  ***************************************************************************/
 #ifndef IBLCFG_H

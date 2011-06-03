@@ -7,7 +7,7 @@
 #*
 #**************************************************************************
 
-DEVICES= c6455 c6472 c6474 c6474l c6457 c661x
+DEVICES= c6455 c6472 c6474 c6474l c6457 c66x
 
 ifndef IBL_ROOT
  IBL_ROOT=../..
@@ -22,7 +22,7 @@ endif
 
 # The PLL object files are device specific
 PLL_PATH= ../../hw/c64x/make
-ifeq ($(TARGET),c661x)
+ifeq ($(TARGET),c66x)
  PLL_OBJS=  $(PLL_PATH)/pll.$(IEXT).oc $(PLL_PATH)/cfgpll.$(IEXT).oc $(PLL_PATH)/cfgpll2.$(IEXT).oc
  PLL_OBJS+= ../../device/c64x/make/c64x.$(IEXT).oa
  PSC_OBJS= ../../hw/c64x/make/psc.$(IEXT).oc
@@ -34,7 +34,7 @@ endif
 
 
 ECODIR= $(IBL_ROOT)/util/i2cConfig
-ifeq ($(TARGET),c661x)
+ifeq ($(TARGET),c66x)
  TFILES= ../../device/c64x/make/$(TARGET)util.$(IEXT).oc
 endif
 

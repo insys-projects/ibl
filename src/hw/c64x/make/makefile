@@ -62,7 +62,7 @@ else
     ifeq ($(TARGET),c6455)
      CSRC= t64.c cpmacdrv.c pll.c emif31.c mdio.c gpio.c nandgpio.c i2c.c
 	else
-	 ifeq ($(TARGET),c661x)
+	 ifeq ($(TARGET),c66x)
 	  CSRC= t64.c pll.c cfgpll.c cfgpll2.c mdio.c i2c.c psc.c cpsw.c qm.c cpdma.c pa.c sgmii.c serdes.c gmacsl.c emif4.c gpio.c
 	  CSRC+= nandemif25.c nandgpio.c spi.c nandspi.c noremif25.c norspi.c emif25.c spiutil.c
      else
@@ -173,7 +173,7 @@ ifeq ($(TARGET),c6455)
  vpath % $(ECODIR)/i2c
 endif
 
-ifeq ($(TARGET),c661x)
+ifeq ($(TARGET),c66x)
  vpath % $(ECODIR)/plls/pll014phi
  vpath % $(ECODIR)/mdio
  vpath % $(ECODIR)/i2c

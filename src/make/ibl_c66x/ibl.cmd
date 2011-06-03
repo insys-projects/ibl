@@ -1,5 +1,5 @@
 /************************************************************************************
- * FILE PURPOSE: Define the memory usage of the ibl module for the c661x
+ * FILE PURPOSE: Define the memory usage of the ibl module for the c66x
  ************************************************************************************
  * FILE NAME: ibl.cmd
  *

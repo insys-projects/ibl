@@ -1,8 +1,8 @@
 /**
- * @file c661xinit.c
+ * @file c66xinit.c
  *
  * @brief
- *		c661x functions used during the initial stage of the ibl load
+ *		c66x functions used during the initial stage of the ibl load
  *
  */
 #include "ibl.h"
@@ -11,7 +11,7 @@
 #include "pllapi.h"
 #include "spi_api.h"
 #include "spi_loc.h"
-#include "tiboot_c661x.h"       
+#include "tiboot_c66x.h"       
 
 
 /**
