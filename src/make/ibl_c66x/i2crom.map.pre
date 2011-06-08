@@ -19,7 +19,147 @@ section
   sw_pll_postdiv = 2
   options        = 1
 
-  core_freq_mhz    = 625
+  core_freq_mhz    = 100
+  i2c_clk_freq_khz = 200
+
+  dev_addr_ext = I2C_BUS_ADDR
+
+  multi_i2c_id = 0
+  my_i2c_id    = 1
+  address_delay = 0
+  exe_file = INIT_EXE_FILE
+}
+
+section 
+{
+  param_index    = 1
+  boot_mode      = 40
+  sw_pll_prediv	 = 1
+  sw_pll_mult    = 16
+  sw_pll_postdiv = 2
+  options        = 1
+
+  core_freq_mhz    = 100
+  i2c_clk_freq_khz = 200
+
+  dev_addr_ext = I2C_BUS_ADDR
+
+  multi_i2c_id = 0
+  my_i2c_id    = 1
+  address_delay = 0
+  exe_file = INIT_EXE_FILE
+}
+
+section 
+{
+  param_index    = 2
+  boot_mode      = 40
+  sw_pll_prediv	 = 1
+  sw_pll_mult    = 16
+  sw_pll_postdiv = 2
+  options        = 1
+
+  core_freq_mhz    = 100
+  i2c_clk_freq_khz = 200
+
+  dev_addr_ext = I2C_BUS_ADDR
+
+  multi_i2c_id = 0
+  my_i2c_id    = 1
+  address_delay = 0
+  exe_file = INIT_EXE_FILE
+}
+
+section 
+{
+  param_index    = 3
+  boot_mode      = 40
+  sw_pll_prediv	 = 1
+  sw_pll_mult    = 16
+  sw_pll_postdiv = 2
+  options        = 1
+
+  core_freq_mhz    = 100
+  i2c_clk_freq_khz = 200
+
+  dev_addr_ext = I2C_BUS_ADDR
+
+  multi_i2c_id = 0
+  my_i2c_id    = 1
+  address_delay = 0
+  exe_file = INIT_EXE_FILE
+}
+
+section 
+{
+  param_index    = 4
+  boot_mode      = 40
+  sw_pll_prediv	 = 1
+  sw_pll_mult    = 16
+  sw_pll_postdiv = 2
+  options        = 1
+
+  core_freq_mhz    = 100
+  i2c_clk_freq_khz = 200
+
+  dev_addr_ext = I2C_BUS_ADDR
+
+  multi_i2c_id = 0
+  my_i2c_id    = 1
+  address_delay = 0
+  exe_file = INIT_EXE_FILE
+}
+
+section 
+{
+  param_index    = 5
+  boot_mode      = 40
+  sw_pll_prediv	 = 1
+  sw_pll_mult    = 16
+  sw_pll_postdiv = 2
+  options        = 1
+
+  core_freq_mhz    = 100
+  i2c_clk_freq_khz = 200
+
+  dev_addr_ext = I2C_BUS_ADDR
+
+  multi_i2c_id = 0
+  my_i2c_id    = 1
+  address_delay = 0
+  exe_file = INIT_EXE_FILE
+}
+
+section 
+{
+  param_index    = 6
+  boot_mode      = 40
+  sw_pll_prediv	 = 1
+  sw_pll_mult    = 16
+  sw_pll_postdiv = 2
+  options        = 1
+
+  core_freq_mhz    = 100
+  i2c_clk_freq_khz = 200
+
+  dev_addr_ext = I2C_BUS_ADDR
+
+  multi_i2c_id = 0
+  my_i2c_id    = 1
+  address_delay = 0
+  exe_file = INIT_EXE_FILE
+}
+
+section 
+{
+  param_index    = 7
+  boot_mode      = 40
+  sw_pll_prediv	 = 1
+  sw_pll_mult    = 16
+  sw_pll_postdiv = 2
+  options        = 1
+
+  core_freq_mhz    = 100
   i2c_clk_freq_khz = 200
 
   dev_addr_ext = I2C_BUS_ADDR

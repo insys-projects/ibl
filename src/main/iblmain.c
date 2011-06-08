@@ -309,7 +309,7 @@ void main (void)
             }
             boot_mode_idx = boot_para_idx/ibl_N_IMAGES;
             /* Get the boot image index */
-            iblImageIdx == boot_para_idx & (ibl_N_IMAGES - 1);
+            iblImageIdx = boot_para_idx & (ibl_N_IMAGES - 1);
 
             iblStatus.activeBoot = ibl.bootModes[boot_mode_idx].bootMode;
 
