@@ -332,6 +332,13 @@ Int32 targetMacRcv (void *ptr_device, UINT8 *buffer);
 #define DEVICE_PSTREAM_CFG_REG_VAL_ROUTE_PDSP0      0
 #define hwConfigStreamingSwitch()                   DEVICE_REG32_W(DEVICE_PSTREAM_CFG_REG_ADDR, DEVICE_PSTREAM_CFG_REG_VAL_ROUTE_PDSP0);
 
+#define NAND_BYTES_PER_PAGE		512
+#define ECC_BLOCK_SIZE			256
+#define NAND_SPARE_BYTES_PER_PAGE	16
+
+/* NAND address pack macro */
+#define PACK_ADDR(col, page, block) \
+        ((col & 0x000000ff) | ((page & 0x0000001f) << 9) | ((block & 0x00000fff) << 14))
 
 /**
  *  @brief

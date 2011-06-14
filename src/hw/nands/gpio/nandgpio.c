@@ -57,15 +57,6 @@
 #include "target.h"
 #include "nandgpioloc.h"
 
-#define NAND_BYTES_PER_PAGE		512
-#define ECC_BLOCK_SIZE			256
-#define NAND_SPARE_BYTES_PER_PAGE	16
-#define ECC_SPARE_OFFSET  (NAND_SPARE_BYTES_PER_PAGE - 3 * (NAND_BYTES_PER_PAGE / ECC_BLOCK_SIZE))
-
-/* NAND address pack macro */
-#define PACK_ADDR(col, page, block) \
-        ((col & 0x000000ff) | ((page & 0x0000001f) << 9) | ((block & 0x00000fff) << 14))
-
 /* Pointer to the device configuration */
 extern volatile cregister Uint32 TSCL;
 nandDevInfo_t *hwDevInfo;
