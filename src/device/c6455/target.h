@@ -171,6 +171,13 @@
 #define GPIO_SET_FAL_TRIG_REG	0x02B0002C
 #define GPIO_CLR_FAL_TRIG_REG	0x02B00030
 
+#define NAND_BYTES_PER_PAGE		2048
+#define ECC_BLOCK_SIZE			256
+#define NAND_SPARE_BYTES_PER_PAGE	64
+
+/* NAND address pack macro */
+#define	PACK_ADDR(col, page, block) \
+		((col &	0x00000fff) | ((page & 0x0000003f)<<16)	| ((block & 0x000003ff)	<< 22 ))
 
 /**
  *  @brief
