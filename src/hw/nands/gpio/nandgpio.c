@@ -317,7 +317,6 @@ Int32 nandHwGpioDriverReadBytes (Uint32 block, Uint32 page, Uint32 byte, Uint32 
 
 		ptNandCmdSet(0x30);
 	}
-
     
 	// Wait for Ready Busy Pin to go HIGH  
 	ret = ptNandWaitRdy(100000);
@@ -362,10 +361,11 @@ Int32 nandHwGpioDriverReadPage(Uint32 block, Uint32 page, Uint8 *data)
 
 	for(i = 0; i < hwDevInfo->pageSizeBytes / ECC_BLOCK_SIZE; i++)
 	{
-		/* Correct ecc error for each 256 byte blocks */
+		
+		if (hwDevInfo->pageSizeBytes == 512) {
+			/* Correct ecc error for each 256 byte blocks */
 			eccComputeECC(data + i * ECC_BLOCK_SIZE, eccCalc);
 			
-		if (hwDevInfo->pageSizeBytes == 512) {
 			if ( i == 0) {
 				iErrors = eccCorrectData(data + (i * ECC_BLOCK_SIZE), 
 				(SpareAreaBuf +  (i * 3)), eccCalc);
@@ -379,8 +379,10 @@ Int32 nandHwGpioDriverReadPage(Uint32 block, Uint32 page, Uint8 *data)
 				iErrors = eccCorrectData(data + (i * ECC_BLOCK_SIZE), 
 					tempSpareAreaBuf, eccCalc);
 			}
-		} else {
-			iErrors = eccCorrectData(data + (i * ECC_BLOCK_SIZE), 
+		} else if (hwDevInfo->pageSizeBytes == 2048) {
+			/* Correct ecc error for each 256 byte blocks */
+			eccComputeECC(data + i * ECC_BLOCK_SIZE, eccCalc);
+			iErrors = eccCorrectData(data + (i * ECC_BLOCK_SIZE),
 				(SpareAreaBuf + 40 + (i * 3)), eccCalc);
 		}
 	}
