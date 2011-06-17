@@ -152,9 +152,122 @@ void iblEnableEDC ()
 	*(volatile unsigned int *)(SMEDCC) |= 0x40000000;	//Set ECM(bit30)=1	
 }
 
+#ifdef IBL_ENABLE_PCIE_WORKAROUND
+
+/* undocumented register in data manual 
+ * Bit 0 of this register is supposed to give the status of PCIe PLL lock*/
+#define PCIE_STS_REG    0x262015C
+
+/* Workaround for PCIe boot mode support for C6678/C6670 */
+/* This is a temporary workaround should be removed once fixed in RBL */
+
+/* PCIe Config register base on C6678/C6670 */
+#define PCIE_BASE_ADDR 0x21800000
+
+/* PCIe Application registers */
+#define PCIE_APP_CMD_STATUS  0x4
+#define PCIE_OB_SIZE         0x30
+#define PCIE_APP_SERDES_CFG0 0x390
+#define PCIE_APP_SERDES_CFG1 0x394
+
+/* PCIe Local Configuration registers */
+#define PCIE_VENDER_DEVICE_ID   0x1000
+#define PCIE_STATUS_CMD         0x1004
+#define PCIE_CLASSCODE_REVID    0x1008
+#define PCIE_BAR0               0x1010
+#define PCIE_BAR1               0x1014
+#define PCIE_BAR2               0x1018
+#define PCIE_BAR3               0x101c
+#define PCIE_DEVICE_CAP         0x1074
+#define PCIE_DEV_STAT_CTRL   	0x1078
+#define PCIE_LINK_STAT_CTRL     0x1080
+#define PCIE_ACCR	            0x1118
+#define PCIE_DEBUG0             0x1728
+#define PCIE_PL_GEN2            0x180C
+
+/* SERDES Configuration registers */
+#define PCIE_SERDES_CFG_PLL 0x2620358
+
+#define MAGIC_ADDR (*(volatile unsigned int *)0x87fffc)
+
+/* */
+
+extern cregister volatile unsigned int IER;
+
+void waitForBoot(void)
+{
+    void (*escape)();
+    UINT32  i;
+
+    /* Disable interrupts */
+    IER = 1;
+	MAGIC_ADDR = 0;
+
+    do {
+        for (i=0; i < 100; i++)
+            asm("    nop");
+    } while (MAGIC_ADDR == 0);
+
+    escape = (void (*)())(MAGIC_ADDR);
+    (*escape)();
+}
+
+void iblPCIeWorkaround()
+{
+    UINT32  cmd_stat;
+    UINT32  reg,i;
+
+     /* Power up PCIe */
+    devicePowerPeriph (TARGET_PWR_PCIE);
+    for(i=0; i<1000; i++) asm (" NOP");
+
+    DEVICE_REG32_W ((PCIE_BASE_ADDR + PCIE_APP_SERDES_CFG0), 0x00062320);  /* ss clock */
+    DEVICE_REG32_W ((PCIE_BASE_ADDR + PCIE_APP_SERDES_CFG1), 0x00022320);  /* ss clock */
+      
+    /* Wait for PCIe PLL lock */
+    while(!(DEVICE_REG32_R(PCIE_STS_REG) & 1));
+
+    DEVICE_REG32_W ((PCIE_BASE_ADDR + PCIE_CLASSCODE_REVID), 0x04800001);  /* class = 4 */ 
+    DEVICE_REG32_W ((PCIE_BASE_ADDR + PCIE_LINK_STAT_CTRL),  0x10110080);  /* extended synch */
+
+    DEVICE_REG32_W ((PCIE_BASE_ADDR + PCIE_VENDER_DEVICE_ID),  0x8888104c); 
+    DEVICE_REG32_W ((PCIE_BASE_ADDR + PCIE_DEVICE_CAP),  0x288701); 
+
+	DEVICE_REG32_W ((PCIE_BASE_ADDR + PCIE_OB_SIZE),  0x00000003);          /* OB_SIZE = 8M */ 
+	DEVICE_REG32_W ((PCIE_BASE_ADDR + PCIE_PL_GEN2),  0x0000000F);
+
+    DEVICE_REG32_W ((PCIE_BASE_ADDR + PCIE_APP_CMD_STATUS), 0x0020); /* Set dbi_cs2 to allow access to the BAR registers */ 
+    DEVICE_REG32_W ((PCIE_BASE_ADDR + PCIE_BAR0), 0x00003FFF);
+    DEVICE_REG32_W ((PCIE_BASE_ADDR + PCIE_BAR1), 0x0007FFFF);
+    DEVICE_REG32_W ((PCIE_BASE_ADDR + PCIE_BAR2), 0x003FFFFF);
+    DEVICE_REG32_W ((PCIE_BASE_ADDR + PCIE_BAR3), 0x00FFFFFF);
+
+	DEVICE_REG32_W ((PCIE_BASE_ADDR + PCIE_APP_CMD_STATUS), 0x0);          /* dbi_cs2=0 */
+
+	DEVICE_REG32_W ((PCIE_BASE_ADDR + PCIE_STATUS_CMD), 0x00100146);
+    DEVICE_REG32_W ((PCIE_BASE_ADDR + PCIE_DEV_STAT_CTRL), 0x0000281F);
+    DEVICE_REG32_W ((PCIE_BASE_ADDR + PCIE_ACCR), 0x000001E0);
+    DEVICE_REG32_W ((PCIE_BASE_ADDR + PCIE_BAR0), 0);
+
+    DEVICE_REG32_W ((PCIE_BASE_ADDR + PCIE_APP_CMD_STATUS), 0x0000007);    /* enable LTSSM, IN, OB */
+    while((DEVICE_REG32_R(PCIE_BASE_ADDR + PCIE_DEBUG0) & 0x11)!=0x11);    /* Wait for training to complete */
+ 
+    /* Wait for the Boot from Host */
+    waitForBoot();
+
+    /* Will never reach here */
+    return;
+}
+
+#endif
+
 #define FPGA_BM_GPI_STATUS_LO_REG           4   /* Boot Mode GPI Status (07-00 Low Byte) Register */
 #define FPGA_BM_GPI_STATUS_HI_REG           5   /* Boot Mode GPI Status (15-08 High Byte) Register */
+#define FPGA_ICS557_SEL_CTRL_REG            0x50 /* ICS 557 Clock Selection
+                                                    Control Register*/
 #define FPGA_READ_REG_CMD(x)                ((x | 0x80) << 8)
+#define FPGA_WRITE_REG_CMD(addr,byte)       (((addr & 0x7f) << 8) | (byte & 0xff))
+
 /**
  * @brief
  *      Enter the ROM boot loader if the FPGA boot register
@@ -163,7 +276,6 @@ void iblEnableEDC ()
  */
 void iblEnterRom ()
 {
-    uint32      reg =  DEVICE_REG32_R (DEVICE_REG_DEVSTAT);
     uint32      v, dev_stat, bm_lo, bm_hi;
     void        (*exit)();
 
@@ -192,7 +304,7 @@ void iblEnterRom ()
     DEVICE_REG32_W (DEVICE_SPI_BASE(0) + SPI_REG_SPIGCR1, 0x01000003);
 
     /* Read the BM status lo register */
-	DEVICE_REG32_W(DEVICE_SPI_BASE(0) + 0x38, FPGA_READ_REG_CMD(FPGA_BM_GPI_STATUS_LO_REG));
+	DEVICE_REG32_W(DEVICE_SPI_BASE(0) + SPI_REG_SPIDAT0, FPGA_READ_REG_CMD(FPGA_BM_GPI_STATUS_LO_REG));
     chipDelay32(10000);
     v = DEVICE_REG32_R(DEVICE_SPI_BASE(0) + SPI_REG_SPIFLG);
     if ( v & 0x100)
@@ -205,7 +317,7 @@ void iblEnterRom ()
     }
 
     /* Read the BM status hi register */
-	DEVICE_REG32_W(DEVICE_SPI_BASE(0) + 0x38, FPGA_READ_REG_CMD(FPGA_BM_GPI_STATUS_HI_REG));
+	DEVICE_REG32_W(DEVICE_SPI_BASE(0) + SPI_REG_SPIDAT0, FPGA_READ_REG_CMD(FPGA_BM_GPI_STATUS_HI_REG));
     chipDelay32(10000);
     v = DEVICE_REG32_R(DEVICE_SPI_BASE(0) + SPI_REG_SPIFLG);
     if ( v & 0x100)
@@ -217,8 +329,6 @@ void iblEnterRom ()
         return;
     }
 
-    /* Reset SPI */
-    DEVICE_REG32_W (DEVICE_SPI_BASE(0) + SPI_REG_SPIGCR0, SPI_REG_VAL_SPIGCR0_RESET);
 
     if ( (BOOT_READ_BITFIELD(bm_lo,3,1) != 0x5)     ||
          (BOOT_READ_BITFIELD(bm_hi,3,3) == 0x0) )    
@@ -233,6 +343,27 @@ void iblEnterRom ()
         /* Update the DEVSTAT register for the intended Boot Device and i2c Addr */
         DEVICE_REG32_W (DEVICE_REG_DEVSTAT, dev_stat);
 
+#ifdef IBL_ENABLE_PCIE_WORKAROUND
+#define BOOT_DEVICE_MASK    0xE
+#define DEVSTAT_BOOTDEVICE_SHIFT    1
+#define PCI_BOOT_MODE   0x4
+
+        if (((dev_stat & BOOT_DEVICE_MASK)>>DEVSTAT_BOOTDEVICE_SHIFT) == PCI_BOOT_MODE) {
+            /* Write ICS 557 Clock Selection Control Register in the FPGA */
+            /* 1 : FPGA_ICS557_SEL s driven high */
+	        DEVICE_REG32_W(DEVICE_SPI_BASE(0) + SPI_REG_SPIDAT0,
+                           FPGA_WRITE_REG_CMD(FPGA_ICS557_SEL_CTRL_REG,1));
+            chipDelay32(10000);
+            /* Reset SPI */
+            DEVICE_REG32_W (DEVICE_SPI_BASE(0) + SPI_REG_SPIGCR0, SPI_REG_VAL_SPIGCR0_RESET);
+
+            iblPCIeWorkaround();
+            /* Will never reach here */
+        }
+#endif
+        /* Reset SPI */
+        DEVICE_REG32_W (DEVICE_SPI_BASE(0) + SPI_REG_SPIGCR0, SPI_REG_VAL_SPIGCR0_RESET);
+
         exit = (void (*)())BOOT_ROM_ENTER_ADDRESS;
         (*exit)();        
     }
@@ -241,6 +372,9 @@ void iblEnterRom ()
         /* Update the DEVSTAT register for the actual boot configuration */
         DEVICE_REG32_W (DEVICE_REG_DEVSTAT, ((bm_hi << 8) | bm_lo));
     }
+
+    /* Reset SPI */
+    DEVICE_REG32_W (DEVICE_SPI_BASE(0) + SPI_REG_SPIGCR0, SPI_REG_VAL_SPIGCR0_RESET);
 }
 
 #if (!defined(EXCLUDE_NOR_SPI) || !defined(EXCLUDE_NAND_SPI))
@@ -301,7 +435,5 @@ void deviceLoadInitSpiConfig (void *vcfg)
     }
 
 }
-
-
-
 #endif
+

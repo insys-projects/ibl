@@ -157,6 +157,12 @@
 #define TARGET_PWR_GPIO     -1
 
 /**
+ *  @brief
+ *      The LPSC number for PCIe. PCIe is 10 for C6678/C6770
+ */
+#define TARGET_PWR_PCIE    10 
+
+/**
  * @brief
  *  Flag to indicate timer 0 power up requested. The time is always on in the 6472
  */
@@ -365,6 +371,13 @@ Int32 targetMacRcv (void *ptr_device, UINT8 *buffer);
 #define deviceConfigureForNor()    0
 
 
+/****************************************************************
+ *
+ * NOTE: Following build flags enable DEVICE specific workarounds
+ * and have code which is specific to C6670/C6678 LC EVMs
+ *
+ ****************************************************************/
+
 /**
  *  @brief
  *      Support for PLL workaround to re-enter ROM boot loader.
@@ -377,4 +390,11 @@ Int32 targetMacRcv (void *ptr_device, UINT8 *buffer);
  */
 #define IBL_ENABLE_EDC             1 
 
+/**
+ *  @brief
+ *      Support for enabling PCIe workarond for C6678/C6670.
+ */
+#define IBL_ENABLE_PCIE_WORKAROUND 1
+
 #endif /* _TARGET_H */
+

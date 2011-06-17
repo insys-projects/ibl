@@ -288,13 +288,13 @@ Int32 nand_open (void *ptr_driver, void (*asyncComplete)(void *))
     
 
     /* Construct the logical to physical block array */  
-    for (i = j = startBlock; i < nandmcb.devInfo.totalBlocks; i++)  {
+    for (i = startBlock, j = 0; i < nandmcb.devInfo.totalBlocks; i++)  {
         if (nandmcb.blocks[i] != 0xff)
             nandmcb.logicalToPhysMap[j++] = i;
     }
 
     /* Construct the physical to logical block array */
-    for (i = j = startBlock; i < nandmcb.devInfo.totalBlocks; i++)  {
+    for (i = startBlock, j = 0; i < nandmcb.devInfo.totalBlocks; i++)  {
         if (nandmcb.blocks[i] == 0xff)
             nandmcb.physToLogicalMap[i] = 0xff;
         else
@@ -307,7 +307,7 @@ Int32 nand_open (void *ptr_driver, void (*asyncComplete)(void *))
     nandmcb.currentLogicalBlock = 0xffffffff;
     nandmcb.currentPage         = 0xffffffff;
 
-    nand_seek (ibln->bootAddress[iblEndianIdx][iblImageIdx], 0);
+    nand_seek (0, 0);
             
     return (0);
 
