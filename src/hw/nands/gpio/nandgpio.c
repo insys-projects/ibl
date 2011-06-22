@@ -280,21 +280,31 @@ Int32 nandHwGpioDriverReadBytes (Uint32 block, Uint32 page, Uint32 byte, Uint32 
 	{
 		/* Read page data */
 		cmd = hwDevInfo->readCommandPre;
+		ptNandCmdSet(cmd); // First cycle send 0
+		addr = PACK_ADDR(0x0, page, block);
 	}
 	else
 	{
 		/* Read spare area data */
-		cmd = 0x50;
+		if (hwDevInfo->pageSizeBytes == 512) {
+			cmd = 0x50;
+			ptNandCmdSet(cmd);
+			addr = PACK_ADDR(0x0, page, block);
+		} else if (hwDevInfo->pageSizeBytes == 2048) {
+			cmd = 0x0;
+			ptNandCmdSet(cmd);
+			addr = PACK_ADDR(0x800, page, block);
+		}
 	}
 
-	ptNandCmdSet(cmd); // First cycle send 0
+//	ptNandCmdSet(cmd); // First cycle send 0
 
 	/* 
 	 * Send address of the block + page to be read
 	 * Address cycles = 4, Block shift = 14,
 	 * Page Shift = 9, Bigblock = 0
 	 */
-	addr = PACK_ADDR(0x0, page, block);
+//	addr = PACK_ADDR(0x0, page, block);
 	
 	if (hwDevInfo->pageSizeBytes == 512) {
 		ptNandAleSet((addr >>  0u) & 0xFF);   /* A0-A7  1st Cycle;  column addr */
