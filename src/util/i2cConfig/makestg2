@@ -86,7 +86,8 @@ $(CFG_MODULES):
 clean2: $(CLEAN_MODULES)
 	@rm -f $(OBJS)
 	@rm -f $(subst .c,.dc,$(CSRC))
-	
+	@rm -f *.out *.map
+
 
 $(CLEAN_MODULES):
 	@echo cleaning $(subst clean_, ,$@)
