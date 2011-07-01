@@ -277,12 +277,11 @@ evm_c6455:
 
 # The c6472 EVM has a 128k eeprom (64k at 0x50, 64k at 0x51), so both endians are built with full functionality
 evm_c6472:
-	make -f makestg1 ARCH=c64x TARGET=c6472 I2C_BUS_ADDR=0x50 \
-    I2C_MAP_ADDR=$(I2C_MAP_ADDR) COMPACT_I2C=no ENDIAN_MODE=both CEXCLUDES='ELF BIS MULTI_BOOT' c6472
-	cp -f ibl_c6472/i2crom.dat bin/i2crom_0x50_c6472_le-be.dat
-	cp -f ibl_c6472/i2crom.bin bin/i2crom_0x50_c6472_le-be.bin
-	cp -f ../util/i2cConfig/i2cparam_c6472_le.out bin/i2cparam_0x50_c6472_le_$(I2C_MAP_ADDR).out
-	cp -f ../util/i2cConfig/i2cparam_c6472_be.out bin/i2cparam_0x50_c6472_be_$(I2C_MAP_ADDR).out
+	make -f makestg1 ARCH=c64x TARGET=c6472 I2C_BUS_ADDR=0x50 I2C_MAP_ADDR=0x500 \
+    COMPACT_I2C=yes ENDIAN_MODE=$(ENDIAN) CEXCLUDES='ELF COFF BIS MULTI_BOOT' c6472
+	cp -f ibl_c6472/i2crom.dat bin/i2crom_0x50_c6472_$(ENDIAN_SFX).dat
+	cp -f ibl_c6472/i2crom.bin bin/i2crom_0x50_c6472_$(ENDIAN_SFX).bin
+	cp -f ../util/i2cConfig/i2cparam_c6472_$(ENDIAN_SFX).out bin/i2cparam_0x50_c6472_$(ENDIAN_SFX)_0x500.out
 
 # The 6474 EVM has a 32k eeprom. A stripped down version is build with only one endian.
 evm_c6474:
