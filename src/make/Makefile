@@ -80,8 +80,8 @@
 #*			make test_build
 #*******************************************************************************************
 
-IBLS_C6X= c6455 c6472 c6474 c6457 c66x
-EVMS_C6X= evm_c6455 evm_c6472 evm_c6474
+IBLS_C6X= c6455 c6472 c6474 c6474l c6457 c66x
+EVMS_C6X= evm_c6455 evm_c6472 evm_c6474 evm_c6474l
 
 
 # Excluding functions from the build reduces the I2C eeprom memory used and
@@ -248,7 +248,7 @@ SPI_DEFS+= SPI_CLKDIV=$(SPI_CLKDIV)
 SPI_DEFS+= SPI_ROM=$(SPI_ROM)
 
 
-.PHONY: all $(IBLS_C6X) evm_c6455 evm_c6472 evm_c6474 evm_c6457 evm_c6678_i2c evm_c6670_i2c 
+.PHONY: all $(IBLS_C6X) evm_c6455 evm_c6472 evm_c6474 evm_c6474l evm_c6457 evm_c6678_i2c evm_c6670_i2c 
 .PHONY: test_c66x test_c6455 test_c6472 test_c6474 test_c6457 clean
 
 
@@ -294,11 +294,11 @@ evm_c6474:
 	cp -f ../util/i2cConfig/i2cparam_c6474_$(ENDIAN_SFX).out bin/i2cparam_0x50_c6474_$(ENDIAN_SFX)_0x200.out
 
 evm_c6474l:
-	make -f makestg1 ARCH=c64x TARGET=c6474 I2C_BUS_ADDR=0x50 I2C_MAP_ADDR=0x200 \
-    COMPACT_I2C=yes ENDIAN_MODE=$(ENDIAN) CEXCLUDES='ELF COFF BIS MULTI_BOOT' I2C_SIZE_BYTES=0x8000 c6474
-	cp -f ibl_c6474/i2crom.dat bin/i2crom_0x50_c6474l_$(ENDIAN_SFX).dat
-	cp -f ibl_c6474/i2crom.bin bin/i2crom_0x50_c6474l_$(ENDIAN_SFX).bin
-	cp -f ../util/i2cConfig/i2cparam_c6474_$(ENDIAN_SFX).out bin/i2cparam_0x50_c6474l_$(ENDIAN_SFX)_0x200.out
+	make -f makestg1 ARCH=c64x TARGET=c6474l I2C_BUS_ADDR=0x50 I2C_MAP_ADDR=0x200 \
+    COMPACT_I2C=yes ENDIAN_MODE=$(ENDIAN) CEXCLUDES='ELF COFF BIS MULTI_BOOT' I2C_SIZE_BYTES=0x8000 c6474l
+	cp -f ibl_c6474l/i2crom.dat bin/i2crom_0x50_c6474l_$(ENDIAN_SFX).dat
+	cp -f ibl_c6474l/i2crom.bin bin/i2crom_0x50_c6474l_$(ENDIAN_SFX).bin
+	cp -f ../util/i2cConfig/i2cparam_c6474l_$(ENDIAN_SFX).out bin/i2cparam_0x50_c6474l_$(ENDIAN_SFX)_0x200.out
 
 # The 6457 EVM
 evm_c6457:
@@ -392,6 +392,7 @@ clean:
 	make -f makestg2 clean   ARCH=c64x TARGET=c6472
 	make -f makestg2 cleant  ARCH=c64x TARGET=c6472
 	make -f makestg2 cleant  ARCH=c64x TARGET=c6474
+	make -f makestg2 cleant  ARCH=c64x TARGET=c6474l
 	make -f makestg2 cleant  ARCH=c64x TARGET=c6455
 	make -f makestg2 cleant  ARCH=c64x TARGET=c6457
 	make -f makestg2 cleant  ARCH=c64x TARGET=c66x
@@ -400,6 +401,7 @@ clean:
 	make -C ../util/i2cConfig      clean    ARCH=c64x TARGET=c6455
 	make -C ../util/i2cConfig      clean    ARCH=c64x TARGET=c6472
 	make -C ../util/i2cConfig      clean    ARCH=c64x TARGET=c6474
+	make -C ../util/i2cConfig      clean    ARCH=c64x TARGET=c6474l
 	make -C ../util/i2cConfig      clean    ARCH=c64x TARGET=c6457
 	make -C ../util/i2cConfig      clean    ARCH=c64x TARGET=c66x
 	make -C ../util/romparse       clean

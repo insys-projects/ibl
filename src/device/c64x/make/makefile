@@ -61,7 +61,7 @@ else
    CSRC= c6474.c c6474init.c
   else
    ifeq ($(TARGET),c6474l)
-    CSRC= c6474l.c
+    CSRC= c6474l.c c6474linit.c
    else
     ifeq ($(TARGET),c6457)
      CSRC= c6457.c c6457init.c
@@ -69,7 +69,7 @@ else
 	 ifeq ($(TARGET),c66x)
 	  CSRC= c66x.c c66xinit.c c66xutil.c
      else
-      CSRC= c6472.c c6455.c c6474.c c6474l.c c6457.c c6472init.c c6455init.c c6474init.c c66x.c c66xinit.c c66xutil.c
+      CSRC= c6472.c c6455.c c6474.c c6474l.c c6457.c c6472init.c c6455init.c c6474linit.c c6474init.c c66x.c c66xinit.c c66xutil.c
      endif
     endif 
    endif

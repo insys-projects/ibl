@@ -56,6 +56,10 @@ ifeq ($(TARGET),c6474)
  C64X_EXCLUDES=yes
 endif
 
+ifeq ($(TARGET),c6474l)
+ C64X_EXCLUDES=yes
+endif
+
 ifeq ($(C64X_EXCLUDES),yes)
 
  ifeq (,$(findstring SPI, $(EXCLUDES)))
