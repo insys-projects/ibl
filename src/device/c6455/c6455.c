@@ -182,7 +182,10 @@ int32 devicePowerPeriph (int32 modNum)
         
 }
 
-
+unsigned int get_device_switch_setting()
+{
+	return (0);
+}
 
 /**
  *  @brief  Enable the pass through version of the nand controller

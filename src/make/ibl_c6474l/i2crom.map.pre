@@ -12,6 +12,24 @@
 ;  portion of the IBL
 section 
 {
+  param_index   = 0
+  boot_mode     = 257
+  sw_pll		= 20
+  options       = 1
+
+  core_freq_mhz    = 1000
+  i2c_clk_freq_khz = 100
+
+  dev_addr_ext = I2C_BUS_ADDR
+
+  multi_i2c_id = 0
+  my_i2c_id    = 1
+  address_delay = 200
+  exe_file = INIT_EXE_FILE
+}
+
+section 
+{
   param_index   = 1
   boot_mode     = 257
   sw_pll		= 20
@@ -20,6 +38,7 @@ section
   core_freq_mhz    = 1000
   i2c_clk_freq_khz = 100
 
+  dev_addr     = 0x500
   dev_addr_ext = I2C_BUS_ADDR
 
   multi_i2c_id = 0

@@ -110,6 +110,12 @@ int32 devicePowerPeriph (int32 modNum);
 void deviceDdrConfig (void);
 
 
+/* Function to get the endian setting of a device */
+unsigned int get_device_endian();
+
+/* Function to get the switch setting of a device */
+unsigned int get_device_switch_setting();
+
 /**
  * @brief
  *    Perform device level configuration for nand boot
@@ -157,6 +163,8 @@ bool deviceIsLittleEndian(void);
  *      A delay loop
  */
 void chipDelay32 (uint32 nCycles);
+
+
 
 
 /**

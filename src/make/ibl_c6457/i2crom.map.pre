@@ -28,6 +28,25 @@ section
   exe_file = INIT_EXE_FILE
 }
 
+section 
+{
+  param_index   = 1
+  boot_mode     = 257
+  sw_pll		= 20
+  options       = 1
+
+  core_freq_mhz    = 1000
+  i2c_clk_freq_khz = 100
+
+  dev_addr     = 0x500
+  dev_addr_ext = I2C_BUS_ADDR
+
+  multi_i2c_id = 0
+  my_i2c_id    = 1
+  address_delay = 200
+  exe_file = INIT_EXE_FILE
+}
+
 ; The layout statement defines how the resulting I2C image is layed out. The base address
 ; of this (given in the dev_addr) statement must be known to the initial IBL program
 ; at compile time. The layout block is simple a group of 32 bit i2c addresses, so 

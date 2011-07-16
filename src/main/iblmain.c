@@ -237,6 +237,7 @@ void main (void)
 {
     int32 i, j;
     UINT32 v, boot_mode_idx, boot_para_idx;
+    unsigned int dip_setting;
 
     /* Initialize the status structure */
     iblMemset (&iblStatus, 0, sizeof(iblStatus_t));
@@ -343,53 +344,36 @@ void main (void)
         else
 #endif
         {
-            
-           /* For C64x devices, loop through the boot modes to find the one with the highest priority
-            * value, and try to boot it. */
-            for (i = ibl_HIGHEST_PRIORITY; i < ibl_LOWEST_PRIORITY; i++)  {
-                
-                for (j = 0; j < ibl_N_BOOT_MODES; j++)  {
-                    
-                    if (ibl.bootModes[j].priority == i)  {
-                        
-                        iblStatus.activeBoot = ibl.bootModes[j].bootMode;
-                        
-                        switch (ibl.bootModes[j].bootMode)  {
-                            
-                            
+
+	dip_setting = get_device_switch_setting();
+	
+	if (dip_setting == 0)
+		boot_mode_idx = 0;
+	else if (dip_setting == 1)
+		boot_mode_idx = 1;
+	
+	iblStatus.activeBoot = ibl.bootModes[boot_mode_idx].bootMode;
+	
+	switch (ibl.bootModes[boot_mode_idx].bootMode) {                            
 #ifndef EXCLUDE_ETH
-                        case ibl_BOOT_MODE_TFTP:
-                            iblStatus.activeDevice = ibl_ACTIVE_DEVICE_ETH;
-                            iblMemcpy (&iblStatus.ethParams, &ibl.bootModes[j].u.ethBoot.ethInfo, sizeof(iblEthBootInfo_t));
-                            iblEthBoot (j);
-                            break;
+                case ibl_BOOT_MODE_TFTP:
+                        iblStatus.activeDevice = ibl_ACTIVE_DEVICE_ETH;
+                        iblMemcpy (&iblStatus.ethParams, &ibl.bootModes[boot_mode_idx].u.ethBoot.ethInfo, sizeof(iblEthBootInfo_t));
+                        iblEthBoot (boot_mode_idx);
+                        break;
 #endif
                             
 #if ((!defined(EXCLUDE_NAND_EMIF)) || (!defined(EXCLUDE_NAND_GPIO)))
-                        case ibl_BOOT_MODE_NAND:
-                            iblPmemCfg (ibl.bootModes[j].u.nandBoot.interface, ibl.bootModes[j].port, TRUE);
-                            iblNandBoot (j);
-                            break;
+		case ibl_BOOT_MODE_NAND:
+                        iblPmemCfg (ibl.bootModes[boot_mode_idx].u.nandBoot.interface, ibl.bootModes[boot_mode_idx].port, TRUE);
+                        iblNandBoot (boot_mode_idx);
+                        break;
 #endif
-                            
-#if (!defined(EXCLUDE_NOR_EMIF) && !defined(EXCLUDE_NOR_SPI))
-                        case ibl_BOOT_MODE_NOR:
-                            iblPmemCfg (ibl.bootModes[j].u.norBoot.interface, ibl.bootModes[j].port, TRUE);
-                            iblNorBoot (j);
-                            break;
-#endif
-                            
-                        }
-                    }
-                    
-                    iblStatus.heartBeat += 1;
-                    
-                }
-            }
-        }
+	}
+	iblStatus.heartBeat += 1;
+	}
+
     }
-
-
 } /* main */
 
 
