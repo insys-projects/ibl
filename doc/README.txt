@@ -1,7 +1,7 @@
 =====================================================
 C6x Intermediate Bootloader (IBL)
-Version: 1.0.0.8
-June 2011
+Version: 1.0.0.9
+July 2011
 =====================================================
 
 This directory contains the following documents:
