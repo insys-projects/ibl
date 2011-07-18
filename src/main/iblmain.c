@@ -341,9 +341,7 @@ void main (void)
             }
             iblStatus.heartBeat += 1;
         }
-        else
-#endif
-        {
+#else
 
 	dip_setting = get_device_switch_setting();
 	
@@ -371,7 +369,7 @@ void main (void)
 #endif
 	}
 	iblStatus.heartBeat += 1;
-	}
+#endif
 
     }
 } /* main */
