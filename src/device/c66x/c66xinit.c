@@ -166,7 +166,7 @@ void iblEnableEDC ()
 
 /* PCIe Application registers */
 #define PCIE_APP_CMD_STATUS  0x4
-#define PCIE_OB_SIZE         0x30
+#define PCIE_APP_OB_SIZE     0x30
 #define PCIE_APP_SERDES_CFG0 0x390
 #define PCIE_APP_SERDES_CFG1 0x394
 
@@ -188,34 +188,29 @@ void iblEnableEDC ()
 /* SERDES Configuration registers */
 #define PCIE_SERDES_CFG_PLL 0x2620358
 
-#define MAGIC_ADDR (*(volatile unsigned int *)0x87fffc)
-
-/* */
-
-extern cregister volatile unsigned int IER;
-
-void waitForBoot(void)
+void waitForBoot(UINT32 MAGIC_ADDR)
 {
-    void (*escape)();
-    UINT32  i;
-
-    /* Disable interrupts */
-    IER = 1;
-	MAGIC_ADDR = 0;
-
-    do {
+    void (*exit)();
+    UINT32 i, entry_addr;
+	
+    while(1)
+    {
+        entry_addr = DEVICE_REG32_R(MAGIC_ADDR);
+        if (entry_addr != 0)
+        {
+            /* jump to the exit point, which will be the entry point for the full IBL */
+            exit = (void (*)())entry_addr;
+            (*exit)();
+        }
         for (i=0; i < 100; i++)
-            asm("    nop");
-    } while (MAGIC_ADDR == 0);
-
-    escape = (void (*)())(MAGIC_ADDR);
-    (*escape)();
+            asm("nop");
+	}
 }
 
 void iblPCIeWorkaround()
 {
-    UINT32  cmd_stat;
-    UINT32  reg,i;
+    UINT32  v, flag_6678 = 0, flag_6670 = 0, MAGIC_ADDR;
+    UINT32  i;
 
      /* Power up PCIe */
     devicePowerPeriph (TARGET_PWR_PCIE);
@@ -227,33 +222,59 @@ void iblPCIeWorkaround()
     /* Wait for PCIe PLL lock */
     while(!(DEVICE_REG32_R(PCIE_STS_REG) & 1));
 
-    DEVICE_REG32_W ((PCIE_BASE_ADDR + PCIE_CLASSCODE_REVID), 0x04800001);  /* class = 4 */ 
-    DEVICE_REG32_W ((PCIE_BASE_ADDR + PCIE_LINK_STAT_CTRL),  0x10110080);  /* extended synch */
+	/* Determine 6670 or 6678 */
+    v = *((Uint32 *)DEVICE_JTAG_ID_REG);
+    v &= DEVICE_JTAG_ID_MASK;
+	
+    if (v == DEVICE_C6678_JTAG_ID_VAL) {
+		MAGIC_ADDR = 0x87fffc;
+		flag_6678 = 1;
+	} 
+	if (v == DEVICE_C6670_JTAG_ID_VAL) {
+        MAGIC_ADDR = 0x8ffffc;
+		flag_6670 = 1;
+	}
 
-    DEVICE_REG32_W ((PCIE_BASE_ADDR + PCIE_VENDER_DEVICE_ID),  0x8888104c); 
-    DEVICE_REG32_W ((PCIE_BASE_ADDR + PCIE_DEVICE_CAP),  0x288701); 
+    DEVICE_REG32_W ((PCIE_BASE_ADDR + PCIE_CLASSCODE_REVID), 0x04800001);  /* class 0x04, sub-class 0x80, Prog I/F 0x00, Other multimedia device */ 
+    DEVICE_REG32_W ((PCIE_BASE_ADDR + PCIE_LINK_STAT_CTRL), 0x10110080);  /* extended sync, slot_clk_cfg = 1 */
 
-	DEVICE_REG32_W ((PCIE_BASE_ADDR + PCIE_OB_SIZE),  0x00000003);          /* OB_SIZE = 8M */ 
-	DEVICE_REG32_W ((PCIE_BASE_ADDR + PCIE_PL_GEN2),  0x0000000F);
+    DEVICE_REG32_W ((PCIE_BASE_ADDR + PCIE_VENDER_DEVICE_ID), 0xb005104c);  /* Vendor and Device ID */
+    DEVICE_REG32_W ((PCIE_BASE_ADDR + PCIE_DEVICE_CAP), 0x288701); /* L0 = 4, L1 = 3 */
+
+	DEVICE_REG32_W ((PCIE_BASE_ADDR + PCIE_APP_OB_SIZE), 0x00000003);     /* OB_SIZE = 8M */ 
+	DEVICE_REG32_W ((PCIE_BASE_ADDR + PCIE_PL_GEN2), 0x0000000F);   /* num_fts = 0xF*/
 
     DEVICE_REG32_W ((PCIE_BASE_ADDR + PCIE_APP_CMD_STATUS), 0x0020); /* Set dbi_cs2 to allow access to the BAR registers */ 
-    DEVICE_REG32_W ((PCIE_BASE_ADDR + PCIE_BAR0), 0x00003FFF);
-    DEVICE_REG32_W ((PCIE_BASE_ADDR + PCIE_BAR1), 0x0007FFFF);
-    DEVICE_REG32_W ((PCIE_BASE_ADDR + PCIE_BAR2), 0x003FFFFF);
-    DEVICE_REG32_W ((PCIE_BASE_ADDR + PCIE_BAR3), 0x00FFFFFF);
+ 
+	if (flag_6678)  {
+		/* 6678 */
+		DEVICE_REG32_W ((PCIE_BASE_ADDR + PCIE_BAR0), 0x00000FFF);   /* 4K */
+		DEVICE_REG32_W ((PCIE_BASE_ADDR + PCIE_BAR1), 0x0007FFFF);   /* 512K */
+		DEVICE_REG32_W ((PCIE_BASE_ADDR + PCIE_BAR2), 0x003FFFFF);   /* 4M */
+		DEVICE_REG32_W ((PCIE_BASE_ADDR + PCIE_BAR3), 0x00FFFFFF);   /* 16M */
+	} 
 
-	DEVICE_REG32_W ((PCIE_BASE_ADDR + PCIE_APP_CMD_STATUS), 0x0);          /* dbi_cs2=0 */
+	if (flag_6670)  {
+		/* 6670 */
+		DEVICE_REG32_W ((PCIE_BASE_ADDR + PCIE_BAR0), 0x00000FFF);   /* 4K */
+		DEVICE_REG32_W ((PCIE_BASE_ADDR + PCIE_BAR1), 0x000FFFFF);   /* 1M */
+		DEVICE_REG32_W ((PCIE_BASE_ADDR + PCIE_BAR2), 0x001FFFFF);   /* 2M */
+		DEVICE_REG32_W ((PCIE_BASE_ADDR + PCIE_BAR3), 0x00FFFFFF);   /* 16M */
+    }
 
-	DEVICE_REG32_W ((PCIE_BASE_ADDR + PCIE_STATUS_CMD), 0x00100146);
-    DEVICE_REG32_W ((PCIE_BASE_ADDR + PCIE_DEV_STAT_CTRL), 0x0000281F);
-    DEVICE_REG32_W ((PCIE_BASE_ADDR + PCIE_ACCR), 0x000001E0);
-    DEVICE_REG32_W ((PCIE_BASE_ADDR + PCIE_BAR0), 0);
+	DEVICE_REG32_W ((PCIE_BASE_ADDR + PCIE_APP_CMD_STATUS), 0x0);    /* dbi_cs2=0 */
+
+	DEVICE_REG32_W ((PCIE_BASE_ADDR + PCIE_STATUS_CMD), 0x00100146); /* ENABLE mem access */
+    DEVICE_REG32_W ((PCIE_BASE_ADDR + PCIE_DEV_STAT_CTRL), 0x0000281F); /* Error control */
+    DEVICE_REG32_W ((PCIE_BASE_ADDR + PCIE_ACCR), 0x000001E0); /* Error control */
+    DEVICE_REG32_W ((PCIE_BASE_ADDR + PCIE_BAR0), 0); /* non-prefetch, 32-bit, mem bar */
 
     DEVICE_REG32_W ((PCIE_BASE_ADDR + PCIE_APP_CMD_STATUS), 0x0000007);    /* enable LTSSM, IN, OB */
     while((DEVICE_REG32_R(PCIE_BASE_ADDR + PCIE_DEBUG0) & 0x11)!=0x11);    /* Wait for training to complete */
  
     /* Wait for the Boot from Host */
-    waitForBoot();
+    DEVICE_REG32_W(MAGIC_ADDR, 0);
+	waitForBoot(MAGIC_ADDR);
 
     /* Will never reach here */
     return;
