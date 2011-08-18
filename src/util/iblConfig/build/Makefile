@@ -29,7 +29,7 @@ FILES  = \
 	 types.h \
 
 OBJ_DIR = ./obj
-VPATH = ../iblcfg
+VPATH = ../src
 CLIB_INC = $(C_DIR)/include/
 
 HEADERS = $(filter %.h, $(FILES))

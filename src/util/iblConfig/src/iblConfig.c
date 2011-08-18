@@ -77,6 +77,8 @@ int main (void)
         return -1;
     }
 
+    printf ("Generated updated binary %s\n", file_name);
+
     fclose(fp);
 }
 
