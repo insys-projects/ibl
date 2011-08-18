@@ -52,6 +52,8 @@ include $(IBL_ROOT)/make/$(ARCH)/makedefs.mk
 
 export ARCH
 export TARGET
+export EVM
+export I2C_MAP_ADDR
 
 .PHONY:  $(TARGETS) i2crom spiRom compare iblInit iblMain $(MODULES) $(CFG_MODULES)
 .PHONY:  utils clean clean_modules hwClean cleant
@@ -210,7 +212,7 @@ endif
 	make -C $(IBL_ROOT)/util/btoccs
 	make -C $(IBL_ROOT)/util/romparse TARGET=$(TARGET)
 	make -C $(IBL_ROOT)/util/bconvert
-	make -C $(IBL_ROOT)/util/iblConfig/build
+	make -C $(IBL_ROOT)/util/iblConfig/build EVM=$(EVM) I2C_MAP_ADDR=$(I2C_MAP_ADDR)
 
 clean: $(CLEAN_MODULES) hwClean
 	

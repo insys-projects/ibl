@@ -12,7 +12,7 @@ LD_OPTS =
 C_OPTS =
 
 #RT_LIB = $(C_DIR)/lib/libc.a
-C_OPTS += -O2
+C_OPTS += -O2 -DEVM=$(EVM) -DI2C_MAP_ADDR=$(I2C_MAP_ADDR)
 
 #LNK_OPTS += -i$(C_DIR)/lib -c $(RT_LIB)
 LNK_OPTS +=
@@ -34,8 +34,8 @@ CLIB_INC = $(C_DIR)/include/
 
 HEADERS = $(filter %.h, $(FILES))
 INCL = -I$(CLIB_INC) $(patsubst %,-I%,$(VPATH))
-TARGET_TEMP = $(patsubst %,-D%,$(TARGET))
-DEFINE_TARGET = $(patsubst %,%_TARGET,$(TARGET_TEMP))
+BOARD_TEMP = $(patsubst %,-D%,$(BOARD))
+DEFINE_BOARD = $(patsubst %,%_BOARD,$(BOARD_TEMP))
 
 OBJS = $(patsubst %.c,$(OBJ_DIR)/%.obj,$(filter %.c, $(FILES)))
 
@@ -48,7 +48,7 @@ $(IBLCFG_EXE): $(OBJS)
 	cp $@ $@.dbg 
 
 $(OBJ_DIR)/%.obj: %.c $(HEADERS) $(OBJ_DIR)/.created
-	$(CC) -c $(C_OPTS) $(INCL) $(DEFINE_TARGET) $< -o $@
+	$(CC) -c $(C_OPTS) $(INCL) $(DEFINE_BOARD) $< -o $@
 
 $(OBJ_DIR)/.created:
 	mkdir -p $(OBJ_DIR)

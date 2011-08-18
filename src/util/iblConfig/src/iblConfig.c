@@ -17,7 +17,7 @@ char *input_file = "input.txt";
 
 char        file_name[MAX_LINE_LENGTH];
 uint32_t    device_id;
-uint32_t    offset;
+uint32_t    offset = I2C_MAP_ADDR;
 
 #define ARRAY_SIZE(x) (sizeof(x)/sizeof(x[0]))
 typedef ibl_t (*ibl_config_fn)(void);
