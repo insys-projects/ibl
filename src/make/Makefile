@@ -269,14 +269,14 @@ $(IBLS_C6X):
 # Configurations for individual evms
 # The c6455 EVM has a 128k eeprom (64k at 0x50, 64k at 0x51), so both endians are built with full functionality
 evm_c6455:
-	make -f makestg1 ARCH=c64x TARGET=c6455 I2C_BUS_ADDR=0x50 I2C_MAP_ADDR=0x500 \
+	make -f makestg1 ARCH=c64x TARGET=c6455 EVM=c6455 I2C_BUS_ADDR=0x50 I2C_MAP_ADDR=0x500 \
     COMPACT_I2C=no ENDIAN_MODE=$(ENDIAN) CEXCLUDES='ELF COFF BIS NAND_GPIO MULTI_BOOT' c6455
 	cp -f ibl_c6455/i2crom.dat bin/i2crom_0x50_c6455_$(ENDIAN_SFX).dat
 	cp -f ibl_c6455/i2crom.bin bin/i2crom_0x50_c6455_$(ENDIAN_SFX).bin
 	
 # The c6472 EVM has a 128k eeprom (64k at 0x50, 64k at 0x51), so both endians are built with full functionality
 evm_c6472:
-	make -f makestg1 ARCH=c64x TARGET=c6472 I2C_BUS_ADDR=0x50 I2C_MAP_ADDR=0x500 \
+	make -f makestg1 ARCH=c64x TARGET=c6472 EVM=c6472 I2C_BUS_ADDR=0x50 I2C_MAP_ADDR=0x500 \
     COMPACT_I2C=yes ENDIAN_MODE=$(ENDIAN) CEXCLUDES='ELF COFF BIS MULTI_BOOT' c6472
 	cp -f ibl_c6472/i2crom.dat bin/i2crom_0x50_c6472_$(ENDIAN_SFX).dat
 	cp -f ibl_c6472/i2crom.bin bin/i2crom_0x50_c6472_$(ENDIAN_SFX).bin
@@ -284,21 +284,21 @@ evm_c6472:
 
 # The 6474 EVM has a 32k eeprom. A stripped down version is build with only one endian.
 evm_c6474:
-	make -f makestg1 ARCH=c64x TARGET=c6474 I2C_BUS_ADDR=0x50 I2C_MAP_ADDR=0x200 \
+	make -f makestg1 ARCH=c64x TARGET=c6474 EVM=c6474 I2C_BUS_ADDR=0x50 I2C_MAP_ADDR=0x200 \
     COMPACT_I2C=yes ENDIAN_MODE=$(ENDIAN) CEXCLUDES='ELF NAND_GPIO COFF BIS MULTI_BOOT' I2C_SIZE_BYTES=0x8000 c6474
 	cp -f ibl_c6474/i2crom.dat bin/i2crom_0x50_c6474_$(ENDIAN_SFX).dat
 	cp -f ibl_c6474/i2crom.bin bin/i2crom_0x50_c6474_$(ENDIAN_SFX).bin
 	
 
 evm_c6474l:
-	make -f makestg1 ARCH=c64x TARGET=c6474l I2C_BUS_ADDR=0x50 I2C_MAP_ADDR=0x200 \
+	make -f makestg1 ARCH=c64x TARGET=c6474l EVM=c6474l I2C_BUS_ADDR=0x50 I2C_MAP_ADDR=0x200 \
     COMPACT_I2C=yes ENDIAN_MODE=$(ENDIAN) CEXCLUDES='ELF COFF BIS MULTI_BOOT' I2C_SIZE_BYTES=0x8000 c6474l
 	cp -f ibl_c6474l/i2crom.dat bin/i2crom_0x50_c6474l_$(ENDIAN_SFX).dat
 	cp -f ibl_c6474l/i2crom.bin bin/i2crom_0x50_c6474l_$(ENDIAN_SFX).bin
 	
 # The 6457 EVM
 evm_c6457:
-	make -f makestg1 ARCH=c64x TARGET=c6457 I2C_BUS_ADDR=0x50 I2C_MAP_ADDR=0x200 \
+	make -f makestg1 ARCH=c64x TARGET=c6457 EVM=c6457 I2C_BUS_ADDR=0x50 I2C_MAP_ADDR=0x200 \
     COMPACT_I2C=yes ENDIAN_MODE=$(ENDIAN) CEXCLUDES='ELF COFF BIS MULTI_BOOT' c6457
 	cp -f ibl_c6457/i2crom.dat bin/i2crom_0x50_c6457_$(ENDIAN_SFX).dat
 	cp -f ibl_c6457/i2crom.bin bin/i2crom_0x50_c6457_$(ENDIAN_SFX).bin
@@ -318,14 +318,14 @@ evm_c667x_spi:
 
 evm_c6678_i2c:
 	make -f makestg1 I2C_BUS_ADDR=$(I2C_BUS_ADDR) I2C_MAP_ADDR=$(I2C_MAP_ADDR) \
-ENDIAN_MODE=$(ENDIAN) ARCH=c64x TARGET=c66x SPI=no SPI_DEFS='$(EVM_667x_SPI_DEFS)' \
+ENDIAN_MODE=$(ENDIAN) ARCH=c64x TARGET=c66x EVM=c6678 SPI=no SPI_DEFS='$(EVM_667x_SPI_DEFS)' \
 CEXCLUDES='COFF BIS NAND_GPIO' c66x
 	cp -f ibl_c66x/i2crom.dat bin/i2crom_$(I2C_BUS_ADDR)_c6678_$(ENDIAN_SFX).dat
 	cp -f ibl_c66x/i2crom.bin bin/i2crom_$(I2C_BUS_ADDR)_c6678_$(ENDIAN_SFX).bin
 	
 evm_c6670_i2c:
 	make -f makestg1 I2C_BUS_ADDR=$(I2C_BUS_ADDR) I2C_MAP_ADDR=$(I2C_MAP_ADDR) \
-ENDIAN_MODE=$(ENDIAN) ARCH=c64x TARGET=c66x SPI=no SPI_DEFS='$(EVM_667x_SPI_DEFS)' \
+ENDIAN_MODE=$(ENDIAN) ARCH=c64x TARGET=c66x EVM=c6670 SPI=no SPI_DEFS='$(EVM_667x_SPI_DEFS)' \
 CEXCLUDES='COFF BIS NAND_EMIF' c66x
 	cp -f ibl_c66x/i2crom.dat bin/i2crom_$(I2C_BUS_ADDR)_c6670_$(ENDIAN_SFX).dat
 	cp -f ibl_c66x/i2crom.bin bin/i2crom_$(I2C_BUS_ADDR)_c6670_$(ENDIAN_SFX).bin
