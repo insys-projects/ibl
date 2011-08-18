@@ -273,15 +273,14 @@ evm_c6455:
     COMPACT_I2C=no ENDIAN_MODE=$(ENDIAN) CEXCLUDES='ELF COFF BIS NAND_GPIO MULTI_BOOT' c6455
 	cp -f ibl_c6455/i2crom.dat bin/i2crom_0x50_c6455_$(ENDIAN_SFX).dat
 	cp -f ibl_c6455/i2crom.bin bin/i2crom_0x50_c6455_$(ENDIAN_SFX).bin
-	cp -f ../util/i2cConfig/i2cparam_c6455_$(ENDIAN_SFX).out bin/i2cparam_0x50_c6455_$(ENDIAN_SFX)_0x500.out
-
+	
 # The c6472 EVM has a 128k eeprom (64k at 0x50, 64k at 0x51), so both endians are built with full functionality
 evm_c6472:
 	make -f makestg1 ARCH=c64x TARGET=c6472 I2C_BUS_ADDR=0x50 I2C_MAP_ADDR=0x500 \
     COMPACT_I2C=yes ENDIAN_MODE=$(ENDIAN) CEXCLUDES='ELF COFF BIS MULTI_BOOT' c6472
 	cp -f ibl_c6472/i2crom.dat bin/i2crom_0x50_c6472_$(ENDIAN_SFX).dat
 	cp -f ibl_c6472/i2crom.bin bin/i2crom_0x50_c6472_$(ENDIAN_SFX).bin
-	cp -f ../util/i2cConfig/i2cparam_c6472_$(ENDIAN_SFX).out bin/i2cparam_0x50_c6472_$(ENDIAN_SFX)_0x500.out
+	
 
 # The 6474 EVM has a 32k eeprom. A stripped down version is build with only one endian.
 evm_c6474:
@@ -289,22 +288,21 @@ evm_c6474:
     COMPACT_I2C=yes ENDIAN_MODE=$(ENDIAN) CEXCLUDES='ELF NAND_GPIO COFF BIS MULTI_BOOT' I2C_SIZE_BYTES=0x8000 c6474
 	cp -f ibl_c6474/i2crom.dat bin/i2crom_0x50_c6474_$(ENDIAN_SFX).dat
 	cp -f ibl_c6474/i2crom.bin bin/i2crom_0x50_c6474_$(ENDIAN_SFX).bin
-	cp -f ../util/i2cConfig/i2cparam_c6474_$(ENDIAN_SFX).out bin/i2cparam_0x50_c6474_$(ENDIAN_SFX)_0x200.out
+	
 
 evm_c6474l:
 	make -f makestg1 ARCH=c64x TARGET=c6474l I2C_BUS_ADDR=0x50 I2C_MAP_ADDR=0x200 \
     COMPACT_I2C=yes ENDIAN_MODE=$(ENDIAN) CEXCLUDES='ELF COFF BIS MULTI_BOOT' I2C_SIZE_BYTES=0x8000 c6474l
 	cp -f ibl_c6474l/i2crom.dat bin/i2crom_0x50_c6474l_$(ENDIAN_SFX).dat
 	cp -f ibl_c6474l/i2crom.bin bin/i2crom_0x50_c6474l_$(ENDIAN_SFX).bin
-	cp -f ../util/i2cConfig/i2cparam_c6474l_$(ENDIAN_SFX).out bin/i2cparam_0x50_c6474l_$(ENDIAN_SFX)_0x200.out
-
+	
 # The 6457 EVM
 evm_c6457:
 	make -f makestg1 ARCH=c64x TARGET=c6457 I2C_BUS_ADDR=0x50 I2C_MAP_ADDR=0x200 \
     COMPACT_I2C=yes ENDIAN_MODE=$(ENDIAN) CEXCLUDES='ELF COFF BIS MULTI_BOOT' c6457
 	cp -f ibl_c6457/i2crom.dat bin/i2crom_0x50_c6457_$(ENDIAN_SFX).dat
 	cp -f ibl_c6457/i2crom.bin bin/i2crom_0x50_c6457_$(ENDIAN_SFX).bin
-	cp -f ../util/i2cConfig/i2cparam_c6457_$(ENDIAN_SFX).out bin/i2cparam_0x50_c6457_$(ENDIAN_SFX)_0x200.out
+	
 
 # The 6608 EVM
 EVM_6608_SPI_DEFS= SPI_MODE=1 SPI_ADDR_WIDTH=24 SPI_NPIN=5 SPI_CSEL=2 SPI_C2TDEL=1 SPI_CLKDIV=8 SPI_ROM=1
@@ -324,15 +322,14 @@ ENDIAN_MODE=$(ENDIAN) ARCH=c64x TARGET=c66x SPI=no SPI_DEFS='$(EVM_667x_SPI_DEFS
 CEXCLUDES='COFF BIS NAND_GPIO' c66x
 	cp -f ibl_c66x/i2crom.dat bin/i2crom_$(I2C_BUS_ADDR)_c6678_$(ENDIAN_SFX).dat
 	cp -f ibl_c66x/i2crom.bin bin/i2crom_$(I2C_BUS_ADDR)_c6678_$(ENDIAN_SFX).bin
-	cp -f ../util/i2cConfig/i2cparam_c66x_$(ENDIAN_SFX).out bin/i2cparam_$(I2C_BUS_ADDR)_c6678_$(ENDIAN_SFX)_$(I2C_MAP_ADDR).out
-
+	
 evm_c6670_i2c:
 	make -f makestg1 I2C_BUS_ADDR=$(I2C_BUS_ADDR) I2C_MAP_ADDR=$(I2C_MAP_ADDR) \
 ENDIAN_MODE=$(ENDIAN) ARCH=c64x TARGET=c66x SPI=no SPI_DEFS='$(EVM_667x_SPI_DEFS)' \
 CEXCLUDES='COFF BIS NAND_EMIF' c66x
 	cp -f ibl_c66x/i2crom.dat bin/i2crom_$(I2C_BUS_ADDR)_c6670_$(ENDIAN_SFX).dat
 	cp -f ibl_c66x/i2crom.bin bin/i2crom_$(I2C_BUS_ADDR)_c6670_$(ENDIAN_SFX).bin
-	cp -f ../util/i2cConfig/i2cparam_c66x_$(ENDIAN_SFX).out bin/i2cparam_$(I2C_BUS_ADDR)_c6670_$(ENDIAN_SFX)_$(I2C_MAP_ADDR).out
+	
 
 test_c66x:
 	make -f makestg1 ARCH=c64x TARGET=c66x ENDIAN_MODE=both CEXCLUDES='NOR_SPI' SPI_DEFS='SPI_ROM=1 SPI_MODE=3 SPI_ADDR_WIDTH=24 SPI_NPIN=5 SPI_CSEL=2 SPI_C2TDEL=8 SPI_CLKDIV=0x20' I2C_BUS_ADDR=0x50 I2C_MAP_ADDR=$(I2C_MAP_ADDR) COMPACT_I2C=no c66x
@@ -396,12 +393,6 @@ clean:
 	make -f makestg2 cleant  ARCH=c64x TARGET=c66x
 	make -C ../util/bconvert       clean
 	make -C ../util/btoccs         clean
-	make -C ../util/i2cConfig      clean    ARCH=c64x TARGET=c6455
-	make -C ../util/i2cConfig      clean    ARCH=c64x TARGET=c6472
-	make -C ../util/i2cConfig      clean    ARCH=c64x TARGET=c6474
-	make -C ../util/i2cConfig      clean    ARCH=c64x TARGET=c6474l
-	make -C ../util/i2cConfig      clean    ARCH=c64x TARGET=c6457
-	make -C ../util/i2cConfig      clean    ARCH=c64x TARGET=c66x
 	make -C ../util/romparse       clean
 	make -C ../test/test1		   clean
 	make -C ../test/test2		   clean
