@@ -209,6 +209,7 @@ endif
 	make -C $(IBL_ROOT)/util/btoccs
 	make -C $(IBL_ROOT)/util/romparse TARGET=$(TARGET)
 	make -C $(IBL_ROOT)/util/bconvert
+	make -C $(IBL_ROOT)/util/iblConfig/build
 
 clean: $(CLEAN_MODULES) hwClean
 	

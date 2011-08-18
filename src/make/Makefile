@@ -394,6 +394,7 @@ clean:
 	make -C ../util/bconvert       clean
 	make -C ../util/btoccs         clean
 	make -C ../util/romparse       clean
+	make -C ../util/iblConfig/build    clean
 	make -C ../test/test1		   clean
 	make -C ../test/test2		   clean
 	rm -f bin/*.out
