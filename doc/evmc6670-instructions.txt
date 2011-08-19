@@ -2,36 +2,16 @@ Steps to use IBL on the c6670 EVM
 
 1. Programing "IBL" on the EEPROM at bus address 0x51
    (a) Use the I2C EEPROM writer for c6670 EVM from the MCSDK distribution.
-   (b) Program i2crom_0x51_c6670_le.dat (IBL image) to the EEPROM at I2C BUS 
+   (b) Program i2crom_0x51_c6670_le.bin (IBL image) to the EEPROM at I2C BUS 
        address 0x51 following the EEPROM writer's procedure.
 
-2. Programing "IBL Configuration"
-   NOTE: For an understanding of the IBL configuration parameters used in this step, 
-         please refer to the IBL-Configuration documentation. The configuration 
-         data structure is ibl_s.		 
-   (a) Make sure that the boot mode dip switch is set to no boot/EMIF16 
-       boot mode on the EVM (please refer to the EVM technical reference manual
-	   on how to set the boot mode dip switches.
-   (b) Open CCSv5 and launch the evmc66xx emulator target configuration and connect to core 0.
-   (c) Load the program i2cparam_0x51_c6670_le_0x500.out to CCS.
-   (d) Run the program and a message "Run the GEL for the device to be configured, 
-       press return to program the I2C" will be printed on the CCS console.
-   (e) Load i2cConfig.gel (in CCSv5 Tools->GEL Files, right click mouse in GEL Files
-       window and select "Load GEL"
-   (f) Run the GEL script "EVM c6670 IBL"->setConfig_c6670_main, this will set the 
-       default boot parameters for booting application images from NOR, NAND and 
-       Ethernet.
-   (g) Now press "Enter" in the CCS console window, and the program will write the 
-       boot parameter table to the EEPROM. On success the message "I2c table write complete" 
-	   will be printed on the CCS console.
-
-3. Programming the application on NAND or NOR flash
+2. Programming the application on NAND or NOR flash
    NOTE: This step is not needed if the application is booted from Ethernet.
    (a) Use the NAND or NOR writer c6670 EVM from the tools directory.
    (a) Flash the Application to NAND or NOR. For instructions please follow 
        the instructions given along with the NAND/NOR writer.
 
-4. Booting the Application using IBL
+3. Booting the Application using IBL
    Supported boot modes:
    IBL supports three I2C boot modes: NOR boot, NAND boot and EMAC boot. 
    Both NOR boot and NAND boot support maximum 2 images, EMAC boot supports only 1 image. 
