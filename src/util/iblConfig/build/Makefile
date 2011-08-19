@@ -11,7 +11,6 @@ AR               = ar
 LD_OPTS =
 C_OPTS =
 
-#RT_LIB = $(C_DIR)/lib/libc.a
 C_OPTS += -O2 -DEVM=$(EVM) -DI2C_MAP_ADDR=$(I2C_MAP_ADDR)
 
 ifeq ($(EVM),c6455)
@@ -36,7 +35,6 @@ ifeq ($(EVM),c6670l)
 	DEVICE_ID = 7
 endif
 
-#LNK_OPTS += -i$(C_DIR)/lib -c $(RT_LIB)
 LNK_OPTS +=
 
 ###############################################################################
@@ -52,10 +50,9 @@ FILES  = \
 
 OBJ_DIR = ./obj
 VPATH = ../src
-CLIB_INC = $(C_DIR)/include/
 
 HEADERS = $(filter %.h, $(FILES))
-INCL = -I$(CLIB_INC) $(patsubst %,-I%,$(VPATH))
+INCL = $(patsubst %,-I%,$(VPATH))
 BOARD_TEMP = $(patsubst %,-D%,$(BOARD))
 DEFINE_BOARD = $(patsubst %,%_BOARD,$(BOARD_TEMP))
 

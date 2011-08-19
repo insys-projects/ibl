@@ -2,7 +2,6 @@
 #include <string.h>
 #include <stdlib.h>
 #include <stdint.h>
-#include <arpa/inet.h>
 #include "device.h"
 
 #define TRUE 1
