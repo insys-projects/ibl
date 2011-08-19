@@ -8,7 +8,7 @@
 #define TRUE 1
 #define FALSE 0
 #define MAX_LINE_LENGTH 40
-char *input_file = "input.txt";
+char *input_file = "./input.txt";
 
 /* Parameters defined in the input_file */
 #define FILE_NAME      "file_name"
@@ -17,7 +17,7 @@ char *input_file = "input.txt";
 
 char        file_name[MAX_LINE_LENGTH];
 uint32_t    device_id;
-uint32_t    offset = I2C_MAP_ADDR;
+uint32_t    offset;
 
 #define ARRAY_SIZE(x) (sizeof(x)/sizeof(x[0]))
 typedef ibl_t (*ibl_config_fn)(void);
@@ -41,8 +41,8 @@ int main (void)
     fp = fopen(input_file, "r");
     if (fp == NULL)
     {
-        printf("Error in opening %s input file\n", input_file);
-        return;
+	    printf("Error in opening %s input file\n", input_file);
+	    return;
     }
 
     ret = parse_input_file(fp);

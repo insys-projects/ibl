@@ -886,9 +886,9 @@ ibl_t c6678_ibl_config(void)
 	ibl.bootModes[2].u.ethBoot.bootFormat       = ibl_BOOT_FORMAT_BBLOB;
 
 
-    SETIP(ibl.bootModes[2].u.ethBoot.ethInfo.ipAddr,    192,168,2,100);
-    SETIP(ibl.bootModes[2].u.ethBoot.ethInfo.serverIp,  192,168,2,101);
-    SETIP(ibl.bootModes[2].u.ethBoot.ethInfo.gatewayIp, 192,168,2,1);
+    SETIP(ibl.bootModes[2].u.ethBoot.ethInfo.ipAddr,    158,218,100,112);
+    SETIP(ibl.bootModes[2].u.ethBoot.ethInfo.serverIp,  158,218,100,25);
+    SETIP(ibl.bootModes[2].u.ethBoot.ethInfo.gatewayIp, 158,218,100,2);
     SETIP(ibl.bootModes[2].u.ethBoot.ethInfo.netmask,   255,255,255,0);
 
     /* Use the e-fuse value */
@@ -900,18 +900,18 @@ ibl_t c6678_ibl_config(void)
     ibl.bootModes[2].u.ethBoot.ethInfo.hwAddress[5] = 0;
 
 
-    ibl.bootModes[2].u.ethBoot.ethInfo.fileName[0]  = 'a';
-    ibl.bootModes[2].u.ethBoot.ethInfo.fileName[1]  = 'p';
-    ibl.bootModes[2].u.ethBoot.ethInfo.fileName[2]  = 'p';
-    ibl.bootModes[2].u.ethBoot.ethInfo.fileName[3]  = '.';
-    ibl.bootModes[2].u.ethBoot.ethInfo.fileName[4]  = 'o';
-    ibl.bootModes[2].u.ethBoot.ethInfo.fileName[5]  = 'u';
-    ibl.bootModes[2].u.ethBoot.ethInfo.fileName[6]  = 't';
-    ibl.bootModes[2].u.ethBoot.ethInfo.fileName[7]  = '\0';
-    ibl.bootModes[2].u.ethBoot.ethInfo.fileName[8]  = '\0';
-    ibl.bootModes[2].u.ethBoot.ethInfo.fileName[9]  = '\0';
-    ibl.bootModes[2].u.ethBoot.ethInfo.fileName[10] = '\0';
-    ibl.bootModes[2].u.ethBoot.ethInfo.fileName[11] = '\0';
+    ibl.bootModes[2].u.ethBoot.ethInfo.fileName[0]  = 'c';
+    ibl.bootModes[2].u.ethBoot.ethInfo.fileName[1]  = '6';
+    ibl.bootModes[2].u.ethBoot.ethInfo.fileName[2]  = '6';
+    ibl.bootModes[2].u.ethBoot.ethInfo.fileName[3]  = '7';
+    ibl.bootModes[2].u.ethBoot.ethInfo.fileName[4]  = '8';
+    ibl.bootModes[2].u.ethBoot.ethInfo.fileName[5]  = '-';
+    ibl.bootModes[2].u.ethBoot.ethInfo.fileName[6]  = 'l';
+    ibl.bootModes[2].u.ethBoot.ethInfo.fileName[7]  = 'e';
+    ibl.bootModes[2].u.ethBoot.ethInfo.fileName[8]  = '.';
+    ibl.bootModes[2].u.ethBoot.ethInfo.fileName[9]  = 'b';
+    ibl.bootModes[2].u.ethBoot.ethInfo.fileName[10] = 'i';
+    ibl.bootModes[2].u.ethBoot.ethInfo.fileName[11] = 'n';
     ibl.bootModes[2].u.ethBoot.ethInfo.fileName[12] = '\0';
     ibl.bootModes[2].u.ethBoot.ethInfo.fileName[13] = '\0';
     ibl.bootModes[2].u.ethBoot.ethInfo.fileName[14] = '\0';
@@ -1103,9 +1103,9 @@ ibl_t c6670_ibl_config(void)
 	ibl.bootModes[2].u.ethBoot.bootFormat       = ibl_BOOT_FORMAT_BBLOB;
 
 
-    SETIP(ibl.bootModes[2].u.ethBoot.ethInfo.ipAddr,    192,168,2,100);
-    SETIP(ibl.bootModes[2].u.ethBoot.ethInfo.serverIp,  192,168,2,101);
-    SETIP(ibl.bootModes[2].u.ethBoot.ethInfo.gatewayIp, 192,168,2,1);
+    SETIP(ibl.bootModes[2].u.ethBoot.ethInfo.ipAddr,    158,218,100,116);
+    SETIP(ibl.bootModes[2].u.ethBoot.ethInfo.serverIp,  158,218,100,25);
+    SETIP(ibl.bootModes[2].u.ethBoot.ethInfo.gatewayIp, 158,218,100,2);
     SETIP(ibl.bootModes[2].u.ethBoot.ethInfo.netmask,   255,255,255,0);
 
     /* Use the e-fuse value */
@@ -1117,18 +1117,18 @@ ibl_t c6670_ibl_config(void)
     ibl.bootModes[2].u.ethBoot.ethInfo.hwAddress[5] = 0;
 
 
-    ibl.bootModes[2].u.ethBoot.ethInfo.fileName[0]  = 'a';
-    ibl.bootModes[2].u.ethBoot.ethInfo.fileName[1]  = 'p';
-    ibl.bootModes[2].u.ethBoot.ethInfo.fileName[2]  = 'p';
-    ibl.bootModes[2].u.ethBoot.ethInfo.fileName[3]  = '.';
-    ibl.bootModes[2].u.ethBoot.ethInfo.fileName[4]  = 'o';
-    ibl.bootModes[2].u.ethBoot.ethInfo.fileName[5]  = 'u';
-    ibl.bootModes[2].u.ethBoot.ethInfo.fileName[6]  = 't';
-    ibl.bootModes[2].u.ethBoot.ethInfo.fileName[7]  = '\0';
-    ibl.bootModes[2].u.ethBoot.ethInfo.fileName[8]  = '\0';
-    ibl.bootModes[2].u.ethBoot.ethInfo.fileName[9]  = '\0';
-    ibl.bootModes[2].u.ethBoot.ethInfo.fileName[10] = '\0';
-    ibl.bootModes[2].u.ethBoot.ethInfo.fileName[11] = '\0';
+    ibl.bootModes[2].u.ethBoot.ethInfo.fileName[0]  = 'c';
+    ibl.bootModes[2].u.ethBoot.ethInfo.fileName[1]  = '6';
+    ibl.bootModes[2].u.ethBoot.ethInfo.fileName[2]  = '6';
+    ibl.bootModes[2].u.ethBoot.ethInfo.fileName[3]  = '7';
+    ibl.bootModes[2].u.ethBoot.ethInfo.fileName[4]  = '0';
+    ibl.bootModes[2].u.ethBoot.ethInfo.fileName[5]  = '-';
+    ibl.bootModes[2].u.ethBoot.ethInfo.fileName[6]  = 'l';
+    ibl.bootModes[2].u.ethBoot.ethInfo.fileName[7]  = 'e';
+    ibl.bootModes[2].u.ethBoot.ethInfo.fileName[8]  = '.';
+    ibl.bootModes[2].u.ethBoot.ethInfo.fileName[9]  = 'b';
+    ibl.bootModes[2].u.ethBoot.ethInfo.fileName[10] = 'i';
+    ibl.bootModes[2].u.ethBoot.ethInfo.fileName[11] = 'n';
     ibl.bootModes[2].u.ethBoot.ethInfo.fileName[12] = '\0';
     ibl.bootModes[2].u.ethBoot.ethInfo.fileName[13] = '\0';
     ibl.bootModes[2].u.ethBoot.ethInfo.fileName[14] = '\0';

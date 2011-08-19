@@ -14,6 +14,28 @@ C_OPTS =
 #RT_LIB = $(C_DIR)/lib/libc.a
 C_OPTS += -O2 -DEVM=$(EVM) -DI2C_MAP_ADDR=$(I2C_MAP_ADDR)
 
+ifeq ($(EVM),c6455)
+	DEVICE_ID = 1
+endif
+ifeq ($(EVM),c6474)
+	DEVICE_ID = 2
+endif
+ifeq ($(EVM),c6474l)
+	DEVICE_ID = 3
+endif
+ifeq ($(EVM),c6457)
+	DEVICE_ID = 4
+endif
+ifeq ($(EVM),c6472)
+	DEVICE_ID = 5
+endif
+ifeq ($(EVM),c6678l)
+	DEVICE_ID = 6
+endif
+ifeq ($(EVM),c6670l)
+	DEVICE_ID = 7
+endif
+
 #LNK_OPTS += -i$(C_DIR)/lib -c $(RT_LIB)
 LNK_OPTS +=
 
@@ -43,7 +65,7 @@ OBJS = $(patsubst %.c,$(OBJ_DIR)/%.obj,$(filter %.c, $(FILES)))
 # Normal make process                                                         
 ###############################################################################
 
-$(IBLCFG_EXE): $(OBJS)
+$(IBLCFG_EXE): $(OBJS) gen_input
 	$(CC) $(C_OPTS) $(OBJS) $(LNK_OPTS) -o $@
 	cp $@ $@.dbg 
 
@@ -54,6 +76,11 @@ $(OBJ_DIR)/.created:
 	mkdir -p $(OBJ_DIR)
 	touch $(OBJ_DIR)/.created
 
+gen_input:
+	touch input.txt
+	echo "file_name = ibl.bin" > input.txt
+	echo "device = $(DEVICE_ID)" >> input.txt
+	echo "offset = $(I2C_MAP_ADDR)" >> input.txt
 
 ###############################################################################
 # Cleanup								      
@@ -64,4 +91,5 @@ clean:
 	-rm -rf *.dbg
 	-rm -rf *.out
 	-rm -rf *.bin
+	-rm -rf *.txt
 
