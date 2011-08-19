@@ -137,6 +137,9 @@ i2crom:
 	$(CP) i2crom.ccs ibl_$(TARGET)/$@.ccs
 	$(CP) i2crom.ccs ibl_$(TARGET)/$@.dat
 	../util/btoccs/ccs2bin -swap ibl_$(TARGET)/$@.ccs ibl_$(TARGET)/$@.bin
+	cp ibl_$(TARGET)/$@.bin ../util/iblConfig/build/ibl.bin
+	(cd ../util/iblConfig/build;./iblConfig.out)
+	cp ../util/iblConfig/build/ibl.bin ibl_$(TARGET)/$@.bin
 	$(RM) i2crom.ccs ibl_le.b ibl.b
 
 spiRom:
