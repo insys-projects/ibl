@@ -1,3 +1,6 @@
+# IBL build is rather messy, we need to ignore a bunch of stuff
+
+# file extensions (any file and dir)
 *.bak
 *~
 *.o
@@ -13,9 +16,41 @@
 *.log
 *.exe
 *.out
+*.out.dbg
 *.b
 *.ccs
+*.le.oa
+*.be.oa
+*.bin
+*.dat
+*.tab.c
+*.tab.h
+*.lst
+*.map.pp
+*.tgz
+
+# file names (any dir)
 cdefdep
-junk/
-logs/
-hacky-stuff/cgtools
+.created
+ibl_init_objs.inc
+ibl_init_objs.pp
+ibl_init_symbols.inc
+ibl_objs.inc
+ibl_objs.pp
+
+# specific paths
+ibl_bin*/i2cConfig.gel
+src/util/iblConfig/build/input.txt
+# (utility binaries on Linux have no extension to ignore)
+src/util/bconvert/bconvert
+src/util/bconvert/bconvert64x
+src/util/btoccs/b2ccs
+src/util/btoccs/b2i2c
+src/util/btoccs/bfaddsect
+src/util/btoccs/bfmerge
+src/util/btoccs/ccs2b
+src/util/btoccs/ccs2bin
+src/util/romparse/romparse
+
+
+
