@@ -1,6 +1,0 @@
-#! /bin/sh
-./time-make clean
-./time-make c6472
-LOGNAME=-null ./time-make c6472
-
-
