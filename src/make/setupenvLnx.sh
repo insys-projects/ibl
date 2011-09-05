@@ -14,6 +14,11 @@ if [ -z "$C6X_BASE_DIR" ]; then
 	done
 fi
 
+if [ ! -x $C6X_BASE_DIR/bin/cl6x ] ; then
+	echo "You must define the C6X_BASE_DIR to point to TI CGT compiler for C6000"
+	exit 2
+fi
+
 #make sure its exported
 export C6X_BASE_DIR
 
