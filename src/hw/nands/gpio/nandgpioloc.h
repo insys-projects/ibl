@@ -50,6 +50,8 @@
 void ndelay(Uint32 uiDelay);
 Uint32 ptNandWaitRdy(Uint32 in_timeout);
 void ptNandWriteDataByte(Uint8 data);
+void ptNandReadDataByte(Uint8* data);
+
 void ptNandAleSet(Uint32 addr);
 void ptNandCmdSet(Uint32 cmd);
 Uint32 swapBytes (Uint32 v);
