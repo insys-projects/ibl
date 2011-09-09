@@ -1,12 +1,12 @@
 #!/bin/bash
 export OS="Linux"
 
-# The below is only valid in TI Germantown network and should really not be here
-#export C6X_BASE_DIR=/apps/ti/cgt/TI_CGT_C6000_6.1.12
-#export C6X_BASE_DIR=/apps/ti/cgt/C6000CGT7.2.0
+if [ -z $C6X_CGT_VERSION ]; then
+    C6X_CGT_VERSION=7.2.1
+fi
 
 if [ -z "$C6X_BASE_DIR" ]; then
-	for dir in {~,}/opt/ti/ccsv5/tools/compiler/c6000 ; do
+	for dir in {~,}{,/opt}/{ti,TI,texas_instruments}/TI_CGT_C6000_${C6X_CGT_VERSION} {~,}{,/opt}/{ti,texas_instruments}/ccsv5/tools/compiler/c6000 ; do
 		if [ -x $dir/bin/cl6x ]; then
 			C6X_BASE_DIR=$dir
 			break
