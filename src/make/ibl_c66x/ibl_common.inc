@@ -15,8 +15,8 @@
 
 MEMORY
 {
-	TEXT_INIT :  origin = 0x800000, length = 0x4000
-	TEXT      :  origin = 0x804000, length = 0xc000
+	TEXT_INIT :  origin = 0x800000, length = 0x4200
+	TEXT      :  origin = 0x804200, length = 0xbe00
 	STACK     :  origin = 0x810000, length = 0x0800
 	HEAP      :  origin = 0x810800, length = 0x8000
 	DATA_INIT :  origin = 0x818800, length = 0x0400
