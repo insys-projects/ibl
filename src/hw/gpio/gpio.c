@@ -226,9 +226,9 @@ void hwGpioSetDataBus(Uint8 uchValue)
  * Pre-Condition:	The GPIO[7:0] should be configured as input
  * 
  *****************************************************************************/
-Uint8 hwGpioReadDataBus( void )
+Uint32 hwGpioReadDataBus( void )
 {
-	Uint8* puchGpioInput = (Uint8*)GPIO_IN_DATA_REG;    
+	Uint32* puchGpioInput = (Uint32*)GPIO_IN_DATA_REG;
     return *puchGpioInput;
 }
 

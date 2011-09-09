@@ -125,7 +125,7 @@ void hwGpioSetOutput( Uint32 uiNumber);
 void hwGpioClearOutput( Uint32 uiNumber);
 Uint32 hwGpioReadInput( Uint32 uiNumber );
 void hwGpioWriteDataBus ( Uint8 uchValue );
-Uint8 hwGpioReadDataBus( void );
+Uint32 hwGpioReadDataBus( void );
 void hwGpioEnableGlobalInterrupt( void );
 void hwGpioSetDataBus(Uint8 uchValue);
 void hwGpioClearDataBus(Uint8 uchValue);
