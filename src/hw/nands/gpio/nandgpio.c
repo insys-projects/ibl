@@ -75,23 +75,22 @@ void ndelay(Uint32 uiDelay)
 	while(TSCL < (t + uiDelay));
 }
 
-Uint32 ptNandWaitRdy(Uint32 in_timeout) 
+Uint32 ptNandWaitRdy(Uint32 in_timeout)
 {
-    Uint32 t;
+	Uint32 count = 0;
 
-    ndelay(NAND_WAIT_PIN_POLL_ST_DLY);
+	ndelay(NAND_WAIT_PIN_POLL_ST_DLY);
+	ndelay(NAND_WAIT_PIN_POLL_ST_DLY);
 
-    TSCL = 1; 
-    t = TSCL;
-     
-    while(!hwGpioReadInput(NAND_BSY_GPIO_PIN))
-    {
-        if( TSCL > (t + in_timeout) )
-        {
-            return 0; /* fail */
-        }
-    }
-    return 1; /* success */
+	while(!hwGpioReadInput(NAND_BSY_GPIO_PIN))
+	{
+		ndelay(NAND_WAIT_PIN_POLL_ST_DLY);
+		count ++;        
+		if (count > in_timeout)
+			return 0;
+	}
+
+	return 1;
 }
 
 /**
@@ -103,11 +102,14 @@ void ptNandWriteDataByte(Uint8 data)
 	// Data is written to the data register on the rising edge of WE# when
 	//	• CE#, CLE, and ALE are LOW, and
 	//	• the device is not busy.
+	hwGpioClearDataBus(GPIO_DATAMASK);
+
 	hwGpioClearOutput(NAND_NWE_GPIO_PIN);
 	ndelay(TARGET_NAND_STD_DELAY);
-	hwGpioClearDataBus(GPIO_DATAMASK);
+
 	hwGpioWriteDataBus(data);
 	ndelay(TARGET_NAND_STD_DELAY);
+
 	hwGpioSetOutput(NAND_NWE_GPIO_PIN);   // At posedge clock, make WE# = 1.
 	ndelay(TARGET_NAND_STD_DELAY);
 }
@@ -121,7 +123,7 @@ void ptNandAleSet(Uint32 addr)
 {
 	// ALE HIGH indicates address cycle occurring
 	hwGpioSetOutput(NAND_ALE_GPIO_PIN);
-	ptNandWriteDataByte(addr);
+	ptNandWriteDataByte((Uint8)addr);
 	hwGpioClearOutput(NAND_ALE_GPIO_PIN);
 }
 
@@ -136,7 +138,7 @@ void ptNandCmdSet(Uint32 cmd)
 	//	• CLE is HIGH, and : CLE HIGH indicates command cycle occurring
 	//	• the device is not busy
 	hwGpioSetOutput(NAND_CLE_GPIO_PIN);
-	ptNandWriteDataByte(cmd);
+	ptNandWriteDataByte((Uint8)cmd);
 	hwGpioClearOutput(NAND_CLE_GPIO_PIN);
 }
 
@@ -146,23 +148,53 @@ void ptNandCmdSet(Uint32 cmd)
  *  Setup hwGpio to drive the NAND interface
  */
 void ptNandConfig (void) 
-{	
+{
+	hwGpioSetOutput(NAND_NCE_GPIO_PIN);		// Chip Enable = 1
+	hwGpioClearOutput(NAND_ALE_GPIO_PIN);		// Address latch Enable = 0
+	hwGpioClearOutput(NAND_CLE_GPIO_PIN);		// Command Latch enable = 0
+	hwGpioSetOutput(NAND_NWE_GPIO_PIN);		// Write Enable = 1
+	hwGpioSetOutput(NAND_NRE_GPIO_PIN);		// Read Enable = 1
+
 	// Set direction of control signals as OUT
-	hwGpioSetDirection(NAND_CLE_GPIO_PIN, GPIO_OUT);
 	hwGpioSetDirection(NAND_NCE_GPIO_PIN, GPIO_OUT);
-	hwGpioSetDirection(NAND_NWE_GPIO_PIN, GPIO_OUT);
 	hwGpioSetDirection(NAND_ALE_GPIO_PIN, GPIO_OUT);
+	hwGpioSetDirection(NAND_CLE_GPIO_PIN, GPIO_OUT);
+	hwGpioSetDirection(NAND_NWE_GPIO_PIN, GPIO_OUT);
 	hwGpioSetDirection(NAND_NRE_GPIO_PIN, GPIO_OUT);
+
+	hwGpioSetDirection(NAND_BSY_GPIO_PIN, GPIO_IN);
 	
 	// Set Data Bus direction as OUT
    	hwGpioSetDataBusDirection(GPIO_OUT);
-	
-	hwGpioSetOutput(NAND_NCE_GPIO_PIN);   	// Chip Enable = 1
-    hwGpioClearOutput(NAND_CLE_GPIO_PIN);  	// Command Latch enable = 0
-    hwGpioClearOutput(NAND_ALE_GPIO_PIN);		// Address latch Enable = 0
-	hwGpioSetOutput(NAND_NWE_GPIO_PIN);		// Write Enable = 1
-	hwGpioSetOutput(NAND_NRE_GPIO_PIN);		// Read Enable = 1
 }
+
+/**
+*  @brief
+*      Read a single data byte
+*/
+void ptNandReadDataByte(Uint8* puchValue)
+{
+	Uint32 temp;
+       // Set Data Bus direction as IN
+       hwGpioSetDataBusDirection(GPIO_IN);
+       ndelay(TARGET_NAND_STD_DELAY);
+       
+       hwGpioClearOutput(NAND_NRE_GPIO_PIN);
+       ndelay(TARGET_NAND_STD_DELAY);
+       
+       temp = hwGpioReadDataBus();
+       temp = temp & 0xff;
+       *puchValue = (Uint8)temp;
+       
+       ndelay(TARGET_NAND_STD_DELAY);
+       hwGpioSetOutput(NAND_NRE_GPIO_PIN);
+       ndelay(TARGET_NAND_STD_DELAY);
+       
+       // Set Data Bus direction as OUT
+       hwGpioSetDataBusDirection(GPIO_OUT);
+       ndelay(TARGET_NAND_STD_DELAY);
+}
+
 
 /**
  *  @brief Initialize the driver
@@ -172,12 +204,13 @@ Int32 nandHwGpioDriverInit (int32 cs, void *vdevInfo)
 {
 	Uint32 cmd;
 	Uint32 ret;
-    nandDevInfo_t *devInfo = (nandDevInfo_t *)vdevInfo;
 
-    hwDevInfo = devInfo;
+	nandDevInfo_t *devInfo = (nandDevInfo_t *)vdevInfo;
 
-    if (devInfo->addressBytes > 4)
-        return (NAND_INVALID_ADDR_SIZE);
+	hwDevInfo = devInfo;
+
+	if (devInfo->addressBytes > 4)
+		return (NAND_INVALID_ADDR_SIZE);
 
 	// Initialize NAND interface
 	ptNandConfig();
@@ -186,36 +219,17 @@ Int32 nandHwGpioDriverInit (int32 cs, void *vdevInfo)
 	cmd = hwDevInfo->resetCommand;
 	// Send reset command to NAND
 	hwGpioClearOutput(NAND_NCE_GPIO_PIN);   	// Chip EN = 0
+	ndelay(TARGET_NAND_STD_DELAY * 10);
 	ptNandCmdSet(cmd);
+	ndelay(TARGET_NAND_STD_DELAY * 10);
 	hwGpioSetOutput(NAND_NCE_GPIO_PIN);
 		
 	ret = ptNandWaitRdy(100000);
-	if (ret != 1)
+	if (ret == 1)
+		return 0;
+	else 
 		return -1;
-
-    return (0);
 }	 
-
-/**
- *  @brief
- *      Read a single data byte
- */
-void ptNandReadDataByte(Uint8* puchValue)
-{
-	// Set Data Bus direction as IN
-   	hwGpioSetDataBusDirection(GPIO_IN);
-   	
-	hwGpioClearOutput(NAND_NRE_GPIO_PIN);
-	ndelay(TARGET_NAND_STD_DELAY);
-	
-	*puchValue = hwGpioReadDataBus();
-	hwGpioSetOutput(NAND_NRE_GPIO_PIN);
-	ndelay(TARGET_NAND_STD_DELAY);
-	
-	// Set Data Bus direction as OUT
-   	hwGpioSetDataBusDirection(GPIO_OUT);
-   	ndelay(TARGET_NAND_STD_DELAY);
-}
 
 /**
  *  @brief
@@ -264,12 +278,13 @@ Int32 nandHwGpioDriverReadBytes (Uint32 block, Uint32 page, Uint32 byte, Uint32 
 	Uint32 addr;
 	Uint32 cmd;
 	Uint32 ret;
+
 	if (data == NULL)
 		return (NAND_NULL_ARG);
 
-    if ( (block >= hwDevInfo->totalBlocks)    ||
-         (page  >= hwDevInfo->pagesPerBlock)  )
-        return (NAND_INVALID_ADDR);
+	if ( (block >= hwDevInfo->totalBlocks)    ||
+		(page  >= hwDevInfo->pagesPerBlock)  )
+			return (NAND_INVALID_ADDR);
 
 	ndelay(TARGET_NAND_STD_DELAY*10);
 		
@@ -296,15 +311,6 @@ Int32 nandHwGpioDriverReadBytes (Uint32 block, Uint32 page, Uint32 byte, Uint32 
 			addr = PACK_ADDR(0x800, page, block);
 		}
 	}
-
-//	ptNandCmdSet(cmd); // First cycle send 0
-
-	/* 
-	 * Send address of the block + page to be read
-	 * Address cycles = 4, Block shift = 14,
-	 * Page Shift = 9, Bigblock = 0
-	 */
-//	addr = PACK_ADDR(0x0, page, block);
 	
 	if (hwDevInfo->pageSizeBytes == 512) {
 		ptNandAleSet((addr >>  0u) & 0xFF);   /* A0-A7  1st Cycle;  column addr */
@@ -335,8 +341,8 @@ Int32 nandHwGpioDriverReadBytes (Uint32 block, Uint32 page, Uint32 byte, Uint32 
 	
 	// Set Chip enable
 	hwGpioSetOutput(NAND_NCE_GPIO_PIN);	
-	ndelay(TARGET_NAND_STD_DELAY*5);
-
+	ndelay(TARGET_NAND_STD_DELAY*5);	
+	
 	return (0);
 }
 
@@ -351,11 +357,8 @@ Int32 nandHwGpioDriverReadPage(Uint32 block, Uint32 page, Uint8 *data)
 {
     Int32  ret;
     Int32  i;
-    Int32  nblocks;
-    Uint8 *blockp;
-    Uint8 *eccp;
     Uint8  eccCalc[3];
-    int32 iErrors = ECC_SUCCESS;
+    int32  iErrors = ECC_SUCCESS;
     Uint8 *SpareAreaBuf = NULL;
     Uint8  tempSpareAreaBuf[3];
 
