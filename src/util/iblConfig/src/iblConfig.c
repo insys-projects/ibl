@@ -79,6 +79,7 @@ int main (void)
     printf ("Generated updated binary %s\n", file_name);
 
     fclose(fp);
+    return 0;
 }
 
 int32_t 
