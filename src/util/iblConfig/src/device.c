@@ -60,14 +60,14 @@ ibl_t c6455_ibl_config(void)
     ibl.bootModes[0].port     = 0;
 
     /* Bootp is disabled. The server and file name are provided here */
-    ibl.bootModes[0].u.ethBoot.doBootp          = FALSE;
+    ibl.bootModes[0].u.ethBoot.doBootp          = TRUE;
     ibl.bootModes[0].u.ethBoot.useBootpServerIp = TRUE;
     ibl.bootModes[0].u.ethBoot.useBootpFileName = TRUE;
     ibl.bootModes[0].u.ethBoot.bootFormat       = ibl_BOOT_FORMAT_BBLOB;
 
-    SETIP(ibl.bootModes[0].u.ethBoot.ethInfo.ipAddr,    158,218,100,118);
-    SETIP(ibl.bootModes[0].u.ethBoot.ethInfo.serverIp,  158,218,100,25);
-    SETIP(ibl.bootModes[0].u.ethBoot.ethInfo.gatewayIp, 158,218,100,2);
+    SETIP(ibl.bootModes[0].u.ethBoot.ethInfo.ipAddr,    192,168,1,3);
+    SETIP(ibl.bootModes[0].u.ethBoot.ethInfo.serverIp,  192,168,1,2);
+    SETIP(ibl.bootModes[0].u.ethBoot.ethInfo.gatewayIp, 192,168,1,1);
     SETIP(ibl.bootModes[0].u.ethBoot.ethInfo.netmask,   255,255,255,0);
 
     /* There is no e-fuse mac address. A value must be assigned */
@@ -171,14 +171,14 @@ ibl_t c6474_ibl_config(void)
     ibl.bootModes[0].port     = 0;
 
     /* Bootp is disabled. The server and file name are provided here */
-    ibl.bootModes[0].u.ethBoot.doBootp          = FALSE;
+    ibl.bootModes[0].u.ethBoot.doBootp          = TRUE;
     ibl.bootModes[0].u.ethBoot.useBootpServerIp = TRUE;
     ibl.bootModes[0].u.ethBoot.useBootpFileName = TRUE;
     ibl.bootModes[0].u.ethBoot.bootFormat       = ibl_BOOT_FORMAT_BBLOB;
 
-    SETIP(ibl.bootModes[0].u.ethBoot.ethInfo.ipAddr,    10,218,109,35);
-    SETIP(ibl.bootModes[0].u.ethBoot.ethInfo.serverIp,  10,218,109,196);
-    SETIP(ibl.bootModes[0].u.ethBoot.ethInfo.gatewayIp, 10,218,109,1);
+    SETIP(ibl.bootModes[0].u.ethBoot.ethInfo.ipAddr,    192,168,1,3);
+    SETIP(ibl.bootModes[0].u.ethBoot.ethInfo.serverIp,  192,168,1,2);
+    SETIP(ibl.bootModes[0].u.ethBoot.ethInfo.gatewayIp, 192,168,1,1);
     SETIP(ibl.bootModes[0].u.ethBoot.ethInfo.netmask,   255,255,255,0);
 
     /* Set the hardware address as 0 so the e-fuse value will be used */
@@ -278,14 +278,14 @@ ibl_t c6474l_ibl_config(void)
     ibl.bootModes[0].port     = 0;
 
     /* Bootp is disabled. The server and file name are provided here */
-    ibl.bootModes[0].u.ethBoot.doBootp          = FALSE;
+    ibl.bootModes[0].u.ethBoot.doBootp          = TRUE;
     ibl.bootModes[0].u.ethBoot.useBootpServerIp = TRUE;
     ibl.bootModes[0].u.ethBoot.useBootpFileName = TRUE;
     ibl.bootModes[0].u.ethBoot.bootFormat       = ibl_BOOT_FORMAT_BBLOB;
 
-    SETIP(ibl.bootModes[0].u.ethBoot.ethInfo.ipAddr,    158,218,100,118);
-    SETIP(ibl.bootModes[0].u.ethBoot.ethInfo.serverIp,  158,218,100,25);
-    SETIP(ibl.bootModes[0].u.ethBoot.ethInfo.gatewayIp, 158,218,100,2);
+    SETIP(ibl.bootModes[0].u.ethBoot.ethInfo.ipAddr,    192,168,1,3);
+    SETIP(ibl.bootModes[0].u.ethBoot.ethInfo.serverIp,  192,168,1,2);
+    SETIP(ibl.bootModes[0].u.ethBoot.ethInfo.gatewayIp, 192,168,1,1);
     SETIP(ibl.bootModes[0].u.ethBoot.ethInfo.netmask,   255,255,255,0);
 
     /* Set the hardware address as 0 so the e-fuse value will be used */
@@ -443,14 +443,14 @@ ibl_t c6457_ibl_config(void)
     ibl.bootModes[0].port = 0;
 
     /* Bootp is disabled. The server and file name are provided here */
-    ibl.bootModes[0].u.ethBoot.doBootp          = FALSE;
+    ibl.bootModes[0].u.ethBoot.doBootp          = TRUE;
     ibl.bootModes[0].u.ethBoot.useBootpServerIp = TRUE;
     ibl.bootModes[0].u.ethBoot.useBootpFileName = TRUE;
     ibl.bootModes[0].u.ethBoot.bootFormat       = ibl_BOOT_FORMAT_BBLOB;
 
-    SETIP(ibl.bootModes[0].u.ethBoot.ethInfo.ipAddr,    158,218,100,115);
-    SETIP(ibl.bootModes[0].u.ethBoot.ethInfo.serverIp,  158,218,100,25);
-    SETIP(ibl.bootModes[0].u.ethBoot.ethInfo.gatewayIp, 158,218,100,2);
+    SETIP(ibl.bootModes[0].u.ethBoot.ethInfo.ipAddr,    192,168,1,3);
+    SETIP(ibl.bootModes[0].u.ethBoot.ethInfo.serverIp,  192,168,1,2);
+    SETIP(ibl.bootModes[0].u.ethBoot.ethInfo.gatewayIp, 192,168,1,1);
     SETIP(ibl.bootModes[0].u.ethBoot.ethInfo.netmask,   255,255,255,0);
 
     /* Set the hardware address as 0 so the e-fuse value will be used */
@@ -604,7 +604,7 @@ ibl_t c6472_ibl_config(void)
     ibl.bootModes[0].port     = 0;
 
     /* Bootp is disabled. The server and file name are provided here */
-    ibl.bootModes[0].u.ethBoot.doBootp          = FALSE;
+    ibl.bootModes[0].u.ethBoot.doBootp          = TRUE;
     ibl.bootModes[0].u.ethBoot.useBootpServerIp = TRUE;
     ibl.bootModes[0].u.ethBoot.useBootpFileName = TRUE;
     ibl.bootModes[0].u.ethBoot.bootFormat       = ibl_BOOT_FORMAT_BBLOB;
@@ -615,9 +615,9 @@ ibl_t c6472_ibl_config(void)
     ibl.bootModes[0].u.ethBoot.blob.sizeBytes     = 0x20000000;       /* All of DDR2 */
     ibl.bootModes[0].u.ethBoot.blob.branchAddress = 0xe0000000;       /* Base of DDR2 */
 
-    SETIP(ibl.bootModes[0].u.ethBoot.ethInfo.ipAddr,    158,218,100,113);
-    SETIP(ibl.bootModes[0].u.ethBoot.ethInfo.serverIp,  158,218,100,25);
-    SETIP(ibl.bootModes[0].u.ethBoot.ethInfo.gatewayIp, 158,218,100,2);
+    SETIP(ibl.bootModes[0].u.ethBoot.ethInfo.ipAddr,    192,168,1,3);
+    SETIP(ibl.bootModes[0].u.ethBoot.ethInfo.serverIp,  192,168,1,2);
+    SETIP(ibl.bootModes[0].u.ethBoot.ethInfo.gatewayIp, 192,168,1,1);
     SETIP(ibl.bootModes[0].u.ethBoot.ethInfo.netmask,   255,255,255,0);
 
     /* Leave the hardware address as 0 so the e-fuse value will be used */
@@ -880,15 +880,15 @@ ibl_t c6678_ibl_config(void)
 	ibl.bootModes[2].priority = ibl_HIGHEST_PRIORITY+1;
 	ibl.bootModes[2].port     = ibl_PORT_SWITCH_ALL;
 
-	ibl.bootModes[2].u.ethBoot.doBootp          = FALSE;
+	ibl.bootModes[2].u.ethBoot.doBootp          = TRUE;
 	ibl.bootModes[2].u.ethBoot.useBootpServerIp = TRUE;
 	ibl.bootModes[2].u.ethBoot.useBootpFileName = TRUE;
 	ibl.bootModes[2].u.ethBoot.bootFormat       = ibl_BOOT_FORMAT_BBLOB;
 
 
-    SETIP(ibl.bootModes[2].u.ethBoot.ethInfo.ipAddr,    158,218,100,112);
-    SETIP(ibl.bootModes[2].u.ethBoot.ethInfo.serverIp,  158,218,100,25);
-    SETIP(ibl.bootModes[2].u.ethBoot.ethInfo.gatewayIp, 158,218,100,2);
+    SETIP(ibl.bootModes[2].u.ethBoot.ethInfo.ipAddr,    192,168,1,3);
+    SETIP(ibl.bootModes[2].u.ethBoot.ethInfo.serverIp,  192,168,1,2);
+    SETIP(ibl.bootModes[2].u.ethBoot.ethInfo.gatewayIp, 192,168,1,1);
     SETIP(ibl.bootModes[2].u.ethBoot.ethInfo.netmask,   255,255,255,0);
 
     /* Use the e-fuse value */
@@ -1097,15 +1097,15 @@ ibl_t c6670_ibl_config(void)
 	ibl.bootModes[2].priority = ibl_HIGHEST_PRIORITY+1;
 	ibl.bootModes[2].port     = ibl_PORT_SWITCH_ALL;
 
-	ibl.bootModes[2].u.ethBoot.doBootp          = FALSE;
+	ibl.bootModes[2].u.ethBoot.doBootp          = TRUE;
 	ibl.bootModes[2].u.ethBoot.useBootpServerIp = TRUE;
 	ibl.bootModes[2].u.ethBoot.useBootpFileName = TRUE;
 	ibl.bootModes[2].u.ethBoot.bootFormat       = ibl_BOOT_FORMAT_BBLOB;
 
 
-    SETIP(ibl.bootModes[2].u.ethBoot.ethInfo.ipAddr,    158,218,100,116);
-    SETIP(ibl.bootModes[2].u.ethBoot.ethInfo.serverIp,  158,218,100,25);
-    SETIP(ibl.bootModes[2].u.ethBoot.ethInfo.gatewayIp, 158,218,100,2);
+    SETIP(ibl.bootModes[2].u.ethBoot.ethInfo.ipAddr,    192,168,1,3);
+    SETIP(ibl.bootModes[2].u.ethBoot.ethInfo.serverIp,  192,168,1,2);
+    SETIP(ibl.bootModes[2].u.ethBoot.ethInfo.gatewayIp, 192,168,1,1);
     SETIP(ibl.bootModes[2].u.ethBoot.ethInfo.netmask,   255,255,255,0);
 
     /* Use the e-fuse value */
