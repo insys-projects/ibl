@@ -93,130 +93,231 @@ static void ddr3_wait (uint32 del)
  *************************************************************************************************/
 SINT16 hwEmif4p0Enable (iblEmif4p0_t *cfg)
 {
-    UINT32 v, i, TEMP;
+    UINT32 v, i;
     
     v = DEVICE_REG32_R(DEVICE_JTAG_ID_REG);
     v &= DEVICE_JTAG_ID_MASK;
     
-    if ( (v == DEVICE_C6678_JTAG_ID_VAL) ||
-         (v == DEVICE_C6670_JTAG_ID_VAL) )
+    if (v == DEVICE_C6678_JTAG_ID_VAL)
     {
-        /* 1333 MHz data rate */
+#if 0
+        /* C6678 Old 1066 configuration */
+        DDR3PLLCTL0 = 0x100807C1;
+        
+        DDR_SDTIM1   = 0x0CCF369B;
+        DDR_SDTIM2   = 0x3A3F7FDA;
+        DDR_SDTIM3   = 0x057F83A8;
+        DDR_PMCTL   |= (0x9 << 4); // Set up SR_TIM to Enter self-refresh after 4096 clocks
+        
+        DDR_DDRPHYC  = 0x0010010B;
+        
+        DDR_SDRFC = 0x00004111; //500us
+        
+        
+        DDR_SDCFG    = 0x63C51A32; //0x63C51A32;    //row-col = 13-10
+        
+        
+        //Values with invertclkout = 0
+        DATA0_GTLVL_INIT_RATIO = 0x3C;
+        DATA1_GTLVL_INIT_RATIO = 0x3C;
+        DATA2_GTLVL_INIT_RATIO = 0x23;
+        DATA3_GTLVL_INIT_RATIO = 0x2D;
+        DATA4_GTLVL_INIT_RATIO = 0x13;
+        DATA5_GTLVL_INIT_RATIO = 0x11;
+        DATA6_GTLVL_INIT_RATIO = 0x9;
+        DATA7_GTLVL_INIT_RATIO = 0xC;
+        //DATA8_GTLVL_INIT_RATIO = 0x21; //ECC byte lane. Don't care as long as you don't enable ECC by software
+        
+        //Values with invertclkout = 0
+        RDWR_INIT_RATIO_0 = 0x0;
+        RDWR_INIT_RATIO_1 = 0x0;
+        RDWR_INIT_RATIO_2 = 0x0;
+        RDWR_INIT_RATIO_3 = 0x0;
+        RDWR_INIT_RATIO_4 = 0x0;
+        RDWR_INIT_RATIO_5 = 0x0;
+        RDWR_INIT_RATIO_6 = 0x0;
+        RDWR_INIT_RATIO_7 = 0x0;
+        //RDWR_INIT_RATIO_8 = 0x0; //ECC byte lane. Don't care as long as you don't enable ECC by software
+        
+        
+        
+        //GEL_TextOut("\nProgrammed initial ratios.\n");
+        
+        DDR3_CONFIG_REG_0 = DDR3_CONFIG_REG_0 | 0xF;
+        
+        //DDR3_CONFIG_REG_23 = RD_DQS_SLAVE_RATIO_1066 | (WR_DQS_SLAVE_RATIO_1066 << 10) | (WR_DATA_SLAVE_RATIO_1066 << 20);
+        
+        DDR3_CONFIG_REG_23 |= 0x00000200; //Set bit 9 = 1 to use forced ratio leveling for read DQS
+        //GEL_TextOut("\nSet bit 9 = 1 for forced ratio read eye leveling.\n");
+        
+        DDR_RDWR_LVL_RMP_CTRL = 0x80000000; //enable full leveling
+        DDR_RDWR_LVL_CTRL = 0x80000000; //Trigger full leveling - This ignores read DQS leveling result and uses ratio forced value 							//(0x34) instead
+        //GEL_TextOut("\n Triggered full leveling.\n");
+        
+        DDR_SDTIM1; //Read MMR to ensure full leveling is complete
+        
+        DDR_SDRFC    = 0x00001040; //Refresh rate = Round[7.8*666.5MHz] = 0x1450
+#endif
+#if 1
+        /* C6678 1333 MHz data rate */
         /***************** 2.2 DDR3 PLL Configuration ************/
         DDR3PLLCTL1 |= 0x00000040;      //Set ENSAT bit = 1
         DDR3PLLCTL1 |= 0x00002000;      //Set RESET bit = 1
         DDR3PLLCTL0 = 0x090804C0;       //Configure CLKR, CLKF, CLKOD, BWADJ
-        ddr3_wait(1000);                //Wait for reset to complete
+        ddr3_wait(1000);               //Wait for reset to complete
         DDR3PLLCTL1 &= ~(0x00002000);   //Clear RESET bit
-        ddr3_wait(1000);                //Wait for PLL lock
-
+        ddr3_wait(1000);              //Wait for PLL lock
+        
+        /***************** 2.3 Basic Controller and DRAM configuration ************/
+        DDR_SDRFC    = 0x80005162;    // inhibit configuration 
+        
+        DDR_SDTIM1   = 0x1113783C;
+        DDR_SDTIM2   = 0x304F7FE3;
+        DDR_SDTIM3   = 0x559F849F;
+        
+        DDR_DDRPHYC  = 0x0010010F;
+        
+        DDR_ZQCFG    = 0x70073214;
+        
+        DDR_PMCTL    = 0x0;
+        
+        DDR_SDRFC    = 0x00005162;    // enable configuration
+        DDR_SDCFG    = 0x63222A32;    // last config write – DRAM init occurs
+        
+        ddr3_wait(1000);            //Wait for HW init to complete
+        DDR_SDRFC = 0x00001450;       //Refresh rate = (7.8*666MHz]
+        
         /**************** 3.0 Leveling Register Configuration ********************/
         /* Using partial automatic leveling due to errata */
         
-       /**************** 3.2 Invert Clock Out ********************/
+        /**************** 3.2 Invert Clock Out ********************/
         DDR3_CONFIG_REG_0 &= ~(0x007FE000);  // clear ctrl_slave_ratio field
         DDR3_CONFIG_REG_0 |= 0x00200000;     // set ctrl_slave_ratio to 0x100
         DDR3_CONFIG_REG_12 |= 0x08000000;    // Set invert_clkout = 1
         DDR3_CONFIG_REG_0 |= 0xF;            // set dll_lock_diff to 15
-        DDR3_CONFIG_REG_23 |= 0x00000200;    //Set bit 9 = 1 to use forced ratio leveling for read DQS
-            
-       //Values with invertclkout = 1
-      /**************** 3.3+3.4 Partial Automatic Leveling ********************/
-      DATA0_WRLVL_INIT_RATIO = 0x5E;
-      DATA1_WRLVL_INIT_RATIO = 0x5E;
-      DATA2_WRLVL_INIT_RATIO = 0x5E;
-      DATA3_WRLVL_INIT_RATIO = 0x51;
-      DATA4_WRLVL_INIT_RATIO = 0x38;
-      DATA5_WRLVL_INIT_RATIO = 0x3A;
-      DATA6_WRLVL_INIT_RATIO = 0x24;
-      DATA7_WRLVL_INIT_RATIO = 0x20;
-      DATA8_WRLVL_INIT_RATIO = 0x44;
-
-      DATA0_GTLVL_INIT_RATIO = 0xDD;
-      DATA1_GTLVL_INIT_RATIO = 0xDD;
-      DATA2_GTLVL_INIT_RATIO = 0xBE;
-      DATA3_GTLVL_INIT_RATIO = 0xCA;
-      DATA4_GTLVL_INIT_RATIO = 0xA9;
-      DATA5_GTLVL_INIT_RATIO = 0xA7;
-      DATA6_GTLVL_INIT_RATIO = 0x9E;
-      DATA7_GTLVL_INIT_RATIO = 0xA1;
-      DATA8_GTLVL_INIT_RATIO = 0xBA;
-  
-      //Do a PHY reset. Toggle DDR_PHY_CTRL_1 bit 15 0->1->0
-      DDR_DDRPHYC &= ~(0x00008000);
-      DDR_DDRPHYC |= (0x00008000);
-      DDR_DDRPHYC &= ~(0x00008000);
-
-      /***************** 2.3 Basic Controller and DRAM configuration ************/
-      DDR_SDRFC    = 0x00005162;    // enable configuration 
-
-      /* DDR_SDTIM1   = 0x1113783C; */
-       TEMP = 0;
-       TEMP |= 0x8 << 25; // T_RP bit field 28:25
-       TEMP |= 0x8 << 21; // T_RCD bit field 24:21
-       TEMP |= 0x9 << 17; // T_WR bit field 20:17
-       TEMP |= 0x17 << 12; // T_RAS bit field 16:12
-       TEMP |= 0x20 << 6; // T_RC bit field 11:6
-       TEMP |= 0x7 << 3; // T_RRD bit field 5:3
-       TEMP |= 0x4; // T_WTR bit field 2:0
-       DDR_SDTIM1 = TEMP;
-
-      /* DDR_SDTIM2   = 0x304F7FE3; */
-       TEMP = 0;
-       TEMP |= 0x3 << 28; // T_XP bit field 30:28
-       TEMP |= 0x4f << 16; // T_XSNR bit field 24:16
-       TEMP |= 0x1ff << 6; // T_XSRD bit field 15:6
-       TEMP |= 0x4 << 3; // T_RTP bit field 5:3
-       TEMP |= 0x3; // T_CKE bit field 2:0
-       DDR_SDTIM2 = TEMP;
-
-      /*  DDR_SDTIM3   = 0x559F849F; */
-       TEMP = 0;
-       TEMP |= 0x5 << 28; // T_PDLL_UL bit field 31:28 (fixed value)
-       TEMP |= 0x5 << 24; // T_CSTA bit field 27:24 (fixed value)
-       TEMP |= 0x4 << 21; // T_CKESR bit field 23:21
-       TEMP |= 0x3f << 15; // T_ZQCS bit field 20:15
-       TEMP |= 0x49 << 4; // T_RFC bit field 12:4
-       TEMP |= 0xf; // T_RAS_MAX bit field 3:0 (fixed value)
-       DDR_SDTIM3 = TEMP; 
-
+        
+        
+        /**************** 3.3+3.4 Partial Automatic Leveling ********************/
+        DATA0_WRLVL_INIT_RATIO = 0x20;
+        DATA1_WRLVL_INIT_RATIO = 0x24;
+        DATA2_WRLVL_INIT_RATIO = 0x3A;
+        DATA3_WRLVL_INIT_RATIO = 0x38;
+        DATA4_WRLVL_INIT_RATIO = 0x51;
+        DATA5_WRLVL_INIT_RATIO = 0x5E;
+        DATA6_WRLVL_INIT_RATIO = 0x5E;
+        DATA7_WRLVL_INIT_RATIO = 0x5E;
+        DATA8_WRLVL_INIT_RATIO = 0x44;
+        
+        DATA0_GTLVL_INIT_RATIO = 0xA1;
+        DATA1_GTLVL_INIT_RATIO = 0x9E;
+        DATA2_GTLVL_INIT_RATIO = 0xA7;
+        DATA3_GTLVL_INIT_RATIO = 0xA9;
+        DATA4_GTLVL_INIT_RATIO = 0xCA;
+        DATA5_GTLVL_INIT_RATIO = 0xBE;
+        DATA6_GTLVL_INIT_RATIO = 0xDD;
+        DATA7_GTLVL_INIT_RATIO = 0xDD;
+        DATA8_GTLVL_INIT_RATIO = 0xBA;
+        
+        DDR3_CONFIG_REG_23 |= 0x00000200;
+        DDR_RDWR_LVL_RMP_CTRL = 0x80000000;
+        DDR_RDWR_LVL_CTRL = 0x80000000;
+#endif
+        
+#if 0
+        /* C6678 New 1066 rate */
+        /***************** 2.2 DDR3 PLL Configuration ************/
+        DDR3PLLCTL1 |= 0x00000040;      //Set ENSAT bit = 1
+        DDR3PLLCTL1 |= 0x00002000;      //Set RESET bit = 1
+        DDR3PLLCTL0 = 0x0F0807C1;       //Configure CLKR, CLKF, CLKOD, BWADJ
+        ddr3_wait(1000);              //Wait for reset to complete
+        DDR3PLLCTL1 &= ~(0x00002000);   //Clear RESET bit
+        ddr3_wait(1000);
+        
+        /***************** 2.3 Basic Controller and DRAM configuration ************/
+        DDR_SDRFC    = 0x8000411B;    // inhibit configuration 
+        DDR_SDTIM1   = 0x0CCF36B3;
+        DDR_SDTIM2   = 0x303F7FDA;
+        DDR_SDTIM3   = 0x559F83AF;
+        
+        DDR_DDRPHYC  = 0x0010010A;
+        DDR_ZQCFG    = 0x70073214;
+        
+        //DDR_PMCTL    = 0x0;
+        DDR_SDRFC    = 0x0000411B;    // enable configuration
+        DDR_SDCFG    = 0x63211A32;    // last config write – DRAM init occurs
+        
+        ddr3_wait(1000);             //Wait for HW init to complete
+        
+        DDR_SDRFC = 0x00001040;       //Refresh rate = (7.8*666MHz]
+        
+        /**************** 3.0 Leveling Register Configuration ********************/
+        /* Using partial automatic leveling due to errata */
+        
+        /**************** 3.2 Invert Clock Out ********************/
+        DDR3_CONFIG_REG_0 &= ~(0x007FE000);  // clear ctrl_slave_ratio field
+        DDR3_CONFIG_REG_0 |= 0x00200000;     // set ctrl_slave_ratio to 0x100
+        DDR3_CONFIG_REG_12 |= 0x08000000;    // Set invert_clkout = 1
+        DDR3_CONFIG_REG_0 |= 0xF;            // set dll_lock_diff to 15
+        
+        /**************** 3.3+3.4 Partial Automatic Leveling ********************/
+        DATA0_WRLVL_INIT_RATIO = 0x19;//0x4C;
+        DATA1_WRLVL_INIT_RATIO = 0x1C;//0x4C;
+        DATA2_WRLVL_INIT_RATIO = 0x2F;//0x4C;
+        DATA3_WRLVL_INIT_RATIO = 0x2D;//0x42;
+        DATA4_WRLVL_INIT_RATIO = 0x42;//0x2D;
+        DATA5_WRLVL_INIT_RATIO = 0x4C;//0x2F;
+        DATA6_WRLVL_INIT_RATIO = 0x4C;//0x1C;
+        DATA7_WRLVL_INIT_RATIO = 0x4C;//0x19;
+        DATA8_WRLVL_INIT_RATIO = 0x37;
+        
+        DATA0_GTLVL_INIT_RATIO = 0x8D;//0xBC;
+        DATA1_GTLVL_INIT_RATIO = 0x8A;//0xBC;
+        DATA2_GTLVL_INIT_RATIO = 0x91;//0xA4;
+        DATA3_GTLVL_INIT_RATIO = 0x93;//0xAE;
+        DATA4_GTLVL_INIT_RATIO = 0xAE;//0x93;
+        DATA5_GTLVL_INIT_RATIO = 0xA4;//0x91;
+        DATA6_GTLVL_INIT_RATIO = 0xBC;//0x8A;
+        DATA7_GTLVL_INIT_RATIO = 0xBC;//0x8D;
+        DATA8_GTLVL_INIT_RATIO = 0xA1;
+        
+        DDR3_CONFIG_REG_23 |= 0x00000200;
+        DDR_RDWR_LVL_RMP_CTRL = 0x80000000;
+        DDR_RDWR_LVL_CTRL = 0x80000000;
+#endif
+    }
+    else if (v == DEVICE_C6670_JTAG_ID_VAL)
+    {
+        /* C6670 800 M rate */
+        DDR3PLLCTL1 |= 0x00000040;    //Set ENSAT = 1
+        DDR3PLLCTL1 |= 0x00002000;    //Set RESET bit before programming DDR3PLLCTL0
+        DDR3PLLCTL0 = 0x02000140;
+        
+        for(i=0;i<1000;i++); //Wait atleast 5us
+        DDR3PLLCTL1 &= 0xFFFFDFFF;    //Clear RESET bit
+        
+        DDR_SDRFC    = 0x800030D4;    // inhibit configuration
+        
+        DDR_SDTIM1   = 0x0AAAE4E3;
+        DDR_SDTIM2   = 0x20437FDA;
+        DDR_SDTIM3   = 0x559F83FF;
+        
         DDR_DDRPHYC  = 0x0010010F;
-     
-        DDR_ZQCFG    = 0x70073214; 
-
-        DDR_PMCTL    = 0x0;
-     
-        DDR_SDRFC = 0x00005162; // enable configuration
-
-        /* DDR_SDCFG    = 0x63062A32; */
-        /* New value with DYN_ODT disabled and SDRAM_DRIVE = RZQ/7 //0x63222A32;    // last config write DRAM init occurs */
-         TEMP = 0;
-         TEMP |= 0x3 << 29; // SDRAM_TYPE bit field 31:29 (fixed value)
-         TEMP |= 0x0 << 27; // IBANK_POS bit field 28:27
-         TEMP |= 0x3 << 24; // DDR_TERM bit field 26:24
-         TEMP |= 0x0 << 21; // DYN_ODT bit field 22:21
-         TEMP |= 0x1 << 18; // SDRAM_DRIVE bit field 19:18
-         TEMP |= 0x2 << 16; // CWL bit field 17:16
-         TEMP |= 0x0 << 14; // NM bit field 15:14
-         TEMP |= 0xA << 10; // CL bit field 13:10
-         TEMP |= 0x4 << 7; // ROWSIZE bit field 9:7
-         TEMP |= 0x3 << 4; // IBANK bit field 6:4
-         TEMP |= 0x0 << 3; // EBANK bit field 3:3
-         TEMP |= 0x2; // PAGESIZE bit field 2:0
-         DDR_SDCFG = TEMP;
-
-         ddr3_wait(1000);             //Wait 600us for HW init to complete
-
-        DDR_SDRFC = 0x00001450;       //Refresh rate = (7.8*666MHz]
-
-        DDR_RDWR_LVL_RMP_CTRL = 0x80000000; //enable full leveling
-   
-        /*Trigger full leveling - This ignores read DQS leveling result and uses ratio forced value
-          Wait for min 1048576 DDR clock cycles for leveling to complete = 1048576 * 1.5ns = 1572864ns = 1.57ms.
-          Actual time = ~10-15 ms */
-        DDR_RDWR_LVL_CTRL = 0x80000000; 
-
-        ddr3_wait(1000); //Wait 3ms for leveling to complete
+        
+        DDR_SDRFC    = 0x000030D4;    // enable configuration
+        
+        DDR_SDCFG    = 0x63222AB2;    // DRAM Mode Register writes occur here - 31.25us long refresh periods
+        
+        DDR3_CONFIG_REG_0 |= 0xF;         // set dll_lock_diff to 15
+        DDR3_CONFIG_REG_0 &= 0xFF801FFF;  // clear ctrl_slave_ratio field
+        DDR3_CONFIG_REG_0 |= 0x00200000;  // set ctrl_slave_ratio field to 256 since INV_CLKOUT = 1
+        
+        DDR3_CONFIG_REG_12 |= 0x08000000; // Set INV_CLKOUT = 1
+        
+        DDR3_CONFIG_REG_23 = RD_DQS_SLAVE_RATIO | (WR_DQS_SLAVE_RATIO << 10) | (WR_DATA_SLAVE_RATIO << 20);
+        DDR3_CONFIG_REG_24 = FIFO_WE_SLAVE_RATIO;
+        
+        
+        DDR_SDRFC    = 0x00000C30; //Refresh rate = Round[7.8*400MHz] = 0x0C30
     }
     else
     {
