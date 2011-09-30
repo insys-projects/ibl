@@ -16,6 +16,8 @@
 
 #define KICK0			*(volatile unsigned int*)(CHIP_LEVEL_REG + 0x0038)
 #define KICK1			*(volatile unsigned int*)(CHIP_LEVEL_REG + 0x003C)
+#define KICK0_UNLOCK		0x83e70b13
+#define KICK1_UNLOCK		0x95a4f1e0
 
 #define DDR3PLLCTL0		*(volatile unsigned int*)(CHIP_LEVEL_REG + 0x0330)
 #define DDR3PLLCTL1		*(unsigned int*)(CHIP_LEVEL_REG + 0x0334)
@@ -101,14 +103,25 @@ SINT16 hwEmif4p0Enable (iblEmif4p0_t *cfg)
     if ( (v == DEVICE_C6678_JTAG_ID_VAL) ||
          (v == DEVICE_C6670_JTAG_ID_VAL) )
     {
+
+
+	KICK0 = KICK0_UNLOCK;
+	KICK1 = KICK1_UNLOCK;
+
         /* 1333 MHz data rate */
         /***************** 2.2 DDR3 PLL Configuration ************/
         DDR3PLLCTL1 |= 0x00000040;      //Set ENSAT bit = 1
         DDR3PLLCTL1 |= 0x00002000;      //Set RESET bit = 1
         DDR3PLLCTL0 = 0x090804C0;       //Configure CLKR, CLKF, CLKOD, BWADJ
-        ddr3_wait(1000);                //Wait for reset to complete
+
+	for (i = 0;i < 20;i++)
+		ddr3_wait(1000);                //Wait for reset to complete
+
         DDR3PLLCTL1 &= ~(0x00002000);   //Clear RESET bit
-        ddr3_wait(1000);                //Wait for PLL lock
+
+	for (i = 0;i < 500;i++)
+		ddr3_wait(1000);                //Wait for PLL lock
+
 
         /**************** 3.0 Leveling Register Configuration ********************/
         /* Using partial automatic leveling due to errata */
@@ -205,7 +218,9 @@ SINT16 hwEmif4p0Enable (iblEmif4p0_t *cfg)
          TEMP |= 0x2; // PAGESIZE bit field 2:0
          DDR_SDCFG = TEMP;
 
-         ddr3_wait(1000);             //Wait 600us for HW init to complete
+	for (i = 0; i < 12000; i++) {
+	        ddr3_wait(1000);             //Wait 600us for HW init to complete
+	}
 
         DDR_SDRFC = 0x00001450;       //Refresh rate = (7.8*666MHz]
 
@@ -216,7 +231,9 @@ SINT16 hwEmif4p0Enable (iblEmif4p0_t *cfg)
           Actual time = ~10-15 ms */
         DDR_RDWR_LVL_CTRL = 0x80000000; 
 
-        ddr3_wait(1000); //Wait 3ms for leveling to complete
+	for (i = 0; i < 30000; i++) {
+		ddr3_wait(1000); //Wait 3ms for leveling to complete
+	}
     }
     else
     {
