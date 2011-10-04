@@ -1,0 +1,104 @@
+== Generating the program to create an IBL binary ==
+
+- The Release will have a set of binary images for each EVM/SOC supported in both endians
+- Each binary will however have to be customized for an individual use case.
+- Change directory into
+
+  cd ibl/src/util/iblConfig/src
+
+- Now edit the file device.c
+
+- There are individual functions for each EVM supported in the release. Edit the appropriate function. If multiple EVMs/SOCs are going to be used, then it is better to make the changes for each EVM at this stage
+
+- Below we depict an example of what to change. Please appropriately change
+the IP address, the server IP, etc. This will have to be customized for the user's development environment. The index of the bootmode, i.e bootMode[2] or bootMode[1] or bootMode[0] varies between the various EVMs. 
+
+    ibl.bootModes[2].u.ethBoot.doBootp          = FALSE;
+    ibl.bootModes[2].u.ethBoot.useBootpServerIp = TRUE;
+    ibl.bootModes[2].u.ethBoot.useBootpFileName = TRUE;
+    ibl.bootModes[2].u.ethBoot.bootFormat       = ibl_BOOT_FORMAT_BBLOB;
+
+
+    SETIP(ibl.bootModes[2].u.ethBoot.ethInfo.ipAddr,    158,218,100,116);
+    SETIP(ibl.bootModes[2].u.ethBoot.ethInfo.serverIp,  158,218,100,23);
+    SETIP(ibl.bootModes[2].u.ethBoot.ethInfo.gatewayIp, 158,218,100,2);
+    SETIP(ibl.bootModes[2].u.ethBoot.ethInfo.netmask,   255,255,255,0);
+
+- In the above case the bootloader will issue a TFTP request. If the user wants to boot using DHCP, then change 
+
+    ibl.bootModes[2].u.ethBoot.doBootp          = FALSE;
+
+    to
+
+    ibl.bootModes[2].u.ethBoot.doBootp          = TRUE;
+
+
+- Please note that the 6455 does not have an EFUSE MAC address. Hence for every EVM this needs to be different and the MAC address needs to be explicitly given.
+
+    /* There is no e-fuse mac address. A value must be assigned */
+    ibl.bootModes[0].u.ethBoot.ethInfo.hwAddress[0] = 10;
+    ibl.bootModes[0].u.ethBoot.ethInfo.hwAddress[1] = 224;
+    ibl.bootModes[0].u.ethBoot.ethInfo.hwAddress[2] = 166;
+    ibl.bootModes[0].u.ethBoot.ethInfo.hwAddress[3] = 102;
+    ibl.bootModes[0].u.ethBoot.ethInfo.hwAddress[4] = 87;
+    ibl.bootModes[0].u.ethBoot.ethInfo.hwAddress[5] = 25;
+
+- One other setting that will need to be changed is the filename. Change the filename depending on what the user wants to boot up. 
+
+    ibl.bootModes[2].u.ethBoot.ethInfo.fileName[0]  = 'c';
+    ibl.bootModes[2].u.ethBoot.ethInfo.fileName[1]  = '6';
+    ibl.bootModes[2].u.ethBoot.ethInfo.fileName[2]  = '6';
+    ibl.bootModes[2].u.ethBoot.ethInfo.fileName[3]  = '7';
+    ibl.bootModes[2].u.ethBoot.ethInfo.fileName[4]  = '0';
+    ibl.bootModes[2].u.ethBoot.ethInfo.fileName[5]  = '-';
+    ibl.bootModes[2].u.ethBoot.ethInfo.fileName[6]  = 'l';
+    ibl.bootModes[2].u.ethBoot.ethInfo.fileName[7]  = 'e';
+    ibl.bootModes[2].u.ethBoot.ethInfo.fileName[8]  = '.';
+    ibl.bootModes[2].u.ethBoot.ethInfo.fileName[9]  = 'b';
+    ibl.bootModes[2].u.ethBoot.ethInfo.fileName[10] = 'i';
+    ibl.bootModes[2].u.ethBoot.ethInfo.fileName[11] = 'n';
+    ibl.bootModes[2].u.ethBoot.ethInfo.fileName[12] = '\0';
+    ibl.bootModes[2].u.ethBoot.ethInfo.fileName[13] = '\0';
+    ibl.bootModes[2].u.ethBoot.ethInfo.fileName[14] = '\0';
+
+- Save the file once all changes have been made
+
+- Then issue the command
+
+  cd ibl/src/util/iblConfig/build
+
+- Now issue the following command depending on the EVM
+
+For DSK6455
+make EVM=c6455 I2C_MAP_ADDR=0x500
+
+For C6474
+make EVM=c6474 I2C_MAP_ADDR=0x200
+
+For C6474L 
+make EVM=c6474l I2C_MAP_ADDR=0x200
+
+For C6457 
+make EVM=c6457 I2C_MAP_ADDR=0x200
+
+For C6472
+make EVM=c6472 I2C_MAP_ADDR=0x500
+
+For C6678 
+make EVM=c6678l I2C_MAP_ADDR=0x500
+
+For C6670 
+make EVM=c6670l I2C_MAP_ADDR=0x500
+
+
+- There will an '''iblConfig.out''' that gets generated.
+
+== Create an IBL binary for a given EVM ==
+
+- To create a IBL binary for a given use case, please copy the prebuilt IBL binary for the required EVM in the required endian from the releases folder and rename it to ibl.bin. Please Note, you have to rename the IBL to ibl.bin. This binary(ibl.bin) should be in the same folder as the iblConfig.out that was built in the above step. please be in ibl/src/util/iblConfig/build folder at all times.
+
+- Then issue the command ./iblConfig.out
+
+- This will generate the required ibl.bin for the given EVM in the required endian
+
+
