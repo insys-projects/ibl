@@ -940,7 +940,7 @@ ibl_t c6670_ibl_config(void)
 	ibl.pllConfig[ibl_MAIN_PLL].pllOutFreqMhz = 983;
 
 	/* DDR PLL: 66.66 MHz reference, 400 MHz output, for an 800MHz DDR rate */
-	ibl.pllConfig[ibl_DDR_PLL].doEnable       = 1; 
+	ibl.pllConfig[ibl_DDR_PLL].doEnable       = 0; 
 	ibl.pllConfig[ibl_DDR_PLL].prediv         = 1;
 	ibl.pllConfig[ibl_DDR_PLL].mult           = 12;
 	ibl.pllConfig[ibl_DDR_PLL].postdiv        = 2;
