@@ -214,6 +214,9 @@ ifeq ($(HAS_SPI),1)
 endif
 	make -C $(IBL_ROOT)/util/btoccs
 	make -C $(IBL_ROOT)/util/romparse TARGET=$(TARGET)
+ifeq ($(HAS_I2C),1)
+	make -C $(IBL_ROOT)/util/i2cConfig $(TARGET) MAINDEFS='$(MAINDEFS) $(SPI_CFG)' 
+endif
 	make -C $(IBL_ROOT)/util/bconvert
 	make -C $(IBL_ROOT)/util/iblConfig/build EVM=$(EVM) I2C_MAP_ADDR=$(I2C_MAP_ADDR)
 
