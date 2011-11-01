@@ -20,6 +20,10 @@
 #define PLL_REG_CMD       0x0138
 #define PLL_REG_PLLSTAT   0x013c
 #define PLL_REG_CKCTL     0x0154
+#define PLL_REG_DIV2	  0x011C
+#define PLL_REG_DIV5	  0x0164
+#define PLL_REG_DIV8	  0x0170
+#define PLL_REG_ALNCTL	  0x0140
 
 /* PLL constants */
 
