@@ -111,7 +111,9 @@ SINT16 hwEmif4p0Enable (iblEmif4p0_t *cfg)
         /* 1333 MHz data rate */
         /***************** 2.2 DDR3 PLL Configuration ************/
         DDR3PLLCTL1 |= 0x00000040;      //Set ENSAT bit = 1
+	DDR3PLLCTL0 |= 0x00800000;      // Set BYPASS = 1
         DDR3PLLCTL1 |= 0x00002000;      //Set RESET bit = 1
+
         DDR3PLLCTL0 = 0x090804C0;       //Configure CLKR, CLKF, CLKOD, BWADJ
 
 	for (i = 0;i < 20;i++)
@@ -121,6 +123,8 @@ SINT16 hwEmif4p0Enable (iblEmif4p0_t *cfg)
 
 	for (i = 0;i < 500;i++)
 		ddr3_wait(1000);                //Wait for PLL lock
+
+	DDR3PLLCTL0 &= ~(0x00800000);      // Set BYPASS = 0
 
 
         /**************** 3.0 Leveling Register Configuration ********************/
