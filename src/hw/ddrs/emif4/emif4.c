@@ -19,9 +19,6 @@
 #define KICK0_UNLOCK		0x83e70b13
 #define KICK1_UNLOCK		0x95a4f1e0
 
-#define DDR3PLLCTL0		*(volatile unsigned int*)(CHIP_LEVEL_REG + 0x0330)
-#define DDR3PLLCTL1		*(unsigned int*)(CHIP_LEVEL_REG + 0x0334)
-
 // DDR3 definitions
 #define DDR_BASE_ADDR 0x21000000
 
@@ -107,25 +104,6 @@ SINT16 hwEmif4p0Enable (iblEmif4p0_t *cfg)
 
 	KICK0 = KICK0_UNLOCK;
 	KICK1 = KICK1_UNLOCK;
-
-        /* 1333 MHz data rate */
-        /***************** 2.2 DDR3 PLL Configuration ************/
-        DDR3PLLCTL1 |= 0x00000040;      //Set ENSAT bit = 1
-	DDR3PLLCTL0 |= 0x00800000;      // Set BYPASS = 1
-        DDR3PLLCTL1 |= 0x00002000;      //Set RESET bit = 1
-
-        DDR3PLLCTL0 = 0x090804C0;       //Configure CLKR, CLKF, CLKOD, BWADJ
-
-	for (i = 0;i < 20;i++)
-		ddr3_wait(1000);                //Wait for reset to complete
-
-        DDR3PLLCTL1 &= ~(0x00002000);   //Clear RESET bit
-
-	for (i = 0;i < 500;i++)
-		ddr3_wait(1000);                //Wait for PLL lock
-
-	DDR3PLLCTL0 &= ~(0x00800000);      // Set BYPASS = 0
-
 
         /**************** 3.0 Leveling Register Configuration ********************/
         /* Using partial automatic leveling due to errata */
