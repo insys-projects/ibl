@@ -90,7 +90,7 @@ SINT16 hwPllSetPll (UINT32 pllNum, UINT32 prediv, UINT32 mult, UINT32 postdiv)
 	/* Set the ENSAT Bit */
 	/* Usage Note 9: For optimal PLL operation, the ENSAT bit in the PLL control
 	 * registers for the Main PLL, DDR3 PLL, and PA PLL should be set to 1.
-	 * The PLL initialization sequence in the boot ROM sets this bit to 0 and
+	 * The PLL initialization sequence in the silicon sets this bit to 0 and
 	 * could lead to non-optimal PLL operation. Software can set the bit to the
 	 * optimal value of 1 after boot
 	 */
@@ -108,7 +108,7 @@ SINT16 hwPllSetPll (UINT32 pllNum, UINT32 prediv, UINT32 mult, UINT32 postdiv)
 
 	
 	/* Wait for 4 Ref clocks */
-	/* The slowest clock can be at 24MHz, so min:160ns delay */
+	/* The slowest clock can be at 25MHz, so min:160ns delay */
 	hw_pll_delay(225);
 
 	/* Put the PLL in Bypass mode to perform the power down mode */
@@ -155,9 +155,7 @@ SINT16 hwPllSetPll (UINT32 pllNum, UINT32 prediv, UINT32 mult, UINT32 postdiv)
 	/* set the output divide */
 	secctl = BOOT_SET_BITFIELD(secctl, 1 & 0x000f, 22, 19);
 	DEVICE_REG32_W (pllBase + PLL_REG_SECCTL, secctl); 
-      	
-	/* WAIT FOR THE go STAT BIT HERE (50 us) */
-	hw_pll_delay (140056 >> 1);   
+  
 	/* wait for the GOSTAT, but don't trap if lock is never read */
 	for (i = 0; i < 100; i++)  {
 		hw_pll_delay (300);
@@ -199,7 +197,10 @@ SINT16 hwPllSetPll (UINT32 pllNum, UINT32 prediv, UINT32 mult, UINT32 postdiv)
 			break;
 	}
 
-	/* Wait for 7 us, use 10 us*/
+	if (i == 100)  
+		ret = -1;
+
+	/* Wait for a minimum of 7 us*/
 	hw_pll_delay (14006);
 
 	/* Release PLL from Reset */
@@ -207,19 +208,7 @@ SINT16 hwPllSetPll (UINT32 pllNum, UINT32 prediv, UINT32 mult, UINT32 postdiv)
 	DEVICE_REG32_W (pllBase + PLL_REG_CTL, ctl);
 
 	/* Wait for PLL Lock time (min 50 us) */
-	hw_pll_delay (140056 >> 1);  
-   
-	/* wait for the pll to lock, but don't trap if lock is never read */
-	for (i = 0; i < 100; i++)  {
-		hw_pll_delay (2000/7);
-		status = DEVICE_REG32_R (pllBase + PLL_REG_PLLSTAT);
-		if ( (status & PLL_REG_STATUS_FIELD_LOCK) != 0 )
-			break;
-	}
-
-	/* Enable the pll even if the lock failed. Return a warning. */
-	if (i == 100)  
-		ret = -1;
+	hw_pll_delay (140056 >> 1);
 
 	/* Clear the secondary controller bypass bit */
 	secctl = secctl & ~PLL_REG_SECCTL_FIELD_BYPASS;
