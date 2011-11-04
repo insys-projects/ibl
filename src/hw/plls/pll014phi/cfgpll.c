@@ -75,15 +75,20 @@ SINT16 hwPllSetCfgPll (UINT32 base, UINT32 prediv, UINT32 mult, UINT32 postdiv, 
     if (postdiv > 0)
         postdiv -= 1;
 
+    regb = BOOT_SET_BITFIELD(regb, 1, 6, 6);
+    DEVICE_REG32_W (base + 4, regb);
+
+    /* Setup the PLL. Assert bypass */
+    reg = BOOT_SET_BITFIELD (reg, 1,              23, 23);   /* Bypass must be enabled */
+    DEVICE_REG32_W (base, reg);
+
     /* Set bit 14 in register 1 to disable the PLL (assert reset) */
     regb = BOOT_SET_BITFIELD(regb, 1, 14, 14);
     DEVICE_REG32_W (base + 4, regb);
 
-    /* Setup the PLL. Assert bypass */
     reg = BOOT_SET_BITFIELD (reg, prediv,          5,  0);
     reg = BOOT_SET_BITFIELD (reg, mult,           18,  6);
-    reg = BOOT_SET_BITFIELD (reg, postdiv,        22, 19);
-    reg = BOOT_SET_BITFIELD (reg, 1,              23, 23);   /* Bypass must be enabled */
+    reg = BOOT_SET_BITFIELD (reg, postdiv,        22, 19); 
     reg = BOOT_SET_BITFIELD (reg, (bwAdj & 0xff), 31, 24);
 
     DEVICE_REG32_W (base, reg);
