@@ -18,6 +18,16 @@
 #define BOOT_READ_BITFIELD(z,x,y)   (((UINT32)z) & BOOTBITMASK(x,y)) >> (y)
 #define BOOT_SET_BITFIELD(z,f,x,y)  (((UINT32)z) & ~BOOTBITMASK(x,y)) | ( (((UINT32)f) << (y)) & BOOTBITMASK(x,y) )
 
+void pass_pll_delay (UINT32 del)
+{
+  UINT32 i;
+  volatile UINT32 j;
+
+  for (i = j = 0; i < del; i++)
+    asm (" nop ");
+
+} /* hw_pll_delay */
+
 
 /*********************************************************************************************************
  * FUNCTION PURPOSE: Configure and enable a pll
@@ -86,9 +96,9 @@ SINT16 hwPllSetCfgPll (UINT32 base, UINT32 prediv, UINT32 mult, UINT32 postdiv, 
     regb = BOOT_SET_BITFIELD(regb, 1, 14, 14);
     DEVICE_REG32_W (base + 4, regb);
 
-    reg = BOOT_SET_BITFIELD (reg, prediv,          5,  0);
-    reg = BOOT_SET_BITFIELD (reg, mult,           18,  6);
-    reg = BOOT_SET_BITFIELD (reg, postdiv,        22, 19); 
+    reg = BOOT_SET_BITFIELD (reg, prediv - 1, 5, 0);
+    reg = BOOT_SET_BITFIELD (reg, mult - 1, 18, 6);
+    reg = BOOT_SET_BITFIELD (reg, postdiv - 1, 22, 19);
     reg = BOOT_SET_BITFIELD (reg, (bwAdj & 0xff), 31, 24);
 
     DEVICE_REG32_W (base, reg);
@@ -100,25 +110,24 @@ SINT16 hwPllSetCfgPll (UINT32 base, UINT32 prediv, UINT32 mult, UINT32 postdiv, 
 
     /* Reset must be asserted for at least 5us. Give a huge amount of padding here to be safe
      * (the factor of 100) */
-    chipDelay32 (5 * chipFreqMhz * 100);
-
+    pass_pll_delay(7000);
 
     /* Clear bit 14 in register 1 to re-enable the pll */
     regb = BOOT_SET_BITFIELD(regb, 0, 14, 14);
     DEVICE_REG32_W (base + 4, regb);
 
-    /* Need to wait 100,000 output PLL cycles before releasing bypass and setting 
-     * up the clk output */
-    chipDelay32 (chipFreqMhz * 100000 / pllFreqMhz);
-
+    /* Wait for 50 us */
+    pass_pll_delay(70000);
 
     /* Disable the bypass */
     reg = BOOT_SET_BITFIELD (reg, 0, 23, 23);   /* The value 0 disables the bypass */
     DEVICE_REG32_W (base, reg);
 
+#if 0    
     /* Enable the output source (set bit 13) */
     regb = BOOT_SET_BITFIELD(regb, 1, 13, 13);
     DEVICE_REG32_W (base + 4, regb);
+#endif
 
     return (0);
 
