@@ -26,7 +26,7 @@ void pass_pll_delay (UINT32 del)
   for (i = j = 0; i < del; i++)
     asm (" nop ");
 
-} /* hw_pll_delay */
+}
 
 
 /*********************************************************************************************************
@@ -85,6 +85,7 @@ SINT16 hwPllSetCfgPll (UINT32 base, UINT32 prediv, UINT32 mult, UINT32 postdiv, 
     if (postdiv > 0)
         postdiv -= 1;
 
+    /* Write to the ENSAT bit */
     regb = BOOT_SET_BITFIELD(regb, 1, 6, 6);
     DEVICE_REG32_W (base + 4, regb);
 
@@ -98,7 +99,6 @@ SINT16 hwPllSetCfgPll (UINT32 base, UINT32 prediv, UINT32 mult, UINT32 postdiv, 
 
     reg = BOOT_SET_BITFIELD (reg, prediv - 1, 5, 0);
     reg = BOOT_SET_BITFIELD (reg, mult - 1, 18, 6);
-    reg = BOOT_SET_BITFIELD (reg, postdiv - 1, 22, 19);
     reg = BOOT_SET_BITFIELD (reg, (bwAdj & 0xff), 31, 24);
 
     DEVICE_REG32_W (base, reg);
