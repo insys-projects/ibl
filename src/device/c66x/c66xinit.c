@@ -48,27 +48,6 @@ void devicePllConfig (void)
                      ibl.pllConfig[ibl_MAIN_PLL].postdiv);
 
 
-
-        /* 1333 MHz data rate */
-        /***************** 2.2 DDR3 PLL Configuration ************/
-        DDR3PLLCTL1 |= 0x00000040;      //Set ENSAT bit = 1
-	DDR3PLLCTL0 |= 0x00800000;      // Set BYPASS = 1
-        DDR3PLLCTL1 |= 0x00002000;      //Set RESET bit = 1
-
-        DDR3PLLCTL0 = 0x090804C0;       //Configure CLKR, CLKF, CLKOD, BWADJ
-
-	for (i = 0;i < 20;i++)
-		ddr3_delay(1000);                //Wait for reset to complete
-
-        DDR3PLLCTL1 &= ~(0x00002000);   //Clear RESET bit
-
-	for (i = 0;i < 500;i++)
-		ddr3_delay(1000);                //Wait for PLL lock
-
-	DDR3PLLCTL0 &= ~(0x00800000);      // Set BYPASS = 0
-
-#if 0
-
     if (ibl.pllConfig[ibl_DDR_PLL].doEnable == TRUE)
         hwPllSetCfg2Pll (DEVICE_PLL_BASE(DDR_PLL),
                          ibl.pllConfig[ibl_DDR_PLL].prediv,
@@ -77,7 +56,6 @@ void devicePllConfig (void)
                          ibl.pllConfig[ibl_MAIN_PLL].pllOutFreqMhz,
                          ibl.pllConfig[ibl_DDR_PLL].pllOutFreqMhz);
 
-#endif
 
     if (ibl.pllConfig[ibl_NET_PLL].doEnable == TRUE)
         hwPllSetCfgPll (DEVICE_PLL_BASE(NET_PLL),
@@ -86,7 +64,6 @@ void devicePllConfig (void)
                         ibl.pllConfig[ibl_NET_PLL].postdiv,
                         ibl.pllConfig[ibl_MAIN_PLL].pllOutFreqMhz,
                         ibl.pllConfig[ibl_NET_PLL].pllOutFreqMhz);
-
 
 }
 
