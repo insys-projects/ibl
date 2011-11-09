@@ -80,47 +80,36 @@ SINT16 hwPllSetCfg2Pll (UINT32 base, UINT32 prediv, UINT32 mult, UINT32 postdiv,
     /* bwAdj is based only on the mult value */
     bwAdj = (mult >> 1) - 1;
 
-    /* Multiplier / divider values are input as 1 less then the desired value */
-    if (prediv > 0)
-        prediv -= 1;
-
-    if (mult > 0)
-        mult -= 1;
-
-    if (postdiv > 0)
-        postdiv -= 1;
-
     /* Write to the ENSAT bit */
-    regb = BOOT_SET_BITFIELD(regb, 1, 6, 6);
+    regb |= (1 << 6);
     DEVICE_REG32_W (base + 4, regb);
 
     /* Bypass must be enabled */
-    reg = BOOT_SET_BITFIELD (reg, 1, 23, 23);
+    reg |= (1 << 23);
     DEVICE_REG32_W (base, reg);
 
     /* Set bit 13 in register 1 to disable the PLL (assert reset) */
-    regb = BOOT_SET_BITFIELD(regb, 1, 13, 13);
+    regb |= (1 << 13);
     DEVICE_REG32_W (base + 4, regb);
 
 
-    /* Configure CLKR, CLKF, CLKOD, BWADJ */
-    reg = ((prediv - 1) | ((mult - 1 ) << 6) | (bwAdj << 24));
+    /* Configure PLLM, PPLD BWADJ */
+    reg |= ((prediv - 1) | ((mult - 1 ) << 6) | ((bwAdj & 0xff) << 24));
 
 
     DEVICE_REG32_W (base, reg);
 
-    /* The 4 MS Bits of bwadj */
-    regb = BOOT_SET_BITFIELD (regb, (bwAdj >> 8), 3, 0);
+    /* The 4 MS Bits of BWADJ */
+    regb |= (bwAdj >> 8);
     DEVICE_REG32_W (base + 4, regb);
 
 
-    /* Reset must be asserted for at least 5us. Give a huge amount of padding here to be safe
-     * (the factor of 100) */
+    /* Reset must be asserted for at least 7us */
     ddr3_pll_delay(70000);
 
 
     /* Clear bit 13 in register 1 to re-enable the pll */
-    regb = BOOT_SET_BITFIELD(regb, 0, 13, 13);
+    regb &= ~(1 << 13);
     DEVICE_REG32_W (base + 4, regb);
 
     /* Need to wait 100,000 output PLL cycles before releasing bypass and setting 
@@ -128,7 +117,7 @@ SINT16 hwPllSetCfg2Pll (UINT32 base, UINT32 prediv, UINT32 mult, UINT32 postdiv,
     ddr3_pll_delay(70000);
 
     /* Disable the bypass */
-    reg = BOOT_SET_BITFIELD (reg, 0, 23, 23);   /* The value 0 disables the bypass */
+    reg &= ~(1 << 23);   /* The value 0 disables the bypass */
     DEVICE_REG32_W (base, reg);
 
     return (0);

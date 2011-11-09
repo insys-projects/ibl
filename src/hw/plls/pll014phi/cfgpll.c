@@ -75,16 +75,6 @@ SINT16 hwPllSetCfgPll (UINT32 base, UINT32 prediv, UINT32 mult, UINT32 postdiv, 
     /* bwAdj is based only on the mult value */
     bwAdj = (mult >> 1) - 1;
 
-    /* Multiplier / divider values are input as 1 less then the desired value */
-    if (prediv > 0)
-        prediv -= 1;
-
-    if (mult > 0)
-        mult -= 1;
-
-    if (postdiv > 0)
-        postdiv -= 1;
-
     /* Write to the ENSAT bit */
     regb = BOOT_SET_BITFIELD(regb, 1, 6, 6);
     DEVICE_REG32_W (base + 4, regb);
