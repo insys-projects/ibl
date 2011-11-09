@@ -98,26 +98,19 @@ SINT16 hwPllSetCfgPll (UINT32 base, UINT32 prediv, UINT32 mult, UINT32 postdiv, 
     DEVICE_REG32_W (base + 4, regb);
 
 
-    /* Reset must be asserted for at least 5us. Give a huge amount of padding here to be safe
-     * (the factor of 100) */
+    /* Reset must be asserted for at least 5us */
     pass_pll_delay(7000);
 
     /* Clear bit 14 in register 1 to re-enable the pll */
     regb = BOOT_SET_BITFIELD(regb, 0, 14, 14);
     DEVICE_REG32_W (base + 4, regb);
 
-    /* Wait for 50 us */
+    /* Wait for atleast 500 * REFCLK cycles * (PLLD+1) */
     pass_pll_delay(70000);
 
     /* Disable the bypass */
     reg = BOOT_SET_BITFIELD (reg, 0, 23, 23);   /* The value 0 disables the bypass */
     DEVICE_REG32_W (base, reg);
-
-#if 0    
-    /* Enable the output source (set bit 13) */
-    regb = BOOT_SET_BITFIELD(regb, 1, 13, 13);
-    DEVICE_REG32_W (base + 4, regb);
-#endif
 
     return (0);
 
