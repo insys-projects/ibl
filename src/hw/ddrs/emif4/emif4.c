@@ -19,6 +19,9 @@
 #define KICK0_UNLOCK		0x83e70b13
 #define KICK1_UNLOCK		0x95a4f1e0
 
+#define DDR3PLLCTL0		*(volatile unsigned int*)(CHIP_LEVEL_REG + 0x0330)
+#define DDR3PLLCTL1		*(unsigned int*)(CHIP_LEVEL_REG + 0x0334)
+
 // DDR3 definitions
 #define DDR_BASE_ADDR 0x21000000
 
@@ -67,7 +70,6 @@
 
 #define DDR3_CONFIG_REG_0   (*(volatile unsigned int*)(0x02620404))
 #define DDR3_CONFIG_REG_12  (*(volatile unsigned int*)(0x02620434))
-#define DDR3_CONFIG_REG_13  (*(volatile unsigned int*)(0x02620460))
 #define DDR3_CONFIG_REG_23  (*(volatile unsigned int*)(0x02620460))
 #define DDR3_CONFIG_REG_24  (*(volatile unsigned int*)(0x02620464))
 
@@ -81,7 +83,7 @@ static void ddr3_wait (uint32 del)
 {
     volatile unsigned int i;
 
-    for (i = 0; i < del; i++);
+    for (i = 0; i < del; i++) asm (" nop ");
 
 }
 
@@ -104,19 +106,26 @@ SINT16 hwEmif4p0Enable (iblEmif4p0_t *cfg)
 
 	KICK0 = KICK0_UNLOCK;
 	KICK1 = KICK1_UNLOCK;
-
+	/* Adding DDR PLL code here */
+	DDR3PLLCTL1 |= 0x00000040;      //Set ENSAT bit = 1
+	DDR3PLLCTL0 |= 0x00800000;      //Set BYPASS bit = 1
+	DDR3PLLCTL1 |= 0x00002000;      //Set RESET bit = 1
+	DDR3PLLCTL0 = 0x098804C0;       //Configure PLLM, PLLD, BWADJ
+	DDR3PLLCTL1 &= ~(0x0000000F);   //Clear upper BWADJ
+	ddr3_wait(7000);                //Wait at least 5us for reset to complete
+	DDR3PLLCTL1 &= ~(0x00002000);   //Clear RESET bit
+	ddr3_wait(70000);               //Wait >50us for PLL lock - min 500*(PLL+1) DDRCLK periods
+	DDR3PLLCTL0 &= ~(0x00800000);   //Clear BYPASS bit
+	/*End DDR PLL code */
         
        /**************** 3.3 Leveling register configuration ********************/
         DDR3_CONFIG_REG_0 &= ~(0x007FE000);  // clear ctrl_slave_ratio field
         DDR3_CONFIG_REG_0 |= 0x00200000;     // set ctrl_slave_ratio to 0x100
         DDR3_CONFIG_REG_12 |= 0x08000000;    // Set invert_clkout = 1
         DDR3_CONFIG_REG_0 |= 0xF;            // set dll_lock_diff to 15
-	 /* Set for Partial Automatic Levelling, QTT */
-        DDR3_CONFIG_REG_23 |= 0x00000200;    //Set bit 9 = 1 to use forced ratio leveling for read DQS
+        DDR3_CONFIG_REG_23 |= 0x00000200;    // See section 4.2.1, set for partial automatic levelling
             
-       //Values with invertclkout = 1
       /**************** 3.3 Partial Automatic Leveling ********************/
-      /* Is this required for C6670 also? QTT */	   
       DATA0_WRLVL_INIT_RATIO = 0x5E;
       DATA1_WRLVL_INIT_RATIO = 0x5E;
       DATA2_WRLVL_INIT_RATIO = 0x5E;
@@ -200,25 +209,25 @@ SINT16 hwEmif4p0Enable (iblEmif4p0_t *cfg)
          TEMP |= 0x2; // PAGESIZE bit field 2:0
          DDR_SDCFG = TEMP;
 
-	for (i = 0; i < 12000; i++) {
-	        ddr3_wait(1000);             //Wait 600us for HW init to complete
-	}
+ 	/* assuming max device speed, 1.4GHz, 1 cycle = 0.714 ns *
+  	* so, 100 us = 100000 ns = 140056 cycles
+          thereby, 600us=840336 */
+         ddr3_wait(840336);             //Wait 600us for HW init to complete
 
         DDR_SDRFC = 0x00001450;       //Refresh rate = (7.8*666MHz]
 
-        /* 4.2.1 Partial automatic levelling because we set DDR3_CONFIG_REG_23 above? */
-        /* QTT : Isnt this partial automatic levelling?*/
-        DDR_RDWR_LVL_RMP_CTRL = 0x80000000; //enable full leveling
+      /***************** 4.2.1 Partial automatic leveling ************/
+        DDR_RDWR_LVL_RMP_CTRL = 0x80000000; //enable automatic leveling
    
-        /* QTT : Isnt this partial automatic levelling?*/
-        /*Trigger full leveling - This ignores read DQS leveling result and uses ratio forced value
+        /*Trigger automatic leveling - This ignores read DQS leveling result and uses ratio forced value
           Wait for min 1048576 DDR clock cycles for leveling to complete = 1048576 * 1.5ns = 1572864ns = 1.57ms.
           Actual time = ~10-15 ms */
         DDR_RDWR_LVL_CTRL = 0x80000000; 
 
-	for (i = 0; i < 30000; i++) {
-		ddr3_wait(1000); //Wait 3ms for leveling to complete
-	}
+ 	/* assuming max device speed, 1.4GHz, 1 cycle = 0.714 ns *
+  	* so, 100 us = 100000 ns = 140056 cycles
+          thereby, 3ms=3000us=4201680 */
+	ddr3_wait(4201680); //Wait 3ms for leveling to complete
     }
     else
     {

@@ -723,7 +723,7 @@ ibl_t c6678_ibl_config(void)
 	ibl.pllConfig[ibl_MAIN_PLL].pllOutFreqMhz = 1000;
 
 	/* DDR PLL: */
-	ibl.pllConfig[ibl_DDR_PLL].doEnable       = 1; 
+	ibl.pllConfig[ibl_DDR_PLL].doEnable       = 0; 
 	ibl.pllConfig[ibl_DDR_PLL].prediv         = 1;
 	ibl.pllConfig[ibl_DDR_PLL].mult           = 20;
 	ibl.pllConfig[ibl_DDR_PLL].postdiv        = 2;
@@ -940,7 +940,7 @@ ibl_t c6670_ibl_config(void)
 	ibl.pllConfig[ibl_MAIN_PLL].pllOutFreqMhz = 983;
 
 	/* DDR PLL */
-	ibl.pllConfig[ibl_DDR_PLL].doEnable       = 1; 
+	ibl.pllConfig[ibl_DDR_PLL].doEnable       = 0; 
 	ibl.pllConfig[ibl_DDR_PLL].prediv         = 1;
 	ibl.pllConfig[ibl_DDR_PLL].mult           = 20;
 	ibl.pllConfig[ibl_DDR_PLL].postdiv        = 2;
