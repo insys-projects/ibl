@@ -105,18 +105,18 @@ SINT16 hwEmif4p0Enable (iblEmif4p0_t *cfg)
 	KICK0 = KICK0_UNLOCK;
 	KICK1 = KICK1_UNLOCK;
 
-        /**************** 3.0 Leveling Register Configuration ********************/
-        /* Using partial automatic leveling due to errata */
         
-       /**************** 3.2 Invert Clock Out ********************/
+       /**************** 3.3 Leveling register configuration ********************/
         DDR3_CONFIG_REG_0 &= ~(0x007FE000);  // clear ctrl_slave_ratio field
         DDR3_CONFIG_REG_0 |= 0x00200000;     // set ctrl_slave_ratio to 0x100
         DDR3_CONFIG_REG_12 |= 0x08000000;    // Set invert_clkout = 1
         DDR3_CONFIG_REG_0 |= 0xF;            // set dll_lock_diff to 15
+	 /* Set for Partial Automatic Levelling, QTT */
         DDR3_CONFIG_REG_23 |= 0x00000200;    //Set bit 9 = 1 to use forced ratio leveling for read DQS
             
        //Values with invertclkout = 1
-      /**************** 3.3+3.4 Partial Automatic Leveling ********************/
+      /**************** 3.3 Partial Automatic Leveling ********************/
+      /* Is this required for C6670 also? QTT */	   
       DATA0_WRLVL_INIT_RATIO = 0x5E;
       DATA1_WRLVL_INIT_RATIO = 0x5E;
       DATA2_WRLVL_INIT_RATIO = 0x5E;
@@ -142,7 +142,7 @@ SINT16 hwEmif4p0Enable (iblEmif4p0_t *cfg)
       DDR_DDRPHYC |= (0x00008000);
       DDR_DDRPHYC &= ~(0x00008000);
 
-      /***************** 2.3 Basic Controller and DRAM configuration ************/
+      /***************** 3.4 Basic Controller and DRAM configuration ************/
       DDR_SDRFC    = 0x00005162;    // enable configuration 
 
       /* DDR_SDTIM1   = 0x1113783C; */
@@ -206,8 +206,11 @@ SINT16 hwEmif4p0Enable (iblEmif4p0_t *cfg)
 
         DDR_SDRFC = 0x00001450;       //Refresh rate = (7.8*666MHz]
 
+        /* 4.2.1 Partial automatic levelling because we set DDR3_CONFIG_REG_23 above? */
+        /* QTT : Isnt this partial automatic levelling?*/
         DDR_RDWR_LVL_RMP_CTRL = 0x80000000; //enable full leveling
    
+        /* QTT : Isnt this partial automatic levelling?*/
         /*Trigger full leveling - This ignores read DQS leveling result and uses ratio forced value
           Wait for min 1048576 DDR clock cycles for leveling to complete = 1048576 * 1.5ns = 1572864ns = 1.57ms.
           Actual time = ~10-15 ms */

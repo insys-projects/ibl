@@ -14,18 +14,6 @@
 #include "tiboot_c66x.h"       
 
 
-#define CHIP_LEVEL_REG		0x02620000
-#define DDR3PLLCTL0		*(volatile unsigned int*)(CHIP_LEVEL_REG + 0x0330)
-#define DDR3PLLCTL1		*(volatile unsigned int*)(CHIP_LEVEL_REG + 0x0334)
-
-static void ddr3_delay (uint32 del)
-{
-    volatile unsigned int i;
-
-    for (i = 0; i < del; i++);
-
-}
-
 /**
  * @brief Configure the PLLs
  *
@@ -35,8 +23,6 @@ static void ddr3_delay (uint32 del)
  */
 void devicePllConfig (void)
 {
-	unsigned int i;
-
     /* Unlock the chip registers and leave them unlocked */
     *((Uint32 *)0x2620038) = 0x83e70b13;
     *((Uint32 *)0x262003c) = 0x95a4f1e0;
