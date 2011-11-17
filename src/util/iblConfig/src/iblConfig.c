@@ -1,7 +1,4 @@
 #include <stdio.h>
-#include <string.h>
-#include <stdlib.h>
-#include <stdint.h>
 #include "device.h"
 
 #define TRUE 1
@@ -54,7 +51,7 @@ int main (void)
     }
 
 
-    fp = fopen (file_name, "r+");
+    fp = fopen (file_name, "r+b");
     if (fp == NULL)
     {
         printf ("Failed to open file %s\n", file_name);
@@ -75,6 +72,7 @@ int main (void)
         fclose(fp);
         return -1;
     }
+
 
     printf ("Generated updated binary %s\n", file_name);
 

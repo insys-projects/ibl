@@ -53,26 +53,28 @@
 
 
 #include <stdlib.h>  /* Defines NULL */
+#include <stdint.h>
+#include <string.h>
 
 /* a signed 16-bit integer */
-typedef short int16;
-typedef unsigned short uint16;
+typedef int16_t int16;
+typedef uint16_t uint16;
 
-typedef int int32;
-typedef unsigned int uint32;
+typedef int32_t int32;
+typedef uint32_t uint32;
 
-typedef char char8;
-typedef unsigned char uchar8;
+typedef int8_t char8;
+typedef uint8_t uchar8;
 
-typedef char int8;
-typedef unsigned char uint8;
+typedef int8_t int8;
+typedef uint8_t uint8;
 
 
-typedef unsigned char word;
+typedef uint8_t word;
 
-typedef short BOOL;
-typedef short bool;
-typedef short Bool;
+typedef int16_t BOOL;
+typedef int16_t bool;
+typedef int16_t Bool;
 #ifndef FALSE
 #define FALSE 0
 #endif
@@ -83,25 +85,25 @@ typedef short Bool;
 
 
 /* tistdtypes.h types used from the emac driver */
-typedef unsigned char Uint8;
-typedef char Int8;
-typedef int Int32;
-typedef unsigned short Uint16;
-typedef unsigned int Uint32;
+typedef uint8_t Uint8;
+typedef int8_t Int8;
+typedef int32_t Int32;
+typedef uint16_t Uint16;
+typedef uint32_t Uint32;
 
 /* TI boot types */
-typedef unsigned char  UINT8;
-typedef unsigned short UINT16;
-typedef short          SINT16;
-typedef unsigned int   UINT32;
-typedef int            SINT32;
+typedef uint8_t  UINT8;
+typedef uint16_t UINT16;
+typedef int16_t          SINT16;
+typedef uint32_t   UINT32;
+typedef int32_t            SINT32;
 
 
 /* Types from evm driver */
-typedef volatile unsigned int  VUint32;
-typedef volatile unsigned char VUint8;
+typedef volatile uint32_t  VUint32;
+typedef volatile uint8_t VUint8;
 
 /* Types from the ethernet driver */
-typedef unsigned int  IPN;
+typedef uint32_t  IPN;
 
 #endif /* ibl_types.h */
