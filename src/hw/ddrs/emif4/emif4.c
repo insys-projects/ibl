@@ -106,17 +106,6 @@ SINT16 hwEmif4p0Enable (iblEmif4p0_t *cfg)
 
 	KICK0 = KICK0_UNLOCK;
 	KICK1 = KICK1_UNLOCK;
-	/* Adding DDR PLL code here */
-	DDR3PLLCTL1 |= 0x00000040;      //Set ENSAT bit = 1
-	DDR3PLLCTL0 |= 0x00800000;      //Set BYPASS bit = 1
-	DDR3PLLCTL1 |= 0x00002000;      //Set RESET bit = 1
-	DDR3PLLCTL0 = 0x098804C0;       //Configure PLLM, PLLD, BWADJ
-	DDR3PLLCTL1 &= ~(0x0000000F);   //Clear upper BWADJ
-	ddr3_wait(7000);                //Wait at least 5us for reset to complete
-	DDR3PLLCTL1 &= ~(0x00002000);   //Clear RESET bit
-	ddr3_wait(70000);               //Wait >50us for PLL lock - min 500*(PLL+1) DDRCLK periods
-	DDR3PLLCTL0 &= ~(0x00800000);   //Clear BYPASS bit
-	/*End DDR PLL code */
         
        /**************** 3.3 Leveling register configuration ********************/
         DDR3_CONFIG_REG_0 &= ~(0x007FE000);  // clear ctrl_slave_ratio field

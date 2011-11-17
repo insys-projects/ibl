@@ -33,6 +33,13 @@ void devicePllConfig (void)
                      ibl.pllConfig[ibl_MAIN_PLL].mult,
                      ibl.pllConfig[ibl_MAIN_PLL].postdiv);
 
+    if (ibl.pllConfig[ibl_NET_PLL].doEnable == TRUE)
+        hwPllSetCfgPll (DEVICE_PLL_BASE(NET_PLL),
+                        ibl.pllConfig[ibl_NET_PLL].prediv,
+                        ibl.pllConfig[ibl_NET_PLL].mult,
+                        ibl.pllConfig[ibl_NET_PLL].postdiv,
+                        ibl.pllConfig[ibl_MAIN_PLL].pllOutFreqMhz,
+                        ibl.pllConfig[ibl_NET_PLL].pllOutFreqMhz);
 
     if (ibl.pllConfig[ibl_DDR_PLL].doEnable == TRUE)
         hwPllSetCfg2Pll (DEVICE_PLL_BASE(DDR_PLL),
@@ -41,15 +48,6 @@ void devicePllConfig (void)
                          ibl.pllConfig[ibl_DDR_PLL].postdiv,
                          ibl.pllConfig[ibl_MAIN_PLL].pllOutFreqMhz,
                          ibl.pllConfig[ibl_DDR_PLL].pllOutFreqMhz);
-
-
-    if (ibl.pllConfig[ibl_NET_PLL].doEnable == TRUE)
-        hwPllSetCfgPll (DEVICE_PLL_BASE(NET_PLL),
-                        ibl.pllConfig[ibl_NET_PLL].prediv,
-                        ibl.pllConfig[ibl_NET_PLL].mult,
-                        ibl.pllConfig[ibl_NET_PLL].postdiv,
-                        ibl.pllConfig[ibl_MAIN_PLL].pllOutFreqMhz,
-                        ibl.pllConfig[ibl_NET_PLL].pllOutFreqMhz);
 
 }
 
