@@ -69,6 +69,8 @@
 #include "evmc66x_uart.h"
 
 #define PLL_DDR_INIT_LOOPMAX 10
+#define IBL_STR_LEN          20
+
 extern cregister unsigned int DNUM;
 #define DDR3_TEST_ENABLE
 
@@ -179,10 +181,9 @@ Uint32 deviceLocalAddrToGlobal (Uint32 addr)
 void deviceDdrConfig (void)
 {
     uint32 loopcount=0;
-    uint32 uartcount=10;
-    int8  ddr_pass_str[20] = "IBL: DDR TEST PASS\n";
-    int8  ddr_fail_str[20] = "IBL: DDR TEST FAIL\n";
-    int8  ibl_msg_str1[20] = "IBL: PLL SEQ DONE \n";
+    int8  ddr_pass_str[IBL_STR_LEN] = "IBL: DDR TEST PASS\n";
+    int8  ddr_fail_str[IBL_STR_LEN] = "IBL: DDR TEST FAIL\n";
+    int8  ibl_msg_str1[IBL_STR_LEN] = "IBL: PLL SEQ DONE \n";
 	
 		
     /* The emif registers must be made visible. MPAX mapping 2 is used */
@@ -222,15 +223,15 @@ void deviceDdrConfig (void)
         /* Init UART */
 	 uart_init();
         /* Write something to UART */
-	   uart_write_string(ibl_msg_str1,19);
+	 uart_write_string(ibl_msg_str1,IBL_STR_LEN);
 #ifdef DDR3_TEST_ENABLE
 	if (ddr3_memory_test() == 0) 
 	{
-	    uart_write_string(ddr_pass_str,19);
+	    uart_write_string(ddr_pass_str,IBL_STR_LEN);
 	    break;
 	}
 #endif
-      uart_write_string(ddr_fail_str,19);
+      uart_write_string(ddr_fail_str,IBL_STR_LEN);
 
     }
 
