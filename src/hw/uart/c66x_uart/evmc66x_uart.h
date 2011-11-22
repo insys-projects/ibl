@@ -33,21 +33,22 @@
 
 /******************************************************************************
  *
- * File	Name:	evmc66x_i2c_uart.h
+ * File    Name:    evmc66x_uart.h
  *
- * Description:	This contains UART specific structure, typedefs, function
- *		prototypes.
+ * Description:    This contains UART specific structure, typedefs, function
+ *        prototypes.
  *
  ******************************************************************************/
-#ifndef	_EVM66X_I2C_UART_H_
-#define	_EVM66X_I2C_UART_H_
+#ifndef    _EVM66X_I2C_UART_H_
+#define    _EVM66X_I2C_UART_H_
+
 #include <stdint.h>
 
 #define UART_REGS_BASE            (0x02540000)
 
-/**************************************************************************\
-* Register Overlay Structure
-\**************************************************************************/
+/**************************************************************************
+ * Register Overlay Structure
+ **************************************************************************/
 typedef struct  {
     volatile uint32_t RBR;
     volatile uint32_t IER;
@@ -63,25 +64,17 @@ typedef struct  {
     volatile uint32_t REVID2;
     volatile uint32_t PWREMU_MGMT;
     volatile uint32_t MDR;
-} UartRegs;
+} uart_registers_t;
 
-/************************
- * Defines and Macros
- ************************/
-/* Mask	to enable DLL and DLM */
-#define	DLAB		(0x80)			// Way to swap mem banks
+/* Mask    to enable DLL and DLM */
+#define    DLAB        (0x80)            /* Way to swap mem banks */
 
-/* for 19200 baudrate for crystal clock	14.7456	MHz*/
-#define	DLL_VAL		(0x30)
-#define	DLM_VAL		(0x00)
+/* Baudrate table for crystal clock 14.7456 MHz*/
+#define    BAUD_RATE_9600      (0x0060)
+#define    BAUD_RATE_19200     (0x0030)
+#define    BAUD_RATE_115200    (0x0058)
 
-/* Macros to be	used for setting baudrate */
-#define	BAUD_RATE_9600		(0x0060)
-#define	BAUD_RATE_19200		(0x0030)
-#define	BAUD_RATE_56000		(0x0010)
-#define	BAUD_RATE_115200	(0x0008)
-
-#define hUartRegs    ((UartRegs*) UART_REGS_BASE)
+#define uart_registers    ((uart_registers_t*) UART_REGS_BASE)
 
 /* Following 2 lines are added due to CSL3.x tools limitations */
 #define THR RBR   /* RBR & THR have same offset */
@@ -92,7 +85,8 @@ typedef struct  {
 
 /************************
  * Function declarations
-************************/
+ ************************/
 void uart_init(void);
-void uart_write_string(uint8_t * str, uint32_t length);
+void uart_write_string(char * str, uint32_t length);
+
 #endif /* _EVM66X_I2C_UART_H_ */

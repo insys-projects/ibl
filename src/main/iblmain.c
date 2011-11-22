@@ -65,6 +65,7 @@
 #include "spi_api.h"
 #include "ibl_elf.h"
 #include <string.h>
+#include "evmc66x_uart.h"
 
 extern cregister unsigned int IER;
 
@@ -319,6 +320,8 @@ void main (void)
 #ifndef EXCLUDE_ETH
             case ibl_BOOT_MODE_TFTP:
                 iblStatus.activeDevice = ibl_ACTIVE_DEVICE_ETH;
+                /*Print something to UART, max len=80, if len is pased as 0 UART prints entire string upto '\n' or max len */
+                uart_write_string("IBL: Booting from ethernet",0);
                 iblMemcpy (&iblStatus.ethParams, &ibl.bootModes[boot_mode_idx].u.ethBoot.ethInfo, sizeof(iblEthBootInfo_t));
                 iblEthBoot (boot_mode_idx);
                 break;
@@ -328,6 +331,8 @@ void main (void)
             case ibl_BOOT_MODE_NAND:
                 iblPmemCfg (ibl.bootModes[boot_mode_idx].u.nandBoot.interface, ibl.bootModes[boot_mode_idx].port, TRUE);
                 memset ((void *)0x80000000, 0, 0x20000000);
+                /*Print something to UART, max len=80, if len is pased as 0 UART prints entire string upto '\n' or max len */
+                uart_write_string("IBL: Booting from NAND",0);
                 iblNandBoot (boot_mode_idx);
                 break;
 #endif
@@ -335,6 +340,8 @@ void main (void)
 #if (!defined(EXCLUDE_NOR_EMIF) && !defined(EXCLUDE_NOR_SPI))
             case ibl_BOOT_MODE_NOR:
                 iblPmemCfg (ibl.bootModes[boot_mode_idx].u.norBoot.interface, ibl.bootModes[boot_mode_idx].port, TRUE);
+                /*Print something to UART, max len=80, if len is pased as 0 UART prints entire string upto '\n' or max len */
+                uart_write_string("IBL: Booting from NOR",0);
                 iblNorBoot (boot_mode_idx);
                 break;
 #endif
@@ -357,6 +364,8 @@ void main (void)
                 case ibl_BOOT_MODE_TFTP:
                         iblStatus.activeDevice = ibl_ACTIVE_DEVICE_ETH;
                         iblMemcpy (&iblStatus.ethParams, &ibl.bootModes[boot_mode_idx].u.ethBoot.ethInfo, sizeof(iblEthBootInfo_t));
+                        /*Print something to UART, max len=80, if len is pased as 0 UART prints entire string upto '\n' or max len */
+                        uart_write_string("IBL: Booting from Ethernet",0);
                         iblEthBoot (boot_mode_idx);
                         break;
 #endif
@@ -364,6 +373,8 @@ void main (void)
 #if ((!defined(EXCLUDE_NAND_EMIF)) || (!defined(EXCLUDE_NAND_GPIO)))
 		case ibl_BOOT_MODE_NAND:
                         iblPmemCfg (ibl.bootModes[boot_mode_idx].u.nandBoot.interface, ibl.bootModes[boot_mode_idx].port, TRUE);
+                        /*Print something to UART, max len=80, if len is pased as 0 UART prints entire string upto '\n' or max len */
+                        uart_write_string("IBL: Booting from NAND",0);
                         iblNandBoot (boot_mode_idx);
                         break;
 #endif
