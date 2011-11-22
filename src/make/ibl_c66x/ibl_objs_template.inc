@@ -11,7 +11,10 @@
 ../hw/c64x/make/psc.ENDIAN_TAG.oc
 ../hw/c64x/make/emif4.ENDIAN_TAG.oc
 ../device/c64x/make/c64x.ENDIAN_TAG.oa
-
+../hw/c64x/make/pll.ENDIAN_TAG.oc
+../hw/c64x/make/cfgpll.ENDIAN_TAG.oc
+../hw/c64x/make/cfgpll2.ENDIAN_TAG.oc
+../hw/c64x/make/evmc66x_uart.ENDIAN_TAG.oc
 
 #ifndef EXCLUDE_BIS
 ../interp/c64x/make/bis.ENDIAN_TAG.oc

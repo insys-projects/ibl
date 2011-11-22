@@ -21,6 +21,21 @@
 #define BOOT_READ_BITFIELD(z,x,y)   (((UINT32)z) & BOOTBITMASK(x,y)) >> (y)
 #define BOOT_SET_BITFIELD(z,f,x,y)  (((UINT32)z) & ~BOOTBITMASK(x,y)) | ( (((UINT32)f) << (y)) & BOOTBITMASK(x,y) )
 
+#define CHIP_LEVEL_REG		0x02620000
+#define DDR3PLLCTL0		*(volatile unsigned int*)(CHIP_LEVEL_REG + 0x0330)
+#define DDR3PLLCTL1		*(volatile unsigned int*)(CHIP_LEVEL_REG + 0x0334)
+
+
+
+void ddr3_pll_delay (UINT32 del)
+{
+  UINT32 i;
+  volatile UINT32 j;
+
+  for (i = j = 0; i < del; i++)
+    asm (" nop ");
+
+}
 
 /*********************************************************************************************************
  * FUNCTION PURPOSE: Configure and enable a pll
@@ -56,7 +71,7 @@ SINT16 hwPllSetCfg2Pll (UINT32 base, UINT32 prediv, UINT32 mult, UINT32 postdiv,
     if ( (currentBypass  == 0)           &&
          (currentPrediv  == prediv)      &&
          (currentMult    == mult)        &&
-         (currentPostdiv == postdiv)     &&
+	 (currentPostdiv == postdiv)     &&
          (currentEnable  == 0)           &&
          (currentBwAdj   == (mult >> 1))  )
         return (0);
@@ -65,50 +80,44 @@ SINT16 hwPllSetCfg2Pll (UINT32 base, UINT32 prediv, UINT32 mult, UINT32 postdiv,
     /* bwAdj is based only on the mult value */
     bwAdj = (mult >> 1) - 1;
 
-    /* Multiplier / divider values are input as 1 less then the desired value */
-    if (prediv > 0)
-        prediv -= 1;
-
-    if (mult > 0)
-        mult -= 1;
-
-    if (postdiv > 0)
-        postdiv -= 1;
-
-    /* Set bit 13 in register 1 to disable the PLL (assert reset) */
-    regb = BOOT_SET_BITFIELD(regb, 1, 13, 13);
+    /* Write to the ENSAT bit */
+    regb |= (1 << 6);
     DEVICE_REG32_W (base + 4, regb);
 
-    /* Setup the PLL. Assert bypass */
-    reg = BOOT_SET_BITFIELD (reg, prediv,          5,  0);
-    reg = BOOT_SET_BITFIELD (reg, mult,           18,  6);
-    reg = BOOT_SET_BITFIELD (reg, postdiv,        22, 19);
-    reg = BOOT_SET_BITFIELD (reg, 1,              23, 23);   /* Bypass must be enabled */
+    /* Bypass must be enabled */
+    reg |= (1 << 23);
+    DEVICE_REG32_W (base, reg);
+
+    /* Set bit 13 in register 1 to disable the PLL (assert reset) */
+    regb |= (1 << 13);
+    DEVICE_REG32_W (base + 4, regb);
+
+
+    /* Configure PLLM, PPLD BWADJ */
+    reg = BOOT_SET_BITFIELD (reg, prediv - 1, 5, 0);
+    reg = BOOT_SET_BITFIELD (reg, mult - 1, 18, 6);
     reg = BOOT_SET_BITFIELD (reg, (bwAdj & 0xff), 31, 24);
 
     DEVICE_REG32_W (base, reg);
 
-    /* The 4 MS Bits of bwadj */
+    /* The 4 MS Bits of BWADJ */
     regb = BOOT_SET_BITFIELD (regb, (bwAdj >> 8), 3, 0);
     DEVICE_REG32_W (base + 4, regb);
 
 
-    /* Reset must be asserted for at least 5us. Give a huge amount of padding here to be safe
-     * (the factor of 100) */
-    chipDelay32 (5 * chipFreqMhz * 100);
+    /* Reset must be asserted for at least 5us */
+    ddr3_pll_delay(7000);
 
 
     /* Clear bit 13 in register 1 to re-enable the pll */
-    regb = BOOT_SET_BITFIELD(regb, 0, 13, 13);
+    regb &= ~(1 << 13);
     DEVICE_REG32_W (base + 4, regb);
 
-    /* Need to wait 100,000 output PLL cycles before releasing bypass and setting 
-     * up the clk output */
-    chipDelay32 (chipFreqMhz * 100000 / pllFreqMhz);
-
+    /* Wait for atleast 500 * REFCLK cycles * (PLLD+1) */
+    ddr3_pll_delay(70000);
 
     /* Disable the bypass */
-    reg = BOOT_SET_BITFIELD (reg, 0, 23, 23);   /* The value 0 disables the bypass */
+    reg &= ~(1 << 23);   /* The value 0 disables the bypass */
     DEVICE_REG32_W (base, reg);
 
     return (0);

@@ -26,7 +26,7 @@ void pass_pll_delay (UINT32 del)
   for (i = j = 0; i < del; i++)
     asm (" nop ");
 
-} /* hw_pll_delay */
+}
 
 
 /*********************************************************************************************************
@@ -75,16 +75,7 @@ SINT16 hwPllSetCfgPll (UINT32 base, UINT32 prediv, UINT32 mult, UINT32 postdiv, 
     /* bwAdj is based only on the mult value */
     bwAdj = (mult >> 1) - 1;
 
-    /* Multiplier / divider values are input as 1 less then the desired value */
-    if (prediv > 0)
-        prediv -= 1;
-
-    if (mult > 0)
-        mult -= 1;
-
-    if (postdiv > 0)
-        postdiv -= 1;
-
+    /* Write to the ENSAT bit */
     regb = BOOT_SET_BITFIELD(regb, 1, 6, 6);
     DEVICE_REG32_W (base + 4, regb);
 
@@ -98,7 +89,6 @@ SINT16 hwPllSetCfgPll (UINT32 base, UINT32 prediv, UINT32 mult, UINT32 postdiv, 
 
     reg = BOOT_SET_BITFIELD (reg, prediv - 1, 5, 0);
     reg = BOOT_SET_BITFIELD (reg, mult - 1, 18, 6);
-    reg = BOOT_SET_BITFIELD (reg, postdiv - 1, 22, 19);
     reg = BOOT_SET_BITFIELD (reg, (bwAdj & 0xff), 31, 24);
 
     DEVICE_REG32_W (base, reg);
@@ -108,26 +98,19 @@ SINT16 hwPllSetCfgPll (UINT32 base, UINT32 prediv, UINT32 mult, UINT32 postdiv, 
     DEVICE_REG32_W (base + 4, regb);
 
 
-    /* Reset must be asserted for at least 5us. Give a huge amount of padding here to be safe
-     * (the factor of 100) */
+    /* Reset must be asserted for at least 5us */
     pass_pll_delay(7000);
 
     /* Clear bit 14 in register 1 to re-enable the pll */
     regb = BOOT_SET_BITFIELD(regb, 0, 14, 14);
     DEVICE_REG32_W (base + 4, regb);
 
-    /* Wait for 50 us */
+    /* Wait for atleast 500 * REFCLK cycles * (PLLD+1) */
     pass_pll_delay(70000);
 
     /* Disable the bypass */
     reg = BOOT_SET_BITFIELD (reg, 0, 23, 23);   /* The value 0 disables the bypass */
     DEVICE_REG32_W (base, reg);
-
-#if 0    
-    /* Enable the output source (set bit 13) */
-    regb = BOOT_SET_BITFIELD(regb, 1, 13, 13);
-    DEVICE_REG32_W (base + 4, regb);
-#endif
 
     return (0);
 

@@ -65,8 +65,67 @@
 #include "nor_api.h"
 #include "spi_api.h"
 #include <string.h>
+#include <stdint.h>
+#include "evmc66x_uart.h"
+
+#define PLL_DDR_INIT_LOOPMAX 10
+#define IBL_RESULT_CODE_STR_LEN 20
+#define IBL_RESULT_CODE_LOC 17
 
 extern cregister unsigned int DNUM;
+#define DDR3_TEST_ENABLE
+
+#ifdef DDR3_TEST_ENABLE
+/**
+ *  @brief Simple DDR3 test
+ *
+ *  @details
+ *      This function performs a simple DDR3 test for a memory range
+ *      specified below and returns -1 for failure and 0 for success.
+ */
+
+#define DDR3_TEST_START_ADDRESS 0x80000000
+
+#define DDR3_TEST_END_ADDRESS   (DDR3_TEST_START_ADDRESS + (128 *1024))
+
+static int32_t ddr3_memory_test (void)
+{
+	uint32_t index, value;
+
+	/* Write a pattern */
+	for (index = DDR3_TEST_START_ADDRESS; index < DDR3_TEST_END_ADDRESS; index += 4) {
+		*(volatile uint32_t *) index = (uint32_t)index;
+	}
+
+	/* Read and check the pattern */
+	for (index = DDR3_TEST_START_ADDRESS; index < DDR3_TEST_END_ADDRESS; index += 4) {
+
+		value = *(uint32_t *) index;
+
+		if (value  != index) {
+			return -1;
+		}
+	}
+
+	/* Write a pattern for complementary values */
+	for (index = DDR3_TEST_START_ADDRESS; index < DDR3_TEST_END_ADDRESS; index += 4) {
+		*(volatile uint32_t *) index = (uint32_t)~index;
+	}
+
+	/* Read and check the pattern */
+	for (index = DDR3_TEST_START_ADDRESS; index < DDR3_TEST_END_ADDRESS; index += 4) {
+
+		value = *(uint32_t *) index;
+
+		if (value  != ~index) {
+			return -1;
+		}
+	}
+
+	return 0;
+}
+
+#endif
 
 /**
  *  @brief Determine if an address is local
@@ -122,12 +181,74 @@ Uint32 deviceLocalAddrToGlobal (Uint32 addr)
  */
 void deviceDdrConfig (void)
 {
+    uint32 loopcount=0;
+    int8  ddr_result_code_str[IBL_RESULT_CODE_STR_LEN] = "IBL Result code 0";
     /* The emif registers must be made visible. MPAX mapping 2 is used */
     DEVICE_REG_XMPAX_L(2) =  0x10000000 | 0xff;     /* replacement addr + perm*/
     DEVICE_REG_XMPAX_H(2) =  0x2100000B;         /* base addr + seg size (64KB)*/	
+    
+    for (loopcount = 0; loopcount < PLL_DDR_INIT_LOOPMAX; loopcount++)
+    {
+        if(loopcount !=0) /*Do not call PLL sequence for the first time */
+        {
+    	/* Calling MAIN, PA, DDR PLL init  */
+    	    if (ibl.pllConfig[ibl_MAIN_PLL].doEnable == TRUE)
+            	hwPllSetPll (MAIN_PLL, 
+                    	     ibl.pllConfig[ibl_MAIN_PLL].prediv,
+                                 ibl.pllConfig[ibl_MAIN_PLL].mult,
+                                 ibl.pllConfig[ibl_MAIN_PLL].postdiv);
+    
+            if (ibl.pllConfig[ibl_NET_PLL].doEnable == TRUE)
+                hwPllSetCfgPll (DEVICE_PLL_BASE(NET_PLL),
+                                ibl.pllConfig[ibl_NET_PLL].prediv,
+                                ibl.pllConfig[ibl_NET_PLL].mult,
+                                ibl.pllConfig[ibl_NET_PLL].postdiv,
+                                ibl.pllConfig[ibl_MAIN_PLL].pllOutFreqMhz,
+                                ibl.pllConfig[ibl_NET_PLL].pllOutFreqMhz);
+    
+            if (ibl.pllConfig[ibl_DDR_PLL].doEnable == TRUE)
+                hwPllSetCfg2Pll (DEVICE_PLL_BASE(DDR_PLL),
+                                 ibl.pllConfig[ibl_DDR_PLL].prediv,
+                                 ibl.pllConfig[ibl_DDR_PLL].mult,
+                                 ibl.pllConfig[ibl_DDR_PLL].postdiv,
+                                 ibl.pllConfig[ibl_MAIN_PLL].pllOutFreqMhz,
+                                 ibl.pllConfig[ibl_DDR_PLL].pllOutFreqMhz);
+      	  }
+	  
+        if (ibl.ddrConfig.configDdr != 0)
+            hwEmif4p0Enable (&ibl.ddrConfig.uEmif.emif4p0);
+        /* Init UART */
+	 uart_init();
+#ifdef DDR3_TEST_ENABLE
+	if (ddr3_memory_test() == 0) 
+	{
+	    break;
+	}
+#endif
 
-    if (ibl.ddrConfig.configDdr != 0)
-        hwEmif4p0Enable (&ibl.ddrConfig.uEmif.emif4p0);
+    }
+    if (loopcount < 10) 
+    {
+        ddr_result_code_str[IBL_RESULT_CODE_LOC] = loopcount + '0';
+    }
+    else if ((loopcount >= 10) && (loopcount < 35))
+    {
+        ddr_result_code_str[IBL_RESULT_CODE_LOC] =   loopcount + 'A';
+    }
+    else 
+    {
+        ddr_result_code_str[IBL_RESULT_CODE_LOC] =   loopcount + 'Z';
+    }
+
+    if (loopcount == PLL_DDR_INIT_LOOPMAX) 
+    {
+        uart_write_string("IBL: DDR INITIALIZATION FAILED",0);
+    }
+    else
+    {
+        uart_write_string("IBL: PLL and DDR Initialization Complete",0);
+    }
+    uart_write_string(ddr_result_code_str,0);
 
 }
         
