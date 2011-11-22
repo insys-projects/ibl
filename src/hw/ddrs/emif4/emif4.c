@@ -20,7 +20,7 @@
 #define KICK1_UNLOCK		0x95a4f1e0
 
 #define DDR3PLLCTL0		*(volatile unsigned int*)(CHIP_LEVEL_REG + 0x0330)
-#define DDR3PLLCTL1		*(unsigned int*)(CHIP_LEVEL_REG + 0x0334)
+#define DDR3PLLCTL1		*(volatile unsigned int*)(CHIP_LEVEL_REG + 0x0334)
 
 // DDR3 definitions
 #define DDR_BASE_ADDR 0x21000000
