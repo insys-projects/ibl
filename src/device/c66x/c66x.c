@@ -66,7 +66,7 @@
 #include "spi_api.h"
 #include <string.h>
 #include <stdint.h>
-#include "evmc66x_uart.h"
+#include "uart.h"
 
 #define PLL_DDR_INIT_LOOPMAX 10
 #define IBL_RESULT_CODE_STR_LEN 20

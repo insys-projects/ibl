@@ -101,7 +101,7 @@ C6X_C_DIR+= ;$(IBL_ROOT)/hw/nands
 C6X_C_DIR+= ;$(IBL_ROOT)/hw/nors
 C6X_C_DIR+= ;$(IBL_ROOT)/driver/eth
 C6X_C_DIR+= ;$(IBL_ROOT)/hw/spi
-C6X_C_DIR+= ;$(IBL_ROOT)/hw/uart/c66x_uart
+C6X_C_DIR+= ;$(IBL_ROOT)/hw/uart
 export C6X_C_DIR
 
 vpath % $(IBL_ROOT)/device/$(TARGET)

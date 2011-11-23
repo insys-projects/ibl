@@ -48,19 +48,19 @@ ECODIR= $(IBL_ROOT)/hw
 
 # If no target specified, set CSRC to all files (used for clean)
 ifeq ($(TARGET),c6472)
- CSRC= t64.c cpmacdrv.c pll.c psc.c emif31.c mdio.c gpio.c nandgpio.c i2c.c 
+ CSRC= t64.c cpmacdrv.c pll.c psc.c emif31.c mdio.c gpio.c nandgpio.c i2c.c null_uart.c
 else
  ifeq ($(TARGET),c6474)
-  CSRC= t64.c cpmacdrv.c pll.c psc.c emif31.c mdio.c gpio.c nandgpio.c i2c.c sgmii.c
+  CSRC= t64.c cpmacdrv.c pll.c psc.c emif31.c mdio.c gpio.c nandgpio.c i2c.c sgmii.c null_uart.c
  else
   ifeq ($(TARGET),c6474l)
-   CSRC= t64.c cpmacdrv.c pll.c psc.c emif31.c mdio.c gpio.c nandgpio.c i2c.c sgmii.c
+   CSRC= t64.c cpmacdrv.c pll.c psc.c emif31.c mdio.c gpio.c nandgpio.c i2c.c sgmii.c null_uart.c
   else
    ifeq ($(TARGET),c6457)
-    CSRC= t64.c cpmacdrv.c pll.c psc.c emif31.c mdio.c gpio.c nandgpio.c i2c.c sgmiicur.c
+    CSRC= t64.c cpmacdrv.c pll.c psc.c emif31.c mdio.c gpio.c nandgpio.c i2c.c sgmiicur.c null_uart.c
    else
     ifeq ($(TARGET),c6455)
-     CSRC= t64.c cpmacdrv.c pll.c emif31.c mdio.c gpio.c nandgpio.c i2c.c
+     CSRC= t64.c cpmacdrv.c pll.c emif31.c mdio.c gpio.c nandgpio.c i2c.c null_uart.c
 	else
 	 ifeq ($(TARGET),c66x)
 	  CSRC= t64.c pll.c cfgpll.c cfgpll2.c mdio.c i2c.c psc.c cpsw.c qm.c cpdma.c pa.c sgmii.c serdes.c gmacsl.c emif4.c gpio.c
@@ -110,6 +110,7 @@ C6X_C_DIR+= ;$(IBL_ROOT)/hw/pa
 C6X_C_DIR+= ;$(IBL_ROOT)/hw/spi
 C6X_C_DIR+= ;$(IBL_ROOT)/hw/nors
 C6X_C_DIR+= ;$(IBL_ROOT)/hw/emif25
+C6X_C_DIR+= ;$(IBL_ROOT)/hw/uart
 C6X_C_DIR+= ;$(IBL_ROOT)/ecc
 export C6X_C_DIR
 
@@ -125,6 +126,7 @@ ifeq ($(TARGET),c6472)
  vpath % $(ECODIR)/gpio
  vpath % $(ECODIR)/nands/gpio
  vpath % $(ECODIR)/i2c
+ vpath % $(ECODIR)/uart/null_uart
 endif
 
 ifeq ($(TARGET),c6474)
@@ -137,6 +139,7 @@ ifeq ($(TARGET),c6474)
  vpath % $(ECODIR)/nands/gpio
  vpath % $(ECODIR)/i2c
  vpath % $(ECODIR)/sgmii
+ vpath % $(ECODIR)/uart/null_uart
 endif
 
 ifeq ($(TARGET),c6474l)
@@ -149,6 +152,7 @@ ifeq ($(TARGET),c6474l)
  vpath % $(ECODIR)/nands/gpio
  vpath % $(ECODIR)/i2c
  vpath % $(ECODIR)/sgmii
+ vpath % $(ECODIR)/uart/null_uart
 endif
 
 ifeq ($(TARGET),c6457)
@@ -161,6 +165,7 @@ ifeq ($(TARGET),c6457)
  vpath % $(ECODIR)/nands/gpio
  vpath % $(ECODIR)/i2c
  vpath % $(ECODIR)/sgmii
+ vpath % $(ECODIR)/uart/null_uart
 endif
 
 ifeq ($(TARGET),c6455)
@@ -171,6 +176,7 @@ ifeq ($(TARGET),c6455)
  vpath % $(ECODIR)/gpio
  vpath % $(ECODIR)/nands/gpio
  vpath % $(ECODIR)/i2c
+ vpath % $(ECODIR)/uart/null_uart
 endif
 
 ifeq ($(TARGET),c66x)
