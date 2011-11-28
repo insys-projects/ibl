@@ -33,7 +33,7 @@
 
 /******************************************************************************
  *
- * File    Name:    evmc66x_uart.h
+ * File    Name:    c66x_uart.h
  *
  * Description:    This contains UART specific structure, typedefs, function
  *        prototypes.

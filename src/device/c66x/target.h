@@ -52,6 +52,10 @@
 #ifndef _TARGET_H
 #define _TARGET_H
 #include "types.h"
+#include <stdint.h>
+#include <stdio.h>
+#include <string.h>
+#include <stdlib.h>
  
  
 /** 
@@ -400,6 +404,21 @@ Int32 targetMacRcv (void *ptr_device, UINT8 *buffer);
  *      Support for enabling PCIe workarond for C6678/C6670.
  */
 #define IBL_ENABLE_PCIE_WORKAROUND 1
+
+/**
+ *  @brief
+ *     DDR start and end address needed for DDR memory test 
+ */
+#define DDR3_TEST_START_ADDRESS 0x80000000
+#define DDR3_TEST_END_ADDRESS   (DDR3_TEST_START_ADDRESS + (128 *1024))
+
+/**
+ *  @brief
+ *     Software workaround for DDR3 memory corruption is to re-init the PLL's and DDR controller. This flag enables the workaround
+ */
+#define DDR3_TEST_ENABLE
+
+extern int32_t ddr3_memory_test();
 
 #endif /* _TARGET_H */
 

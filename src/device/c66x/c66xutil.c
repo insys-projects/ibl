@@ -7,6 +7,11 @@
 
 #include "device.h"
 #include "pllapi.h"
+#include <string.h>
+#include <stdint.h>
+#include <stdio.h>
+#include <string.h>
+#include <stdlib.h>
 
 
 /**
@@ -125,4 +130,53 @@ int32 devicePowerPeriph (int32 modNum)
     return ((int32)pscEnableModule(modNum));
         
 }
+
+#ifdef DDR3_TEST_ENABLE
+/**
+ *  @brief Simple DDR3 test
+ *
+ *  @details
+ *      This function performs a simple DDR3 test for a memory range
+ *      specified below and returns -1 for failure and 0 for success.
+ */
+
+
+int32_t ddr3_memory_test (void)
+{
+	uint32_t index, value;
+
+	/* Write a pattern */
+	for (index = DDR3_TEST_START_ADDRESS; index < DDR3_TEST_END_ADDRESS; index += 4) {
+		*(volatile uint32_t *) index = (uint32_t)index;
+	}
+
+	/* Read and check the pattern */
+	for (index = DDR3_TEST_START_ADDRESS; index < DDR3_TEST_END_ADDRESS; index += 4) {
+
+		value = *(uint32_t *) index;
+
+		if (value  != index) {
+			return -1;
+		}
+	}
+
+	/* Write a pattern for complementary values */
+	for (index = DDR3_TEST_START_ADDRESS; index < DDR3_TEST_END_ADDRESS; index += 4) {
+		*(volatile uint32_t *) index = (uint32_t)~index;
+	}
+
+	/* Read and check the pattern */
+	for (index = DDR3_TEST_START_ADDRESS; index < DDR3_TEST_END_ADDRESS; index += 4) {
+
+		value = *(uint32_t *) index;
+
+		if (value  != ~index) {
+			return -1;
+		}
+	}
+
+	return 0;
+}
+
+#endif
 

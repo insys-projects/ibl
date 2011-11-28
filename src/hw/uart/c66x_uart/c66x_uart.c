@@ -31,7 +31,7 @@
  *
  *****************************************************************************/
 
-#include "evmc66x_uart.h"
+#include "c66x_uart.h"
 
 static void uart_delay_cycles(uint32_t cycles)
 {
