@@ -65,7 +65,7 @@
 #include "spi_api.h"
 #include "ibl_elf.h"
 #include <string.h>
-#include "c66x_uart.h"
+#include "uart.h"
 
 extern cregister unsigned int IER;
 

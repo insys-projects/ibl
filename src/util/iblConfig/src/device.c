@@ -16,6 +16,7 @@
 ibl_t c6455_ibl_config(void)
 {
     ibl_t ibl;	
+    memset(&ibl, 0, sizeof(ibl_t));
 	
     ibl.iblMagic = ibl_MAGIC_VALUE;
     ibl.iblEvmType = ibl_EVM_C6455L;
@@ -112,6 +113,7 @@ ibl_t c6455_ibl_config(void)
 ibl_t c6474_ibl_config(void)
 {
     ibl_t ibl;
+    memset(&ibl, 0, sizeof(ibl_t));
 	
     ibl.iblMagic = ibl_MAGIC_VALUE;
     ibl.iblEvmType = ibl_EVM_C6474M;
@@ -222,6 +224,7 @@ ibl_t c6474_ibl_config(void)
 ibl_t c6474l_ibl_config(void)
 {
     ibl_t ibl;
+    memset(&ibl, 0, sizeof(ibl_t));
 	
     ibl.iblMagic = ibl_MAGIC_VALUE;
     ibl.iblEvmType = ibl_EVM_C6474L;
@@ -388,6 +391,7 @@ ibl_t c6474l_ibl_config(void)
 ibl_t c6457_ibl_config(void)
 {
     ibl_t ibl;
+    memset(&ibl, 0, sizeof(ibl_t));
 	
     ibl.iblMagic = ibl_MAGIC_VALUE;
     ibl.iblEvmType = ibl_EVM_C6457L;
@@ -552,6 +556,7 @@ ibl_t c6457_ibl_config(void)
 ibl_t c6472_ibl_config(void)
 {
     ibl_t ibl;
+    memset(&ibl, 0, sizeof(ibl_t));
 	
     ibl.iblMagic = ibl_MAGIC_VALUE;
     ibl.iblEvmType = ibl_EVM_C6472L;
@@ -711,7 +716,8 @@ ibl_t c6472_ibl_config(void)
 ibl_t c6678_ibl_config(void)
 {
 	ibl_t ibl;
-	
+    memset(&ibl, 0, sizeof(ibl_t));
+    
 	ibl.iblMagic = ibl_MAGIC_VALUE;
 	ibl.iblEvmType = ibl_EVM_C6678L;
 
@@ -928,6 +934,7 @@ ibl_t c6678_ibl_config(void)
 ibl_t c6670_ibl_config(void)
 {
 	ibl_t ibl;
+    memset(&ibl, 0, sizeof(ibl_t));
 	
 	ibl.iblMagic = ibl_MAGIC_VALUE;
 	ibl.iblEvmType = ibl_EVM_C6670L;

@@ -9,6 +9,7 @@
 ../hw/c64x/make/t64.ENDIAN_TAG.oc
 ../hw/c64x/make/psc.ENDIAN_TAG.oc
 ../hw/c64x/make/emif31.ENDIAN_TAG.oc
+../hw/c64x/make/null_uart.ENDIAN_TAG.oc
 
 
 #ifndef EXCLUDE_BIS
