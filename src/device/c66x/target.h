@@ -52,10 +52,6 @@
 #ifndef _TARGET_H
 #define _TARGET_H
 #include "types.h"
-#include <stdint.h>
-#include <stdio.h>
-#include <string.h>
-#include <stdlib.h>
 
  
 /** 
@@ -418,7 +414,7 @@ Int32 targetMacRcv (void *ptr_device, UINT8 *buffer);
  */
 #define PLL_REINIT_WORKAROUND
 
-extern int32_t ddr3_memory_test();
+UINT32 ddr3_memory_test();
 
 #endif /* _TARGET_H */
 

@@ -8,12 +8,7 @@
 #include "device.h"
 #include "target.h"
 #include "pllapi.h"
-#include <string.h>
-#include <stdint.h>
-#include <stdio.h>
-#include <string.h>
-#include <stdlib.h>
-
+#include "types.h"
 
 /**
  *  @brief
@@ -142,19 +137,19 @@ int32 devicePowerPeriph (int32 modNum)
  */
 
 
-int32_t ddr3_memory_test (void)
+UINT32 ddr3_memory_test (void)
 {
-	uint32_t index, value;
+	 UINT32 index, value;
 
 	/* Write a pattern */
 	for (index = DDR3_TEST_START_ADDRESS; index < DDR3_TEST_END_ADDRESS; index += 4) {
-		*(volatile uint32_t *) index = (uint32_t)index;
+		*(VUint32 *) index = (UINT32)index;
 	}
 
 	/* Read and check the pattern */
 	for (index = DDR3_TEST_START_ADDRESS; index < DDR3_TEST_END_ADDRESS; index += 4) {
 
-		value = *(uint32_t *) index;
+		value = *(UINT32 *) index;
 
 		if (value  != index) {
 			return -1;
@@ -163,13 +158,13 @@ int32_t ddr3_memory_test (void)
 
 	/* Write a pattern for complementary values */
 	for (index = DDR3_TEST_START_ADDRESS; index < DDR3_TEST_END_ADDRESS; index += 4) {
-		*(volatile uint32_t *) index = (uint32_t)~index;
+		*(VUint32 *) index = (UINT32)~index;
 	}
 
 	/* Read and check the pattern */
 	for (index = DDR3_TEST_START_ADDRESS; index < DDR3_TEST_END_ADDRESS; index += 4) {
 
-		value = *(uint32_t *) index;
+		value = *(UINT32 *) index;
 
 		if (value  != ~index) {
 			return -1;
