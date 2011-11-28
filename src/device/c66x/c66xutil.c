@@ -6,6 +6,7 @@
  */
 
 #include "device.h"
+#include "target.h"
 #include "pllapi.h"
 #include <string.h>
 #include <stdint.h>
@@ -131,7 +132,7 @@ int32 devicePowerPeriph (int32 modNum)
         
 }
 
-#ifdef DDR3_TEST_ENABLE
+#ifdef PLL_REINIT_WORKAROUND
 /**
  *  @brief Simple DDR3 test
  *

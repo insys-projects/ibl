@@ -138,7 +138,7 @@ void deviceDdrConfig (void)
     if (ibl.ddrConfig.configDdr != 0)
         hwEmif4p0Enable (&ibl.ddrConfig.uEmif.emif4p0);
 
-#ifdef DDR3_TEST_ENABLE
+#ifdef PLL_REINIT_WORKAROUND
     for (loopcount = 0; loopcount < PLL_DDR_INIT_LOOPMAX; loopcount++)
     {
 	if (ddr3_memory_test() == 0) 
@@ -170,9 +170,9 @@ void deviceDdrConfig (void)
 	  
         if (ibl.ddrConfig.configDdr != 0)
             hwEmif4p0Enable (&ibl.ddrConfig.uEmif.emif4p0);
-        /* Init UART 
-	 uart_init();*/
     }
+    /* Init UART again because we are re-initializing the PLL's */ 
+    uart_init();
 
     if (loopcount < 10) 
     {

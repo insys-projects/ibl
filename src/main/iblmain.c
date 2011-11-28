@@ -245,6 +245,8 @@ void main (void)
     iblStatus.iblMagic   = ibl_MAGIC_VALUE;
     iblStatus.iblVersion = ibl_VERSION;
 
+    /* Init UART */
+     uart_init();
 
     /* Power up the timer */
     devicePowerPeriph (TARGET_PWR_TIMER_0);
