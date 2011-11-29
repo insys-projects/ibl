@@ -3,14 +3,24 @@
 
 #define TRUE 1
 #define FALSE 0
-#define MAX_LINE_LENGTH 40
-char *input_file = "./input.txt";
+#define MAX_LINE_LENGTH 80
+#define DEFAULT_ETHBOOT_IDX 0
+#define EVM_C6678_ETHBOOT_IDX 2
 
 /* Parameters defined in the input_file */
 #define FILE_NAME      "file_name"
 #define DEVICE_ID      "device"
 #define OFFSET_ADDR    "offset"
+#define DOBOOTP  "ethBoot-doBootp"
+#define BOOTFORMAT  "ethBoot-bootFormat"
+#define IPADDR  "ethBoot-ipAddr"
+#define SERVERIP  "ethBoot-serverIp"
+#define GATEWAYIP  "ethBoot-gatewayIp"
+#define NETMASK  "ethBoot-netmask"
+#define FILENAME  "ethBoot-fileName"
 
+
+char *input_file = "./input.txt";
 char        file_name[MAX_LINE_LENGTH];
 uint32_t    device_id;
 uint32_t    offset;
@@ -21,7 +31,7 @@ typedef ibl_t (*ibl_config_fn)(void);
 int main (void)
 {
     ibl_t ibl_params;
-    FILE    *fp;
+    FILE    *fp, *mfp;
     int    ret;
     ibl_config_fn cfg[] = {
 	    [1] = &c6455_ibl_config,
@@ -67,6 +77,10 @@ int main (void)
 
     if (device_id > 0 && device_id < ncfgs)
 	    ibl_params = (*cfg[device_id])();
+		
+	mfp = fopen(input_file, "r");
+	modifyIblConfig(mfp, &ibl_params);
+	fclose(mfp);
     
     if (fwrite((void*)&ibl_params, sizeof(ibl_t), 1, fp) != 1) {
         fclose(fp);
@@ -204,3 +218,71 @@ int parse_input_file(FILE *fp)
     return TRUE;
 }
 
+int modifyIblConfig(FILE *fp, ibl_t *ibl)
+{
+    char line[MAX_LINE_LENGTH];
+    char tokens[] = " :=;\n\r";
+    char *key, *data;
+	unsigned char ethBootIdx=DEFAULT_ETHBOOT_IDX, i0, i1, i2, i3;
+    if ((device_id == 6) || (device_id == 7)) 
+        ethBootIdx = EVM_C6678_ETHBOOT_IDX;
+    memset(line, 0, MAX_LINE_LENGTH);
+
+    while(fgets(line, MAX_LINE_LENGTH, fp) != '\0')
+	{
+		key  = (char *)strtok(line, tokens);
+		data = (char *)strtok(NULL, tokens);
+		if ( (key == NULL) || (data == NULL) ) {} 
+		else if (strcmp(key, DOBOOTP) == 0)
+		{
+			if (strcmp(data, "TRUE") == 0)
+				ibl->bootModes[ethBootIdx].u.ethBoot.doBootp = TRUE;
+			else
+				ibl->bootModes[ethBootIdx].u.ethBoot.doBootp = FALSE;
+		}
+		else if (strcmp(key, BOOTFORMAT) == 0)
+		{
+			if (strcmp(data, "ELF") == 0)
+				ibl->bootModes[ethBootIdx].u.ethBoot.bootFormat = ibl_BOOT_FORMAT_ELF;
+			else
+				ibl->bootModes[ethBootIdx].u.ethBoot.bootFormat = ibl_BOOT_FORMAT_BBLOB;
+		}
+		else if (strcmp(key, IPADDR) == 0)
+		{
+			i0 = atoi((unsigned char*)strtok(data, "."));
+			i1 = atoi((unsigned char*)strtok(NULL, "."));
+			i2 = atoi((unsigned char*)strtok(NULL, "."));
+			i3 = atoi((unsigned char*)strtok(NULL, "."));
+			SETIP(ibl->bootModes[ethBootIdx].u.ethBoot.ethInfo.ipAddr, i0, i1, i2, i3);
+		}
+		else if (strcmp(key, SERVERIP) == 0)
+		{
+			i0 = atoi((unsigned char*)strtok(data, "."));
+			i1 = atoi((unsigned char*)strtok(NULL, "."));
+			i2 = atoi((unsigned char*)strtok(NULL, "."));
+			i3 = atoi((unsigned char*)strtok(NULL, "."));
+			SETIP(ibl->bootModes[ethBootIdx].u.ethBoot.ethInfo.serverIp, i0, i1, i2, i3);
+		}
+		else if (strcmp(key, GATEWAYIP) == 0)
+		{
+			i0 = atoi((unsigned char*)strtok(data, "."));
+			i1 = atoi((unsigned char*)strtok(NULL, "."));
+			i2 = atoi((unsigned char*)strtok(NULL, "."));
+			i3 = atoi((unsigned char*)strtok(NULL, "."));
+			SETIP(ibl->bootModes[ethBootIdx].u.ethBoot.ethInfo.gatewayIp, i0, i1, i2, i3);
+		}
+		else if (strcmp(key, NETMASK) == 0)
+		{
+			i0 = atoi((unsigned char*)strtok(data, "."));
+			i1 = atoi((unsigned char*)strtok(NULL, "."));
+			i2 = atoi((unsigned char*)strtok(NULL, "."));
+			i3 = atoi((unsigned char*)strtok(NULL, "."));
+			SETIP(ibl->bootModes[ethBootIdx].u.ethBoot.ethInfo.netmask, i0, i1, i2, i3);
+		}
+		else if (strcmp(key, FILENAME) == 0)
+		{
+			strcpy(ibl->bootModes[ethBootIdx].u.ethBoot.ethInfo.fileName, data);
+		}
+	}
+    return TRUE;
+}

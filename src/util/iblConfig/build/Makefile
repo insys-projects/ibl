@@ -2,7 +2,7 @@
 # Copyright (C) 2011 Texas Instruments Incorporated - http://www.ti.com/
 ###############################################################################
 
-CC               = gcc
+CC               = gcc 
 AR               = ar
 
 ###############################################################################
@@ -78,6 +78,13 @@ gen_input:
 	echo "file_name = ibl.bin" > input.txt
 	echo "device = $(DEVICE_ID)" >> input.txt
 	echo "offset = $(I2C_MAP_ADDR)" >> input.txt
+	echo "ethBoot-doBootp = " >> input.txt
+	echo "ethBoot-bootFormat = " >> input.txt
+	echo "ethBoot-ipAddr = " >> input.txt
+	echo "ethBoot-serverIp = " >> input.txt
+	echo "ethBoot-gatewayIp = " >> input.txt
+	echo "ethBoot-netmask = " >> input.txt
+	echo "ethBoot-fileName = " >> input.txt
 
 ###############################################################################
 # Cleanup								      
