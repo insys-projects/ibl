@@ -154,22 +154,22 @@ SINT16 hwEmif4p0Enable (iblEmif4p0_t *cfg)
        TEMP |= 0x4; // T_WTR bit field 2:0
        DDR_SDTIM1 = TEMP;
 
-      /* DDR_SDTIM2   = 0x304F7FE3; */
+      /* DDR_SDTIM2   = 0x30717FE3; */
        TEMP = 0;
        TEMP |= 0x3 << 28; // T_XP bit field 30:28
-       TEMP |= 0x4f << 16; // T_XSNR bit field 24:16
+       TEMP |= 0x71 << 16; // T_XSNR bit field 24:16
        TEMP |= 0x1ff << 6; // T_XSRD bit field 15:6
        TEMP |= 0x4 << 3; // T_RTP bit field 5:3
        TEMP |= 0x3; // T_CKE bit field 2:0
        DDR_SDTIM2 = TEMP;
 
-      /*  DDR_SDTIM3   = 0x559F849F; */
+      /*  DDR_SDTIM3   = 0x559F86AF; */
        TEMP = 0;
        TEMP |= 0x5 << 28; // T_PDLL_UL bit field 31:28 (fixed value)
        TEMP |= 0x5 << 24; // T_CSTA bit field 27:24 (fixed value)
        TEMP |= 0x4 << 21; // T_CKESR bit field 23:21
        TEMP |= 0x3f << 15; // T_ZQCS bit field 20:15
-       TEMP |= 0x49 << 4; // T_RFC bit field 12:4
+       TEMP |= 0x6a << 4; // T_RFC bit field 12:4
        TEMP |= 0xf; // T_RAS_MAX bit field 3:0 (fixed value)
        DDR_SDTIM3 = TEMP; 
 
