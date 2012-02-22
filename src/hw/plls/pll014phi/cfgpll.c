@@ -60,18 +60,6 @@ SINT16 hwPllSetCfgPll (UINT32 base, UINT32 prediv, UINT32 mult, UINT32 postdiv, 
     currentEnable  =     BOOT_READ_BITFIELD(regb, 14, 14);
     currentClkOut  =     BOOT_READ_BITFIELD(regb, 13, 13);
 
-    /* The PLL is currently enabled and connected if bypass == 0, enable == 1, clkout == 1 */
-
-    if ( (currentBypass  == 0)           &&
-         (currentPrediv  == prediv)      &&
-         (currentMult    == mult)        &&
-         (currentPostdiv == postdiv)     &&
-         (currentEnable  == 0)           &&
-         (currentClkOut  == 1)           &&  
-         (currentBwAdj   == (mult >> 1))  )
-        return (0);
-
-
     /* bwAdj is based only on the mult value */
     bwAdj = (mult >> 1) - 1;
 
