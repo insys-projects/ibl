@@ -415,6 +415,6 @@ Int32 targetMacRcv (void *ptr_device, UINT8 *buffer);
 #define PLL_REINIT_WORKAROUND
 
 UINT32 ddr3_memory_test();
-
+void ddr3_memory_zero(UINT32 size_mb );
 #endif /* _TARGET_H */
 
