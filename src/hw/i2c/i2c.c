@@ -68,8 +68,9 @@ static void chipDelay32 (uint32 del)
 {
     volatile unsigned int i;
 
-    for (i = 0; i < del/8; i++);
-
+    for (i = 0; i < del/8; i++){
+        asm(" NOP ");
+    }
 }
 
 
