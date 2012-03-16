@@ -69,17 +69,16 @@ nandDevInfo_t *hwDevInfo;
 void ndelay(Uint32 uiDelay)
 {
 	Uint32 t;
-	TSCL = 1;
-
-	t = TSCL;
-	while(TSCL < (t + uiDelay));
+    for (t = 0; t < uiDelay; t++)
+    {
+        asm (" nop ");
+    }
 }
 
 Uint32 ptNandWaitRdy(Uint32 in_timeout)
 {
 	Uint32 count = 0;
 
-	ndelay(NAND_WAIT_PIN_POLL_ST_DLY);
 	ndelay(NAND_WAIT_PIN_POLL_ST_DLY);
 
 	while(!hwGpioReadInput(NAND_BSY_GPIO_PIN))

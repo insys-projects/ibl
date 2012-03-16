@@ -246,7 +246,9 @@ void main (void)
     iblStatus.iblVersion = ibl_VERSION;
 
     /* Init UART */
-     uart_init();
+    uart_init();
+    uart_write_string("", 0);
+    uart_write_string("IBL version: "ibl_VERSION_STR, 0);
 
     /* Power up the timer */
     devicePowerPeriph (TARGET_PWR_TIMER_0);
