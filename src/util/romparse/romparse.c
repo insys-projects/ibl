@@ -334,9 +334,10 @@ void section (void)
   /* If the section referenced a data file, link the data file back to this section */
   if (current_file >= 0)  {
     for (i = 0; i < NUM_BOOT_PARAM_TABLES; i++)  {
-      if (progFile[current_file].tag[i] < 0)
+      if (progFile[current_file].tag[i] < 0) {
         progFile[current_file].tag[i] = ctable_index;
         break;
+	  }
     }
   }
 
