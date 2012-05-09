@@ -61,7 +61,7 @@ int16 pscDelay (void)
   volatile uint32 i;
   for (i = 0; i < 10000; i++);
 
-  return (0);
+  return (1);
 
 } /* pscDelay */
 
