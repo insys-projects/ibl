@@ -12,5 +12,5 @@ This directory contains the following documents:
                       Load the index.html file from this folder in a browser.
 4. evmc6678-instructions.txt: Document describing steps to use IBL on the c6678 EVM
 5. evmc6670-instructions.txt: Document describing steps to use IBL on the c6670 EVM
-
+6. evmc6657-instructions.txt: Document describing steps to use IBL on the c6657 EVM
 

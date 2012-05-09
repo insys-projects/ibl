@@ -242,7 +242,7 @@ int modifyIblConfig(FILE *fp, ibl_t *ibl)
 		}
 		else if (strcmp(key, BOOTFORMAT) == 0)
 		{
-			if (strcmp(data, "ELF") == 0)
+			if (strcmp(data, "ibl_BOOT_FORMAT_ELF") == 0)
 				ibl->bootModes[ethBootIdx].u.ethBoot.bootFormat = ibl_BOOT_FORMAT_ELF;
 			else
 				ibl->bootModes[ethBootIdx].u.ethBoot.bootFormat = ibl_BOOT_FORMAT_BBLOB;

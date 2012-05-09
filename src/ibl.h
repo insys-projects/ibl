@@ -65,11 +65,11 @@
 
 /**
  * @brief
- *  The version number, 1.0.0.14
+ *  The version number, 1.0.0.15
  */
-#define ibl_VERSION  ibl_MAKE_VERSION(1,0,0,14)
+#define ibl_VERSION  ibl_MAKE_VERSION(1,0,0,15)
 /* Version string for UART write */
-#define ibl_VERSION_STR  "1.0.0.14"
+#define ibl_VERSION_STR  "1.0.0.15"
 
 /**
  * @defgroup iblBootModes  Defines the boot modes supported by the IBL
