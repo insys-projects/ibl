@@ -90,6 +90,8 @@ make EVM=c6678l I2C_MAP_ADDR=0x500
 For C6670 
 make EVM=c6670l I2C_MAP_ADDR=0x500
 
+For C6657
+make EVM=c6670l I2C_MAP_ADDR=0x500
 
 - There will an '''iblConfig.out''' that gets generated.
 

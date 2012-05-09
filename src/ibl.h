@@ -702,7 +702,7 @@ typedef struct iblBoot_s
 #define ibl_EVM_C6474M  0x41  	/**< C6474 Mez EVM */
 #define ibl_EVM_C6670L  0x50  	/**< C6670 Low Cost EVM */
 #define ibl_EVM_C6678L  0x60  	/**< C6678 Low Cost EVM */
-
+#define ibl_EVM_C6657L  0x70    /**< C6657 Low Cost EVM */
 
 /**
  *  @brief

@@ -80,7 +80,7 @@
 #*			make test_build
 #*******************************************************************************************
 
-IBLS_C6X= c6455 c6472 c6474 c6474l c6457 c66x
+IBLS_C6X= c6455 c6472 c6474 c6474l c6457 c66x c665x
 EVMS_C6X= evm_c6455 evm_c6472 evm_c6474 evm_c6474l
 
 
@@ -248,8 +248,8 @@ SPI_DEFS+= SPI_CLKDIV=$(SPI_CLKDIV)
 SPI_DEFS+= SPI_ROM=$(SPI_ROM)
 
 
-.PHONY: all $(IBLS_C6X) evm_c6455 evm_c6472 evm_c6474 evm_c6474l evm_c6457 evm_c6678_i2c evm_c6670_i2c 
-.PHONY: test_c66x test_c6455 test_c6472 test_c6474 test_c6457 clean
+.PHONY: all $(IBLS_C6X) evm_c6455 evm_c6472 evm_c6474 evm_c6474l evm_c6457 evm_c6678_i2c evm_c6670_i2c evm_c6657_i2c
+.PHONY: test_c66x test_c665x test_c6455 test_c6472 test_c6474 test_c6457 clean
 
 
 all:
@@ -341,6 +341,26 @@ test_c66x:
 	make -f makestg1 ARCH=c64x TARGET=c66x ENDIAN_MODE=both CEXCLUDES='SPI NOR_SPI NAND_SPI' I2C_BUS_ADDR=0x50 I2C_MAP_ADDR=$(I2C_MAP_ADDR) COMPACT_I2C=no c66x
 	make -f makestg1 ARCH=c64x TARGET=c66x ENDIAN_MODE=both CEXCLUDES=I2C SPI_DEFS='SPI_ROM=1 SPI_MODE=3 SPI_ADDR_WIDTH=24 SPI_NPIN=5 SPI_CSEL=2 SPI_C2TDEL=8 SPI_CLKDIV=0x20' c66x
 
+evm_c6657_spi:
+	make -f makestg1 ARCH=c64x TARGET=c665x I2C=no I2C_BUS_ADDR=0x51 I2C_MAP_ADDR=0x500 ENDIAN_MODE=little CEXCLUDES=I2C SPI_DEFS='$(EVM_667x_SPI_DEFS)' c66x
+
+evm_c6657_i2c:
+	make -f makestg1 I2C_BUS_ADDR=$(I2C_BUS_ADDR) I2C_MAP_ADDR=$(I2C_MAP_ADDR) \
+ENDIAN_MODE=$(ENDIAN) ARCH=c64x TARGET=c665x EVM=c6657l SPI=no SPI_DEFS='$(EVM_667x_SPI_DEFS)' \
+CEXCLUDES='COFF BIS NAND_GPIO' c665x
+	cp -f ibl_c665x/i2crom.dat bin/i2crom_$(I2C_BUS_ADDR)_c6657_$(ENDIAN_SFX).dat
+	cp -f ibl_c665x/i2crom.bin bin/i2crom_$(I2C_BUS_ADDR)_c6657_$(ENDIAN_SFX).bin
+	cp -f ../util/i2cConfig/i2cparam_c665x_$(ENDIAN_SFX).out bin/i2cparam_$(I2C_BUS_ADDR)_c6657_$(ENDIAN_SFX)_$(I2C_MAP_ADDR).out
+
+test_c665x:
+	make -f makestg1 ARCH=c64x TARGET=c665x ENDIAN_MODE=both CEXCLUDES='NOR_SPI' SPI_DEFS='SPI_ROM=1 SPI_MODE=3 SPI_ADDR_WIDTH=24 SPI_NPIN=5 SPI_CSEL=2 SPI_C2TDEL=8 SPI_CLKDIV=0x20' I2C_BUS_ADDR=0x50 I2C_MAP_ADDR=$(I2C_MAP_ADDR) COMPACT_I2C=no c665x
+	make -f makestg1 ARCH=c64x TARGET=c665x ENDIAN_MODE=both CEXCLUDES='NAND_SPI' SPI_DEFS='SPI_ROM=1 SPI_MODE=3 SPI_ADDR_WIDTH=24 SPI_NPIN=5 SPI_CSEL=2 SPI_C2TDEL=8 SPI_CLKDIV=0x20' I2C_BUS_ADDR=0x50 I2C_MAP_ADDR=$(I2C_MAP_ADDR) COMPACT_I2C=no c665x
+	make -f makestg1 ARCH=c64x TARGET=c665x ENDIAN_MODE=both CEXCLUDES='NOR_EMIF' SPI_DEFS='SPI_ROM=1 SPI_MODE=3 SPI_ADDR_WIDTH=24 SPI_NPIN=5 SPI_CSEL=2 SPI_C2TDEL=8 SPI_CLKDIV=0x20' I2C_BUS_ADDR=0x50 I2C_MAP_ADDR=$(I2C_MAP_ADDR) COMPACT_I2C=no c665x
+	make -f makestg1 ARCH=c64x TARGET=c665x ENDIAN_MODE=both CEXCLUDES='NAND_EMIF' SPI_DEFS='SPI_ROM=1 SPI_MODE=3 SPI_ADDR_WIDTH=24 SPI_NPIN=5 SPI_CSEL=2 SPI_C2TDEL=8 SPI_CLKDIV=0x20' I2C_BUS_ADDR=0x50 I2C_MAP_ADDR=$(I2C_MAP_ADDR) COMPACT_I2C=no c665x
+	make -f makestg1 ARCH=c64x TARGET=c665x ENDIAN_MODE=both CEXCLUDES='NAND_EMIF NOR_EMIF' SPI_DEFS='SPI_ROM=1 SPI_MODE=3 SPI_ADDR_WIDTH=24 SPI_NPIN=5 SPI_CSEL=2 SPI_C2TDEL=8 SPI_CLKDIV=0x20' I2C_BUS_ADDR=0x50 I2C_MAP_ADDR=$(I2C_MAP_ADDR) COMPACT_I2C=no c665x
+	make -f makestg1 ARCH=c64x TARGET=c665x ENDIAN_MODE=both CEXCLUDES='SPI NOR_SPI NAND_SPI' I2C_BUS_ADDR=0x50 I2C_MAP_ADDR=$(I2C_MAP_ADDR) COMPACT_I2C=no c665x
+	make -f makestg1 ARCH=c64x TARGET=c665x ENDIAN_MODE=both CEXCLUDES=I2C SPI_DEFS='SPI_ROM=1 SPI_MODE=3 SPI_ADDR_WIDTH=24 SPI_NPIN=5 SPI_CSEL=2 SPI_C2TDEL=8 SPI_CLKDIV=0x20' c665x
+
 # Test - builds all the targets, with single component exclusion
 
 test_c6455:
@@ -380,7 +400,7 @@ test_c6474:
 	make -f makestg1 ARCH=c64x TARGET=c6474 I2C_BUS_ADDR=0x50 I2C_MAP_ADDR=$(I2C_MAP_ADDR) COMPACT_I2C=yes ENDIAN_MODE=both CEXCLUDES=BLOB      c6474
 
 
-test_build: test_c6455 test_c6457 test_c6472 test_c6474 test_c66x
+test_build: test_c6455 test_c6457 test_c6472 test_c6474 test_c66x test_c665x
 
 
 # will need to add a line for each additional ARCH type added
@@ -392,6 +412,7 @@ clean:
 	make -f makestg2 cleant  ARCH=c64x TARGET=c6455
 	make -f makestg2 cleant  ARCH=c64x TARGET=c6457
 	make -f makestg2 cleant  ARCH=c64x TARGET=c66x
+	make -f makestg2 cleant  ARCH=c64x TARGET=c665x
 	make -C ../util/bconvert       clean
 	make -C ../util/btoccs         clean
 	make -C ../util/i2cConfig      clean    ARCH=c64x TARGET=c6455
@@ -400,6 +421,7 @@ clean:
 	make -C ../util/i2cConfig      clean    ARCH=c64x TARGET=c6474l
 	make -C ../util/i2cConfig      clean    ARCH=c64x TARGET=c6457
 	make -C ../util/i2cConfig      clean    ARCH=c64x TARGET=c66x
+	make -C ../util/i2cConfig      clean	ARCH=c64x TARGET=c665x	
 	make -C ../util/romparse       clean
 	make -C ../util/iblConfig/build    clean
 	make -C ../test/test1		   clean

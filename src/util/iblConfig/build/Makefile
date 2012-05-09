@@ -34,7 +34,9 @@ endif
 ifeq ($(EVM),c6670l)
 	DEVICE_ID = 7
 endif
-
+ifeq ($(EVM),c6657l)
+	DEVICE_ID = 8
+endif
 LNK_OPTS +=
 
 ###############################################################################

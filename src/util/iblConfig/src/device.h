@@ -67,7 +67,7 @@
  * @brief
  *  The version number, 1.0.0.9
  */
-#define ibl_VERSION  ibl_MAKE_VERSION(1,0,0,9)
+#define ibl_VERSION  ibl_MAKE_VERSION(1,0,0,10)
 
 #define SETIP(array,i0,i1,i2,i3)      array[0]=(i0);  \
                                       array[1]=(i1);  \
@@ -704,7 +704,7 @@ typedef struct iblBoot_s
 #define ibl_EVM_C6474M  0x41  	/**< C6474 Mez EVM */
 #define ibl_EVM_C6670L  0x50  	/**< C6670 Low Cost EVM */
 #define ibl_EVM_C6678L  0x60  	/**< C6678 Low Cost EVM */
-
+#define ibl_EVM_C6657L  0x70	/**< C6657 Low Cost EVM */
 
 /**
  *  @brief
@@ -909,7 +909,7 @@ ibl_t c6457_ibl_config(void);
 ibl_t c6472_ibl_config(void);
 ibl_t c6678_ibl_config(void);
 ibl_t c6670_ibl_config(void);
-
+ibl_t c6657_ibl_config(void);
 
 
 

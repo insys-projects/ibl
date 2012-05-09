@@ -279,7 +279,8 @@ void main (void)
         v &= DEVICE_JTAG_ID_MASK;
         if (
             (v == DEVICE_C6678_JTAG_ID_VAL)         || 
-            (v == DEVICE_C6670_JTAG_ID_VAL)
+            (v == DEVICE_C6670_JTAG_ID_VAL)	    ||
+	    (v == DEVICE_C6657_JTAG_ID_VAL)	
            )
         {
             IER = 0;

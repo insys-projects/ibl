@@ -1,0 +1,80 @@
+#include "iblcfg.h"
+;  This file is run through the C preprocessor to get the build time layout information
+;  The following values must be defined:
+;     SPI_CSEL       - The SPI chip select of the eeprom holding the ROM boot info and the layout info
+;     SPI_ADDR_WIDTH - Number of bits in the SPI address
+;     SPI_NPINS		 - Number of pins used by the interface (4 or 5)
+;     SPI_MODE       - SPI operation mode (0-3)
+;	  INIT_EXE_FILE  - The SPI blocked stage 1 of the ibl
+;     EXE_FILE_1     - The SPI blocked stage 2 of the ibl, must be the little endian version
+;     EXE_FILE_2  	 - The SPI blocked stage 2 of the ibl, must be the big endian version
+;     PAD_FILE_ID_1  - This pad holds the IBL configuration structure for the little endian version
+;     PAD_FILE_ID_2  - This pad holds the IBL configuration structure for the big endian version
+;
+;  The section statement directs the ROM boot loader to load the initial endian independent 
+;  portion of the IBL
+section 
+{
+  param_index    = 0
+  boot_mode      = 50
+  sw_pll_prediv	 = 0
+  sw_pll_mult    = 0
+  sw_pll_postdiv = 0
+  sw_pll_flags   = 0
+
+  options        = 1
+  core_freq_mhz  = 800
+
+  bus_freq_mhz     = 1
+  bus_freq_khz     = 0
+
+  addr_width   = SPI_ADDR_WIDTH
+  n_pins       = SPI_NPIN
+  mode         = SPI_MODE
+  csel         = SPI_CSEL
+
+  exe_file = INIT_EXE_FILE
+}
+
+; The layout statement defines how the resulting SPI image is layed out. The base address
+; of this (given in the dev_addr) statement must be known to the initial IBL program
+; at compile time. The layout block is simple a group of 32 bit i2c addresses, so 
+; the order of the exe_file and pad_file_id statements must be configured so as to
+; match the definition of struct iblI2cMap_t defined in ibl.h.
+layout
+{
+  dev_addr     = IBL_CFG_SPI_MAP_TABLE_DATA_ADDR_LSW		; Defined in iblcfg.h
+  dev_addr_ext = IBL_CFG_SPI_MAP_TABLE_DATA_ADDR_MSW
+  file_align   = 0x80
+
+  exe_file    = EXE_FILE_1
+  pad_file_id = PAD_FILE_ID_1
+
+
+  exe_file    = EXE_FILE_2
+  pad_file_id = PAD_FILE_ID_2
+}
+
+; The pad statements simply provide space for the IBL configuration structures. It is valid to
+; have a single configuration structure which is used for both endian values.
+pad
+{
+  pad_file_id  = 1
+  dev_addr     = 0x500
+  dev_addr_ext = IBL_CFG_SPI_MAP_TABLE_DATA_ADDR_MSW
+  len          = 0x300
+}
+
+#if (PAD_FILE_ID_1 != PAD_FILE_ID_2)
+pad
+{
+  pad_file_id  = 2
+  dev_addr     = 0x800
+  dev_addr_ext = I2C_BUS_ADDR
+  len          = IBL_CFG_SPI_MAP_TABLE_DATA_ADDR_MSW
+}
+#endif
+
+
+
+

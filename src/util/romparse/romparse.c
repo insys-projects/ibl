@@ -314,7 +314,7 @@ void section (void)
 
   current_table.common.length   = 30;
 
-  #ifdef c66x
+  #if (defined(c66x) || defined(c665x))
     if (current_table.common.boot_mode == BOOT_MODE_SPI)
         current_table.common.length   = sizeof(BOOT_PARAMS_SPI_T);
     else
@@ -475,7 +475,7 @@ void assignKeyVal (int field, int value)
                                break;
 
         case CORE_FREQ_MHZ:    
-                               #ifdef c66x
+                               #if (defined(c66x) || defined(c665x))
                                    if (current_table.common.boot_mode == BOOT_MODE_SPI)  {
                                         current_table.spi.cpuFreqMhz = value;
                                         break;
@@ -498,12 +498,12 @@ void assignKeyVal (int field, int value)
         case ADDRESS_DELAY:    current_table.i2c.address_delay = value;
                                break;
 
-#if (!defined(c6455) && !defined(c66x))
+#if (!defined(c6455) && !defined(c66x) && !defined(c665x))
         case SWPLL:            current_table.i2c.swPll = value;
                                break;
 #endif
 
-#ifdef c66x
+#if (defined(c66x) || defined(c665x))
         case SWPLL_PREDIV:    current_table.common.swPllCfg_lsw &= 0x00ff;
                               current_table.common.swPllCfg_lsw |= ((value & 0xff) << 16);
                               break;
@@ -529,7 +529,7 @@ void assignKeyVal (int field, int value)
                                break;
 
 
-#ifdef c66x
+#if (defined(c66x) || defined(c665x))
         case N_PINS:           current_table.spi.nPins = value;
                                break;
 
@@ -899,7 +899,7 @@ void createOutput (void)
     for (j = 0; j < NUM_BOOT_PARAM_TABLES; j++)  {
       if (progFile[i].tag[j] >= 0)  {
         
-        #ifdef c66x
+        #if (defined(c66x) || defined(c665x))
           if (boot_params[progFile[i].tag[j]].common.boot_mode == BOOT_MODE_SPI)  {
             boot_params[progFile[i].tag[j]].spi.read_addr_lsw = (progFile[i].addressBytes & 0xffff);
             boot_params[progFile[i].tag[j]].spi.read_addr_msw = (progFile[i].addressBytes  >> 16) & 0xffff;

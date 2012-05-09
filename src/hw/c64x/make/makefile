@@ -61,13 +61,18 @@ else
    else
     ifeq ($(TARGET),c6455)
      CSRC= t64.c cpmacdrv.c pll.c emif31.c mdio.c gpio.c nandgpio.c i2c.c null_uart.c
-	else
-	 ifeq ($(TARGET),c66x)
-	  CSRC= t64.c pll.c cfgpll.c cfgpll2.c mdio.c i2c.c psc.c cpsw.c qm.c cpdma.c pa.c sgmii.c serdes.c gmacsl.c emif4.c gpio.c
-	  CSRC+= nandemif25.c nandgpio.c spi.c nandspi.c noremif25.c norspi.c emif25.c spiutil.c c66x_uart.c
-     else
-      CSRC= t64.c cpmacdrv.c pll.c psc.c emif31.c mdio.c gpio.c nandgpio.c i2c.c sgmii.c cfgpll.c cfgpll2.c
-	  CSRC+= qm.c cpdma.c pa.c serdes.c gmacsl.c emif4.c nandemif25.c spi.c nandspi.c noremif25.c norspi.c emif25.c spiutil.c
+        else
+         ifeq ($(TARGET),c66x)
+           CSRC= t64.c pll.c cfgpll.c cfgpll2.c mdio.c i2c.c psc.c cpsw.c qm.c cpdma.c pa.c sgmii.c serdes.c gmacsl.c emif4.c gpio.c
+           CSRC+= nandemif25.c nandgpio.c spi.c nandspi.c noremif25.c norspi.c emif25.c spiutil.c c66x_uart.c
+             else
+              ifeq ($(TARGET),c665x)
+                CSRC= t64.c pll.c cfgpll.c cfgpll2.c mdio.c i2c.c psc.c mdio.c serdes.c sgmii.c emif4.c gpio.c cpmacdrv.c
+                CSRC+= nandemif25.c nandgpio.c spi.c nandspi.c noremif25.c norspi.c emif25.c spiutil.c c66x_uart.c	
+         else
+          CSRC= t64.c cpmacdrv.c pll.c psc.c emif31.c mdio.c gpio.c nandgpio.c i2c.c sgmii.c cfgpll.c cfgpll2.c
+          CSRC+= qm.c cpdma.c pa.c serdes.c gmacsl.c emif4.c nandemif25.c spi.c nandspi.c noremif25.c norspi.c emif25.c spiutil.c
+      endif
      endif
     endif
    endif
@@ -203,6 +208,25 @@ ifeq ($(TARGET),c66x)
  vpath % $(ECODIR)/uart/c66x_uart
 endif
 
+ifeq ($(TARGET),c665x)
+ vpath % $(ECODIR)/plls/pll014phi
+ vpath % $(ECODIR)/mdio
+ vpath % $(ECODIR)/i2c
+ vpath % $(ECODIR)/pscs/psc2
+ vpath % $(ECODIR)/sgmii
+ vpath % $(ECODIR)/serdes
+ vpath % $(ECODIR)/gpio
+ vpath % $(ECODIR)/macs/cpmac
+ vpath % $(ECODIR)/ddrs/emif4
+ vpath % $(ECODIR)/nands/emif25
+ vpath % $(ECODIR)/nands/gpio
+ vpath % $(ECODIR)/nands/spi
+ vpath % $(ECODIR)/spi
+ vpath % $(ECODIR)/nors/emif25
+ vpath % $(ECODIR)/nors/spi
+ vpath % $(ECODIR)/emif25
+ vpath % $(ECODIR)/uart/c66x_uart
+endif
 
 hw: gen_cdefdep makefile $(OBJS)
 

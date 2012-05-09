@@ -10,7 +10,7 @@
 #*			[COMPACT_I2C=yes] [I2C_SIZE_BYTES=..]
 #*******************************************************************************************
 
-IBLS_C6X= c6455 c6472 c6474 c6474l c6457 c66x
+IBLS_C6X= c6455 c6472 c6474 c6474l c6457 c66x c665x
 
 
 # Excluding functions from the build reduces the I2C eeprom memory used and

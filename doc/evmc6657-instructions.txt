@@ -1,0 +1,49 @@
+Steps to use IBL on the c6657 EVM
+
+1. Programing "IBL" on the EEPROM at bus address 0x51
+   (a) Use the I2C EEPROM writer for c6657 EVM from the MCSDK distribution.
+   (b) Program i2crom_0x51_c6657_le.bin (IBL image) to the EEPROM at I2C BUS 
+       address 0x51 following the EEPROM writer's procedure.
+
+2. Programming the application on NAND or NOR flash
+   NOTE: This step is not needed if the application is booted from Ethernet.
+   (a) Use the NAND or NOR writer c6657 EVM from the tools directory.
+   (a) Flash the Application to NAND or NOR. For instructions please follow 
+       the instructions given along with the NAND/NOR writer.
+
+3. Booting the Application using IBL
+   Supported boot modes:
+   IBL supports three I2C boot modes: NOR boot, NAND boot and EMAC boot. 
+   Both NOR boot and NAND boot support maximum 2 images, EMAC boot supports only 1 image. 
+   For all the I2C boot modes, user needs to set the boot dip switches to I2C master, bus address 0x51.
+
+   NOR Boot:
+   Set the dip switches (pin1, pin2, pin3, pin4, pin5, pin6, pin7, pin8) to: 
+
+    SW3(off, off, on, off, on, on, on, on), 
+    SW5(on, on, on, off, on, on, on, on),
+    
+   This will set the boot param index to 0 to boot the NOR image, by default
+   the boot configuration table sets the NOR offset address to be 0 and 
+   image format to be ELF for image 0.
+   
+   NAND Boot:
+   Set the dip switches (pin1, pin2, pin3, pin4, pin5, pin6, pin7, pin8) to: 
+    
+    SW3(off, off, on, off, on, off, on, on), 
+    SW5(on, on, on, off, on, on, on, on),
+
+   This will set the boot param index to 2 to boot the NAND image, by default
+   the boot configuration table sets the NAND offset address to be 16384 
+   (start of block 1) and image format to be BBLOB for image 0.
+
+   EMAC Boot:
+   Set the dip switches (pin1, pin2, pin3, pin4, pin5, pin6, pin7, pin8) to: 
+    
+    SW3(off, off, on, off, on, on, off, on), 
+    SW5(on, on, on, off, on, on, on, on),
+
+   This will set the boot param index to 4 to boot an image from a remote TFTP
+   server, by default the boot configuration table sets the server IP to be 
+   192.168.2.101, board IP to be 192.168.2.100 and image format to be BBLOB.
+

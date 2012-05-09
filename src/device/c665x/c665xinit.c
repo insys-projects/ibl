@@ -1,5 +1,5 @@
 /**
- * @file c66xinit.c
+ * @file c665xinit.c
  *
  * @brief
  *		c66x functions used during the initial stage of the ibl load
@@ -11,7 +11,7 @@
 #include "pllapi.h"
 #include "spi_api.h"
 #include "spi_loc.h"
-#include "tiboot_c66x.h"       
+#include "tiboot_c665x.h"       
 
 
 /**
@@ -32,14 +32,6 @@ void devicePllConfig (void)
                      ibl.pllConfig[ibl_MAIN_PLL].prediv,
                      ibl.pllConfig[ibl_MAIN_PLL].mult,
                      ibl.pllConfig[ibl_MAIN_PLL].postdiv);
-
-    if (ibl.pllConfig[ibl_NET_PLL].doEnable == TRUE)
-        hwPllSetCfgPll (DEVICE_PLL_BASE(NET_PLL),
-                        ibl.pllConfig[ibl_NET_PLL].prediv,
-                        ibl.pllConfig[ibl_NET_PLL].mult,
-                        ibl.pllConfig[ibl_NET_PLL].postdiv,
-                        ibl.pllConfig[ibl_MAIN_PLL].pllOutFreqMhz,
-                        ibl.pllConfig[ibl_NET_PLL].pllOutFreqMhz);
 
     if (ibl.pllConfig[ibl_DDR_PLL].doEnable == TRUE)
         hwPllSetCfg2Pll (DEVICE_PLL_BASE(DDR_PLL),
@@ -101,11 +93,7 @@ int32 deviceReadBootDevice (void)
     v = *((Uint32 *)DEVICE_JTAG_ID_REG);
     v &= DEVICE_JTAG_ID_MASK;
 
-    if (v == DEVICE_C6678_JTAG_ID_VAL)
-        params = (BOOT_PARAMS_COMMON_T *)ROM_BOOT_PARAMS_ADDR_C6678;
-    else if (v == DEVICE_C6670_JTAG_ID_VAL)
-        params = (BOOT_PARAMS_COMMON_T *)ROM_BOOT_PARAMS_ADDR_C6670;
-    else
+    if (v == DEVICE_C6657_JTAG_ID_VAL)
 	params = (BOOT_PARAMS_COMMON_T *)ROM_BOOT_PARAMS_ADDR_C6657; 	
 
     switch (params->boot_mode)  {
@@ -181,7 +169,7 @@ void iblEnableEDC ()
 #define PCIE_DEVICE_CAP         0x1074
 #define PCIE_DEV_STAT_CTRL   	0x1078
 #define PCIE_LINK_STAT_CTRL     0x1080
-#define PCIE_ACCR	            0x1118
+#define PCIE_ACCR	        0x1118
 #define PCIE_DEBUG0             0x1728
 #define PCIE_PL_GEN2            0x180C
 
@@ -209,7 +197,7 @@ void waitForBoot(UINT32 MAGIC_ADDR)
 
 void iblPCIeWorkaround()
 {
-    UINT32  v, flag_6678 = 0, flag_6670 = 0, MAGIC_ADDR;
+    UINT32  v, flag_6678 = 0, flag_6670 = 0, flag_6657 = 0, MAGIC_ADDR;
     UINT32  i;
 
      /* Power up PCIe */
@@ -234,6 +222,11 @@ void iblPCIeWorkaround()
         MAGIC_ADDR = 0x8ffffc;
 		flag_6670 = 1;
 	}
+	if (v == DEVICE_C6657_JTAG_ID_VAL) {
+                MAGIC_ADDR = 0x8ffffc;
+                flag_6657 = 1;
+        }
+
 
     DEVICE_REG32_W ((PCIE_BASE_ADDR + PCIE_CLASSCODE_REVID), 0x04800001);  /* class 0x04, sub-class 0x80, Prog I/F 0x00, Other multimedia device */ 
     DEVICE_REG32_W ((PCIE_BASE_ADDR + PCIE_LINK_STAT_CTRL), 0x10110080);  /* extended sync, slot_clk_cfg = 1 */
@@ -260,11 +253,17 @@ void iblPCIeWorkaround()
 		DEVICE_REG32_W ((PCIE_BASE_ADDR + PCIE_BAR1), 0x000FFFFF);   /* 1M */
 		DEVICE_REG32_W ((PCIE_BASE_ADDR + PCIE_BAR2), 0x001FFFFF);   /* 2M */
 		DEVICE_REG32_W ((PCIE_BASE_ADDR + PCIE_BAR3), 0x00FFFFFF);   /* 16M */
-    }
+   	 }	
+	if (flag_6657)  {
+                /* 6657 */
+                DEVICE_REG32_W ((PCIE_BASE_ADDR + PCIE_BAR0), 0x00000FFF);   /* 4K */
+                DEVICE_REG32_W ((PCIE_BASE_ADDR + PCIE_BAR1), 0x000FFFFF);   /* 1M */
+                DEVICE_REG32_W ((PCIE_BASE_ADDR + PCIE_BAR2), 0x001FFFFF);   /* 2M */
+                DEVICE_REG32_W ((PCIE_BASE_ADDR + PCIE_BAR3), 0x00FFFFFF);   /* 16M */
+        }
+    DEVICE_REG32_W ((PCIE_BASE_ADDR + PCIE_APP_CMD_STATUS), 0x0);    /* dbi_cs2=0 */
 
-	DEVICE_REG32_W ((PCIE_BASE_ADDR + PCIE_APP_CMD_STATUS), 0x0);    /* dbi_cs2=0 */
-
-	DEVICE_REG32_W ((PCIE_BASE_ADDR + PCIE_STATUS_CMD), 0x00100146); /* ENABLE mem access */
+    DEVICE_REG32_W ((PCIE_BASE_ADDR + PCIE_STATUS_CMD), 0x00100146); /* ENABLE mem access */
     DEVICE_REG32_W ((PCIE_BASE_ADDR + PCIE_DEV_STAT_CTRL), 0x0000281F); /* Error control */
     DEVICE_REG32_W ((PCIE_BASE_ADDR + PCIE_ACCR), 0x000001E0); /* Error control */
     DEVICE_REG32_W ((PCIE_BASE_ADDR + PCIE_BAR0), 0); /* non-prefetch, 32-bit, mem bar */
@@ -280,7 +279,7 @@ void iblPCIeWorkaround()
     return;
 }
 
-#endif
+#endif  
 
 #define FPGA_BM_GPI_STATUS_LO_REG           4   /* Boot Mode GPI Status (07-00 Low Byte) Register */
 #define FPGA_BM_GPI_STATUS_HI_REG           5   /* Boot Mode GPI Status (15-08 High Byte) Register */
@@ -300,9 +299,7 @@ void iblEnterRom ()
     uint32      v, dev_stat, bm_lo, bm_hi;
     void        (*exit)();
 
-    /* Power up the SPI */
-    devicePowerPeriph (TARGET_PWR_SPI);
-
+	
     /* Reset SPI */
     DEVICE_REG32_W (DEVICE_SPI_BASE(0) + SPI_REG_SPIGCR0, SPI_REG_VAL_SPIGCR0_RESET);
 
@@ -416,10 +413,8 @@ void deviceLoadInitSpiConfig (void *vcfg)
     v = *((Uint32 *)DEVICE_JTAG_ID_REG);
     v &= DEVICE_JTAG_ID_MASK;
 
-    if (v == DEVICE_C6678_JTAG_ID_VAL)
-        params = (BOOT_PARAMS_COMMON_T *)ROM_BOOT_PARAMS_ADDR_C6678;
-    else
-        params = (BOOT_PARAMS_COMMON_T *)ROM_BOOT_PARAMS_ADDR_C6670;
+    if (v == DEVICE_C6657_JTAG_ID_VAL)
+        params = (BOOT_PARAMS_COMMON_T *)ROM_BOOT_PARAMS_ADDR_C6657;
 
 
     /* SPI_ROM is a constant defined during make which enables the use of the
@@ -435,7 +430,8 @@ void deviceLoadInitSpiConfig (void *vcfg)
         cfg->csel      = spip->csel;
         cfg->c2tdelay  = spip->c2tdelay;
 
-        v = (UINT32)spip->cpuFreqMhz * 1000;  /* CPU frequency in kHz */
+	/* TODO:cpufreqMhz need update */
+        v = (UINT32)spip->cpuFreqMhz * 1000;  /* CPU frequency in kHz */ 
         v = v / (DEVICE_SPI_MOD_DIVIDER * (((UINT32)(spip->busFreqMhz) * 1000) + spip->busFreqKhz));
 
         if (v > DEVICE_SPI_MAX_DIVIDER)
