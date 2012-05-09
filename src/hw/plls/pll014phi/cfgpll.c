@@ -73,6 +73,8 @@ SINT16 hwPllSetCfgPll (UINT32 base, UINT32 prediv, UINT32 mult, UINT32 postdiv, 
 
     /* Set bit 14 in register 1 to disable the PLL (assert reset) */
     regb = BOOT_SET_BITFIELD(regb, 1, 14, 14);
+    /* set bit 13 in register 1 for selecting the output of PASS PLL as the input to PASS */
+    regb = BOOT_SET_BITFIELD(regb, 1, 13, 13);
     DEVICE_REG32_W (base + 4, regb);
 
     reg = BOOT_SET_BITFIELD (reg, prediv - 1, 5, 0);
