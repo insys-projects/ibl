@@ -173,16 +173,5 @@ UINT32 ddr3_memory_test (void)
 
 	return 0;
 }
-
-void ddr3_memory_zero(UINT32 size_mb )
-{
-	 UINT32 index;
-
-	/* clear memory */
-	for (index = DDR3_TEST_START_ADDRESS; index < (DDR3_TEST_START_ADDRESS + (size_mb *1024*1024)); index += 4) {
-		*(VUint32 *) index = (UINT32)0;
-	}
-}
-
 #endif
 

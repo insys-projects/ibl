@@ -195,8 +195,6 @@ void deviceDdrConfig (void)
     else
     {
         uart_write_string("IBL: PLL and DDR Initialization Complete",0);
-        /* Clear the 16MB DDR3 memory - Workaround - should be removed after Linux fixes the issue */
-        ddr3_memory_zero(16);
     }
     uart_write_string(ddr_result_code_str,0);
 #endif
