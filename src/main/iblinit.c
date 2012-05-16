@@ -458,7 +458,10 @@ void main (void)
     iblStatus.iblVersion   = ibl_VERSION;
     iblStatus.activeDevice = ibl_ACTIVE_DEVICE_I2C;
 
-
+#ifdef C665x
+     /*Set GPIO as SPI,UART*/
+    configureGPIO();
+#endif
     /* Determine the boot device to read from */
     bootDevice = deviceReadBootDevice();
 

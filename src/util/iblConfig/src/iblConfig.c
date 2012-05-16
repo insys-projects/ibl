@@ -41,6 +41,7 @@ int main (void)
 	    [5] = &c6472_ibl_config,
 	    [6] = &c6678_ibl_config,
 	    [7] = &c6670_ibl_config,
+	    [8] = &c6657_ibl_config,
     };
     int ncfgs = ARRAY_SIZE(cfg);
 

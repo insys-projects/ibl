@@ -74,6 +74,7 @@ C6X_C_DIR+= ;$(IBL_ROOT)/arch/$(ARCH)
 C6X_C_DIR+= ;$(ECODIR)
 C6X_C_DIR+= ;$(STDINC)
 C6X_C_DIR+= ;$(IBL_ROOT)/cfg/$(TARGET)
+C6X_C_DIR+= ;$(IBL_ROOT)/hw/uart
 export C6X_C_DIR
 
 

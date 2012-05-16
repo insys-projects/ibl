@@ -65,9 +65,9 @@
 
 /**
  * @brief
- *  The version number, 1.0.0.9
+ *  The version number, 1.0.0.11
  */
-#define ibl_VERSION  ibl_MAKE_VERSION(1,0,0,10)
+#define ibl_VERSION  ibl_MAKE_VERSION(1,0,0,11)
 
 #define SETIP(array,i0,i1,i2,i3)      array[0]=(i0);  \
                                       array[1]=(i1);  \

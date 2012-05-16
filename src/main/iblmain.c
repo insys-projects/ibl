@@ -193,8 +193,11 @@ void iblPmemCfg (int32 interface, int32 port, bool enableNand)
                         iblStatus.iblFail = ibl_FAIL_CODE_NO_EMIF_CFG;
                         return;
                     }
-
+#ifdef C665x
+					ret = devicePowerPeriph (TARGET_PWR_EMIF_C6657);
+#else
                     ret = devicePowerPeriph (TARGET_PWR_EMIF);
+#endif
                     if (ret != 0)
                         break;
 
