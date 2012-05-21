@@ -258,7 +258,7 @@ void iblPCIeWorkaround()
                 /* 6657 */
                 DEVICE_REG32_W ((PCIE_BASE_ADDR + PCIE_BAR0), 0x00000FFF);   /* 4K */
                 DEVICE_REG32_W ((PCIE_BASE_ADDR + PCIE_BAR1), 0x000FFFFF);   /* 1M */
-                DEVICE_REG32_W ((PCIE_BASE_ADDR + PCIE_BAR2), 0x001FFFFF);   /* 2M */
+                DEVICE_REG32_W ((PCIE_BASE_ADDR + PCIE_BAR2), 0x000FFFFF);   /* 1M */
                 DEVICE_REG32_W ((PCIE_BASE_ADDR + PCIE_BAR3), 0x00FFFFFF);   /* 16M */
         }
     DEVICE_REG32_W ((PCIE_BASE_ADDR + PCIE_APP_CMD_STATUS), 0x0);    /* dbi_cs2=0 */
