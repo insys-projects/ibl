@@ -225,7 +225,7 @@ int modifyIblConfig(FILE *fp, ibl_t *ibl)
     char tokens[] = " :=;\n\r";
     char *key, *data;
 	unsigned char ethBootIdx=DEFAULT_ETHBOOT_IDX, i0, i1, i2, i3;
-    if ((device_id == 6) || (device_id == 7)) 
+    if ((device_id == 6) || (device_id == 7) || (device_id == 8)) 
         ethBootIdx = EVM_C6678_ETHBOOT_IDX;
     memset(line, 0, MAX_LINE_LENGTH);
 
