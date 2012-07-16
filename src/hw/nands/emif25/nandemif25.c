@@ -41,12 +41,14 @@
 #include "emif25_loc.h"
 #include "ecc.h"
 #include "target.h"
+#include "uart.h"
 
 #define NAND_DATA_OFFSET    0x0     /* Data register offset */
 #define NAND_ALE_OFFSET     0x2000  /* Address latch enable register offset */
 #define NAND_CMD_OFFSET     0x4000  /* Command latch enable register offset */
 
 #define NAND_DELAY          50000
+#define EMIF16_NAND_PROG_TIMEOUT           (100000)
 
 #define DEVICE_REG8_W(x,y)  *(volatile Uint8 *)(x)=(y)
 #define DEVICE_REG8_R(x)    (*(volatile Uint8 *)(x))
@@ -59,7 +61,40 @@ extern uint32 deviceEmif25MemBase (int32 cs);
 
 int32          gCs;        /* The chip select space */
 uint32         memBase;    /* Base address in device memory map */
+
 nandDevInfo_t *hwDevInfo;  /* Pointer to the device configuration */
+
+/******************************************************************************
+  *
+  * Function:    NandWaitRdy
+  *
+  * Description: This function waits for the NAND status to be ready
+  *
+  * Parameters:  uint32_t in_timeout - time out value in micro seconds
+  *
+  * Return Value: Failure if Ready Pin is not high for prescribed time
+  *
+  *****************************************************************************/
+ static Int32 NandWaitRdy(Uint32 in_timeout)
+ {
+     Uint32 count = 0,v;
+
+     do {
+         chipDelay32(1);
+        v = DEVICE_REG32_R (DEVICE_EMIF25_BASE + EMIF25_FLASH_STATUS_REG);
+        if ((v & 1) == 1) {
+            break;
+        }
+        count ++;
+     } while (count < in_timeout);
+
+     if (count >= in_timeout)
+        return -1;
+     else
+        return 0;
+ }
+
+
 
 void 
 nandAleSet
@@ -88,6 +123,8 @@ NandRead4bitECC
 )
 {
     Uint32    mask = 0x03ff03ff;
+    if((*(int*)0x80000000) == 0x464C457F)
+      uart_write_string("DDR OK",0);
 
     code[0] = DEVICE_REG32_R (DEVICE_EMIF25_BASE + EMIF25_FLASH_ECC_REG(0)) & mask;
     code[1] = DEVICE_REG32_R (DEVICE_EMIF25_BASE + EMIF25_FLASH_ECC_REG(1)) & mask;
@@ -256,11 +293,25 @@ Int32 nandHwEmifDriverInit (int32 cs, void *vdevInfo)
  */
 Int32 nandHwEmifDriverReadBytes (Uint32 block, Uint32 page, Uint32 byte, Uint32 nbytes, Uint8 *data)
 {
-    Uint32  addr;
+    Uint32  addr;Uint32 v;
+#ifndef NAND_TYPE_LARGE
     Uint32  cmd;
+#endif
 
-    addr = (block << hwDevInfo->blockOffset) | (page << hwDevInfo->pageOffset) | ((byte & 0xff) << hwDevInfo->columnOffset);   
+    addr = ((block & 0x000003ff) << hwDevInfo->blockOffset) | ((page & 0x0000003f) << hwDevInfo->pageOffset) | ((byte & 0xfff) << hwDevInfo->columnOffset);
 
+#ifdef NAND_TYPE_LARGE
+    nandCmdSet(hwDevInfo->readCommandPre); // First cycle send pre command
+
+    /* 4 address cycles */
+    nandAleSet((addr >>  0) & 0xFF);    /* A0-A7   1st Cycle, column addr       */
+    nandAleSet((addr >>  8) & 0x0F);    /* A8-A15  2nd Cycle, page addr & blk   */
+    nandAleSet((addr >> 16) & 0xFF);    /* A16-A23 3rd Cycle, block addr        */
+    nandAleSet((addr >> 24) & 0xFF);    /* A24-A31 4th Cycle, plane addr        */
+
+    if(hwDevInfo->postCommand)
+      nandCmdSet(hwDevInfo->readCommandPost); // Second cycle send post command
+#else
     if (byte < hwDevInfo->pageSizeBytes) 
     {
         /* Read page data */
@@ -278,9 +329,15 @@ Int32 nandHwEmifDriverReadBytes (Uint32 block, Uint32 page, Uint32 byte, Uint32 
     nandAleSet((addr >> 9) & 0xFF);     /* A9-A16  2nd Cycle, page addr & blk   */
     nandAleSet((addr >> 17) & 0xFF);    /* A17-A24 3rd Cycle, block addr        */
     nandAleSet((addr >> 25) & 0x1);     /* A25-A26 4th Cycle, plane addr        */
+#endif
 
     chipDelay32 (NAND_DELAY);
-
+    // Wait for Ready Busy Pin to go HIGH
+    v = NandWaitRdy(EMIF16_NAND_PROG_TIMEOUT);
+    if (v != 0) {
+        uart_write_string("IBL: Booting from ethernet",0);
+         return -1;
+         }
     nandReadDataBytes(nbytes, data);
 
     return (0);
@@ -292,25 +349,43 @@ Int32 nandHwEmifDriverReadBytes (Uint32 block, Uint32 page, Uint32 byte, Uint32 
  */
 Int32 nandHwEmifDriverReadPage (Uint32 block, Uint32 page, Uint8 *data)
 {
-    Int32   i, j, nSegs;
+    Int32   i;
     Int32   addr;
     Uint8  *pSpareArea;
     Uint8   eccFlash[ibl_N_ECC_BYTES];
     Uint32  v;
 
-    addr = (block << hwDevInfo->blockOffset) | (page << hwDevInfo->pageOffset);   
-
+  //  addr = (block << hwDevInfo->blockOffset) | (page << hwDevInfo->pageOffset);
+    addr = ((block & 0x000003ff) << hwDevInfo->blockOffset) | ((page & 0x0000003f) << hwDevInfo->pageOffset);
+#ifdef NAND_TYPE_LARGE
     /* Send the read command */
-    nandCmdSet(hwDevInfo->readCommandPre); 
+    nandCmdSet(hwDevInfo->readCommandPre);
+
+    /* 4 address cycles */
+    nandAleSet((addr >>  0) & 0xFF);    /* A0-A7   1st Cycle, column addr       */
+    nandAleSet((addr >>  8) & 0x0F);    /* A8-A15  2nd Cycle, page addr & blk   */
+    nandAleSet((addr >> 16) & 0xFF);    /* A16-A23 3rd Cycle, block addr        */
+    nandAleSet((addr >> 24) & 0xFF);    /* A24-A31 4th Cycle, plane addr        */
+
+    if(hwDevInfo->postCommand)
+          nandCmdSet(hwDevInfo->readCommandPost); // Second cycle send post command
+#else
+    /* Send the read command */
+    nandCmdSet(hwDevInfo->readCommandPre);
      
     /* 4 address cycles */
     nandAleSet((addr >> 0) & 0xFF);     /* A0-A7   1st Cycle, column addr       */
     nandAleSet((addr >> 9) & 0xFF);     /* A9-A16  2nd Cycle, page addr & blk   */
     nandAleSet((addr >> 17) & 0xFF);    /* A17-A24 3rd Cycle, block addr        */
     nandAleSet((addr >> 25) & 0x1);     /* A25-A26 4th Cycle, plane addr        */
-
+#endif
     chipDelay32 (NAND_DELAY);
 
+    v = NandWaitRdy(EMIF16_NAND_PROG_TIMEOUT);
+        if (v != 0) {
+            uart_write_string("IBL: Booting from ethernet",0);
+             return -1;
+             }
     /* Start 4-bit ECC calculation */
     v = DEVICE_REG32_R (DEVICE_EMIF25_BASE + EMIF25_FLASH_CTL_REG);
     DEVICE_REG32_W (DEVICE_EMIF25_BASE + EMIF25_FLASH_CTL_REG, v | (1<<12));
@@ -356,8 +431,3 @@ Int32 nandHwEmifDriverClose (void)
     return (0);
 
 }
-        
-
-
-
-
