@@ -73,90 +73,110 @@ SINT16 hwPllSetPll (UINT32 pllNum, UINT32 prediv, UINT32 mult, UINT32 postdiv)
   /* Get the base address of the pll */
   pllBase = (UINT32) DEVICE_PLL_BASE(pllNum);
 
- /* Wait for Stabilization time (min 100 us) */
- /* assuming max device speed, 1.4GHz, 1 cycle = 0.714 ns *
-  * so, 100 us = 100000 ns = 140056 cycles */
+ /* 1. Wait for Stabilization time (min 100 us)             *
+  * assuming max device speed, 1.4GHz, 1 cycle = 0.714 ns   *
+  * so, 100 us = 100000 ns = 140056 cycles                  */
   hw_pll_delay (140056);
 
-  /* Program pllen=0 (pll bypass), pllrst=1 (reset pll), pllsrc = 0 */
+  /* Get the value of PLLCTL */
   ctl = DEVICE_REG32_R (pllBase + PLL_REG_CTL);
 
- /* Check if PLL BYPASS is turned off previously */
+ /* 2. Check the status of BYPASS bit in SECCTL register,                   *
+  *    execute the following steps if                                       *
+  *    BYPASS == 1 (if bypass enabled), if BYPASS==0 then Jump to Step 3    */
   secctl = DEVICE_REG32_R (pllBase + PLL_REG_SECCTL);
 
   if ( (secctl & PLL_REG_SECCTL_FIELD_BYPASS) != 0 ) {
     /* PLL BYPASS is turned on */
 
-	/* Set the ENSAT Bit */
+	/* 2a. Set the ENSAT Bit */
 	/* Usage Note 9: For optimal PLL operation, the ENSAT bit in the PLL control
 	 * registers for the Main PLL, DDR3 PLL, and PA PLL should be set to 1.
 	 * The PLL initialization sequence in the silicon sets this bit to 0 and
 	 * could lead to non-optimal PLL operation. Software can set the bit to the
 	 * optimal value of 1 after boot
+     * |31...7   |6     |5 4       |3...0      |
+     * |Reserved |ENSAT |Reserved  |BWADJ[11:8]|
 	 */
-        reg = DEVICE_REG32_R (DEVICE_MAIN_PLL_CTL_1);
-        reg = reg | (1 << 6);
-        DEVICE_REG32_W (DEVICE_MAIN_PLL_CTL_1, reg);
-
-	/* Clear the PLLENSRC bit */
-	ctl = ctl & ~(PLL_REG_CTL_FIELD_PLLENSRC);
-	DEVICE_REG32_W (pllBase + PLL_REG_CTL, ctl);
-
-	/* Clear the PLLEN bit */
+    reg = DEVICE_REG32_R (DEVICE_MAIN_PLL_CTL_1);   // Read MAINPLLCTL
+    reg = reg | (1 << 6);                           // Set bit 6 (ENSAT)
+    DEVICE_REG32_W (DEVICE_MAIN_PLL_CTL_1, reg);    // Write to MAINPLLCTL
+    
+    /* 2b. Clear the PLLEN bit */
 	ctl = ctl & ~(PLL_REG_CTL_FIELD_PLLEN);
 	DEVICE_REG32_W (pllBase + PLL_REG_CTL, ctl);
 
+	/* 2c. Clear the PLLENSRC bit */
+	ctl = ctl & ~(PLL_REG_CTL_FIELD_PLLENSRC);
+	DEVICE_REG32_W (pllBase + PLL_REG_CTL, ctl);
+
 	
-	/* Wait for 4 Ref clocks */
+	/* 2d. Wait for 4 Ref clocks */
 	/* The slowest clock can be at 25MHz, so min:160ns delay */
 	hw_pll_delay(225);
 
-	/* Put the PLL in Bypass mode to perform the power down mode */
+	/* 2e. Put the PLL in Bypass mode to perform the power down mode */
 	secctl = secctl | PLL_REG_SECCTL_FIELD_BYPASS;
 	DEVICE_REG32_W (pllBase + PLL_REG_SECCTL, secctl);
 
-	/* Advisory 8: Multiple PLLs May Not Lock After Power-on Reset Issue
+	/* 2f. Advisory 8: Multiple PLLs May Not Lock After Power-on Reset Issue
          * In order to ensure proper PLL startup, the PLL power_down pin needs to be
          * toggled. This is accomplished by toggling the PLLPWRDN bit in the PLLCTL
          * register. This needs to be done before the main PLL initialization
          * sequence
 	 */
-	ctl = ctl | 2;
+	ctl = ctl | 0x00000002;
 	DEVICE_REG32_W (pllBase + PLL_REG_CTL, ctl);
 
-	/* Stay in a loop such that the bit is set for 5 µs (minimum) and
+	/* 2g. Stay in a loop such that the bit is set for 5 µs (minimum) and
 	 * then clear the bit.
 	 */
 	hw_pll_delay (14005); /* waiting 10 us */
 
-	/* Power up the PLL */
-	ctl = ctl & ~2;
+	/* 2h. Power up the PLL */
+	ctl = ctl & ~(0x00000002);
 	DEVICE_REG32_W (pllBase + PLL_REG_CTL, ctl);
 	
   }
-
-	/* Assert PLL Reset */
-	ctl = ctl | (PLL_REG_CTL_FIELD_PLLRST);
+  else
+  {
+    /* 3. Enable BYPASS in the PLL controller */
+    
+    /* 3a. Clear PLLEN bit (bypass enabled in PLL controller mux) */
+    ctl = ctl & ~(PLL_REG_CTL_FIELD_PLLEN);
 	DEVICE_REG32_W (pllBase + PLL_REG_CTL, ctl);
+    
+    /* 3b. Clear PLLENSRC bit (enable PLLEN to control PLL controller mux) */
+    ctl = ctl & ~(PLL_REG_CTL_FIELD_PLLENSRC);
+	DEVICE_REG32_W (pllBase + PLL_REG_CTL, ctl);
+    
+    /* 3c. Wait for 4 RefClks (to make sure the PLL controller *
+     * mux switches properly to bypass)                        *
+     * Assuming slowest Ref clock of 25MHz, min: 160 ns delay  */
+     hw_pll_delay(225);
+  }
 
 	/* Program the necessary multipliers/dividers and BW adjustments
 	 * This routine will subtract 1 from the mult value
 	 */
+    /* 4. Program Multipliers */
 	pmult = chipPllExternalMult(pllNum, mult);
 	pmult   = pmult & PLL_REG_PLLM_FIELD_MULTm1;
 	DEVICE_REG32_W (pllBase + PLL_REG_PLLM, pmult);
 
-	/* set the BWADJ */
+	/* 5. set the BWADJ */
 	chipPllExternalBwAdj (pllNum, mult);
 
-	/* Set the PLL Divider */
+	/* 6. Set the PLL Divider */
 	chipPllSetExternalPrediv(pllNum, prediv - 1);  
 
-	/* set the output divide */
+	/* 7. set the output divide */
 	secctl = BOOT_SET_BITFIELD(secctl, 1 & 0x000f, 22, 19);
-	DEVICE_REG32_W (pllBase + PLL_REG_SECCTL, secctl); 
+	DEVICE_REG32_W (pllBase + PLL_REG_SECCTL, secctl);
+
+    /* 8. Program PLLDIVn */
   
-	/* wait for the GOSTAT, but don't trap if lock is never read */
+	/* part of 8, wait for the GOSTAT, but don't trap if lock is never read */
 	for (i = 0; i < 100; i++)  {
 		hw_pll_delay (300);
 		status = DEVICE_REG32_R (pllBase + PLL_REG_PLLSTAT);
@@ -168,7 +188,7 @@ SINT16 hwPllSetPll (UINT32 pllNum, UINT32 prediv, UINT32 mult, UINT32 postdiv)
 	if (i == 100)  
 		ret = -1;
   
-	/* Set PLL dividers if needed */
+	/* part of 8, Set PLL dividers if needed */
 	reg = 0x8000 | (div2 -1);
 	DEVICE_REG32_W (pllBase + PLL_REG_DIV2, reg);
 
@@ -178,18 +198,18 @@ SINT16 hwPllSetPll (UINT32 pllNum, UINT32 prediv, UINT32 mult, UINT32 postdiv)
 	reg = 0x8000 | (div8 -1);
 	DEVICE_REG32_W (pllBase + PLL_REG_DIV8, reg);
 
-	/* Program ALNCTLn registers */
+	/* part of 8, Program ALNCTLn registers */
 	alnctl = DEVICE_REG32_R (pllBase + PLL_REG_ALNCTL);
 	alnctl = alnctl | ((1 << 1) | (1 << 4) | (1 << 7));
 	DEVICE_REG32_W (pllBase + PLL_REG_ALNCTL, alnctl);
 
-	/* Set GOSET bit in PLLCMD to initiate the GO operation to change the divide *   
-	 * values and align the SYSCLKs as programmed                                */
+	/* part of 8, Set GOSET bit in PLLCMD to initiate the GO operation to change the divide *   
+	 * values and align the SYSCLKs as programmed                                           */
 	reg = DEVICE_REG32_R (pllBase + PLL_REG_CMD);
 	reg = reg | 1;
 	DEVICE_REG32_W (pllBase + PLL_REG_CMD, reg);
 
-	/* wait for the GOSTAT, but don't trap if lock is never read */
+	/* part of 8, wait for the GOSTAT, but don't trap if lock is never read */
 	for (i = 0; i < 100; i++)  {
 		hw_pll_delay (300);
 		status = DEVICE_REG32_R (pllBase + PLL_REG_PLLSTAT);
@@ -199,25 +219,31 @@ SINT16 hwPllSetPll (UINT32 pllNum, UINT32 prediv, UINT32 mult, UINT32 postdiv)
 
 	if (i == 100)  
 		ret = -1;
+        
+    /* 9. Assert PLL Reset */
+	ctl = ctl | (PLL_REG_CTL_FIELD_PLLRST);
+	DEVICE_REG32_W (pllBase + PLL_REG_CTL, ctl);
 
-	/* Wait for a minimum of 7 us*/
+	/* 10. Wait for a minimum of 7 us*/
 	hw_pll_delay (14006);
 
-	/* Release PLL from Reset */
+	/* 11. Release PLL from Reset */
 	ctl = ctl & ~(PLL_REG_CTL_FIELD_PLLRST);
 	DEVICE_REG32_W (pllBase + PLL_REG_CTL, ctl);
 
-	/* Wait for PLL Lock time (min 50 us) */
+	/* 12. Wait for PLL Lock time (min 50 us) */
 	hw_pll_delay (140056 >> 1);
 
-	/* Clear the secondary controller bypass bit */
+	/* 13. Clear the secondary controller bypass bit */
 	secctl = secctl & ~PLL_REG_SECCTL_FIELD_BYPASS;
 	DEVICE_REG32_W (pllBase + PLL_REG_SECCTL, secctl);
 
 
-	/* Set pllen to 1 to enable pll mode */
+	/* 14. Set pllen to 1 to enable pll mode */
 	ctl = ctl | PLL_REG_CTL_FIELD_PLLEN;
 	DEVICE_REG32_W (pllBase + PLL_REG_CTL, ctl);
+    
+    /* 15. The PLL and PLL Controller are now initialized in PLL mode - Complete */
   
 	return (ret);
 } /* hwPllSetPll */
