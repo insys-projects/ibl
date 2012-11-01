@@ -1,6 +1,6 @@
 #!/bin/sh
 # Generate the source release tarballs
-export IBL_VERSION="1_0_0_15"
+export IBL_VERSION="1_0_0_16"
 cd ../
 if [ -f ibl_src_$IBL_VERSION.tgz ]; then rm ibl_src_$IBL_VERSION.tgz; fi
 
