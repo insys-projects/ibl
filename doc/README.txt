@@ -13,4 +13,5 @@ This directory contains the following documents:
 4. evmc6678-instructions.txt: Document describing steps to use IBL on the c6678 EVM
 5. evmc6670-instructions.txt: Document describing steps to use IBL on the c6670 EVM
 6. evmc6657-instructions.txt: Document describing steps to use IBL on the c6657 EVM
+7. evmtci6634k2k-instructions.txt: Document describing steps to use IBL on the tci6634k2k EVM
 

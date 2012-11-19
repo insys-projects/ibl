@@ -65,11 +65,11 @@
 
 /**
  * @brief
- *  The version number, 1.0.0.16
+ *  The version number, 1.0.0.17
  */
-#define ibl_VERSION  ibl_MAKE_VERSION(1,0,0,16)
+#define ibl_VERSION  ibl_MAKE_VERSION(1,0,0,17)
 /* Version string for UART write */
-#define ibl_VERSION_STR  "1.0.0.16"
+#define ibl_VERSION_STR  "1.0.0.17"
 
 /**
  * @defgroup iblBootModes  Defines the boot modes supported by the IBL
@@ -703,6 +703,7 @@ typedef struct iblBoot_s
 #define ibl_EVM_C6670L  0x50  	/**< C6670 Low Cost EVM */
 #define ibl_EVM_C6678L  0x60  	/**< C6678 Low Cost EVM */
 #define ibl_EVM_C6657L  0x70    /**< C6657 Low Cost EVM */
+#define ibl_EVM_TCI6634K2K  0x80    /**< TCI6634K2K Low Cost EVM */
 
 /**
  *  @brief

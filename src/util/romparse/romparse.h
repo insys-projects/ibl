@@ -1,34 +1,34 @@
 /*
  *
- * Copyright (C) 2010 Texas Instruments Incorporated - http://www.ti.com/ 
- * 
- * 
- *  Redistribution and use in source and binary forms, with or without 
- *  modification, are permitted provided that the following conditions 
+ * Copyright (C) 2010 Texas Instruments Incorporated - http://www.ti.com/
+ *
+ *
+ *  Redistribution and use in source and binary forms, with or without
+ *  modification, are permitted provided that the following conditions
  *  are met:
  *
- *    Redistributions of source code must retain the above copyright 
+ *    Redistributions of source code must retain the above copyright
  *    notice, this list of conditions and the following disclaimer.
  *
  *    Redistributions in binary form must reproduce the above copyright
- *    notice, this list of conditions and the following disclaimer in the 
- *    documentation and/or other materials provided with the   
+ *    notice, this list of conditions and the following disclaimer in the
+ *    documentation and/or other materials provided with the
  *    distribution.
  *
  *    Neither the name of Texas Instruments Incorporated nor the names of
  *    its contributors may be used to endorse or promote products derived
  *    from this software without specific prior written permission.
  *
- *  THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS 
- *  "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT 
+ *  THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
+ *  "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
  *  LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR
- *  A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT 
- *  OWNER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, 
- *  SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT 
+ *  A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT
+ *  OWNER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL,
+ *  SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT
  *  LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE,
  *  DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY
- *  THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT 
- *  (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE 
+ *  THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
+ *  (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
  *  OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  *
 */
@@ -46,7 +46,7 @@
  *				table
  *
  *************************************************************************************/
- 
+
 /* tiboot.h defines the boot parameters structure that will be created */
 #if defined(c6472)
  #include "tiboot_c6472.h"
@@ -60,6 +60,8 @@
  #include "tiboot_c66x.h"
 #elif defined(c665x)
  #include "tiboot_c665x.h"
+#elif defined(c66xk2x)
+ #include "tiboot_c66xk2x.h"
 #else
  #error invalid or missing device specification
 #endif
@@ -102,14 +104,14 @@ typedef struct {
 } plt_t;
 
 /* Define a layout table. A layout table is a block of data which contains the addresses
- * of data files. Each address is 32 bits, with the upper 16 bits specifying the i2c 
+ * of data files. Each address is 32 bits, with the upper 16 bits specifying the i2c
  * id, the lower address the byte address of the 1st block in the table */
 #define MAX_LAYOUTS         2
 #define MAX_LAYOUT_FILES    8
 typedef struct  {
   int nPlt;                      /* Number of elements in the plt array */
   plt_t plt[MAX_LAYOUT_FILES];   /* Index of each file/pad in order */
-  
+
   unsigned int address;         /* I2c data address of the table */
   unsigned int dev_addr;        /* I2c device address of the table */
   int align;
@@ -132,7 +134,7 @@ typedef struct
 {
   int type;   /* Either PAD or LAYOUT */
   int index;  /* The array index for the pad/layout */
-  
+
 } padLayoutOrder_t;
 
 

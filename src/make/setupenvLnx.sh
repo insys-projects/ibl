@@ -2,11 +2,11 @@
 export OS="Linux"
 
 if [ -z $C6X_CGT_VERSION ]; then
-    C6X_CGT_VERSION=7.2.4
+    C6X_CGT_VERSION=7.3.4
 fi
 
 if [ -z "$C6X_BASE_DIR" ]; then
-	for dir in {~,}{,/opt}/{ti,TI,texas_instruments}/TI_CGT_C6000_${C6X_CGT_VERSION} {~,}{,/opt}/{ti,texas_instruments}/ccsv5/tools/compiler/c6000 ; do
+	for dir in {~,}{,/opt}/{ti,TI,texas_instruments}/TI_CGT_C6000_${C6X_CGT_VERSION} {~,}{,/opt}/{ti,texas_instruments}/ccsv5/tools/compiler/{c6000,c6000_${C6X_CGT_VERSION}} ; do
 		if [ -x $dir/bin/cl6x ]; then
 			C6X_BASE_DIR=$dir
 			break

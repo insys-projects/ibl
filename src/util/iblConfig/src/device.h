@@ -705,6 +705,7 @@ typedef struct iblBoot_s
 #define ibl_EVM_C6670L  0x50  	/**< C6670 Low Cost EVM */
 #define ibl_EVM_C6678L  0x60  	/**< C6678 Low Cost EVM */
 #define ibl_EVM_C6657L  0x70	/**< C6657 Low Cost EVM */
+#define ibl_EVM_TCI6634K2K  0x80	/**< TCI6634K2K Low Cost EVM */
 
 /**
  *  @brief
@@ -910,6 +911,7 @@ ibl_t c6472_ibl_config(void);
 ibl_t c6678_ibl_config(void);
 ibl_t c6670_ibl_config(void);
 ibl_t c6657_ibl_config(void);
+ibl_t tci6634k2k_ibl_config(void);
 
 
 

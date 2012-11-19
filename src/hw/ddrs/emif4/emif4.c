@@ -99,7 +99,11 @@ SINT16 hwEmif4p0Enable (iblEmif4p0_t *cfg)
     v = DEVICE_REG32_R(DEVICE_JTAG_ID_REG);
     v &= DEVICE_JTAG_ID_MASK;
     
-    if ( (v == DEVICE_C6678_JTAG_ID_VAL) ||
+    if (v == DEVICE_TCI6636K2H_JTAG_ID_VAL)
+    {
+	/* TBD */
+    }
+    else if ( (v == DEVICE_C6678_JTAG_ID_VAL) ||
          (v == DEVICE_C6670_JTAG_ID_VAL) )
     {
 

@@ -1,34 +1,34 @@
 /*
  *
- * Copyright (C) 2010 Texas Instruments Incorporated - http://www.ti.com/ 
- * 
- * 
- *  Redistribution and use in source and binary forms, with or without 
- *  modification, are permitted provided that the following conditions 
+ * Copyright (C) 2010 Texas Instruments Incorporated - http://www.ti.com/
+ *
+ *
+ *  Redistribution and use in source and binary forms, with or without
+ *  modification, are permitted provided that the following conditions
  *  are met:
  *
- *    Redistributions of source code must retain the above copyright 
+ *    Redistributions of source code must retain the above copyright
  *    notice, this list of conditions and the following disclaimer.
  *
  *    Redistributions in binary form must reproduce the above copyright
- *    notice, this list of conditions and the following disclaimer in the 
- *    documentation and/or other materials provided with the   
+ *    notice, this list of conditions and the following disclaimer in the
+ *    documentation and/or other materials provided with the
  *    distribution.
  *
  *    Neither the name of Texas Instruments Incorporated nor the names of
  *    its contributors may be used to endorse or promote products derived
  *    from this software without specific prior written permission.
  *
- *  THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS 
- *  "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT 
+ *  THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
+ *  "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
  *  LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR
- *  A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT 
- *  OWNER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, 
- *  SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT 
+ *  A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT
+ *  OWNER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL,
+ *  SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT
  *  LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE,
  *  DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY
- *  THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT 
- *  (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE 
+ *  THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
+ *  (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
  *  OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  *
 */
@@ -123,7 +123,7 @@ BOOL iblMacAddrIsZero (uint8 *maddr)
 /**
  *  @b Description
  *  @n
- *  
+ *
  *  For NAND and NOR boots, configure the specified peripheral or memory interface
  */
 void iblPmemCfg (int32 interface, int32 port, bool enableNand)
@@ -185,10 +185,10 @@ void iblPmemCfg (int32 interface, int32 port, bool enableNand)
                     int i;
 
                     /* Locate the configuration corresponding to this chip select space */
-                    for (i = 0; i < ibl_MAX_EMIF_PMEM; i++) 
+                    for (i = 0; i < ibl_MAX_EMIF_PMEM; i++)
                         if (ibl.emifConfig[i].csSpace == interface)
                             break;
-                        
+
                     if (i == ibl_MAX_EMIF_PMEM)  {
                         iblStatus.iblFail = ibl_FAIL_CODE_NO_EMIF_CFG;
                         return;
@@ -232,7 +232,7 @@ void iblPmemCfg (int32 interface, int32 port, bool enableNand)
  *
  * The main function kicks off the boot. If it does not find the magic value in the
  *     configuration array then default values are loaded. This default load
- *     is done only once at the start of boot. 
+ *     is done only once at the start of boot.
  *
  * @retval
  *  None
@@ -281,16 +281,17 @@ void main (void)
         v = DEVICE_REG32_R(DEVICE_JTAG_ID_REG);
         v &= DEVICE_JTAG_ID_MASK;
         if (
-            (v == DEVICE_C6678_JTAG_ID_VAL)         || 
-            (v == DEVICE_C6670_JTAG_ID_VAL)	    ||
-	    (v == DEVICE_C6657_JTAG_ID_VAL)	
+            (v == DEVICE_C6678_JTAG_ID_VAL)         ||
+            (v == DEVICE_C6670_JTAG_ID_VAL)	        ||
+            (v == DEVICE_C6657_JTAG_ID_VAL)	        ||
+            (v == DEVICE_TCI6636K2H_JTAG_ID_VAL)
            )
         {
             IER = 0;
 
             /* For C66x devices, check the DEVSTAT register to find which image on which device to boot. */
             v = DEVICE_REG32_R(DEVICE_REG_DEVSTAT);
-            
+
             /* Get the Endianness */
             if (ibl_N_ENDIANS == 1)
             {
@@ -323,7 +324,7 @@ void main (void)
 
             iblStatus.activeBoot = ibl.bootModes[boot_mode_idx].bootMode;
 
-            switch (ibl.bootModes[boot_mode_idx].bootMode)  
+            switch (ibl.bootModes[boot_mode_idx].bootMode)
             {
 #ifndef EXCLUDE_ETH
             case ibl_BOOT_MODE_TFTP:
@@ -334,7 +335,7 @@ void main (void)
                 iblEthBoot (boot_mode_idx);
                 break;
 #endif
-                
+
 #if ((!defined(EXCLUDE_NAND_EMIF)) || (!defined(EXCLUDE_NAND_GPIO)))
             case ibl_BOOT_MODE_NAND:
                 iblPmemCfg (ibl.bootModes[boot_mode_idx].u.nandBoot.interface, ibl.bootModes[boot_mode_idx].port, TRUE);
@@ -344,7 +345,7 @@ void main (void)
                 iblNandBoot (boot_mode_idx);
                 break;
 #endif
-                
+
 #if (!defined(EXCLUDE_NOR_EMIF) && !defined(EXCLUDE_NOR_SPI))
             case ibl_BOOT_MODE_NOR:
                 iblPmemCfg (ibl.bootModes[boot_mode_idx].u.norBoot.interface, ibl.bootModes[boot_mode_idx].port, TRUE);
@@ -359,15 +360,15 @@ void main (void)
 #else
 
 	dip_setting = get_device_switch_setting();
-	
+
 	if (dip_setting == 0)
 		boot_mode_idx = 0;
 	else if (dip_setting == 1)
 		boot_mode_idx = 1;
-	
+
 	iblStatus.activeBoot = ibl.bootModes[boot_mode_idx].bootMode;
-	
-	switch (ibl.bootModes[boot_mode_idx].bootMode) {                            
+
+	switch (ibl.bootModes[boot_mode_idx].bootMode) {
 #ifndef EXCLUDE_ETH
                 case ibl_BOOT_MODE_TFTP:
                         iblStatus.activeDevice = ibl_ACTIVE_DEVICE_ETH;
@@ -377,7 +378,7 @@ void main (void)
                         iblEthBoot (boot_mode_idx);
                         break;
 #endif
-                            
+
 #if ((!defined(EXCLUDE_NAND_EMIF)) || (!defined(EXCLUDE_NAND_GPIO)))
 		case ibl_BOOT_MODE_NAND:
                         iblPmemCfg (ibl.bootModes[boot_mode_idx].u.nandBoot.interface, ibl.bootModes[boot_mode_idx].port, TRUE);
@@ -394,11 +395,11 @@ void main (void)
 } /* main */
 
 
-    
+
 /**
  * @b Description
  * @n
- * 
+ *
  * The ibl boot function links a device to a data format. The data format
  * parser pulls data from the boot device
  *
@@ -408,10 +409,10 @@ void main (void)
  *  None
  */
 Uint32 iblBoot (BOOT_MODULE_FXN_TABLE *bootFxn, Int32 dataFormat, void *formatParams)
-{ 
+{
     Uint32  entry = 0;
     Uint32  value32;
-    Uint8   dataBuf[4];   
+    Uint8   dataBuf[4];
     Uint16  value16;
 
     /* Determine the data format if required */
@@ -441,7 +442,7 @@ Uint32 iblBoot (BOOT_MODULE_FXN_TABLE *bootFxn, Int32 dataFormat, void *formatPa
             iblStatus.autoDetectFailCnt += 1;
             return (0);
         }
-    }        
+    }
 
 
     iblStatus.activeFileFormat = dataFormat;
@@ -483,7 +484,7 @@ Uint32 iblBoot (BOOT_MODULE_FXN_TABLE *bootFxn, Int32 dataFormat, void *formatPa
             break;
 
     }
-    
+
 
     return (entry);
 

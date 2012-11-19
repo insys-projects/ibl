@@ -49,7 +49,8 @@
  *  Low level target specific values are defined
  *
  ***************************************************************************/
-
+#ifndef _TARGET_H
+#define _TARGET_H
 #include "types.h"
 
 
@@ -57,40 +58,6 @@
  *  @brief
  *   Device EMAC definitions
  */
-#define TARGET_DEVICE_CPMAC
-
-#define TARGET_EMAC_N_PORTS            1
-
-#define TARGET_EMAC_BASE_ADDRESSES     { 0x02c08000u }
-#define TARGET_EMAC_DSC_BASE_ADDR      { 0x02c0a000u }
-
-#define TARGET_SGMII_BASE_ADDRESSES    { 0x02c08900u }
-
-/* SGMII offsets (at least the serdes configs, vary between devices, so
- * they are defined here. */
-#define TARGET_SGMII_IDVER             0x000
-#define TARGET_SGMII_STATUS            0x014
-#define TARGET_SGMII_MR_LP_ADV_ABILITY 0x020
-#define TARGET_SGMII_TX_CFG            0x030
-#define TARGET_SGMII_RX_CFG            0x034
-#define TARGET_SGMII_AUX_CFG           0x038
-
-/* Leave mdio disabled */
-#define dev_mdio_open()     1
-
-/* No chip level reset required for ethernet, the function call is made a void statment */
-#define deviceSetEthResetState(x,y)
-
-/* The mac control register values */
-#define TARGET_MAC_CONTROL    ( 1 << 18)            /* EXT_EN              */     \
-                            | ( 0 << 9 )            /* Round robin         */     \
-                            | ( 1 << 7 )            /* GIG                 */     \
-                            | ( 0 << 6 )            /* TX pacing disabled  */     \
-                            | ( 1 << 5 )            /* GMII RX & TX        */     \
-                            | ( 0 << 4 )            /* TX flow disabled    */     \
-                            | ( 0 << 3 )            /* RX flow disabled    */     \
-                            | ( 0 << 1 )            /* Loopback enabled    */     \
-                            | ( 1 << 0 )            /* full duplex         */
 
 
 /**
@@ -110,20 +77,21 @@
 /**
  * @def NET_PLL
  */
+#define NET_PLL         1   /**< The index to the network PLL */
 
 /**
  *  @def DDR_PLL
  */
-#define DDR_PLL         1   /**< The index to the DDR PLL */
+#define DDR_PLL         2   /**< The index to the DDR PLL */
 
 
 /**
  *  @brief
  *    Device PLL definitions
  */
-#define DEVICE_PLL_BASE(x)      ((x) == MAIN_PLL ? 0x2310000 : 0x2620330)
-#define DEVICE_MAIN_PLL_CTL_0       0x2620328
-#define DEVICE_MAIN_PLL_CTL_1       0x262032c
+#define DEVICE_PLL_BASE(x)      ((x) == MAIN_PLL ? 0x2310000 : ((x) == NET_PLL ? 0x2620358 : 0x2620360))
+#define DEVICE_MAIN_PLL_CTL_0       0x2620350
+#define DEVICE_MAIN_PLL_CTL_1       0x2620354
 
 
 /**
@@ -136,21 +104,25 @@
  * @brief
  *  Device PSC definitions
  */
-#define DEVICE_PSC_BASE     0x02350000u
+#define DEVICE_PSC_BASE     0x2350000u
 
 /**
  *  @brief
  *    The SPI module base and module divider
  */
-#define DEVICE_SPI_BASE(x)          0x20bf0000u
+#define DEVICE_SPI_BASE(x)          0x21000400u
 #define DEVICE_SPI_MOD_DIVIDER      6
 #define DEVICE_SPI_MAX_DIVIDER      0xff
 
+/**
+ * @brief
+ *  The PSC number for the PA sub-system */
+#define TARGET_PWR_PA       7
 
 /**
  * @brief
- *  The PSC number for the EMAC */
-#define TARGET_PWR_ETH(x)   3
+ *  The PSC number for the SGMII */
+#define TARGET_PWR_ETH(x)   8
 
 /**
  * @brief
@@ -172,13 +144,14 @@
  *    The PSC number for NAND depends on the device
  */
 #define TARGET_PWR_EMIF         deviceEmifPscNum()
-#define TARGET_PWR_EMIF_C6657   -1
-#define NAND_TYPE_LARGE
+#define TARGET_PWR_EMIF_TCI6634K2K   3
+
 /*
  *  @brief
  *     The PSC number for SPI depends on the device
  */
-#define TARGET_PWR_SPI      -1
+#define TARGET_PWR_SPI      deviceSpiPscNum()
+#define TARGET_SPI_EMIF_TCI6634K2K   3
 
 /**
  *  @brief
@@ -188,7 +161,7 @@
 
 /**
  *  @brief
- *      The LPSC number for PCIe. PCIe is 10 for C6657
+ *      The LPSC number for PCIe. PCIe is 10 for C6678/C6770
  */
 #define TARGET_PWR_PCIE    10
 
@@ -196,29 +169,30 @@
  * @brief
  *  Flag to indicate timer 0 power up requested. The time is always on in the 6472
  */
-#define TARGET_PWR_TIMER_0  23
+#define TARGET_PWR_TIMER_0  -1
 
 /**
  *  @brief
  *    Device DDR controller definitions
  */
 #define DEVICE_EMIF4_BASE  0x21000000
+/* TBD: #define DEVICE_EMIF4_BASE(x)  (0x21010000 + (0x10000 * (x))) */
 #define targetEmifType()   ibl_EMIF_TYPE_40
 
 /**
  *  @brief
  *     Device EMIF 2.5 controller definitions
  */
-#define DEVICE_EMIF25_BASE  0x20c00000
+#define DEVICE_EMIF25_BASE  0x21000A00
 
 /**
  *  @brief
  *      NAND memory regions
  */
-#define TARGET_MEM_NAND_CS_2    0x70000000
-#define TARGET_MEM_NAND_CS_3    0x74000000
-#define TARGET_MEM_NAND_CS_4    0x78000000
-#define TARGET_MEM_NAND_CS_5    0x7c000000
+#define TARGET_MEM_NAND_CS_2    0x30000000
+#define TARGET_MEM_NAND_CS_3    0x34000000
+#define TARGET_MEM_NAND_CS_4    0x38000000
+#define TARGET_MEM_NAND_CS_5    0x3c000000
 uint32 deviceNandMemBase (int32 cs);
 #define TARGET_SHFL(x)  _shfl(x)  /* The shuffle intrinsic */
 
@@ -227,39 +201,39 @@ uint32 deviceNandMemBase (int32 cs);
  * @brief
  *  The highest module number. The value for nyquist is used
  */
-#define TARGET_PWR_MAX_MOD  30
+#define TARGET_PWR_MAX_MOD  52
 
 
 /**
  * @brief
  *   The base address of MDIO
  */
-#define TARGET_MDIO_BASE    0x2C080800
+#define TARGET_MDIO_BASE    0x2090300
 
 /**
  * @brief
  *   The number of external ethernet ports
  */
-#define TARGET_EMAC_N_PORTS     1
+#define TARGET_EMAC_N_PORTS     2
 
 /**
  *  @brief
  *    GPIO address
  */
-#define GPIO_GPIOPID_REG	0x02320000
-#define GPIO_GPIOEMU_REG	0x02320004
-#define GPIO_BINTEN_REG		0x02320008
-#define GPIO_DIR_REG		0x02320010
-#define GPIO_OUT_DATA_REG	0x02320014
-#define GPIO_SET_DATA_REG	0x02320018
-#define GPIO_CLEAR_DATA_REG	0x0232001C
-#define GPIO_IN_DATA_REG	0x02320020
-#define GPIO_SET_RIS_TRIG_REG	0x02320024
-#define GPIO_CLR_RIS_TRIG_REG	0x02320028
-#define GPIO_SET_FAL_TRIG_REG	0x0232002C
-#define GPIO_CLR_FAL_TRIG_REG	0x02320030
-#define PIN_CONTROL_0		0x02620580
-#define PIN_CONTROL_1		0x02620584
+#define GPIO_CFG_BASE           0x260BF00
+#define GPIO_GPIOPID_REG        (GPIO_CFG_BASE + 0x0)
+#define GPIO_GPIOEMU_REG        (GPIO_CFG_BASE + 0x4)
+#define GPIO_BINTEN_REG         (GPIO_CFG_BASE + 0x8)
+#define GPIO_DIR_REG            (GPIO_CFG_BASE + 0x10)
+#define GPIO_OUT_DATA_REG       (GPIO_CFG_BASE + 0x14)
+#define GPIO_SET_DATA_REG       (GPIO_CFG_BASE + 0x18)
+#define GPIO_CLEAR_DATA_REG     (GPIO_CFG_BASE + 0x1c)
+#define GPIO_IN_DATA_REG        (GPIO_CFG_BASE + 0x20)
+#define GPIO_SET_RIS_TRIG_REG   (GPIO_CFG_BASE + 0x24)
+#define GPIO_CLR_RIS_TRIG_REG   (GPIO_CFG_BASE + 0x28)
+#define GPIO_SET_FAL_TRIG_REG   (GPIO_CFG_BASE + 0x2c)
+#define GPIO_CLR_FAL_TRIG_REG   (GPIO_CFG_BASE + 0x30)
+
 /**
  *  @brief
  *      The base address of the I2C peripheral, and the module divisor of the cpu clock
@@ -280,10 +254,73 @@ uint32 deviceNandMemBase (int32 cs);
 SINT16 chipPllSetExternalPrediv(UINT16 pllNum, UINT32 predivRegVal);
 SINT16 chipPllExternalBwAdj (UINT16 pllNum, UINT16 mult);
 UINT32 chipPllExternalMult (UINT16 pllNum, UINT16 mult);
-void configureSPIpins(void);
+
+
+/**
+ *  @brief
+ *      Hardware network subsystem support, ethernet switch
+ */
+#define DEVICE_CPSW
+#define DEVICE_CPSW_NUM_PORTS       5                    /* 3 switch ports */
+#define DEVICE_CPSW_BASE            (0x02090800)
+#define targetGetSwitchCtl()        CPSW_CTL_P0_ENABLE   /* Enable port 0 */
+#define targetGetSwitchMaxPktSize() 9000
+
+#define DEVICE_QM
+#define DEVICE_QM_MANAGER_BASE          0x02A02000
+#define DEVICE_QM_DESC_SETUP_BASE       0x02A03000
+#define DEVICE_QM_MANAGER_QUEUES_BASE   0x02A80000
+#define DEVICE_QM_MANAGER_Q_PROXY_BASE  0x02AC0000
+#define DEVICE_QM_QUEUE_STATUS_BASE		0x02A40000
+
+/* QM base address register */
+#define DEVICE_QM1_QUEUE_MANAGEMENT_REGS(x)  (0x23A00000 + 0x80000 + 0x10000*(x))
+#define DEVICE_QM2_QUEUE_MANAGEMENT_REGS(x)  (0x23A00000 + 0xA0000 + 0x10000*(x))
+
+#define DEVICE_QM_NUM_LINKRAMS          2
+#define DEVICE_QM_NUM_MEMREGIONS        20
+void    *targetGetQmConfig(void);
+void     targetInitQs (void);
+
+#define chipLmbd(x,y) _lmbd(x,y)
+
+
+
+
+#define DEVICE_CPDMA
+
+#define DEVICE_PA_CDMA_GLOBAL_CFG_BASE   0x02004000
+#define DEVICE_PA_CDMA_TX_CHAN_CFG_BASE  0x02004400
+#define DEVICE_PA_CDMA_RX_CHAN_CFG_BASE  0x02004800
+#define DEVICE_PA_CDMA_RX_FLOW_CFG_BASE  0x02005000
+
+#define DEVICE_PA_CDMA_RX_NUM_CHANNELS   24
+#define DEVICE_PA_CDMA_RX_NUM_FLOWS      32
+#define DEVICE_PA_CDMA_TX_NUM_CHANNELS   9
+
+
+#define DEVICE_QM_FREE_Q                910
+#define DEVICE_QM_LNK_BUF_Q             911
+#define DEVICE_QM_RCV_Q                 912
+#define DEVICE_QM_TX_Q                  913
+#define DEVICE_QM_PA_CFG_Q              640
+#define DEVICE_QM_ETH_TX_Q              648
+
+#define DEVICE_RX_CDMA_TIMEOUT_COUNT    1000
+
+
+
+#define DEVICE_PA
+#define DEVICE_PA_BASE                  0x02000000
+#define DEVICE_PA_NUM_PDSPS             6
+#define DEVICE_PA_RUN_CHECK_COUNT       100         /* Number of loops to verify PA firmware is running */
+#define DEVICE_PA_PLL_BASE              0x02620338
+#define chipLower8(x)                   ((x) & 0x00ff)
+
 
 #define TARGET_SGMII_EXTERNAL_SERDES
 #define TARGET_SGMII_TYPE_2             /* Use second sgmii setup sequence */
+#define TARGET_SGMII_BASE_ADDRESSES    { 0x02090100, 0x02090200 }
 #define TARGET_SGMII_SERDES_BASE        0x2620340
 #define TARGET_SGMII_SERDES_STATUS_BASE 0x2620158
 #define TARGET_SGMII_SOFT_RESET         0x04
@@ -292,9 +329,18 @@ void configureSPIpins(void);
 void targetSgmiiSerdesConfig (int32 port, void *cfg);
 #define chipKickOpenSerdes(x)           *((uint32 *)0x2620038) = 0x83e70b13; *((uint32 *)0x262003c) = 0x95a4f1e0
 #define chipKickClosedSerdes(x)         ;       /* never lock the registers */
-
-
 #define TARGET_SERDES_LOCK_DELAY        (1600*1000)
+
+#define DEVICE_EMACSL_BASE(x)           (0x02090900 + (x)*0x040)
+#define DEVICE_N_GMACSL_PORTS           2
+#define DEVICE_EMACSL_RESET_POLL_COUNT  100
+Int32 targetMacSend (void *ptr_device, Uint8* buffer, int num_bytes);
+Int32 targetMacRcv (void *ptr_device, UINT8 *buffer);
+
+#define DEVICE_SS
+#define DEVICE_PSTREAM_CFG_REG_ADDR                 0x2000604
+#define DEVICE_PSTREAM_CFG_REG_VAL_ROUTE_PDSP0      0
+#define hwConfigStreamingSwitch()                   DEVICE_REG32_W(DEVICE_PSTREAM_CFG_REG_ADDR, DEVICE_PSTREAM_CFG_REG_VAL_ROUTE_PDSP0);
 
 #define ECC_BLOCK_SIZE			256
 
@@ -328,9 +374,8 @@ void targetSgmiiSerdesConfig (int32 port, void *cfg);
 #define BOOT_MODE_I2C               40
 #define BOOT_MODE_SPI               50
 
-#define ROM_BOOT_PARAMS_ADDR_C6678   0x873680
-#define ROM_BOOT_PARAMS_ADDR_C6657   0x8fff00
-#define ROM_BOOT_PARAMS_ADDR_C6670   0x8f3680
+
+#define ROM_BOOT_PARAMS_ADDR_TCI6634K2K   0x8fff00
 
 /**
  *  @brief
@@ -343,7 +388,7 @@ void targetSgmiiSerdesConfig (int32 port, void *cfg);
 /****************************************************************
  *
  * NOTE: Following build flags enable DEVICE specific workarounds
- * and have code which is specific to C6657 LC EVMs
+ * and have code which is specific to C6670/C6678 LC EVMs
  *
  ****************************************************************/
 
@@ -351,7 +396,7 @@ void targetSgmiiSerdesConfig (int32 port, void *cfg);
  *  @brief
  *      Support for PLL workaround to re-enter ROM boot loader.
  */
-#define IBL_ENTER_ROM              1
+#define IBL_ENTER_ROM              0
 
 /**
  *  @brief
@@ -363,7 +408,7 @@ void targetSgmiiSerdesConfig (int32 port, void *cfg);
  *  @brief
  *      Support for enabling PCIe workarond for C6678/C6670.
  */
-#define IBL_ENABLE_PCIE_WORKAROUND 1
+/* #define IBL_ENABLE_PCIE_WORKAROUND 1  TBD */
 
 /**
  *  @brief
@@ -372,7 +417,12 @@ void targetSgmiiSerdesConfig (int32 port, void *cfg);
 #define DDR3_TEST_START_ADDRESS 0x80000000
 #define DDR3_TEST_END_ADDRESS   (DDR3_TEST_START_ADDRESS + (128 *1024))
 
-UINT32 ddr3_memory_test();
-void configureGPIO(void);
+/**
+ *  @brief
+ *     Software workaround for DDR3 memory corruption is to re-init the PLL's and DDR controller. This flag enables the workaround
+ */
+#define PLL_REINIT_WORKAROUND
 
+UINT32 ddr3_memory_test();
+#endif /* _TARGET_H */
 

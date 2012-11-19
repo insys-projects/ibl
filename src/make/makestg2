@@ -19,7 +19,7 @@ CLEAN_MODULES=$(addprefix clean_,$(subst hw,,$(MODULES)))
 CLEAN_MODULES+=$(addprefix clean_,$(CFG_MODULES))
 
 
-TARGETS= c6472 c6474 c6474l c6455 c6457 c66x c665x
+TARGETS= c6472 c6474 c6474l c6455 c6457 c66x c665x c66xk2x
 
 # The main module needs to know the device address of the i2c where the image map resides
 MAINDEFS=-DIBL_CFG_I2C_MAP_TABLE_DATA_BUS_ADDR=$(I2C_BUS_ADDR)
@@ -60,7 +60,7 @@ export I2C_MAP_ADDR
 
 $(TARGETS): iblMain
 
-ifeq (($(TARGET),c66x) || $(TARGET),c665x )
+ifeq (($(TARGET),c66x) || $(TARGET),c665x || $(TARGET),c66xk2x)
     HAS_SPI=1
 else
     HAS_SPI=0
@@ -180,7 +180,7 @@ iblInit: $(CFG_MODULES) $(MODULES)
 	../util/btoccs/b2i2c ibl_$(TARGET)/ibl.b ibl_$(TARGET)/ibl.i2c.b
 	../util/btoccs/b2ccs ibl_$(TARGET)/ibl.i2c.b ibl_$(TARGET)/ibl_init.i2c.$(IEXT).ccs
 
-	sed -e 's/\\r//' ../util/symExtract/symExtract > ../util/symExtract/symExtract_unix
+	sed -e 's/\r//' ../util/symExtract/symExtract > ../util/symExtract/symExtract_unix
 	bash ../util/symExtract/symExtract_unix ibl_$(TARGET)/ibl_$(TARGET)_init.map ibl_$(TARGET)/ibl_init_symbols.inc $(COMMON_SYMBOLS)
 	rm -f ../util/symExtract/symExtract_unix
 

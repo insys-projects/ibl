@@ -68,7 +68,7 @@ SINT16 hwCpdmaRxDisable (const cpdmaRxCfg_t *cfg)
     return (0);
 
 } /* hwCpdmaRxDisable */
-        
+
 
 
 /*********************************************************************************************
@@ -114,8 +114,8 @@ SINT16 hwCpdmaRxConfig (const cpdmaRxCfg_t *cfg)
                                         cfg->qmNumFreeBuf,      /* Rx packet destination QM number, subsequent descriptors */
                                         cfg->queueFreeBuf );    /* Rx packet destination queue, subsequent descriptors */
     DEVICE_REG32_W (cfg->flowBase + CPDMA_RX_FLOW_CFG(CPDMA_RX_FLOW_REG_D, 0), v);
-  
-    
+
+
     /* Register E uses the same setup as D */
     DEVICE_REG32_W (cfg->flowBase + CPDMA_RX_FLOW_CFG(CPDMA_RX_FLOW_REG_E, 0), v);
 
@@ -127,7 +127,7 @@ SINT16 hwCpdmaRxConfig (const cpdmaRxCfg_t *cfg)
 
 
     /* Enable the rx channels */
-    for (i = 0; i < cfg->nRxChans; i++) 
+    for (i = 0; i < cfg->nRxChans; i++)
         DEVICE_REG32_W (cfg->rxBase + CPDMA_REG_RCHAN_CFG_REG_A(i), CPDMA_REG_VAL_RCHAN_A_RX_ENABLE);
 
 
@@ -143,10 +143,17 @@ SINT16 hwCpdmaRxConfig (const cpdmaRxCfg_t *cfg)
  *************************************************************************************************/
 SINT16 hwCpdmaTxConfig (const cpdmaTxCfg_t *cfg)
 {
-    UINT32 i;
+    UINT32 i, v;
 
     /* Disable loopback in the tx direction */
     DEVICE_REG32_W (cfg->gblCtlBase + CPDMA_REG_EMU_CTL, CPDMA_REG_VAL_EMU_CTL_NO_LOOPBACK);
+
+    v = *((UINT32 *)DEVICE_JTAG_ID_REG);
+    v &= DEVICE_JTAG_ID_MASK;
+
+    if (v == DEVICE_TCI6636K2H_JTAG_ID_VAL)
+    	/* Set QM base address, only for K2x devices */
+    	DEVICE_REG32_W (cfg->gblCtlBase + CPDMA_REG_QM_BASE_ADDR(0), DEVICE_QM1_QUEUE_MANAGEMENT_REGS(0));
 
     /* Enable all channels. The current state isn't important */
     for (i = 0; i < cfg->nTxChans; i++)  {
@@ -183,7 +190,7 @@ SINT16 hwCpdmaTxDisable (const cpdmaTxCfg_t *cfg)
     return (0);
 
 } /* hwCpdmaTxDisable */
-                        
+
 
 
 

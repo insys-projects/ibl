@@ -42,6 +42,7 @@ int main (void)
 	    [6] = &c6678_ibl_config,
 	    [7] = &c6670_ibl_config,
 	    [8] = &c6657_ibl_config,
+	    [9] = &tci6634k2k_ibl_config,
     };
     int ncfgs = ARRAY_SIZE(cfg);
 
@@ -78,11 +79,11 @@ int main (void)
 
     if (device_id > 0 && device_id < ncfgs)
 	    ibl_params = (*cfg[device_id])();
-		
+
 	mfp = fopen(input_file, "r");
 	modifyIblConfig(mfp, &ibl_params);
 	fclose(mfp);
-    
+
     if (fwrite((void*)&ibl_params, sizeof(ibl_t), 1, fp) != 1) {
         fclose(fp);
         return -1;
@@ -95,25 +96,25 @@ int main (void)
     return 0;
 }
 
-int32_t 
+int32_t
 xtoi
 (
-    char            *xs, 
+    char            *xs,
     uint32_t        *result
 )
 {
     uint32_t    szlen = strlen(xs);
     int32_t     i, xv, fact;
-    
+
     if (szlen > 0)
     {
         /* Converting more than 32bit hexadecimal value? */
         if (szlen>8) return 2; /* exit */
-        
+
         /* Begin conversion here */
         *result = 0;
         fact = 1;
-        
+
         /* Run until no more character to convert */
         for(i=szlen-1; i>=0 ;i--)
         {
@@ -145,7 +146,7 @@ xtoi
         }
         return 0;
     }
-    
+
     // Nothing to convert
     return 1;
 }
@@ -189,7 +190,7 @@ int parse_input_file(FILE *fp)
     }
 
     device_id = (uint32_t)atoi(data);
-    
+
     fgets(line, MAX_LINE_LENGTH, fp);
     key  = (char *)strtok(line, tokens);
     data = (char *)strtok(NULL, tokens);
@@ -225,7 +226,7 @@ int modifyIblConfig(FILE *fp, ibl_t *ibl)
     char tokens[] = " :=;\n\r";
     char *key, *data;
 	unsigned char ethBootIdx=DEFAULT_ETHBOOT_IDX, i0, i1, i2, i3;
-    if ((device_id == 6) || (device_id == 7) || (device_id == 8)) 
+    if ((device_id == 6) || (device_id == 7) || (device_id == 8))
         ethBootIdx = EVM_C6678_ETHBOOT_IDX;
     memset(line, 0, MAX_LINE_LENGTH);
 
@@ -233,7 +234,7 @@ int modifyIblConfig(FILE *fp, ibl_t *ibl)
 	{
 		key  = (char *)strtok(line, tokens);
 		data = (char *)strtok(NULL, tokens);
-		if ( (key == NULL) || (data == NULL) ) {} 
+		if ( (key == NULL) || (data == NULL) ) {}
 		else if (strcmp(key, DOBOOTP) == 0)
 		{
 			if (strcmp(data, "TRUE") == 0)

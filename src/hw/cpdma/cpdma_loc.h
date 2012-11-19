@@ -8,9 +8,10 @@
  * DESCRIPTION: Defines the layout of the cpdma peripheral
  *
  **************************************************************************************************/
- 
+
 /* Emulation control register */
 #define CPDMA_REG_EMU_CTL   0x08
+#define CPDMA_REG_QM_BASE_ADDR(x)   (0x10 + (x)*0x4)
 
 /* CPPI Tx DMA channel control registers */
 #define CPDMA_REG_TCHAN_CFG_REG_A(x)   (0x00 + (x)*0x20)
@@ -55,10 +56,10 @@
 
 /* CPPI Tx DMA Scheduler Confuration value. This sets the priorities of
  * the channels. If set to all equal, the actual value doesn't matter */
-#define CPDMA_REG_VAL_TCHAN_SCHED_HIGH_PRIORITY         0 
-#define CPDMA_REG_VAL_TCHAN_SCHED_MED_HIGH_PRIORITY     1 
-#define CPDMA_REG_VAL_TCHAN_SCHED_MED_LOW_PRIORITY      2 
-#define CPDMA_REG_VAL_TCHAN_SCHED_LOW_PRIORITY          3 
+#define CPDMA_REG_VAL_TCHAN_SCHED_HIGH_PRIORITY         0
+#define CPDMA_REG_VAL_TCHAN_SCHED_MED_HIGH_PRIORITY     1
+#define CPDMA_REG_VAL_TCHAN_SCHED_MED_LOW_PRIORITY      2
+#define CPDMA_REG_VAL_TCHAN_SCHED_LOW_PRIORITY          3
 
 
 /* A very simply flow configuration is supported. No queue allocation by bins is supported */
@@ -73,7 +74,7 @@
             ((sopOff & 0x1ff) << 16)  |   \
             ((qmgr & 3) << 12)        |   \
             ((qnum & 0xfff) << 0)     )
-            
+
 /* CPPI Rx flow configuration register B. No tags are used */
 #define CPDMA_REG_VAL_RX_FLOW_B_DEFAULT     0
 
@@ -87,7 +88,7 @@
             ((fd0Qnum & 0xfff) << 16)   |   \
             ((fd1Qm & 3) << 12)         |   \
             ((fd1Qnum & 0xfff) <<  0)   )
-            
+
 /* CPPI Rx flow configuration register E */
 #define CPDMA_REG_VAL_RX_FLOW_E_DEFAULT     0
 
@@ -99,8 +100,8 @@
 
 /* CPPI Rx flow configuration register H */
 #define CPDMA_REG_VAL_RX_FLOW_H_DEFAULT     0
-            
-/* Default Emulation control register value disables loopback */            
+
+/* Default Emulation control register value disables loopback */
 #define CPDMA_REG_VAL_EMU_CTL_NO_LOOPBACK   0
 
 

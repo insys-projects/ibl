@@ -37,6 +37,9 @@ endif
 ifeq ($(EVM),c6657l)
 	DEVICE_ID = 8
 endif
+ifeq ($(EVM),tci6634k2k)
+	DEVICE_ID = 9
+endif
 LNK_OPTS +=
 
 ###############################################################################

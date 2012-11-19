@@ -55,7 +55,7 @@ include $(IBL_ROOT)/make/$(ARCH)/makeeco.mk
 
 
 
-C6X_C_DIR+=  $(IBL_ROOT)
+C6X_C_DIR=  $(IBL_ROOT)
 C6X_C_DIR+= ;$(IBL_ROOT)/arch/$(ARCH)
 C6X_C_DIR+= ;$(IBL_ROOT)/device
 C6X_C_DIR+= ;$(IBL_ROOT)/device/$(TARGET)

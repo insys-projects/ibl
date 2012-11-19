@@ -7,7 +7,7 @@
 #*
 #**************************************************************************
 
-DEVICES= c6455 c6472 c6474 c6474l c6457 c66x c665x
+DEVICES= c6455 c6472 c6474 c6474l c6457 c66x c665x c66xk2x
 
 ifndef IBL_ROOT
  IBL_ROOT=../..
@@ -32,7 +32,13 @@ else
  PLL_OBJS+= ../../device/c64x/make/c64x.$(IEXT).oa
  PSC_OBJS= ../../hw/c64x/make/psc.$(IEXT).oc
  else
-  PLL_OBJS= $(PLL_PATH)/pll.$(IEXT).oc
+  ifeq ($(TARGET),c66xk2x) 
+   PLL_OBJS=  $(PLL_PATH)/pll.$(IEXT).oc $(PLL_PATH)/cfgpll.$(IEXT).oc $(PLL_PATH)/cfgpll2.$(IEXT).oc
+   PLL_OBJS+= ../../device/c64x/make/c64x.$(IEXT).oa
+   PSC_OBJS= ../../hw/c64x/make/psc.$(IEXT).oc
+  else
+   PLL_OBJS= $(PLL_PATH)/pll.$(IEXT).oc
+  endif
  endif 
 endif
 
@@ -45,6 +51,10 @@ ifeq ($(TARGET),c66x)
 else
  ifeq ($(TARGET),c665x) 
   TFILES= ../../device/c64x/make/$(TARGET)util.$(IEXT).oc
+ else
+  ifeq ($(TARGET),c66xk2x) 
+   TFILES= ../../device/c64x/make/$(TARGET)util.$(IEXT).oc
+  endif 
  endif
 endif
 
