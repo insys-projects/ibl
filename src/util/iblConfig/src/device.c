@@ -1166,7 +1166,7 @@ ibl_t c6657_ibl_config(void)
 	/* DDR PLL: */
 	ibl.pllConfig[ibl_DDR_PLL].doEnable       = 1;
 	ibl.pllConfig[ibl_DDR_PLL].prediv         = 3;
-	ibl.pllConfig[ibl_DDR_PLL].mult           = 40;
+	ibl.pllConfig[ibl_DDR_PLL].mult           = 80;
 	ibl.pllConfig[ibl_DDR_PLL].postdiv        = 2;
 	ibl.pllConfig[ibl_DDR_PLL].pllOutFreqMhz  = 1333;
 
