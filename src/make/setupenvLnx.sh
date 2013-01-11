@@ -2,7 +2,7 @@
 export OS="Linux"
 
 if [ -z $C6X_CGT_VERSION ]; then
-    C6X_CGT_VERSION=7.3.4
+    C6X_CGT_VERSION=7.4.1
 fi
 
 if [ -z "$C6X_BASE_DIR" ]; then
