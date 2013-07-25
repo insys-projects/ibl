@@ -1,4 +1,5 @@
 #!/bin/bash
+
 export OS="Linux"
 
 if [ -z $C6X_CGT_VERSION ]; then

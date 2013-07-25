@@ -100,6 +100,7 @@ C6X_C_DIR+= ;$(STDINC)
 C6X_C_DIR+= ;$(IBL_ROOT)/hw/plls
 C6X_C_DIR+= ;$(IBL_ROOT)/hw/pscs
 C6X_C_DIR+= ;$(IBL_ROOT)/hw/gpio
+C6X_C_DIR+= ;$(IBL_ROOT)/hw/led
 C6X_C_DIR+= ;$(IBL_ROOT)/hw/ddrs/emif31
 C6X_C_DIR+= ;$(IBL_ROOT)/hw/qm
 C6X_C_DIR+= ;$(IBL_ROOT)/hw/cpdma
