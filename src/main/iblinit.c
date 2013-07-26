@@ -66,6 +66,8 @@
 #include "device.h"
 #include "iblbtbl.h"
 #include "iblinit.h"
+#include "led.h"
+#include "uart.h"
 #include <string.h>
 
 
@@ -446,7 +448,7 @@ uint16 readUpper16 (uint32 v)
  */
 void main (void)
 {
-
+    int i;
     int32        bootDevice;
     uint32       entry;
     void         (*exit)();
@@ -487,25 +489,42 @@ void main (void)
     /* Pll configuration is device specific */
     devicePllConfig ();
 
+    LED_init();
+    LED_off();
+
+    uart_init();
+    LED_on();
+
+    uart_write_string("PEX-SRIO Start IBL init",0);
+
     /* Enable the EDC for local memory */
     if (IBL_ENABLE_EDC)
     {
+        uart_write_string("Start iblEnableEDC()...",0);
         iblEnableEDC ();
+        uart_write_string("...complete",0);
     }
+
 
     /* Check if need to enter Rom boot loader again */
     if (IBL_ENTER_ROM)
     {
+        uart_write_string("Start iblEnterRom()...",0);
         iblEnterRom ();
+        uart_write_string("...complete",0);
     }
 
     /* Pass control to the boot table processor */
+    uart_write_string("Start iblBootBtbl()...",0);
     iblBootBtbl (bFxnTbl, &entry);
+    uart_write_string("...complete",0);
 
     if (btblWrapEcode != 0)  {
         iblStatus.iblFail = ibl_FAIL_CODE_BTBL_FAIL;
         for (;;);
     }
+
+    uart_write_string("jump to the exit point, which will be the entry point for the full IBL",0);
 
     /* jump to the exit point, which will be the entry point for the full IBL */
     exit = (void (*)())entry;
