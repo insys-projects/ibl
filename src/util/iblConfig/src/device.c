@@ -886,15 +886,15 @@ ibl_t c6678_ibl_config(void)
 	ibl.bootModes[2].priority = ibl_HIGHEST_PRIORITY+1;
 	ibl.bootModes[2].port     = ibl_PORT_SWITCH_ALL;
 
-	ibl.bootModes[2].u.ethBoot.doBootp          = TRUE;
+    ibl.bootModes[2].u.ethBoot.doBootp          = FALSE;
 	ibl.bootModes[2].u.ethBoot.useBootpServerIp = TRUE;
 	ibl.bootModes[2].u.ethBoot.useBootpFileName = TRUE;
 	ibl.bootModes[2].u.ethBoot.bootFormat       = ibl_BOOT_FORMAT_BBLOB;
 
 
-    SETIP(ibl.bootModes[2].u.ethBoot.ethInfo.ipAddr,    192,168,1,3);
-    SETIP(ibl.bootModes[2].u.ethBoot.ethInfo.serverIp,  192,168,1,2);
-    SETIP(ibl.bootModes[2].u.ethBoot.ethInfo.gatewayIp, 192,168,1,1);
+    SETIP(ibl.bootModes[2].u.ethBoot.ethInfo.ipAddr,    192,168,0,197);
+    SETIP(ibl.bootModes[2].u.ethBoot.ethInfo.serverIp,  192,168,0,121);
+    SETIP(ibl.bootModes[2].u.ethBoot.ethInfo.gatewayIp, 192,168,0,1);
     SETIP(ibl.bootModes[2].u.ethBoot.ethInfo.netmask,   255,255,255,0);
 
     /* Use the e-fuse value */
