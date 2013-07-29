@@ -135,43 +135,57 @@ void deviceDdrConfig (void)
     DEVICE_REG_XMPAX_L(2) =  0x10000000 | 0xff;     /* replacement addr + perm*/
     DEVICE_REG_XMPAX_H(2) =  0x2100000B;         /* base addr + seg size (64KB)*/	
     
-    if (ibl.ddrConfig.configDdr != 0)
+    if (ibl.ddrConfig.configDdr != 0) {
+        uart_write_string("Start hwEmif4p0Enable()...",0);
         hwEmif4p0Enable (&ibl.ddrConfig.uEmif.emif4p0);
+        uart_write_string("...complete",0);
+    }
 
 #ifdef PLL_REINIT_WORKAROUND
     for (loopcount = 0; loopcount < PLL_DDR_INIT_LOOPMAX; loopcount++)
     {
     	/* Calling MAIN, PA, DDR PLL init  */
-    	if (ibl.pllConfig[ibl_MAIN_PLL].doEnable == TRUE)
+        if (ibl.pllConfig[ibl_MAIN_PLL].doEnable == TRUE) {
             hwPllSetPll (MAIN_PLL, 
                          ibl.pllConfig[ibl_MAIN_PLL].prediv,
                          ibl.pllConfig[ibl_MAIN_PLL].mult,
                          ibl.pllConfig[ibl_MAIN_PLL].postdiv);
-    
-        if (ibl.pllConfig[ibl_NET_PLL].doEnable == TRUE)
+            uart_init();
+        }
+
+        if (ibl.pllConfig[ibl_NET_PLL].doEnable == TRUE) {
             hwPllSetCfgPll (DEVICE_PLL_BASE(NET_PLL),
                             ibl.pllConfig[ibl_NET_PLL].prediv,
                             ibl.pllConfig[ibl_NET_PLL].mult,
                             ibl.pllConfig[ibl_NET_PLL].postdiv,
                             ibl.pllConfig[ibl_MAIN_PLL].pllOutFreqMhz,
                             ibl.pllConfig[ibl_NET_PLL].pllOutFreqMhz);
+        }
     
-        if (ibl.pllConfig[ibl_DDR_PLL].doEnable == TRUE)
+        if (ibl.pllConfig[ibl_DDR_PLL].doEnable == TRUE) {
             hwPllSetCfg2Pll (DEVICE_PLL_BASE(DDR_PLL),
                              ibl.pllConfig[ibl_DDR_PLL].prediv,
                              ibl.pllConfig[ibl_DDR_PLL].mult,
                              ibl.pllConfig[ibl_DDR_PLL].postdiv,
                              ibl.pllConfig[ibl_MAIN_PLL].pllOutFreqMhz,
                              ibl.pllConfig[ibl_DDR_PLL].pllOutFreqMhz);
+        }
 	  
-        if (ibl.ddrConfig.configDdr != 0)
+        if (ibl.ddrConfig.configDdr != 0) {
+            uart_write_string("Start hwEmif4p0Enable()...again",0);
             hwEmif4p0Enable (&ibl.ddrConfig.uEmif.emif4p0);
+            uart_write_string("...complete",0);
+        }
 			
+        uart_write_string("Start ddr3_memory_test()...",0);
 	    if (ddr3_memory_test() == 0) 
 	    {
+            uart_write_string("...SUCCESS",0);
 	        break;
 	    }
+        uart_write_string("...ERROR",0);
     }
+
     /* Init UART again because we are re-initializing the PLL's */ 
     uart_init();
 

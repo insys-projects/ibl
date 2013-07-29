@@ -248,16 +248,18 @@ void main (void)
     iblStatus.iblMagic   = ibl_MAGIC_VALUE;
     iblStatus.iblVersion = ibl_VERSION;
 
-    /* Init UART */
-    uart_init();
     uart_write_string("", 0);
     uart_write_string("IBL version: "ibl_VERSION_STR, 0);
 
     /* Power up the timer */
+    uart_write_string("Start devicePowerPeriph()...",0);
     devicePowerPeriph (TARGET_PWR_TIMER_0);
+    uart_write_string("...complete",0);
 
     /* Initialize the system timer (software tracking of the hardware timer state) */
+    uart_write_string("Start timer_init()...",0);
     timer_init ();
+    uart_write_string("...complete",0);
 
     /* Load default mac addresses for ethernet boot if requested */
     for (i = 0; i < ibl_N_BOOT_MODES; i++)  {
@@ -272,7 +274,9 @@ void main (void)
 
 
     /* DDR configuration is device specific */
+    uart_write_string("Start deviceDdrConfig()...",0);
     deviceDdrConfig ();
+    uart_write_string("...complete",0);
 
     /* Try booting forever */
     for (;;)  {

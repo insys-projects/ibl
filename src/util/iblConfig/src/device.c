@@ -723,23 +723,23 @@ ibl_t c6678_ibl_config(void)
 
 	/* Main PLL: 100 MHz reference, 1GHz output */
 	ibl.pllConfig[ibl_MAIN_PLL].doEnable      = 1;
-	ibl.pllConfig[ibl_MAIN_PLL].prediv        = 1;
+    ibl.pllConfig[ibl_MAIN_PLL].prediv        = 1;
 	ibl.pllConfig[ibl_MAIN_PLL].mult          = 20;
 	ibl.pllConfig[ibl_MAIN_PLL].postdiv       = 2;
 	ibl.pllConfig[ibl_MAIN_PLL].pllOutFreqMhz = 1000;
 
 	/* DDR PLL: */
 	ibl.pllConfig[ibl_DDR_PLL].doEnable       = 1;
-	ibl.pllConfig[ibl_DDR_PLL].prediv         = 1;
-	ibl.pllConfig[ibl_DDR_PLL].mult           = 20;
-	ibl.pllConfig[ibl_DDR_PLL].postdiv        = 2;
-	ibl.pllConfig[ibl_DDR_PLL].pllOutFreqMhz  = 1333;
+    ibl.pllConfig[ibl_DDR_PLL].prediv         = 9;
+    ibl.pllConfig[ibl_DDR_PLL].mult           = 50;
+    ibl.pllConfig[ibl_DDR_PLL].postdiv        = 9;
+    ibl.pllConfig[ibl_DDR_PLL].pllOutFreqMhz  = 800;
 
-    /* Net PLL: 100 MHz reference, 1050 MHz output (followed by a built in divide by 3 to give 350 MHz to PA) */
+    /* Net PLL: 156.25 MHz reference, 1050 MHz output (followed by a built in divide by 3 to give 350 MHz to PA) */
 	ibl.pllConfig[ibl_NET_PLL].doEnable       = 1;
-	ibl.pllConfig[ibl_NET_PLL].prediv         = 1;
-	ibl.pllConfig[ibl_NET_PLL].mult			  = 21;
-	ibl.pllConfig[ibl_NET_PLL].postdiv        = 2;
+    ibl.pllConfig[ibl_NET_PLL].prediv         = 24;
+    ibl.pllConfig[ibl_NET_PLL].mult			  = 335;
+    ibl.pllConfig[ibl_NET_PLL].postdiv        = 24;
 	ibl.pllConfig[ibl_NET_PLL].pllOutFreqMhz  = 1050;
 
 
