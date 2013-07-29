@@ -136,9 +136,7 @@ void deviceDdrConfig (void)
     DEVICE_REG_XMPAX_H(2) =  0x2100000B;         /* base addr + seg size (64KB)*/	
     
     if (ibl.ddrConfig.configDdr != 0) {
-        uart_write_string("Start hwEmif4p0Enable()...",0);
         hwEmif4p0Enable (&ibl.ddrConfig.uEmif.emif4p0);
-        uart_write_string("...complete",0);
     }
 
 #ifdef PLL_REINIT_WORKAROUND
@@ -174,18 +172,16 @@ void deviceDdrConfig (void)
         }
 	  
         if (ibl.ddrConfig.configDdr != 0) {
-            uart_write_string("Start hwEmif4p0Enable()...again",0);
             hwEmif4p0Enable (&ibl.ddrConfig.uEmif.emif4p0);
-            uart_write_string("...complete",0);
         }
 			
-        uart_write_string("Start ddr3_memory_test()...",0);
+        xprintf("%u: ddr3_memory_test() - ", loopcount);
 	    if (ddr3_memory_test() == 0) 
 	    {
-            uart_write_string("...SUCCESS",0);
+            xprintf("SUCCESS\n\r");
 	        break;
 	    }
-        uart_write_string("...ERROR",0);
+        xprintf("ERROR\n\r");
     }
 
     if (loopcount < 10)
@@ -203,13 +199,14 @@ void deviceDdrConfig (void)
 
     if (loopcount == PLL_DDR_INIT_LOOPMAX) 
     {
-        uart_write_string("IBL: DDR INITIALIZATION FAILED",0);
+        xprintf("%s\n\r", "IBL: DDR INITIALIZATION FAILED");
     }
     else
     {
-        uart_write_string("IBL: PLL and DDR Initialization Complete",0);
+        xprintf("%s\n\r", "IBL: PLL and DDR Initialization Complete");
     }
-    uart_write_string(ddr_result_code_str,0);
+
+    xprintf("%s\n\r", ddr_result_code_str);
 #endif
 }
         

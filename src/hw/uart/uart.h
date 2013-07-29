@@ -48,5 +48,6 @@
  ************************/
 void uart_init(void);
 void uart_write_string(char * str, uint32_t length);
+void xprintf(char *format, ...);
 
 #endif /* _UART_H_ */

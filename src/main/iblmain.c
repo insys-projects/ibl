@@ -248,18 +248,18 @@ void main (void)
     iblStatus.iblMagic   = ibl_MAGIC_VALUE;
     iblStatus.iblVersion = ibl_VERSION;
 
-    uart_write_string("", 0);
-    uart_write_string("IBL version: "ibl_VERSION_STR, 0);
+    xprintf("\n\r");
+    xprintf("IBL version: %s\n\r", ibl_VERSION_STR);
 
     /* Power up the timer */
-    uart_write_string("Start devicePowerPeriph()...",0);
+    xprintf("Start devicePowerPeriph()...");
     devicePowerPeriph (TARGET_PWR_TIMER_0);
-    uart_write_string("...complete",0);
+    xprintf("complete\n\r",0);
 
     /* Initialize the system timer (software tracking of the hardware timer state) */
-    uart_write_string("Start timer_init()...",0);
+    xprintf("Start timer_init()...");
     timer_init ();
-    uart_write_string("...complete",0);
+    xprintf("complete\n\r");
 
     /* Load default mac addresses for ethernet boot if requested */
     for (i = 0; i < ibl_N_BOOT_MODES; i++)  {
@@ -274,9 +274,9 @@ void main (void)
 
 
     /* DDR configuration is device specific */
-    uart_write_string("Start deviceDdrConfig()...",0);
+    xprintf("Start deviceDdrConfig() --- \n\r");
     deviceDdrConfig ();
-    uart_write_string("...complete",0);
+    xprintf(" --- complete\n\r");
 
     /* Try booting forever */
     for (;;)  {
@@ -323,10 +323,12 @@ void main (void)
                 continue;
             }
             boot_mode_idx = boot_para_idx/ibl_N_IMAGES;
+
             /* Get the boot image index */
             iblImageIdx = boot_para_idx & (ibl_N_IMAGES - 1);
 
             iblStatus.activeBoot = ibl.bootModes[boot_mode_idx].bootMode;
+
 
             switch (ibl.bootModes[boot_mode_idx].bootMode)
             {
@@ -334,7 +336,7 @@ void main (void)
             case ibl_BOOT_MODE_TFTP:
                 iblStatus.activeDevice = ibl_ACTIVE_DEVICE_ETH;
                 /*Print something to UART, max len=80, if len is pased as 0 UART prints entire string upto '\n' or max len */
-                uart_write_string("IBL: Booting from ethernet",0);
+                xprintf("IBL: Booting from ethernet\n\r");
                 iblMemcpy (&iblStatus.ethParams, &ibl.bootModes[boot_mode_idx].u.ethBoot.ethInfo, sizeof(iblEthBootInfo_t));
                 iblEthBoot (boot_mode_idx);
                 break;
@@ -345,7 +347,7 @@ void main (void)
                 iblPmemCfg (ibl.bootModes[boot_mode_idx].u.nandBoot.interface, ibl.bootModes[boot_mode_idx].port, TRUE);
                 memset ((void *)0x80000000, 0, 0x20000000);
                 /*Print something to UART, max len=80, if len is pased as 0 UART prints entire string upto '\n' or max len */
-                uart_write_string("IBL: Booting from NAND",0);
+                xprintf("IBL: Booting from NAND\n\r");
                 iblNandBoot (boot_mode_idx);
                 break;
 #endif
@@ -354,7 +356,7 @@ void main (void)
             case ibl_BOOT_MODE_NOR:
                 iblPmemCfg (ibl.bootModes[boot_mode_idx].u.norBoot.interface, ibl.bootModes[boot_mode_idx].port, TRUE);
                 /*Print something to UART, max len=80, if len is pased as 0 UART prints entire string upto '\n' or max len */
-                uart_write_string("IBL: Booting from NOR",0);
+                xprintf("IBL: Booting from NOR\n\r");
                 iblNorBoot (boot_mode_idx);
                 break;
 #endif

@@ -485,7 +485,6 @@ void main (void)
 
     }
     
-
     /* Pll configuration is device specific */
     devicePllConfig ();
 
@@ -495,36 +494,37 @@ void main (void)
     uart_init();
     LED_on();
 
-    uart_write_string("PEX-SRIO Start IBL init",0);
+    xprintf("\n\r");
+    xprintf("PEX-SRIO Start IBL init\n\r");
 
     /* Enable the EDC for local memory */
     if (IBL_ENABLE_EDC)
     {
-        uart_write_string("Start iblEnableEDC()...",0);
+        xprintf("Start iblEnableEDC()...");
         iblEnableEDC ();
-        uart_write_string("...complete",0);
+        xprintf("complete\n\r");
     }
 
 
     /* Check if need to enter Rom boot loader again */
     if (IBL_ENTER_ROM)
     {
-        uart_write_string("Start iblEnterRom()...",0);
+        xprintf("Start iblEnterRom()...");
         iblEnterRom ();
-        uart_write_string("...complete",0);
+        xprintf("complete\n\r");
     }
 
     /* Pass control to the boot table processor */
-    uart_write_string("Start iblBootBtbl()...",0);
+    xprintf("Start iblBootBtbl()...");
     iblBootBtbl (bFxnTbl, &entry);
-    uart_write_string("...complete",0);
+    xprintf("complete\n\r");
 
     if (btblWrapEcode != 0)  {
         iblStatus.iblFail = ibl_FAIL_CODE_BTBL_FAIL;
         for (;;);
     }
 
-    uart_write_string("jump to the exit point, which will be the entry point for the full IBL",0);
+    xprintf("jump to the exit point, which will be the entry point for the full IBL\n\r");
 
     /* jump to the exit point, which will be the entry point for the full IBL */
     exit = (void (*)())entry;
