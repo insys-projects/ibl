@@ -150,6 +150,8 @@ void deviceDdrConfig (void)
                          ibl.pllConfig[ibl_MAIN_PLL].prediv,
                          ibl.pllConfig[ibl_MAIN_PLL].mult,
                          ibl.pllConfig[ibl_MAIN_PLL].postdiv);
+
+            /* Init UART again because we are re-initializing the PLL's */
             uart_init();
         }
 
@@ -186,10 +188,7 @@ void deviceDdrConfig (void)
         uart_write_string("...ERROR",0);
     }
 
-    /* Init UART again because we are re-initializing the PLL's */ 
-    uart_init();
-
-    if (loopcount < 10) 
+    if (loopcount < 10)
     {
         ddr_result_code_str[IBL_RESULT_CODE_LOC] = loopcount + '0';
     }
