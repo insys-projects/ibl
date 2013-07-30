@@ -495,6 +495,7 @@ void main (void)
     LED_on();
 
     xprintf("\n\r");
+    xprintf("\n\r");
     xprintf("PEX-SRIO Start IBL init\n\r");
 
     /* Enable the EDC for local memory */
