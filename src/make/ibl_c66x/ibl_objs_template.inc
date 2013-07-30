@@ -15,6 +15,8 @@
 ../hw/c64x/make/cfgpll.ENDIAN_TAG.oc
 ../hw/c64x/make/cfgpll2.ENDIAN_TAG.oc
 ../hw/c64x/make/c66x_uart.ENDIAN_TAG.oc
+../hw/c64x/make/led.ENDIAN_TAG.oc
+../hw/c64x/make/gpio.ENDIAN_TAG.oc
 
 #ifndef EXCLUDE_BIS
 ../interp/c64x/make/bis.ENDIAN_TAG.oc

@@ -72,6 +72,13 @@ extern cregister unsigned int IER;
 uint32 iblEndianIdx = 0;
 uint32 iblImageIdx = 0;
 
+static void pause(uint32 count)
+{
+    volatile unsigned int i;
+
+    for (i = 0; i < count; i++) asm (" nop ");
+}
+
 /**
  *  @brief
  *      Data structures shared between the 1st and 2nd stage IBL load
@@ -283,10 +290,47 @@ void main (void)
     xprintf("BOOTMODE = 0x%u\n\r", (v >> 1) & 0xfff);
 
     cpu_id = ((v >> 4) & 0x3);
-    boot_type = ((v >> 9) & 0x1) | ((v >> 10) & 0x2);
+    boot_type = (((v >> 10) & 0x1) | ((v >> 11) & 0x2)) & 0x3;
 
     xprintf("BOARD_CPU_ID = 0x%u\n\r", cpu_id);
     xprintf("BOARD_BOOT_TYPE = 0x%u\n\r", boot_type );
+
+    i = 0;
+    while(1) {
+        LED_smart('0');
+        pause(5000000);
+        LED_smart('1');
+        pause(5000000);
+        LED_smart('2');
+        pause(5000000);
+        LED_smart('3');
+        pause(5000000);
+        LED_smart('4');
+        pause(5000000);
+        LED_smart('5');
+        pause(5000000);
+        LED_smart('6');
+        pause(5000000);
+        LED_smart('7');
+        pause(5000000);
+        LED_smart('8');
+        pause(5000000);
+        LED_smart('9');
+        pause(5000000);
+        LED_smart('A');
+        pause(5000000);
+        LED_smart('B');
+        pause(5000000);
+        LED_smart('C');
+        pause(5000000);
+        LED_smart('D');
+        pause(5000000);
+        LED_smart('E');
+        pause(5000000);
+        LED_smart('F');
+        pause(5000000);
+        xprintf("TRY BOOTING %u TIMES\r", i++);
+    };
 
     /* Try booting forever */
     for (;;)  {
