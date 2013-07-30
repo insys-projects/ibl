@@ -239,9 +239,8 @@ void iblPmemCfg (int32 interface, int32 port, bool enableNand)
  */
 void main (void)
 {
-    int32 i, j;
+    int32 i, boot_type, cpu_id;
     UINT32 v, boot_mode_idx, boot_para_idx;
-    unsigned int dip_setting;
 
     /* Initialize the status structure */
     iblMemset (&iblStatus, 0, sizeof(iblStatus_t));
@@ -277,6 +276,17 @@ void main (void)
     xprintf("Start deviceDdrConfig() --- \n\r");
     deviceDdrConfig ();
     xprintf(" --- complete\n\r");
+
+    v = DEVICE_REG32_R(DEVICE_REG_DEVSTAT);
+
+    xprintf("DEVSTAT = 0x%u\n\r", v);
+    xprintf("BOOTMODE = 0x%u\n\r", (v >> 1) & 0xfff);
+
+    cpu_id = ((v >> 4) & 0x3);
+    boot_type = ((v >> 9) & 0x1) | ((v >> 10) & 0x2);
+
+    xprintf("BOARD_CPU_ID = 0x%u\n\r", cpu_id);
+    xprintf("BOARD_BOOT_TYPE = 0x%u\n\r", boot_type );
 
     /* Try booting forever */
     for (;;)  {
@@ -335,8 +345,7 @@ void main (void)
 #ifndef EXCLUDE_ETH
             case ibl_BOOT_MODE_TFTP:
                 iblStatus.activeDevice = ibl_ACTIVE_DEVICE_ETH;
-                /*Print something to UART, max len=80, if len is pased as 0 UART prints entire string upto '\n' or max len */
-                xprintf("IBL: Booting from ethernet\n\r");
+                xprintf("IBL: Booting from ethernet %u times\r", iblStatus.heartBeat);
                 iblMemcpy (&iblStatus.ethParams, &ibl.bootModes[boot_mode_idx].u.ethBoot.ethInfo, sizeof(iblEthBootInfo_t));
                 iblEthBoot (boot_mode_idx);
                 break;
@@ -346,8 +355,7 @@ void main (void)
             case ibl_BOOT_MODE_NAND:
                 iblPmemCfg (ibl.bootModes[boot_mode_idx].u.nandBoot.interface, ibl.bootModes[boot_mode_idx].port, TRUE);
                 memset ((void *)0x80000000, 0, 0x20000000);
-                /*Print something to UART, max len=80, if len is pased as 0 UART prints entire string upto '\n' or max len */
-                xprintf("IBL: Booting from NAND\n\r");
+                xprintf("IBL: Booting from NAND %u times\r", iblStatus.heartBeat);
                 iblNandBoot (boot_mode_idx);
                 break;
 #endif
@@ -355,8 +363,7 @@ void main (void)
 #if (!defined(EXCLUDE_NOR_EMIF) && !defined(EXCLUDE_NOR_SPI))
             case ibl_BOOT_MODE_NOR:
                 iblPmemCfg (ibl.bootModes[boot_mode_idx].u.norBoot.interface, ibl.bootModes[boot_mode_idx].port, TRUE);
-                /*Print something to UART, max len=80, if len is pased as 0 UART prints entire string upto '\n' or max len */
-                xprintf("IBL: Booting from NOR\n\r");
+                xprintf("IBL: Booting from NOR %u times\r", iblStatus.heartBeat);
                 iblNorBoot (boot_mode_idx);
                 break;
 #endif
