@@ -733,7 +733,7 @@ ibl_t c6678_ibl_config(void)
     ibl.pllConfig[ibl_DDR_PLL].prediv         = 12;
     ibl.pllConfig[ibl_DDR_PLL].mult           = 50;
     ibl.pllConfig[ibl_DDR_PLL].postdiv        = 12;
-    ibl.pllConfig[ibl_DDR_PLL].pllOutFreqMhz  = 800;
+    ibl.pllConfig[ibl_DDR_PLL].pllOutFreqMhz  = 1300;
 
     /* Net PLL: 156.25 MHz reference, 1050 MHz output (followed by a built in divide by 3 to give 350 MHz to PA) */
 	ibl.pllConfig[ibl_NET_PLL].doEnable       = 1;
