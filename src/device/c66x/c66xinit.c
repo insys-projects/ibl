@@ -238,11 +238,11 @@ void iblPCIeWorkaround()
     DEVICE_REG32_W ((PCIE_BASE_ADDR + PCIE_CLASSCODE_REVID), 0x04800001);  /* class 0x04, sub-class 0x80, Prog I/F 0x00, Other multimedia device */ 
     DEVICE_REG32_W ((PCIE_BASE_ADDR + PCIE_LINK_STAT_CTRL), 0x10110080);  /* extended sync, slot_clk_cfg = 1 */
 
-    DEVICE_REG32_W ((PCIE_BASE_ADDR + PCIE_VENDER_DEVICE_ID), 0xb005104c);  /* Vendor and Device ID */
+    DEVICE_REG32_W ((PCIE_BASE_ADDR + PCIE_VENDER_DEVICE_ID), 0x66154953);  /* Vendor and Device ID for PEX-SRIO */
     DEVICE_REG32_W ((PCIE_BASE_ADDR + PCIE_DEVICE_CAP), 0x288701); /* L0 = 4, L1 = 3 */
 
-	DEVICE_REG32_W ((PCIE_BASE_ADDR + PCIE_APP_OB_SIZE), 0x00000003);     /* OB_SIZE = 8M */ 
-	DEVICE_REG32_W ((PCIE_BASE_ADDR + PCIE_PL_GEN2), 0x0000000F);   /* num_fts = 0xF*/
+    DEVICE_REG32_W ((PCIE_BASE_ADDR + PCIE_APP_OB_SIZE), 0x00000002);     /* OB_SIZE = 4M */
+    DEVICE_REG32_W ((PCIE_BASE_ADDR + PCIE_PL_GEN2), 0x0000022F);   /* num_fts = 0x22F*/
 
     DEVICE_REG32_W ((PCIE_BASE_ADDR + PCIE_APP_CMD_STATUS), 0x0020); /* Set dbi_cs2 to allow access to the BAR registers */ 
  
@@ -250,8 +250,8 @@ void iblPCIeWorkaround()
 		/* 6678 */
 		DEVICE_REG32_W ((PCIE_BASE_ADDR + PCIE_BAR0), 0x00000FFF);   /* 4K */
 		DEVICE_REG32_W ((PCIE_BASE_ADDR + PCIE_BAR1), 0x0007FFFF);   /* 512K */
-		DEVICE_REG32_W ((PCIE_BASE_ADDR + PCIE_BAR2), 0x003FFFFF);   /* 4M */
-		DEVICE_REG32_W ((PCIE_BASE_ADDR + PCIE_BAR3), 0x00FFFFFF);   /* 16M */
+        DEVICE_REG32_W ((PCIE_BASE_ADDR + PCIE_BAR2), 0x0007FFFF);   /* 512K */
+        DEVICE_REG32_W ((PCIE_BASE_ADDR + PCIE_BAR3), 0x003FFFFF);   /* 4M */
 	} 
 
 	if (flag_6670)  {
@@ -273,11 +273,10 @@ void iblPCIeWorkaround()
     while((DEVICE_REG32_R(PCIE_BASE_ADDR + PCIE_DEBUG0) & 0x11)!=0x11);    /* Wait for training to complete */
  
     /* Wait for the Boot from Host */
-    DEVICE_REG32_W(MAGIC_ADDR, 0);
-	waitForBoot(MAGIC_ADDR);
-
+    //DEVICE_REG32_W(MAGIC_ADDR, 0);
+    //waitForBoot(MAGIC_ADDR);
     /* Will never reach here */
-    return;
+    //return;
 }
 
 #endif

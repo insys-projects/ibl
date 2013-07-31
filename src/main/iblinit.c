@@ -497,6 +497,7 @@ void main (void)
     xprintf("\n\r");
     xprintf("\n\r");
     xprintf("PEX-SRIO Start IBL init\n\r");
+    xprintf("\n\r");
 
     /* Enable the EDC for local memory */
     if (IBL_ENABLE_EDC)
@@ -510,8 +511,15 @@ void main (void)
     /* Check if need to enter Rom boot loader again */
     if (IBL_ENTER_ROM)
     {
-        xprintf("Start iblEnterRom()...");
-        iblEnterRom ();
+        xprintf("Start iblPCIeWorkaround()...");
+        iblEnterRom();
+        xprintf("complete\n\r");
+    }
+
+    if (IBL_ENABLE_PCIE_WORKAROUND)
+    {
+        xprintf("Start iblPCIeWorkaround()...");
+        iblPCIeWorkaround();
         xprintf("complete\n\r");
     }
 
