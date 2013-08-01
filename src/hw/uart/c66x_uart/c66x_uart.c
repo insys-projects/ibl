@@ -276,8 +276,12 @@ void xprintf(char *format, ...)
                     if(c == 'l' &&  n < 0) n = -n, putc('-');
                     xtoa((unsigned long)n, dv);
                     break;
-                case 'x':                       // 16 bit heXadecimal
+                case 'x':                       // 32 bit heXadecimal
                     i = va_arg(a, int);
+                    puth(i >> 28);
+                    puth(i >> 24);
+                    puth(i >> 20);
+                    puth(i >> 16);
                     puth(i >> 12);
                     puth(i >> 8);
                     puth(i >> 4);
