@@ -150,6 +150,24 @@ static inline void uart_write_byte(uint8_t byte)
 
 /******************************************************************************
  *
+ * Function:    uart_read_byte
+ *
+ * Description: This function read a byte of data from UART device
+ *
+ * Parameters:  byte    -  8-bit data to write to THR
+ *
+ * Return Value: none
+ ******************************************************************************/
+static inline uint8_t uart_read_byte(void)
+{
+    while (!(uart_registers->LSR & 0x1)) {
+        uart_delay_cycles(10000);
+    }
+    return uart_registers->RBR;
+}
+
+/******************************************************************************
+ *
  * Function:    uart_write_string
  *
  * Description: This function writes a string of data to UART device
@@ -182,9 +200,14 @@ void putc(unsigned val)
     uart_write_byte(val);
 }
 
-void puts(char *s) 
+void puts(char *s)
 {
     while(*s) putc(*s++); 
+}
+
+int getchar(void)
+{
+    return uart_read_byte();
 }
 
 static const unsigned long dv[] = {
