@@ -64,8 +64,8 @@
 #include "i2c.h"
 #include "spi_api.h"
 #include "ibl_elf.h"
-#include <string.h>
 #include "uart.h"
+#include <string.h>
 
 extern cregister unsigned int IER;
 
@@ -231,6 +231,33 @@ void iblPmemCfg (int32 interface, int32 port, bool enableNand)
 
 }
 
+/**
+ * @b Description
+ * @n
+ *
+ * The function wait until host loader write branch address in MAGIC_ADDR.
+ *
+ * @retval
+ *  None
+ */
+void waitForBoot(UINT32 MAGIC_ADDR)
+{
+    void (*exit)();
+    UINT32 i, entry_addr;
+
+    while(1)
+    {
+        entry_addr = DEVICE_REG32_R(MAGIC_ADDR);
+        if (entry_addr != 0)
+        {
+            xprintf("entry = 0x%x\n\r", entry_addr);
+            exit = (void (*)())entry_addr;
+            (*exit)();
+        }
+        for (i=0; i < 100; i++)
+            asm("nop");
+    }
+}
 
 
 /**
@@ -246,7 +273,7 @@ void iblPmemCfg (int32 interface, int32 port, bool enableNand)
  */
 void main (void)
 {
-    int32 i, boot_type, cpu_id;
+    int32 i, boot_type;
     UINT32 v, boot_mode_idx, boot_para_idx;
 
     /* Initialize the status structure */
@@ -258,14 +285,14 @@ void main (void)
     xprintf("IBL version: %s\n\r", ibl_VERSION_STR);
 
     /* Power up the timer */
-    xprintf("Start devicePowerPeriph()...");
+    //xprintf("Start devicePowerPeriph()...");
     devicePowerPeriph (TARGET_PWR_TIMER_0);
-    xprintf("complete\n\r",0);
+    //xprintf("complete\n\r",0);
 
     /* Initialize the system timer (software tracking of the hardware timer state) */
-    xprintf("Start timer_init()...");
+    //xprintf("Start timer_init()...");
     timer_init ();
-    xprintf("complete\n\r");
+    //xprintf("complete\n\r");
 
     /* Load default mac addresses for ethernet boot if requested */
     for (i = 0; i < ibl_N_BOOT_MODES; i++)  {
@@ -280,57 +307,41 @@ void main (void)
 
 
     /* DDR configuration is device specific */
-    xprintf("Start deviceDdrConfig() --- \n\r");
+    //xprintf("Start deviceDdrConfig() --- \n\r");
     deviceDdrConfig ();
-    xprintf(" --- complete\n\r");
+    //xprintf(" --- complete\n\r");
 
     v = DEVICE_REG32_R(DEVICE_REG_DEVSTAT);
 
-    xprintf("DEVSTAT = 0x%u\n\r", v);
-    xprintf("BOOTMODE = 0x%u\n\r", (v >> 1) & 0xfff);
+    xprintf("DEVSTAT = 0x%x\n\r", v);
+    xprintf("BOOTMODE = 0x%x\n\r", (v >> 1) & 0xfff);
 
-    cpu_id = ((v >> 4) & 0x3);
-    boot_type = (((v >> 10) & 0x1) | ((v >> 11) & 0x2)) & 0x3;
+    boot_type = ((v >> 4) & 0x3);
 
-    xprintf("BOARD_CPU_ID = 0x%u\n\r", cpu_id);
-    xprintf("BOARD_BOOT_TYPE = 0x%u\n\r", boot_type );
+    xprintf("BOARD_BOOT_TYPE = 0x%x\n\r", boot_type );
 
-    i = 0;
     while(1) {
-        LED_smart('0');
-        pause(5000000);
-        LED_smart('1');
-        pause(5000000);
-        LED_smart('2');
-        pause(5000000);
-        LED_smart('3');
-        pause(5000000);
-        LED_smart('4');
-        pause(5000000);
-        LED_smart('5');
-        pause(5000000);
-        LED_smart('6');
-        pause(5000000);
-        LED_smart('7');
-        pause(5000000);
-        LED_smart('8');
-        pause(5000000);
-        LED_smart('9');
-        pause(5000000);
-        LED_smart('A');
-        pause(5000000);
-        LED_smart('B');
-        pause(5000000);
-        LED_smart('C');
-        pause(5000000);
-        LED_smart('D');
-        pause(5000000);
-        LED_smart('E');
-        pause(5000000);
-        LED_smart('F');
-        pause(5000000);
-        xprintf("TRY BOOTING %u TIMES\r", i++);
-    };
+
+        switch(boot_type) {
+        case 0: {
+            xprintf("IBL: Booting from PCI Express %u times\n\r", iblStatus.heartBeat);
+            LED_smart('0');
+            waitForBoot(0x87fffc);
+        }
+        break;
+        case 1: {
+            iblStatus.activeBoot = ibl_BOOT_MODE_TFTP;
+            iblStatus.activeDevice = ibl_ACTIVE_DEVICE_ETH;
+            xprintf("IBL: Booting from ethernet %u times\n\r", iblStatus.heartBeat);
+            LED_smart('1');
+            iblMemcpy (&iblStatus.ethParams, &ibl.bootModes[2].u.ethBoot.ethInfo, sizeof(iblEthBootInfo_t));
+            iblEthBoot(2);
+        } break;
+
+        }
+
+        iblStatus.heartBeat += 1;
+    }
 
     /* Try booting forever */
     for (;;)  {
@@ -496,11 +507,12 @@ Uint32 iblBoot (BOOT_MODULE_FXN_TABLE *bootFxn, Int32 dataFormat, void *formatPa
 #endif
 
         if (dataFormat == ibl_BOOT_FORMAT_AUTO)  {
+
             iblStatus.autoDetectFailCnt += 1;
+
             return (0);
         }
     }
-
 
     iblStatus.activeFileFormat = dataFormat;
 
