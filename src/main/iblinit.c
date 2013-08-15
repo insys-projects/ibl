@@ -68,6 +68,7 @@
 #include "iblinit.h"
 #include "led.h"
 #include "uart.h"
+#include "i2c.h"
 #include <string.h>
 
 
@@ -84,6 +85,13 @@
  *      and used here in the main status fields.
  */
 extern Int32 btblWrapEcode;
+
+void pause(uint32 count)
+{
+    volatile unsigned int i;
+
+    for (i = 0; i < count; i++) asm (" nop ");
+}
 
 /**
  *  @brief
@@ -434,8 +442,6 @@ uint16 readUpper16 (uint32 v)
   return (iblREAD_BITFIELD(v,31,16));
 }
 
-
-
 /**
  *  @brief
  *      The main function
@@ -451,6 +457,7 @@ void main (void)
     int i;
     int32        bootDevice;
     uint32       entry;
+    uint32       devstat;
     void         (*exit)();
 
     BOOT_MODULE_FXN_TABLE *bFxnTbl;
@@ -499,46 +506,112 @@ void main (void)
     xprintf("PEX-SRIO Start IBL init\n\r");
     xprintf("\n\r");
 
+/*
+    i=0;
+    {
+        uint8 data = 0xFE;
+        int ret = 0;
+
+        xprintf("Press any key...\n\r");
+        getchar();
+
+        while(1) {
+
+            data = 0xFE;
+
+            ret = hwI2cMasterWrite(0x70, (UINT8*)&data, 1, I2C_RELEASE_BUS, TRUE);
+            xprintf("%i: hwI2cMasterWrite(): Addr = 0x%x. data = 0x%x. ret = 0x%x\n\r", i, 0x70, data, ret);
+            getchar();
+
+            data = 0xAA;
+
+            ret = hwI2cMasterRead(0, 1, (UINT8*)&data, 0x70, 0);
+            xprintf("%i: hwI2cMasterRead(): Addr = 0x%x. data = 0x%x. ret = 0x%x\n\r", i, 0x70, data, ret);
+            getchar();
+
+//            ret = hwI2cMasterWrite(0xA2, (UINT8*)&data, 2, I2C_RELEASE_BUS, TRUE);
+//            xprintf("%i: hwI2cMasterWrite(): Addr = 0x%x. data = 0x%x. ret = 0x%x\n\r", i, 0xA2, data, ret);
+//            getchar();
+
+            i++;
+
+            if(i == 8) {
+                i=0;
+            }
+        }
+    }
+*/
+
     /* Enable the EDC for local memory */
     if (IBL_ENABLE_EDC)
     {
-        xprintf("Start iblEnableEDC()...");
+        //xprintf("Start iblEnableEDC()...");
         iblEnableEDC ();
-        xprintf("complete\n\r");
+        //xprintf("complete\n\r");
     }
 
 
     /* Check if need to enter Rom boot loader again */
     if (IBL_ENTER_ROM)
     {
-        xprintf("Start iblPCIeWorkaround()...");
+        //xprintf("Start iblPCIeWorkaround()...");
         iblEnterRom();
-        xprintf("complete\n\r");
+        //xprintf("complete\n\r");
     }
 
     if (IBL_ENABLE_PCIE_WORKAROUND)
     {
-        xprintf("Start iblPCIeWorkaround()...");
+        //xprintf("Start iblPCIeWorkaround()...");
         iblPCIeWorkaround();
-        xprintf("complete\n\r");
+        //xprintf("complete\n\r");
     }
 
+    // wailt ~ 3 sec
+    for(i=3; i>=0; i--) {
+        int sym = 0;
+        xprintf("Press any key to stop autoboot...%i\r", i);
+        pause(55000000);
+        sym = waitchar(1);
+        if(sym != 0) {
+            xprintf("\n\r");
+            xprintf("Stop system booting...\n\r");
+            xprintf("R - reboot system\n\r");
+            xprintf("B - continue booting\n\r");
+            while(1) {
+                sym = getchar();
+                switch(sym) {
+                    case 'R':
+                    case 'r':
+                        xprintf("Rebooting...\n\r");
+                    break;
+                    case 'B':
+                    case 'b':
+                        xprintf("Booting...\n\r");
+                        goto boot_label;
+                    break;
+                }
+            };
+        }
+    }
+
+boot_label:
+    xprintf("\n\r");
+
     /* Pass control to the boot table processor */
-    xprintf("Start iblBootBtbl()...");
+    //xprintf("Start iblBootBtbl()...");
     iblBootBtbl (bFxnTbl, &entry);
-    xprintf("complete\n\r");
+    //xprintf("complete\n\r");
 
     if (btblWrapEcode != 0)  {
         iblStatus.iblFail = ibl_FAIL_CODE_BTBL_FAIL;
         for (;;);
     }
 
-    xprintf("jump to the exit point, which will be the entry point for the full IBL\n\r");
+    //xprintf("jump to the exit point, which will be the entry point for the full IBL\n\r");
 
     /* jump to the exit point, which will be the entry point for the full IBL */
     exit = (void (*)())entry;
     (*exit)();
-
 
 }
 
