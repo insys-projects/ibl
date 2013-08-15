@@ -188,25 +188,6 @@ void iblEnableEDC ()
 /* SERDES Configuration registers */
 #define PCIE_SERDES_CFG_PLL 0x2620358
 
-void waitForBoot(UINT32 MAGIC_ADDR)
-{
-    void (*exit)();
-    UINT32 i, entry_addr;
-	
-    while(1)
-    {
-        entry_addr = DEVICE_REG32_R(MAGIC_ADDR);
-        if (entry_addr != 0)
-        {
-            /* jump to the exit point, which will be the entry point for the full IBL */
-            exit = (void (*)())entry_addr;
-            (*exit)();
-        }
-        for (i=0; i < 100; i++)
-            asm("nop");
-	}
-}
-
 void iblPCIeWorkaround()
 {
     UINT32  v, flag_6678 = 0, flag_6670 = 0, MAGIC_ADDR;
@@ -272,11 +253,8 @@ void iblPCIeWorkaround()
     DEVICE_REG32_W ((PCIE_BASE_ADDR + PCIE_APP_CMD_STATUS), 0x0000007);    /* enable LTSSM, IN, OB */
     while((DEVICE_REG32_R(PCIE_BASE_ADDR + PCIE_DEBUG0) & 0x11)!=0x11);    /* Wait for training to complete */
  
-    /* Wait for the Boot from Host */
-    //DEVICE_REG32_W(MAGIC_ADDR, 0);
-    //waitForBoot(MAGIC_ADDR);
-    /* Will never reach here */
-    //return;
+    /* Wait for the Boot from Host in second stage of IBL */
+    DEVICE_REG32_W(MAGIC_ADDR, 0);
 }
 
 #endif
