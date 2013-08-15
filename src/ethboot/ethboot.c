@@ -62,6 +62,7 @@
 #include "cpsw_api.h"
 #include "qm_api.h"
 #include "cpdma_api.h"
+#include "uart.h"
 
 /**
  *  @brief Remove the possible re-definition of iblEthBoot. iblcfg.h defines this to be a void
@@ -117,13 +118,15 @@ void iblEthBoot (Int32 eIdx)
     unsigned int i,j;
 
     /* Power up the device. No action is taken if the device is already powered up */
-    if (devicePowerPeriph (TARGET_PWR_ETH(ibl.bootModes[eIdx].port)) < 0)
+    if (devicePowerPeriph (TARGET_PWR_ETH(ibl.bootModes[eIdx].port)) < 0) {
         return;
+    }
 
     /* Do any mdio configuration */
-    if (ibl.mdioConfig.nMdioOps > 0)
+    if (ibl.mdioConfig.nMdioOps > 0) {
         hwMdio (ibl.mdioConfig.nMdioOps, ibl.mdioConfig.mdio, 
                 ibl.mdioConfig.mdioClkDiv, ibl.mdioConfig.interDelay);
+    }
 
     for (j = 0; j < 0x100; j++)
     	for (i = 0; i < 0x1000000; i++);
@@ -131,8 +134,9 @@ void iblEthBoot (Int32 eIdx)
     /* SGMII configuration. If sgmii is not present this statement is defined
      * to void in target.h */
     for (n = 0; n < ibl_N_ETH_PORTS; n++)  {
-        if (ibl.sgmiiConfig[n].configure == TRUE)
+        if (ibl.sgmiiConfig[n].configure == TRUE) {
             hwSgmiiConfig (n, &ibl.sgmiiConfig[n]);
+        }
     }
 
 
@@ -141,27 +145,23 @@ void iblEthBoot (Int32 eIdx)
     hwCpswConfig (targetGetSwitchCtl(), targetGetSwitchMaxPktSize());
 #endif
 
-
 #ifdef DEVICE_QM
     /* Queue manager configuration */
     hwQmSetup ((qmConfig_t *)(targetGetQmConfig()));
     targetInitQs ();
 #endif
     
-
 #ifdef DEVICE_CPDMA
     /* Cpdma configuration. */
     hwCpdmaRxConfig ((cpdmaRxCfg_t *)targetGetCpdmaRxConfig());
     hwCpdmaTxConfig ((cpdmaTxCfg_t *)targetGetCpdmaTxConfig());
 #endif
 
-
 #ifdef DEVICE_PA
     /* Packet accelerator configuration. If PA is not present this statement is defined
      * to void in target.h */
     targetPaConfig(ibl.bootModes[eIdx].u.ethBoot.ethInfo.hwAddress);
 #endif
-
 
 #ifdef DEVICE_SS
     /* Streaming switch configuration. If not present this statement is defined to void
@@ -213,6 +213,7 @@ void iblEthBoot (Int32 eIdx)
        if ((*net_boot_module.peek) ((uint8 *)&nl, sizeof(nl)) < 0)  {
 
             (*net_boot_module.close)();
+
             return;
         }
     }
@@ -263,9 +264,14 @@ void iblEthBoot (Int32 eIdx)
 
     }
 
+    xprintf("TARGET: %i.%i.%i.%i\n\r", ibl.bootModes[eIdx].u.ethBoot.ethInfo.ipAddr[0],ibl.bootModes[eIdx].u.ethBoot.ethInfo.ipAddr[1],
+                                   ibl.bootModes[eIdx].u.ethBoot.ethInfo.ipAddr[2], ibl.bootModes[eIdx].u.ethBoot.ethInfo.ipAddr[3]);
+    xprintf("SERVER: %i.%i.%i.%i\n\r", ibl.bootModes[eIdx].u.ethBoot.ethInfo.serverIp[0],ibl.bootModes[eIdx].u.ethBoot.ethInfo.serverIp[1],
+                                   ibl.bootModes[eIdx].u.ethBoot.ethInfo.serverIp[2], ibl.bootModes[eIdx].u.ethBoot.ethInfo.serverIp[3]);
+    xprintf("FILE: %s\n\r", &ibl.bootModes[eIdx].u.ethBoot.ethInfo.fileName[0]);
+    xprintf("FORMAT: %i\n\r", format);
 
     entry = iblBoot (&net_boot_module, format, &ibl.bootModes[eIdx].u.ethBoot.blob);
-
 
     /* Before closing the module read any remaining data. In the coff boot mode the boot may
      * detect an exit before the entire file has been read. Read the rest of the file
@@ -297,7 +303,6 @@ void iblEthBoot (Int32 eIdx)
     /* Close up the peripheral */
     (*net_boot_module.close)();
 
-
 #ifdef DEVICE_PA
     hwPaDisable ();
 #endif
@@ -314,16 +319,14 @@ void iblEthBoot (Int32 eIdx)
     hwQmTeardown ();
 #endif
 
+    xprintf("entry = 0x%x\n\r", entry);
 
     if (entry != 0)  {
 
         iblStatus.exitAddress = entry;
         exit = (void (*)())entry;
         (*exit)();
-
     }
-
-
 }
 
 

@@ -69,6 +69,7 @@ C6X_C_DIR+= ;$(IBL_ROOT)/hw/cpsw
 C6X_C_DIR+= ;$(IBL_ROOT)/hw/qm
 C6X_C_DIR+= ;$(IBL_ROOT)/hw/cpdma
 C6X_C_DIR+= ;$(IBL_ROOT)/hw/pa
+C6X_C_DIR+= ;$(IBL_ROOT)/hw/uart
 export C6X_C_DIR
 
 
