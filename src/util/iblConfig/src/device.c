@@ -735,11 +735,11 @@ ibl_t c6678_ibl_config(void)
     ibl.pllConfig[ibl_DDR_PLL].postdiv        = 12;
     ibl.pllConfig[ibl_DDR_PLL].pllOutFreqMhz  = 1300;
 
-    /* Net PLL: 156.25 MHz reference, 1050 MHz output (followed by a built in divide by 3 to give 350 MHz to PA) */
-	ibl.pllConfig[ibl_NET_PLL].doEnable       = 1;
-    ibl.pllConfig[ibl_NET_PLL].prediv         = 24;
-    ibl.pllConfig[ibl_NET_PLL].mult			  = 335;
-    ibl.pllConfig[ibl_NET_PLL].postdiv        = 24;
+    /* Net PLL: 100 MHz reference, 1050 MHz output (followed by a built in divide by 3 to give 350 MHz to PA) */
+    ibl.pllConfig[ibl_NET_PLL].doEnable       = 1;
+    ibl.pllConfig[ibl_NET_PLL].prediv         = 2;
+    ibl.pllConfig[ibl_NET_PLL].mult           = 21;
+    ibl.pllConfig[ibl_NET_PLL].postdiv        = 2;
 	ibl.pllConfig[ibl_NET_PLL].pllOutFreqMhz  = 1050;
 
 
@@ -773,17 +773,17 @@ ibl_t c6678_ibl_config(void)
 
 
 	ibl.sgmiiConfig[0].configure     = 1;
-	ibl.sgmiiConfig[0].adviseAbility = 1;
-	ibl.sgmiiConfig[0].control		 = 1;
-	ibl.sgmiiConfig[0].txConfig      = 0x108a1;
-	ibl.sgmiiConfig[0].rxConfig      = 0x700621;
+	ibl.sgmiiConfig[0].adviseAbility = (1 << 15) | (1 << 14) | (1 << 12) | (2 << 10) | 1;
+	ibl.sgmiiConfig[0].control		 = 0x20;
+    ibl.sgmiiConfig[0].txConfig      = 0x108A1;
+    ibl.sgmiiConfig[0].rxConfig      = 0x700621;
     ibl.sgmiiConfig[0].auxConfig	 = 0x81;
 
 	ibl.sgmiiConfig[1].configure     = 1;
-	ibl.sgmiiConfig[1].adviseAbility = 1;
-	ibl.sgmiiConfig[1].control		 = 1;
-	ibl.sgmiiConfig[1].txConfig      = 0x108a1;
-	ibl.sgmiiConfig[1].rxConfig      = 0x700621;
+	ibl.sgmiiConfig[1].adviseAbility = (1 << 15) | (1 << 14) | (1 << 12) | (2 << 10) | 1;
+	ibl.sgmiiConfig[1].control		 = 0x20;
+    ibl.sgmiiConfig[1].txConfig      = 0x108A1;
+    ibl.sgmiiConfig[1].rxConfig      = 0x700621;
     ibl.sgmiiConfig[1].auxConfig	 = 0x81;
 
     ibl.mdioConfig.nMdioOps = 0;
@@ -989,20 +989,20 @@ ibl_t c6670_ibl_config(void)
 	ibl.ddrConfig.uEmif.emif4p0.eccRange2				= 0;
 	ibl.ddrConfig.uEmif.emif4p0.rdWrtExcThresh			= 0;
 
-
 	ibl.sgmiiConfig[0].configure     = 1;
 	ibl.sgmiiConfig[0].adviseAbility = 1;
 	ibl.sgmiiConfig[0].control		 = 1;
-	ibl.sgmiiConfig[0].txConfig      = 0x108a1;
-	ibl.sgmiiConfig[0].rxConfig      = 0x700621;
-	ibl.sgmiiConfig[0].auxConfig	 = 0x41;
+    ibl.sgmiiConfig[0].txConfig      = 0x0;
+    ibl.sgmiiConfig[0].rxConfig      = 0x0;
+    ibl.sgmiiConfig[0].auxConfig	 = 0x81;
+
 
 	ibl.sgmiiConfig[1].configure     = 1;
 	ibl.sgmiiConfig[1].adviseAbility = 1;
 	ibl.sgmiiConfig[1].control		 = 1;
-	ibl.sgmiiConfig[1].txConfig      = 0x108a1;
-	ibl.sgmiiConfig[1].rxConfig      = 0x700621;
-	ibl.sgmiiConfig[1].auxConfig	 = 0x51;
+    ibl.sgmiiConfig[1].txConfig      = 0x0;
+    ibl.sgmiiConfig[1].rxConfig      = 0x0;
+    ibl.sgmiiConfig[1].auxConfig	 = 0x81;
 
 	ibl.mdioConfig.nMdioOps = 0;
 
