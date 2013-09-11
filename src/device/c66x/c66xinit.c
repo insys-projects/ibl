@@ -258,7 +258,7 @@ void iblPCIeWorkaround()
 }
 
 #endif
-
+#if 0
 #define FPGA_BM_GPI_STATUS_LO_REG           4   /* Boot Mode GPI Status (07-00 Low Byte) Register */
 #define FPGA_BM_GPI_STATUS_HI_REG           5   /* Boot Mode GPI Status (15-08 High Byte) Register */
 #define FPGA_ICS557_SEL_CTRL_REG            0x50 /* ICS 557 Clock Selection
@@ -374,7 +374,7 @@ void iblEnterRom ()
     /* Reset SPI */
     DEVICE_REG32_W (DEVICE_SPI_BASE(0) + SPI_REG_SPIGCR0, SPI_REG_VAL_SPIGCR0_RESET);
 }
-
+#endif
 #if (!defined(EXCLUDE_NOR_SPI) || !defined(EXCLUDE_NAND_SPI))
 /**
  *  @brief
