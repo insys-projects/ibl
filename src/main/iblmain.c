@@ -256,6 +256,8 @@ void waitForBoot(UINT32 MAGIC_ADDR)
         }
         for (i=0; i < 100; i++)
             asm("nop");
+        xprintf("IBL: Booting from PCI Express %u times\r", iblStatus.heartBeat++);
+        pause(55000000);
     }
 }
 
@@ -324,7 +326,6 @@ void main (void)
 
         switch(boot_type) {
         case 0: {
-            xprintf("IBL: Booting from PCI Express %u times\n\r", iblStatus.heartBeat);
             LED_smart('0');
             waitForBoot(0x87fffc);
         }
