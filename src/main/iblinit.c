@@ -554,7 +554,7 @@ void main (void)
     /* Check if need to enter Rom boot loader again */
     if (IBL_ENTER_ROM)
     {
-        //xprintf("Start iblPCIeWorkaround()...");
+        //xprintf("Start iblEnterRom()...");
         iblEnterRom();
         //xprintf("complete\n\r");
     }
