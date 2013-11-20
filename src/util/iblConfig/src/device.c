@@ -779,12 +779,12 @@ ibl_t c6678_ibl_config(void)
     ibl.sgmiiConfig[0].rxConfig      = 0x700621;
     ibl.sgmiiConfig[0].auxConfig	 = 0x81;
 
-	ibl.sgmiiConfig[1].configure     = 1;
-	ibl.sgmiiConfig[1].adviseAbility = (1 << 15) | (1 << 14) | (1 << 12) | (2 << 10) | 1;
-	ibl.sgmiiConfig[1].control		 = 0x20;
-    ibl.sgmiiConfig[1].txConfig      = 0x108A1;
+    ibl.sgmiiConfig[1].configure     = 1;
+    ibl.sgmiiConfig[1].adviseAbility = 1;
+    ibl.sgmiiConfig[1].control       = 1;
+    ibl.sgmiiConfig[1].txConfig      = 0x108a1;
     ibl.sgmiiConfig[1].rxConfig      = 0x700621;
-    ibl.sgmiiConfig[1].auxConfig	 = 0x81;
+    ibl.sgmiiConfig[1].auxConfig     = 0x81;
 
     ibl.mdioConfig.nMdioOps = 0;
 
