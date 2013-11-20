@@ -503,7 +503,7 @@ void main (void)
 
     xprintf("\n\r");
     xprintf("\n\r");
-    xprintf("PEX-SRIO Start IBL init\n\r");
+    xprintf("Ac-DSP Start IBL init\n\r");
     xprintf("\n\r");
 
 /*
