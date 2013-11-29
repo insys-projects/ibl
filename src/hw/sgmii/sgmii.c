@@ -61,9 +61,12 @@ int32 hwSgmiiConfig (int32 port, iblSgmii_t *iblSgmii)
 {
     unsigned int sgmiis[] = TARGET_SGMII_BASE_ADDRESSES;
 
+
     SGMII_ACCESS(port, TARGET_SGMII_CONTROL) = 0;  /* Disable negotiation */
-    SGMII_ACCESS(port, TARGET_SGMII_CONTROL) = 1;  /* Soft reset */
-    SGMII_ACCESS(port, TARGET_SGMII_CONTROL) = 0;  /* Soft reset clear*/
+	if(port == 0) { // in Ac-DSP board SFP present only on SGMII0
+	    SGMII_ACCESS(port, TARGET_SGMII_CONTROL) = 1;  /* Soft reset */
+    	SGMII_ACCESS(port, TARGET_SGMII_CONTROL) = 0;  /* Soft reset clear*/
+	}
 
 #ifdef TARGET_SGMII_EXTERNAL_SERDES
 
@@ -71,6 +74,7 @@ int32 hwSgmiiConfig (int32 port, iblSgmii_t *iblSgmii)
 
 #else
 
+    /* Serdes configuration */
     SGMII_ACCESS(port, TARGET_SGMII_TX_CFG) = iblSgmii->txConfig;
     SGMII_ACCESS(port, TARGET_SGMII_RX_CFG) = iblSgmii->rxConfig;
     SGMII_ACCESS(port, TARGET_SGMII_AUX_CFG) = iblSgmii->auxConfig;
