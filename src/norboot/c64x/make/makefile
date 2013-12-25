@@ -61,6 +61,7 @@ C6X_C_DIR+= ;$(IBL_ROOT)/device
 C6X_C_DIR+= ;$(IBL_ROOT)/device/$(TARGET)
 C6X_C_DIR+= ;$(IBL_ROOT)/norboot
 C6X_C_DIR+= ;$(IBL_ROOT)/driver/nor
+C6X_C_DIR+= ;$(IBL_ROOT)/hw/uart
 C6X_C_DIR+= ;$(STDINC)
 export C6X_C_DIR
 

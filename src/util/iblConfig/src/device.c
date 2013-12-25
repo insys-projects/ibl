@@ -807,7 +807,7 @@ ibl_t c6678_ibl_config(void)
 	ibl.bootModes[0].priority = ibl_HIGHEST_PRIORITY;
 	ibl.bootModes[0].port     = 0;
 
-	ibl.bootModes[0].u.norBoot.bootFormat	= ibl_BOOT_FORMAT_ELF;
+    ibl.bootModes[0].u.norBoot.bootFormat	= ibl_BOOT_FORMAT_BBLOB;
 	ibl.bootModes[0].u.norBoot.bootAddress[0][0]	= 0;		/* Image 0 NOR offset byte address in LE mode */
 	ibl.bootModes[0].u.norBoot.bootAddress[0][1]	= 0xA00000;	/* Image 1 NOR offset byte address in LE mode  */
 	ibl.bootModes[0].u.norBoot.bootAddress[1][0]	= 0;		/* Image 0 NOR offset byte address in BE mode */
@@ -989,20 +989,20 @@ ibl_t c6670_ibl_config(void)
 	ibl.ddrConfig.uEmif.emif4p0.eccRange2				= 0;
 	ibl.ddrConfig.uEmif.emif4p0.rdWrtExcThresh			= 0;
 
+
 	ibl.sgmiiConfig[0].configure     = 1;
 	ibl.sgmiiConfig[0].adviseAbility = 1;
 	ibl.sgmiiConfig[0].control		 = 1;
-    ibl.sgmiiConfig[0].txConfig      = 0x0;
-    ibl.sgmiiConfig[0].rxConfig      = 0x0;
-    ibl.sgmiiConfig[0].auxConfig	 = 0x81;
-
+	ibl.sgmiiConfig[0].txConfig      = 0x108a1;
+	ibl.sgmiiConfig[0].rxConfig      = 0x700621;
+	ibl.sgmiiConfig[0].auxConfig	 = 0x41;
 
 	ibl.sgmiiConfig[1].configure     = 1;
 	ibl.sgmiiConfig[1].adviseAbility = 1;
 	ibl.sgmiiConfig[1].control		 = 1;
-    ibl.sgmiiConfig[1].txConfig      = 0x0;
-    ibl.sgmiiConfig[1].rxConfig      = 0x0;
-    ibl.sgmiiConfig[1].auxConfig	 = 0x81;
+	ibl.sgmiiConfig[1].txConfig      = 0x108a1;
+	ibl.sgmiiConfig[1].rxConfig      = 0x700621;
+	ibl.sgmiiConfig[1].auxConfig	 = 0x51;
 
 	ibl.mdioConfig.nMdioOps = 0;
 

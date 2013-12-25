@@ -559,7 +559,14 @@ void main (void)
             iblMemcpy (&iblStatus.ethParams, &ibl.bootModes[2].u.ethBoot.ethInfo, sizeof(iblEthBootInfo_t));
             iblEthBoot(2);
         } break;
-
+        case 2: {
+            iblStatus.activeBoot = ibl_BOOT_MODE_NOR;
+            iblStatus.activeDevice = ibl_ACTIVE_DEVICE_SPI;
+            LED_smart('2');
+            iblPmemCfg (ibl.bootModes[0].u.norBoot.interface, ibl.bootModes[0].port, FALSE);
+            xprintf("IBL: Booting from SPI NOR %u times\r", iblStatus.heartBeat);
+            iblNorBoot(0);
+        } break;
         }
 
         iblStatus.heartBeat += 1;

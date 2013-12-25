@@ -46,6 +46,7 @@
 #include "nor.h"
 #include "norboot.h"
 #include "device.h"
+#include "uart.h"
 
 
 void iblNorBoot (int32 eIdx)
@@ -58,22 +59,23 @@ void iblNorBoot (int32 eIdx)
         return;
 
     /* Open the nor driver */
-    if ((*nor_boot_module.open) ((void *)&ibl.bootModes[eIdx].u.norBoot, NULL))
+    if ((*nor_boot_module.open) ((void *)&ibl.bootModes[eIdx].u.norBoot, NULL)) {
+        xprintf("%s(): Can't open NOR driver\n\r", __FUNCTION__);
         return;
-
+    }
 
     entry = iblBoot (&nor_boot_module, ibl.bootModes[eIdx].u.norBoot.bootFormat, &ibl.bootModes[eIdx].u.norBoot.blob[iblEndianIdx][iblImageIdx]);
 
     (*nor_boot_module.close)();
+
+    xprintf("%s(): entry = 0x%x\n\r", __FUNCTION__, entry);
 
     if (entry != 0)  {
 
         iblStatus.exitAddress = entry;
         exit = (void (*)())entry;
         (*exit)();
-
     }
-
 }
 
 

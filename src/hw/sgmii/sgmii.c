@@ -63,6 +63,7 @@ int32 hwSgmiiConfig (int32 port, iblSgmii_t *iblSgmii)
 
 
     SGMII_ACCESS(port, TARGET_SGMII_CONTROL) = 0;  /* Disable negotiation */
+
 	if(port == 0) { // in Ac-DSP board SFP present only on SGMII0
 	    SGMII_ACCESS(port, TARGET_SGMII_CONTROL) = 1;  /* Soft reset */
     	SGMII_ACCESS(port, TARGET_SGMII_CONTROL) = 0;  /* Soft reset clear*/

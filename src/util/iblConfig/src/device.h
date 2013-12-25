@@ -604,7 +604,7 @@ typedef struct iblSpi_s
     int16  addrWidth;       /**<  16 or 24 are the only valid values */
     int16  nPins;           /**<  4 or 5 are the only valid values */
     int16  mode;            /**<  Clock / data polarities (valid values 0-3) */
-    int16  csel;            /**<  Chip select value (5 pin). Only 0b10 and 0b01 are valid */
+    int16  csel;            /**<  Chip select value (5 pin). Only 0b10 (CS0 low) and 0b01 (CS1 low) are valid */
     uint16 c2tdelay;        /**<  Setup time between chip select and the transaction */
     uint16 busFreqMHz;      /**<  Bus speed */
 

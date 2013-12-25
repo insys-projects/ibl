@@ -503,7 +503,8 @@ void main (void)
 
     xprintf("\n\r");
     xprintf("\n\r");
-    xprintf("Ac-DSP Start IBL init\n\r");
+    xprintf("Start IBL\n\r");
+    xprintf("Build: %s - %s\n\r", __DATE__, __TIME__);
     xprintf("\n\r");
 
 /*
