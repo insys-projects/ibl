@@ -117,6 +117,67 @@ Uint32 deviceLocalAddrToGlobal (Uint32 addr)
     return (addr);
 
 }
+
+void showDdrParam (void)
+{
+    uint32 PLLD = ibl.pllConfig[ibl_DDR_PLL].prediv;
+    uint32 PLLM = ibl.pllConfig[ibl_DDR_PLL].mult - 1;
+    uint32 PLLOUT = 0;
+
+    PLLOUT = ((156.25/PLLD)*PLLM)/2;
+
+    xprintf("DDR3: PLLD %u PLLM %u. PLLOUT = %u MHz\n\r", PLLD, PLLM, PLLOUT);
+}
+
+Uint32 find_ddr3_pllm(void)
+{
+    Uint32 start_mult = 30;
+    Uint32 curr_mult = 0;
+    Uint32 mult_ok = 0;
+
+    // Check start mult
+    hwPllSetCfg2Pll (DEVICE_PLL_BASE(DDR_PLL),
+                         ibl.pllConfig[ibl_DDR_PLL].prediv,
+                         start_mult,
+                         ibl.pllConfig[ibl_DDR_PLL].postdiv,
+                         ibl.pllConfig[ibl_MAIN_PLL].pllOutFreqMhz,
+                         ibl.pllConfig[ibl_DDR_PLL].pllOutFreqMhz);
+
+    if (ibl.ddrConfig.configDdr != 0) {
+        hwEmif4p0Enable (&ibl.ddrConfig.uEmif.emif4p0);
+    }
+
+    if(ddr3_memory_test() == 0) {
+        mult_ok = start_mult;
+    } else {
+        return 0;
+    }
+
+    //detect max fe
+
+    for (curr_mult = start_mult + 1; curr_mult < start_mult + 33; curr_mult++)
+    {
+        hwPllSetCfg2Pll (DEVICE_PLL_BASE(DDR_PLL),
+                             ibl.pllConfig[ibl_DDR_PLL].prediv,
+                             curr_mult,
+                             ibl.pllConfig[ibl_DDR_PLL].postdiv,
+                             ibl.pllConfig[ibl_MAIN_PLL].pllOutFreqMhz,
+                             ibl.pllConfig[ibl_DDR_PLL].pllOutFreqMhz);
+
+        if (ibl.ddrConfig.configDdr != 0) {
+            hwEmif4p0Enable (&ibl.ddrConfig.uEmif.emif4p0);
+        }
+
+        if (ddr3_memory_test() == 0) {
+            mult_ok = curr_mult;
+            continue;
+        } else {
+            break;
+        }
+    }
+
+    return mult_ok;
+}
         
         
 /**
@@ -130,14 +191,24 @@ Uint32 deviceLocalAddrToGlobal (Uint32 addr)
 void deviceDdrConfig (void)
 {
     uint32 loopcount=0;
+    uint32 new_pllm=0;
     int8  ddr_result_code_str[IBL_RESULT_CODE_STR_LEN] = "IBL Result code 0";
     /* The emif registers must be made visible. MPAX mapping 2 is used */
     DEVICE_REG_XMPAX_L(2) =  0x10000000 | 0xff;     /* replacement addr + perm*/
     DEVICE_REG_XMPAX_H(2) =  0x2100000B;         /* base addr + seg size (64KB)*/	
-    
+
     if (ibl.ddrConfig.configDdr != 0) {
         hwEmif4p0Enable (&ibl.ddrConfig.uEmif.emif4p0);
     }
+
+    new_pllm = find_ddr3_pllm();
+    if(new_pllm != 0) {
+        ibl.pllConfig[ibl_DDR_PLL].mult = new_pllm;
+    } else {
+        xprintf("Error PLLM not converging\n\r");
+    }
+
+    showDdrParam();
 
 #ifdef PLL_REINIT_WORKAROUND
     for (loopcount = 0; loopcount < PLL_DDR_INIT_LOOPMAX; loopcount++)
