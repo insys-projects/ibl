@@ -730,8 +730,8 @@ ibl_t c6678_ibl_config(void)
 
 	/* DDR PLL: */
 	ibl.pllConfig[ibl_DDR_PLL].doEnable       = 1;
-    ibl.pllConfig[ibl_DDR_PLL].prediv         = 7;
-    ibl.pllConfig[ibl_DDR_PLL].mult           = 30;
+    ibl.pllConfig[ibl_DDR_PLL].prediv         = 5;
+    ibl.pllConfig[ibl_DDR_PLL].mult           = 20;
     ibl.pllConfig[ibl_DDR_PLL].postdiv        = 12;
     ibl.pllConfig[ibl_DDR_PLL].pllOutFreqMhz  = 1300;
 

@@ -131,7 +131,7 @@ void showDdrParam (void)
 
 Uint32 find_ddr3_pllm(void)
 {
-    Uint32 start_mult = 30;
+    Uint32 start_mult = 20;
     Uint32 curr_mult = 0;
     Uint32 mult_ok = 0;
 
@@ -155,7 +155,7 @@ Uint32 find_ddr3_pllm(void)
 
     //detect max fe
 
-    for (curr_mult = start_mult + 1; curr_mult < start_mult + 33; curr_mult++)
+    for (curr_mult = start_mult + 1; curr_mult < start_mult + 43; curr_mult++)
     {
         hwPllSetCfg2Pll (DEVICE_PLL_BASE(DDR_PLL),
                              ibl.pllConfig[ibl_DDR_PLL].prediv,
@@ -172,11 +172,15 @@ Uint32 find_ddr3_pllm(void)
             mult_ok = curr_mult;
             continue;
         } else {
+            if(curr_mult < start_mult + 43 - 1)
+                continue;
             break;
         }
     }
 
-    return mult_ok;
+    // for AC_DSP board with maximum value of mult
+    // linux not start
+    return mult_ok - 2;
 }
         
         
