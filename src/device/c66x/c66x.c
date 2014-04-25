@@ -180,7 +180,7 @@ Uint32 find_ddr3_pllm(void)
 
     // for AC_DSP board with maximum value of mult
     // linux not start
-    return mult_ok - 2;
+    return mult_ok;
 }
         
         

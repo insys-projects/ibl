@@ -19,14 +19,15 @@ cp -f src/util/i2cConfig/i2cConfig.gel ibl_bin_$IBL_VERSION/i2cConfig.gel
 
 # Set Build environment
 source src/make/setupenvLnx.sh
+export I2C_BUS_ADDRESS=0x50
 
 # Build c6678 EVM LE
 pushd src/make
 make clean
-make evm_c6678_i2c ENDIAN=little I2C_BUS_ADDR=0x51 
+make evm_c6678_i2c ENDIAN=little I2C_BUS_ADDR=${I2C_BUS_ADDRESS}
 popd
-cp -f src/make/bin/i2crom_0x51_c6678_le.bin ibl_bin_$IBL_VERSION/c6678/le/
-cp -f src/make/bin/i2cparam_0x51_c6678_le_0x500.out ibl_bin_$IBL_VERSION/c6678/le/
+cp -f src/make/bin/i2crom_${I2C_BUS_ADDRESS}_c6678_le.bin ibl_bin_$IBL_VERSION/c6678/le/
+cp -f src/make/bin/i2cparam_${I2C_BUS_ADDRESS}_c6678_le_0x500.out ibl_bin_$IBL_VERSION/c6678/le/
 
 # Create Tar archive for binary package
 tar -czf ibl_bin_$IBL_VERSION.tgz ibl_bin_$IBL_VERSION

@@ -4,8 +4,8 @@ cp input.cfg input.txt
 
 ./iblConfig.out input.txt
 
-cp ibl.bin i2crom_0x51_c6678_le.bin
+echo "-------- Build for I2C_BUS_ADDRESS : ${I2C_BUS_ADDRESS} --------"
 
-cp i2crom_0x51_c6678_le.bin ../../../../../../product/
-
-cp i2crom_0x51_c6678_le.bin ../../../../../../../embedded/c6x-bin
+cp ibl.bin i2crom_${I2C_BUS_ADDRESS}_c6678_le.bin
+cp i2crom_${I2C_BUS_ADDRESS}_c6678_le.bin ../../../../../../product/
+cp i2crom_${I2C_BUS_ADDRESS}_c6678_le.bin ../../../../../../../embedded/c6x-bin
