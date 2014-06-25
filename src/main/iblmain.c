@@ -306,9 +306,6 @@ void main (void)
         }
     }
 
-    //c6678_ibl_config();
-    //xprintf(" DEBUG: c6678_ibl_config()\n\r");
-
     /* DDR configuration is device specific */
     //xprintf("Start deviceDdrConfig() --- \n\r");
     deviceDdrConfig ();
