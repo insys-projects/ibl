@@ -28,6 +28,8 @@
 *.lst
 *.map.pp
 *.tgz
+*.rar
+*.dc_TMP*
 
 # file names (any dir)
 cdefdep
