@@ -990,19 +990,57 @@ ibl_t c6670_ibl_config(void)
 	ibl.ddrConfig.uEmif.emif4p0.rdWrtExcThresh			= 0;
 
 
-	ibl.sgmiiConfig[0].configure     = 1;
-	ibl.sgmiiConfig[0].adviseAbility = 1;
-	ibl.sgmiiConfig[0].control		 = 1;
-	ibl.sgmiiConfig[0].txConfig      = 0x108a1;
-	ibl.sgmiiConfig[0].rxConfig      = 0x700621;
-	ibl.sgmiiConfig[0].auxConfig	 = 0x41;
+#if defined(INSYS_PEX_SRIO)
 
-	ibl.sgmiiConfig[1].configure     = 1;
-	ibl.sgmiiConfig[1].adviseAbility = 1;
-	ibl.sgmiiConfig[1].control		 = 1;
-	ibl.sgmiiConfig[1].txConfig      = 0x108a1;
-	ibl.sgmiiConfig[1].rxConfig      = 0x700621;
-	ibl.sgmiiConfig[1].auxConfig	 = 0x51;
+    ibl.sgmiiConfig[0].configure     = 1;
+    ibl.sgmiiConfig[0].adviseAbility = (1 << 15) | (1 << 14) | (1 << 12) | (2 << 10) | 1;
+    ibl.sgmiiConfig[0].control		 = 0x20;
+    ibl.sgmiiConfig[0].txConfig      = 0x108A1;
+    ibl.sgmiiConfig[0].rxConfig      = 0x700621;
+    ibl.sgmiiConfig[0].auxConfig	 = 0x81;
+
+    ibl.sgmiiConfig[1].configure     = 1;
+    ibl.sgmiiConfig[1].adviseAbility = (1 << 15) | (1 << 14) | (1 << 12) | (2 << 10) | 1;
+    ibl.sgmiiConfig[1].control		 = 0x20;
+    ibl.sgmiiConfig[1].txConfig      = 0x108A1;
+    ibl.sgmiiConfig[1].rxConfig      = 0x700621;
+    ibl.sgmiiConfig[1].auxConfig	 = 0x81;
+
+#elif defined(INSYS_AC_DSP)
+
+    ibl.sgmiiConfig[0].configure     = 1;
+    ibl.sgmiiConfig[0].adviseAbility = (1 << 15) | (1 << 14) | (1 << 12) | (2 << 10) | 1;
+    ibl.sgmiiConfig[0].control		 = 0x20;
+    ibl.sgmiiConfig[0].txConfig      = 0x108a1;
+    ibl.sgmiiConfig[0].rxConfig      = 0x700621;
+    ibl.sgmiiConfig[0].auxConfig	 = 0x81;
+
+    ibl.sgmiiConfig[1].configure     = 1;
+    ibl.sgmiiConfig[1].adviseAbility = 1;
+    ibl.sgmiiConfig[1].control       = 1;
+    ibl.sgmiiConfig[1].txConfig      = 0x108a1;
+    ibl.sgmiiConfig[1].rxConfig      = 0x700621;
+    ibl.sgmiiConfig[1].auxConfig     = 0x81;
+
+#elif defined(INSYS_FMC116V)
+
+    ibl.sgmiiConfig[0].configure     = 1;
+    ibl.sgmiiConfig[0].adviseAbility = 1;
+    ibl.sgmiiConfig[0].control		 = 1;
+    ibl.sgmiiConfig[0].txConfig      = 0x108a1;
+    ibl.sgmiiConfig[0].rxConfig      = 0x700621;
+    ibl.sgmiiConfig[0].auxConfig	 = 0x41;
+
+    ibl.sgmiiConfig[1].configure     = 1;
+    ibl.sgmiiConfig[1].adviseAbility = 1;
+    ibl.sgmiiConfig[1].control		 = 1;
+    ibl.sgmiiConfig[1].txConfig      = 0x108a1;
+    ibl.sgmiiConfig[1].rxConfig      = 0x700621;
+    ibl.sgmiiConfig[1].auxConfig	 = 0x51;
+
+#else
+#error "You need specify INSYS_BOARD environment variable to select board configuration!"
+#endif
 
 	ibl.mdioConfig.nMdioOps = 0;
 

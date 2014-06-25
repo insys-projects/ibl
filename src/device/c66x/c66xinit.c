@@ -219,9 +219,15 @@ void iblPCIeWorkaround()
     DEVICE_REG32_W ((PCIE_BASE_ADDR + PCIE_CLASSCODE_REVID), 0x04800001);  /* class 0x04, sub-class 0x80, Prog I/F 0x00, Other multimedia device */ 
     DEVICE_REG32_W ((PCIE_BASE_ADDR + PCIE_LINK_STAT_CTRL), 0x10110080);  /* extended sync, slot_clk_cfg = 1 */
 
-    //DEVICE_REG32_W ((PCIE_BASE_ADDR + PCIE_VENDER_DEVICE_ID), 0x66154953);  /* Vendor and Device ID for PEX-SRIO */
+#if defined(INSYS_PEX_SRIO)
+    DEVICE_REG32_W ((PCIE_BASE_ADDR + PCIE_VENDER_DEVICE_ID), 0x66154953);  /* Vendor and Device ID for PEX-SRIO */
+#elif defined(INSYS_AC_DSP)
     DEVICE_REG32_W ((PCIE_BASE_ADDR + PCIE_VENDER_DEVICE_ID), 0x66134953);  /* Vendor and Device ID for AC-DSP */
-    //DEVICE_REG32_W ((PCIE_BASE_ADDR + PCIE_VENDER_DEVICE_ID), 0x66164953);  /* Vendor and Device ID for FMC116V */
+#elif defined(INSYS_FMC116V)
+    DEVICE_REG32_W ((PCIE_BASE_ADDR + PCIE_VENDER_DEVICE_ID), 0x66164953);  /* Vendor and Device ID for FMC116V */
+#else
+#error "You need specify INSYS_BOARD environment variable to select board configuration!"
+#endif
 
     DEVICE_REG32_W ((PCIE_BASE_ADDR + PCIE_DEVICE_CAP), 0x288701); /* L0 = 4, L1 = 3 */
 

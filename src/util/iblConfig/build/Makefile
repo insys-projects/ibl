@@ -11,7 +11,7 @@ AR               = ar
 LD_OPTS =
 C_OPTS =
 
-C_OPTS += -O2 -DEVM=$(EVM) -DI2C_MAP_ADDR=$(I2C_MAP_ADDR)
+C_OPTS += -O2 -DEVM=$(EVM) -DI2C_MAP_ADDR=$(I2C_MAP_ADDR) -D$(INSYS_BOARD)
 
 ifeq ($(EVM),c6455)
 	DEVICE_ID = 1

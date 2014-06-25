@@ -19,12 +19,19 @@ cp -f src/util/i2cConfig/i2cConfig.gel ibl_bin_$IBL_VERSION/i2cConfig.gel
 
 # Set Build environment
 source src/make/setupenvLnx.sh
+
 export I2C_BUS_ADDRESS=0x50
+
+# Set INSYS_BOARD for choose board depending sources
+export INSYS_BOARD=INSYS_UNKNOWN
+#export INSYS_BOARD=INSYS_PEX_SRIO
+#export INSYS_BOARD=INSYS_AC_DSP
+#export INSYS_BOARD=INSYS_FMC116V
 
 # Build c6678 EVM LE
 pushd src/make
 make clean
-make evm_c6678_i2c ENDIAN=little I2C_BUS_ADDR=${I2C_BUS_ADDRESS}
+make evm_c6678_i2c ENDIAN=little I2C_BUS_ADDR=${I2C_BUS_ADDRESS} INSYS_BOARD=${INSYS_BOARD}
 popd
 cp -f src/make/bin/i2crom_${I2C_BUS_ADDRESS}_c6678_le.bin ibl_bin_$IBL_VERSION/c6678/le/
 cp -f src/make/bin/i2cparam_${I2C_BUS_ADDRESS}_c6678_le_0x500.out ibl_bin_$IBL_VERSION/c6678/le/
