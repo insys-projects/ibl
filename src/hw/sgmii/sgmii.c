@@ -61,13 +61,9 @@ int32 hwSgmiiConfig (int32 port, iblSgmii_t *iblSgmii)
 {
     unsigned int sgmiis[] = TARGET_SGMII_BASE_ADDRESSES;
 
-
     SGMII_ACCESS(port, TARGET_SGMII_CONTROL) = 0;  /* Disable negotiation */
-
-	if(port == 0) { // in Ac-DSP board SFP present only on SGMII0
-	    SGMII_ACCESS(port, TARGET_SGMII_CONTROL) = 1;  /* Soft reset */
-    	SGMII_ACCESS(port, TARGET_SGMII_CONTROL) = 0;  /* Soft reset clear*/
-	}
+    SGMII_ACCESS(port, TARGET_SGMII_CONTROL) = 1;  /* Soft reset */
+    SGMII_ACCESS(port, TARGET_SGMII_CONTROL) = 0;  /* Soft reset clear*/
 
 #ifdef TARGET_SGMII_EXTERNAL_SERDES
 
