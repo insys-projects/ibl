@@ -729,11 +729,59 @@ ibl_t c6678_ibl_config(void)
 	ibl.pllConfig[ibl_MAIN_PLL].pllOutFreqMhz = 1000;
 
 	/* DDR PLL: */
+/*
 	ibl.pllConfig[ibl_DDR_PLL].doEnable       = 1;
     ibl.pllConfig[ibl_DDR_PLL].prediv         = 5;
     ibl.pllConfig[ibl_DDR_PLL].mult           = 20;
     ibl.pllConfig[ibl_DDR_PLL].postdiv        = 12;
     ibl.pllConfig[ibl_DDR_PLL].pllOutFreqMhz  = 1300;
+*/
+
+#if defined(INSYS_PEX_SRIO)
+	ibl.pllConfig[ibl_DDR_PLL].doEnable       = 1; 
+	ibl.pllConfig[ibl_DDR_PLL].prediv         = 2;
+	ibl.pllConfig[ibl_DDR_PLL].mult           = 19;
+	ibl.pllConfig[ibl_DDR_PLL].postdiv        = 2;
+	ibl.pllConfig[ibl_DDR_PLL].pllOutFreqMhz  = 1600;
+#elif defined(INSYS_AC_DSP)
+	ibl.pllConfig[ibl_DDR_PLL].doEnable       = 1; 
+	ibl.pllConfig[ibl_DDR_PLL].prediv         = 2;
+	ibl.pllConfig[ibl_DDR_PLL].mult           = 19;
+	ibl.pllConfig[ibl_DDR_PLL].postdiv        = 2;
+	ibl.pllConfig[ibl_DDR_PLL].pllOutFreqMhz  = 1600;
+#elif defined(INSYS_FMC110P)
+	ibl.pllConfig[ibl_DDR_PLL].doEnable       = 1; 
+	ibl.pllConfig[ibl_DDR_PLL].prediv         = 2;
+	ibl.pllConfig[ibl_DDR_PLL].mult           = 19;
+	ibl.pllConfig[ibl_DDR_PLL].postdiv        = 2;
+	ibl.pllConfig[ibl_DDR_PLL].pllOutFreqMhz  = 1600;
+#elif defined(INSYS_FMC112CP)
+	ibl.pllConfig[ibl_DDR_PLL].doEnable       = 1; 
+	ibl.pllConfig[ibl_DDR_PLL].prediv         = 2;
+	ibl.pllConfig[ibl_DDR_PLL].mult           = 19;
+	ibl.pllConfig[ibl_DDR_PLL].postdiv        = 2;
+	ibl.pllConfig[ibl_DDR_PLL].pllOutFreqMhz  = 1600;
+#elif defined(INSYS_FMC114V)
+	ibl.pllConfig[ibl_DDR_PLL].doEnable       = 1; 
+	ibl.pllConfig[ibl_DDR_PLL].prediv         = 2;
+	ibl.pllConfig[ibl_DDR_PLL].mult           = 19;
+	ibl.pllConfig[ibl_DDR_PLL].postdiv        = 2;
+	ibl.pllConfig[ibl_DDR_PLL].pllOutFreqMhz  = 1600;
+#elif defined(INSYS_FMC116V)
+	ibl.pllConfig[ibl_DDR_PLL].doEnable       = 1; 
+	ibl.pllConfig[ibl_DDR_PLL].prediv         = 2;
+	ibl.pllConfig[ibl_DDR_PLL].mult           = 19;
+	ibl.pllConfig[ibl_DDR_PLL].postdiv        = 2;
+	ibl.pllConfig[ibl_DDR_PLL].pllOutFreqMhz  = 1600;
+#elif defined(INSYS_FMC117CP)
+	ibl.pllConfig[ibl_DDR_PLL].doEnable       = 1; 
+	ibl.pllConfig[ibl_DDR_PLL].prediv         = 2;
+	ibl.pllConfig[ibl_DDR_PLL].mult           = 19;
+	ibl.pllConfig[ibl_DDR_PLL].postdiv        = 2;
+	ibl.pllConfig[ibl_DDR_PLL].pllOutFreqMhz  = 1600;
+#else
+#error "You need specify INSYS_BOARD environment variable to select board configuration!"
+#endif
 
     /* Net PLL: 100 MHz reference, 1050 MHz output (followed by a built in divide by 3 to give 350 MHz to PA) */
     ibl.pllConfig[ibl_NET_PLL].doEnable       = 1;
