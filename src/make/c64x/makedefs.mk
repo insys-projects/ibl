@@ -89,6 +89,8 @@ ifeq ($(ENDIAN),big)
  CFLAGS+= -me
 endif
 
+CFLAGS+= -D$(INSYS_BOARD)
+
 # Debug flags
 # -as : keep local symbols
 # -g  : enable debugging
