@@ -79,6 +79,26 @@
 #define FIFO_WE_SLAVE_RATIO 0x106
 
 
+#if defined(INSYS_PEX_SRIO)
+#include "emif4_pex_srio.h"
+#elif defined(INSYS_AC_DSP)
+#include "emif4_ac_dsp.h"
+#elif defined(INSYS_FMC110P)
+#include "emif4_fmc110p.h"
+#elif defined(INSYS_FMC112CP)
+#include "emif4_fmc112cp.h"
+#elif defined(INSYS_FMC114V)
+#include "emif4_fmc114v.h"
+#elif defined(INSYS_FMC116V)
+#include "emif4_fmc116v.h"
+#elif defined(INSYS_FMC117CP)
+#include "emif4_fmc117cp.h"
+#else
+#error "You need specify INSYS_BOARD environment variable to select board configuration!"
+#endif
+
+
+
 static void ddr3_wait (uint32 del)
 {
     volatile unsigned int i;
@@ -114,31 +134,32 @@ SINT16 hwEmif4p0Enable (iblEmif4p0_t *cfg)
        /**************** 3.3 Leveling register configuration ********************/
         DDR3_CONFIG_REG_0 &= ~(0x007FE000);  // clear ctrl_slave_ratio field
         DDR3_CONFIG_REG_0 |= 0x00200000;     // set ctrl_slave_ratio to 0x100
-        DDR3_CONFIG_REG_12 |= 0x08000000;    // Set invert_clkout = 1
+        DDR3_CONFIG_REG_12 |= 0x09000000;    // Set invert_clkout = 1
         DDR3_CONFIG_REG_0 |= 0xF;            // set dll_lock_diff to 15
         DDR3_CONFIG_REG_23 |= 0x00000200;    // See section 4.2.1, set for partial automatic levelling
             
-      /**************** 3.3 Partial Automatic Leveling ********************/
-      DATA0_WRLVL_INIT_RATIO = 0x60;
-      DATA1_WRLVL_INIT_RATIO = 0x5A;
-      DATA2_WRLVL_INIT_RATIO = 0x71;
-      DATA3_WRLVL_INIT_RATIO = 0x68;
-      DATA4_WRLVL_INIT_RATIO = 0x7C;
-      DATA5_WRLVL_INIT_RATIO = 0x76;
-      DATA6_WRLVL_INIT_RATIO = 0x84;
-      DATA7_WRLVL_INIT_RATIO = 0x7F;
-      DATA8_WRLVL_INIT_RATIO = 0x00;
 
-      DATA0_GTLVL_INIT_RATIO = 0xA2;
-      DATA1_GTLVL_INIT_RATIO = 0xA9;
-      DATA2_GTLVL_INIT_RATIO = 0xAB;
-      DATA3_GTLVL_INIT_RATIO = 0xB5;
-      DATA4_GTLVL_INIT_RATIO = 0xBB;
-      DATA5_GTLVL_INIT_RATIO = 0xC0;
-      DATA6_GTLVL_INIT_RATIO = 0xCC;
-      DATA7_GTLVL_INIT_RATIO = 0xD1;
-      DATA8_GTLVL_INIT_RATIO = 0x00;
-  
+      /**************** 3.3 Partial Automatic Leveling ********************/
+	DATA0_WRLVL_INIT_RATIO = _level[0];
+	DATA1_WRLVL_INIT_RATIO = _level[1];
+	DATA2_WRLVL_INIT_RATIO = _level[2];
+	DATA3_WRLVL_INIT_RATIO = _level[3];
+	DATA4_WRLVL_INIT_RATIO = _level[4];
+	DATA5_WRLVL_INIT_RATIO = _level[5];
+	DATA6_WRLVL_INIT_RATIO = _level[6];
+	DATA7_WRLVL_INIT_RATIO = _level[7];
+	DATA8_WRLVL_INIT_RATIO = _level[8];
+
+	DATA0_GTLVL_INIT_RATIO = _level[9];
+	DATA1_GTLVL_INIT_RATIO = _level[10];
+	DATA2_GTLVL_INIT_RATIO = _level[11];
+	DATA3_GTLVL_INIT_RATIO = _level[12];
+	DATA4_GTLVL_INIT_RATIO = _level[13];
+	DATA5_GTLVL_INIT_RATIO = _level[14];
+	DATA6_GTLVL_INIT_RATIO = _level[15];
+	DATA7_GTLVL_INIT_RATIO = _level[16];
+	DATA8_GTLVL_INIT_RATIO = _level[17];
+
       //Do a PHY reset. Toggle DDR_PHY_CTRL_1 bit 15 0->1->0
       DDR_DDRPHYC &= ~(0x00008000);
       DDR_DDRPHYC |= (0x00008000);
@@ -149,13 +170,13 @@ SINT16 hwEmif4p0Enable (iblEmif4p0_t *cfg)
 
       /* DDR_SDTIM1   = 0x1113783C; */
        TEMP = 0;
-       TEMP |= 0x8 << 25; // T_RP bit field 28:25
-       TEMP |= 0x8 << 21; // T_RCD bit field 24:21
-       TEMP |= 0x9 << 17; // T_WR bit field 20:17
-       TEMP |= 0x17 << 12; // T_RAS bit field 16:12
-       TEMP |= 0x20 << 6; // T_RC bit field 11:6
-       TEMP |= 0x7 << 3; // T_RRD bit field 5:3
-       TEMP |= 0x4; // T_WTR bit field 2:0
+       TEMP |= T_RP << 25; // T_RP bit field 28:25
+       TEMP |= T_RCD << 21; // T_RCD bit field 24:21
+       TEMP |= T_WR << 17; // T_WR bit field 20:17
+       TEMP |= T_RAS << 12; // T_RAS bit field 16:12
+       TEMP |= T_RC << 6; // T_RC bit field 11:6
+       TEMP |= T_RRD << 3; // T_RRD bit field 5:3
+       TEMP |= T_WTR; // T_WTR bit field 2:0
        DDR_SDTIM1 = TEMP;
 
       /* DDR_SDTIM2   = 0x30717FE3; */
@@ -163,7 +184,7 @@ SINT16 hwEmif4p0Enable (iblEmif4p0_t *cfg)
        TEMP |= 0x3 << 28; // T_XP bit field 30:28
        TEMP |= 0x71 << 16; // T_XSNR bit field 24:16
        TEMP |= 0x1ff << 6; // T_XSRD bit field 15:6
-       TEMP |= 0x4 << 3; // T_RTP bit field 5:3
+       TEMP |= T_RTP << 3; // T_RTP bit field 5:3
        TEMP |= 0x3; // T_CKE bit field 2:0
        DDR_SDTIM2 = TEMP;
 
@@ -173,7 +194,7 @@ SINT16 hwEmif4p0Enable (iblEmif4p0_t *cfg)
        TEMP |= 0x5 << 24; // T_CSTA bit field 27:24 (fixed value)
        TEMP |= 0x4 << 21; // T_CKESR bit field 23:21
        TEMP |= 0x3f << 15; // T_ZQCS bit field 20:15
-       TEMP |= 0x6a << 4; // T_RFC bit field 12:4
+       TEMP |= T_RFC << 4; // T_RFC bit field 12:4
        TEMP |= 0xf; // T_RAS_MAX bit field 3:0 (fixed value)
        DDR_SDTIM3 = TEMP; 
 
@@ -195,11 +216,11 @@ SINT16 hwEmif4p0Enable (iblEmif4p0_t *cfg)
          TEMP |= 0x1 << 18; // SDRAM_DRIVE bit field 19:18
          TEMP |= 0x2 << 16; // CWL bit field 17:16
          TEMP |= 0x0 << 14; // NM bit field 15:14
-         TEMP |= 0xA << 10; // CL bit field 13:10
-         TEMP |= 0x4 << 7; // ROWSIZE bit field 9:7
+         TEMP |= CL  << 10; // CL bit field 13:10
+         TEMP |= ROWSIZE << 7; // ROWSIZE bit field 9:7
          TEMP |= 0x3 << 4; // IBANK bit field 6:4
-         TEMP |= 0x0 << 3; // EBANK bit field 3:3
-         TEMP |= 0x2; // PAGESIZE bit field 2:0
+         TEMP |= RANK << 3; // EBANK bit field 3:3
+         TEMP |= PSIZE; // PAGESIZE bit field 2:0
          DDR_SDCFG = TEMP;
 
  	/* assuming max device speed, 1.4GHz, 1 cycle = 0.714 ns *
