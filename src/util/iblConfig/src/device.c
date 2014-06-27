@@ -729,14 +729,6 @@ ibl_t c6678_ibl_config(void)
 	ibl.pllConfig[ibl_MAIN_PLL].pllOutFreqMhz = 1000;
 
 	/* DDR PLL: */
-/*
-	ibl.pllConfig[ibl_DDR_PLL].doEnable       = 1;
-    ibl.pllConfig[ibl_DDR_PLL].prediv         = 5;
-    ibl.pllConfig[ibl_DDR_PLL].mult           = 20;
-    ibl.pllConfig[ibl_DDR_PLL].postdiv        = 12;
-    ibl.pllConfig[ibl_DDR_PLL].pllOutFreqMhz  = 1300;
-*/
-
 #if defined(INSYS_PEX_SRIO)
 	ibl.pllConfig[ibl_DDR_PLL].doEnable       = 1; 
 	ibl.pllConfig[ibl_DDR_PLL].prediv         = 2;
@@ -820,9 +812,27 @@ ibl_t c6678_ibl_config(void)
 	ibl.ddrConfig.uEmif.emif4p0.rdWrtExcThresh			= 0;
 
 
-	ibl.sgmiiConfig[0].configure     = 1;
-	ibl.sgmiiConfig[0].adviseAbility = (1 << 15) | (1 << 14) | (1 << 12) | (2 << 10) | 1;
-	ibl.sgmiiConfig[0].control		 = 0x20;
+#if defined(INSYS_PEX_SRIO)
+
+    ibl.sgmiiConfig[0].configure     = 1;
+    ibl.sgmiiConfig[0].adviseAbility = (1 << 15) | (1 << 14) | (1 << 12) | (2 << 10) | 1;
+    ibl.sgmiiConfig[0].control		 = 0x20;
+    ibl.sgmiiConfig[0].txConfig      = 0x108A1;
+    ibl.sgmiiConfig[0].rxConfig      = 0x700621;
+    ibl.sgmiiConfig[0].auxConfig	 = 0x81;
+
+    ibl.sgmiiConfig[1].configure     = 1;
+    ibl.sgmiiConfig[1].adviseAbility = (1 << 15) | (1 << 14) | (1 << 12) | (2 << 10) | 1;
+    ibl.sgmiiConfig[1].control		 = 0x20;
+    ibl.sgmiiConfig[1].txConfig      = 0x108A1;
+    ibl.sgmiiConfig[1].rxConfig      = 0x700621;
+    ibl.sgmiiConfig[1].auxConfig	 = 0x81;
+
+#elif defined(INSYS_AC_DSP)
+
+    ibl.sgmiiConfig[0].configure     = 1;
+    ibl.sgmiiConfig[0].adviseAbility = (1 << 15) | (1 << 14) | (1 << 12) | (2 << 10) | 1;
+    ibl.sgmiiConfig[0].control		 = 0x20;
     ibl.sgmiiConfig[0].txConfig      = 0x108a1;
     ibl.sgmiiConfig[0].rxConfig      = 0x700621;
     ibl.sgmiiConfig[0].auxConfig	 = 0x81;
@@ -833,6 +843,26 @@ ibl_t c6678_ibl_config(void)
     ibl.sgmiiConfig[1].txConfig      = 0x108a1;
     ibl.sgmiiConfig[1].rxConfig      = 0x700621;
     ibl.sgmiiConfig[1].auxConfig     = 0x81;
+
+#elif defined(INSYS_FMC116V)
+
+    ibl.sgmiiConfig[0].configure     = 1;
+    ibl.sgmiiConfig[0].adviseAbility = 1;
+    ibl.sgmiiConfig[0].control		 = 1;
+    ibl.sgmiiConfig[0].txConfig      = 0x108a1;
+    ibl.sgmiiConfig[0].rxConfig      = 0x700621;
+    ibl.sgmiiConfig[0].auxConfig	 = 0x41;
+
+    ibl.sgmiiConfig[1].configure     = 1;
+    ibl.sgmiiConfig[1].adviseAbility = 1;
+    ibl.sgmiiConfig[1].control		 = 1;
+    ibl.sgmiiConfig[1].txConfig      = 0x108a1;
+    ibl.sgmiiConfig[1].rxConfig      = 0x700621;
+    ibl.sgmiiConfig[1].auxConfig	 = 0x51;
+
+#else
+#error "You need specify INSYS_BOARD environment variable to select board configuration!"
+#endif
 
     ibl.mdioConfig.nMdioOps = 0;
 
@@ -953,22 +983,22 @@ ibl_t c6678_ibl_config(void)
     ibl.bootModes[2].u.ethBoot.ethInfo.hwAddress[4] = 0;
     ibl.bootModes[2].u.ethBoot.ethInfo.hwAddress[5] = 0;
 
-
-    ibl.bootModes[2].u.ethBoot.ethInfo.fileName[0]  = 'c';
-    ibl.bootModes[2].u.ethBoot.ethInfo.fileName[1]  = '6';
-    ibl.bootModes[2].u.ethBoot.ethInfo.fileName[2]  = '6';
-    ibl.bootModes[2].u.ethBoot.ethInfo.fileName[3]  = '7';
-    ibl.bootModes[2].u.ethBoot.ethInfo.fileName[4]  = '8';
-    ibl.bootModes[2].u.ethBoot.ethInfo.fileName[5]  = '-';
-    ibl.bootModes[2].u.ethBoot.ethInfo.fileName[6]  = 'l';
-    ibl.bootModes[2].u.ethBoot.ethInfo.fileName[7]  = 'e';
-    ibl.bootModes[2].u.ethBoot.ethInfo.fileName[8]  = '.';
-    ibl.bootModes[2].u.ethBoot.ethInfo.fileName[9]  = 'b';
-    ibl.bootModes[2].u.ethBoot.ethInfo.fileName[10] = 'i';
-    ibl.bootModes[2].u.ethBoot.ethInfo.fileName[11] = 'n';
-    ibl.bootModes[2].u.ethBoot.ethInfo.fileName[12] = '\0';
-    ibl.bootModes[2].u.ethBoot.ethInfo.fileName[13] = '\0';
-    ibl.bootModes[2].u.ethBoot.ethInfo.fileName[14] = '\0';
+#if defined(INSYS_PEX_SRIO)
+    snprintf(ibl.bootModes[2].u.ethBoot.ethInfo.fileName, 64, "%s", "c6678-pex-srio.bin");
+#elif defined(INSYS_AC_DSP)
+    snprintf(ibl.bootModes[2].u.ethBoot.ethInfo.fileName, 64, "%s", "c6678-ac-dsp.bin");
+#elif defined(INSYS_FMC110P)
+    snprintf(ibl.bootModes[2].u.ethBoot.ethInfo.fileName, 64, "%s", "c6678-fmc110p.bin");
+#elif defined(INSYS_FMC112CP)
+    snprintf(ibl.bootModes[2].u.ethBoot.ethInfo.fileName, 64, "%s", "c6678-fmc112cp.bin");
+#elif defined(INSYS_FMC114V)
+    snprintf(ibl.bootModes[2].u.ethBoot.ethInfo.fileName, 64, "%s", "c6678-fmc114v.bin");
+#elif defined(INSYS_FMC116V)
+    snprintf(ibl.bootModes[2].u.ethBoot.ethInfo.fileName, 64, "%s", "c6678-fmc116v.bin");
+#elif defined(INSYS_FMC117CP)
+#else
+#error "You need specify INSYS_BOARD environment variable to select board configuration!"
+#endif
 
     ibl.bootModes[2].u.ethBoot.blob.startAddress  = 0x80000000;       /* Load start address */
     ibl.bootModes[2].u.ethBoot.blob.sizeBytes     = 0x20000000;
@@ -1036,59 +1066,6 @@ ibl_t c6670_ibl_config(void)
 	ibl.ddrConfig.uEmif.emif4p0.eccRange1				= 0;
 	ibl.ddrConfig.uEmif.emif4p0.eccRange2				= 0;
 	ibl.ddrConfig.uEmif.emif4p0.rdWrtExcThresh			= 0;
-
-
-#if defined(INSYS_PEX_SRIO)
-
-    ibl.sgmiiConfig[0].configure     = 1;
-    ibl.sgmiiConfig[0].adviseAbility = (1 << 15) | (1 << 14) | (1 << 12) | (2 << 10) | 1;
-    ibl.sgmiiConfig[0].control		 = 0x20;
-    ibl.sgmiiConfig[0].txConfig      = 0x108A1;
-    ibl.sgmiiConfig[0].rxConfig      = 0x700621;
-    ibl.sgmiiConfig[0].auxConfig	 = 0x81;
-
-    ibl.sgmiiConfig[1].configure     = 1;
-    ibl.sgmiiConfig[1].adviseAbility = (1 << 15) | (1 << 14) | (1 << 12) | (2 << 10) | 1;
-    ibl.sgmiiConfig[1].control		 = 0x20;
-    ibl.sgmiiConfig[1].txConfig      = 0x108A1;
-    ibl.sgmiiConfig[1].rxConfig      = 0x700621;
-    ibl.sgmiiConfig[1].auxConfig	 = 0x81;
-
-#elif defined(INSYS_AC_DSP)
-
-    ibl.sgmiiConfig[0].configure     = 1;
-    ibl.sgmiiConfig[0].adviseAbility = (1 << 15) | (1 << 14) | (1 << 12) | (2 << 10) | 1;
-    ibl.sgmiiConfig[0].control		 = 0x20;
-    ibl.sgmiiConfig[0].txConfig      = 0x108a1;
-    ibl.sgmiiConfig[0].rxConfig      = 0x700621;
-    ibl.sgmiiConfig[0].auxConfig	 = 0x81;
-
-    ibl.sgmiiConfig[1].configure     = 1;
-    ibl.sgmiiConfig[1].adviseAbility = 1;
-    ibl.sgmiiConfig[1].control       = 1;
-    ibl.sgmiiConfig[1].txConfig      = 0x108a1;
-    ibl.sgmiiConfig[1].rxConfig      = 0x700621;
-    ibl.sgmiiConfig[1].auxConfig     = 0x81;
-
-#elif defined(INSYS_FMC116V)
-
-    ibl.sgmiiConfig[0].configure     = 1;
-    ibl.sgmiiConfig[0].adviseAbility = 1;
-    ibl.sgmiiConfig[0].control		 = 1;
-    ibl.sgmiiConfig[0].txConfig      = 0x108a1;
-    ibl.sgmiiConfig[0].rxConfig      = 0x700621;
-    ibl.sgmiiConfig[0].auxConfig	 = 0x41;
-
-    ibl.sgmiiConfig[1].configure     = 1;
-    ibl.sgmiiConfig[1].adviseAbility = 1;
-    ibl.sgmiiConfig[1].control		 = 1;
-    ibl.sgmiiConfig[1].txConfig      = 0x108a1;
-    ibl.sgmiiConfig[1].rxConfig      = 0x700621;
-    ibl.sgmiiConfig[1].auxConfig	 = 0x51;
-
-#else
-#error "You need specify INSYS_BOARD environment variable to select board configuration!"
-#endif
 
 	ibl.mdioConfig.nMdioOps = 0;
 
