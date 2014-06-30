@@ -732,43 +732,43 @@ ibl_t c6678_ibl_config(void)
 #if defined(INSYS_PEX_SRIO)
 	ibl.pllConfig[ibl_DDR_PLL].doEnable       = 1; 
 	ibl.pllConfig[ibl_DDR_PLL].prediv         = 2;
-	ibl.pllConfig[ibl_DDR_PLL].mult           = 19;
+	ibl.pllConfig[ibl_DDR_PLL].mult           = 21;
 	ibl.pllConfig[ibl_DDR_PLL].postdiv        = 2;
 	ibl.pllConfig[ibl_DDR_PLL].pllOutFreqMhz  = 1600;
 #elif defined(INSYS_AC_DSP)
 	ibl.pllConfig[ibl_DDR_PLL].doEnable       = 1; 
 	ibl.pllConfig[ibl_DDR_PLL].prediv         = 2;
-	ibl.pllConfig[ibl_DDR_PLL].mult           = 19;
+	ibl.pllConfig[ibl_DDR_PLL].mult           = 21;
 	ibl.pllConfig[ibl_DDR_PLL].postdiv        = 2;
 	ibl.pllConfig[ibl_DDR_PLL].pllOutFreqMhz  = 1600;
 #elif defined(INSYS_FMC110P)
 	ibl.pllConfig[ibl_DDR_PLL].doEnable       = 1; 
 	ibl.pllConfig[ibl_DDR_PLL].prediv         = 2;
-	ibl.pllConfig[ibl_DDR_PLL].mult           = 19;
+	ibl.pllConfig[ibl_DDR_PLL].mult           = 21;
 	ibl.pllConfig[ibl_DDR_PLL].postdiv        = 2;
 	ibl.pllConfig[ibl_DDR_PLL].pllOutFreqMhz  = 1600;
 #elif defined(INSYS_FMC112CP)
 	ibl.pllConfig[ibl_DDR_PLL].doEnable       = 1; 
 	ibl.pllConfig[ibl_DDR_PLL].prediv         = 2;
-	ibl.pllConfig[ibl_DDR_PLL].mult           = 19;
+	ibl.pllConfig[ibl_DDR_PLL].mult           = 21;
 	ibl.pllConfig[ibl_DDR_PLL].postdiv        = 2;
 	ibl.pllConfig[ibl_DDR_PLL].pllOutFreqMhz  = 1600;
 #elif defined(INSYS_FMC114V)
 	ibl.pllConfig[ibl_DDR_PLL].doEnable       = 1; 
 	ibl.pllConfig[ibl_DDR_PLL].prediv         = 2;
-	ibl.pllConfig[ibl_DDR_PLL].mult           = 19;
+	ibl.pllConfig[ibl_DDR_PLL].mult           = 21;
 	ibl.pllConfig[ibl_DDR_PLL].postdiv        = 2;
 	ibl.pllConfig[ibl_DDR_PLL].pllOutFreqMhz  = 1600;
 #elif defined(INSYS_FMC116V)
 	ibl.pllConfig[ibl_DDR_PLL].doEnable       = 1; 
 	ibl.pllConfig[ibl_DDR_PLL].prediv         = 2;
-	ibl.pllConfig[ibl_DDR_PLL].mult           = 19;
+	ibl.pllConfig[ibl_DDR_PLL].mult           = 21;
 	ibl.pllConfig[ibl_DDR_PLL].postdiv        = 2;
 	ibl.pllConfig[ibl_DDR_PLL].pllOutFreqMhz  = 1600;
 #elif defined(INSYS_FMC117CP)
 	ibl.pllConfig[ibl_DDR_PLL].doEnable       = 1; 
 	ibl.pllConfig[ibl_DDR_PLL].prediv         = 2;
-	ibl.pllConfig[ibl_DDR_PLL].mult           = 19;
+	ibl.pllConfig[ibl_DDR_PLL].mult           = 21;
 	ibl.pllConfig[ibl_DDR_PLL].postdiv        = 2;
 	ibl.pllConfig[ibl_DDR_PLL].pllOutFreqMhz  = 1600;
 #else
@@ -844,6 +844,22 @@ ibl_t c6678_ibl_config(void)
     ibl.sgmiiConfig[1].rxConfig      = 0x700621;
     ibl.sgmiiConfig[1].auxConfig     = 0x81;
 
+#elif defined(INSYS_FMC114V)
+
+    ibl.sgmiiConfig[0].configure     = 1;
+    ibl.sgmiiConfig[0].adviseAbility = 1;
+    ibl.sgmiiConfig[0].control		 = 1;
+    ibl.sgmiiConfig[0].txConfig      = 0x108a1;
+    ibl.sgmiiConfig[0].rxConfig      = 0x700621;
+    ibl.sgmiiConfig[0].auxConfig	 = 0x41;
+
+    ibl.sgmiiConfig[1].configure     = 1;
+    ibl.sgmiiConfig[1].adviseAbility = 1;
+    ibl.sgmiiConfig[1].control		 = 1;
+    ibl.sgmiiConfig[1].txConfig      = 0x108a1;
+    ibl.sgmiiConfig[1].rxConfig      = 0x700621;
+    ibl.sgmiiConfig[1].auxConfig	 = 0x51;
+
 #elif defined(INSYS_FMC116V)
 
     ibl.sgmiiConfig[0].configure     = 1;
@@ -876,8 +892,6 @@ ibl_t c6678_ibl_config(void)
     ibl.sgmiiConfig[1].rxConfig      = 0x700621;
     ibl.sgmiiConfig[1].auxConfig	 = 0x51;
 
-#else
-#error "You need specify INSYS_BOARD environment variable to select board configuration!"
 #endif
 
     ibl.mdioConfig.nMdioOps = 0;
