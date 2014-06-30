@@ -13,25 +13,25 @@
 #include "types.h"
 
 unsigned int _level[18] = {
-      0xB1,
-      0xCF,
-      0xC9,
-      0xD5,
-      0xFE,
-      0xFF,
-      0x112,
-      0x119,
-      0x00,
+	    0x98,
+	    0x8D,
+	    0x9A,
+	    0x8B,
+	    0x94,
+	    0x90,
+	    0x91,
+	    0x8D,
+	    0x00,
 
-      0x208,
-      0x1E9,
-      0x1EF,
-      0x1E3,
-      0x1BA,
-      0x1BA,
-      0x1A6,
-      0x19F,
-      0x00
+	    0xCA,
+	    0xD5,
+	    0xC8,
+	    0xD7,
+	    0xCE,
+	    0xD2,
+	    0xD1,
+	    0xD5,
+	    0x0
 };
 
 unsigned int	T_RP  = 0xA; // T_RP bit field 28:25
@@ -42,7 +42,7 @@ unsigned int	T_RC  = 0x26; // T_RC bit field 11:6
 unsigned int	T_RRD = 0x3; // T_RRD bit field 5:3
 unsigned int	T_WTR = 0x5; // T_WTR bit field 2:0
 unsigned int	T_RTP = 0x5; // T_RTP bit field 5:3
-unsigned int	T_RFC = 0x7F; // T_RFC bit field 12:4
+unsigned int	T_RFC = 0xCF; // T_RFC bit field 12:4
 
 unsigned int	CL      = 0xE; // CL bit field 13:10
 unsigned int	ROWSIZE = 0x6; // ROWSIZE bit field 9:7
