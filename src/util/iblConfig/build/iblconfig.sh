@@ -50,9 +50,19 @@ cp input.cfg input.txt
 
 echo "ethBoot-fileName = c6678_"${FNAME_PREFIX}.bin >> input.txt
 
+if [ ${INSYS_CPU} == "CPU0" ] ;
+then
+    echo "ethBoot-ipAddr = 192.168.0.197" >> input.txt
+fi
+
+if [ ${INSYS_CPU} == "CPU1" ] ;
+then
+    echo "ethBoot-ipAddr = 192.168.0.198" >> input.txt
+fi
+
 ./iblConfig.out input.txt
 
-echo "-------- Build for BOARD: ${INSYS_BOARD} --- I2C : ${I2C_BUS_ADDRESS} --------"
+echo "-------- Build for BOARD: ${INSYS_BOARD} --- CPU: ${INSYS_CPU} --- I2C : ${I2C_BUS_ADDRESS} --------"
 
 cp ibl.bin ibl_c6678_${FNAME_PREFIX}_${I2C_BUS_ADDRESS}.bin;
 cp ibl_c6678_${FNAME_PREFIX}_${I2C_BUS_ADDRESS}.bin ../../../../bin/

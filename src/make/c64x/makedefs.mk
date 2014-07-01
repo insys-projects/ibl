@@ -90,6 +90,7 @@ ifeq ($(ENDIAN),big)
 endif
 
 CFLAGS+= -D$(INSYS_BOARD)
+CFLAGS+= -D$(INSYS_CPU)
 
 # Debug flags
 # -as : keep local symbols

@@ -17,10 +17,13 @@ export INSYS_BOARD=INSYS_PEX_SRIO
 #export INSYS_BOARD=INSYS_FMC117CP
 #export INSYS_BOARD=INSYS_FM408C
 
+export INSYS_CPU=CPU0
+#export INSYS_CPU=CPU1
+
 # Build c6678 EVM LE
 pushd ./src/make
 make clean
-make evm_c6678_i2c ENDIAN=little I2C_BUS_ADDR=${I2C_BUS_ADDRESS} INSYS_BOARD=${INSYS_BOARD}
+make evm_c6678_i2c ENDIAN=little I2C_BUS_ADDR=${I2C_BUS_ADDRESS} INSYS_BOARD=${INSYS_BOARD} INSYS_CPU=${INSYS_CPU}
 popd
 cp -f ./src/make/bin/i2crom_${I2C_BUS_ADDRESS}_c6678_le.bin ibl_bin_$IBL_VERSION/c6678/le/
 cp -f ./src/make/bin/i2cparam_${I2C_BUS_ADDRESS}_c6678_le_0x500.out ibl_bin_$IBL_VERSION/c6678/le/

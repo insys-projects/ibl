@@ -30,6 +30,9 @@ MAINDEFS+=$(addprefix -DEXCLUDE_,$(EXCLUDES))
 # Add defines for custom board detection
 MAINDEFS+=-D$(INSYS_BOARD)
 
+# Add defines for processor number on board
+MAINDEFS+=-D$(INSYS_CPU)
+
 # Add SPI definitions
 SPI_CFG= $(addprefix -D,$(SPI_DEFS))
 
@@ -221,7 +224,7 @@ ifeq ($(HAS_I2C),1)
 	make -C $(IBL_ROOT)/util/i2cConfig $(TARGET) MAINDEFS='$(MAINDEFS) $(SPI_CFG)' 
 endif
 	make -C $(IBL_ROOT)/util/bconvert
-	make -C $(IBL_ROOT)/util/iblConfig/build EVM=$(EVM) I2C_MAP_ADDR=$(I2C_MAP_ADDR) INSYS_BOARD=$(INSYS_BOARD)
+	make -C $(IBL_ROOT)/util/iblConfig/build EVM=$(EVM) I2C_MAP_ADDR=$(I2C_MAP_ADDR) INSYS_BOARD=$(INSYS_BOARD) INSYS_CPU=${INSYS_CPU}
 
 clean: $(CLEAN_MODULES) hwClean
 	
