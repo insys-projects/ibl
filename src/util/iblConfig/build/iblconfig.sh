@@ -46,9 +46,15 @@ then
     FNAME_PREFIX="fm408c"
 fi
 
-cp input.cfg input.txt
+if [ ${INSYS_BOARD} == "INSYS_ABC" ] ;
+then
+    FNAME_PREFIX="abc"
+fi
 
-echo "ethBoot-fileName = c6678_"${FNAME_PREFIX}.bin >> input.txt
+#
+# Copy settings to file
+#
+cp input.cfg input.txt
 
 if [ ${INSYS_CPU} == "CPU0" ] ;
 then
@@ -61,6 +67,8 @@ then
     echo "ethBoot-ipAddr = 192.168.0.198" >> input.txt
     CPUNAME_PREFIX="cpu1"
 fi
+
+echo "ethBoot-fileName = c6678_"${FNAME_PREFIX}_${CPUNAME_PREFIX}.bin >> input.txt
 
 ./iblConfig.out input.txt
 

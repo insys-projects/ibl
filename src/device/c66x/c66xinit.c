@@ -233,6 +233,8 @@ void iblPCIeWorkaround()
     DEVICE_REG32_W ((PCIE_BASE_ADDR + PCIE_VENDER_DEVICE_ID), 0x66164953);  /* Vendor and Device ID for FMC116V */
 #elif defined(INSYS_FMC117CP)
     DEVICE_REG32_W ((PCIE_BASE_ADDR + PCIE_VENDER_DEVICE_ID), 0x66174953);  /* Vendor and Device ID for FMC117CP */
+#elif defined(INSYS_ABC)
+    DEVICE_REG32_W ((PCIE_BASE_ADDR + PCIE_VENDER_DEVICE_ID), 0x66024953);  /* Vendor and Device ID for ABC */
 #else
 #error "You need specify INSYS_BOARD environment variable to select board configuration!"
 #endif

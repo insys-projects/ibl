@@ -568,6 +568,7 @@ void main (void)
     }
 
     // wailt ~ 3 sec
+/*
     for(i=3; i>=0; i--) {
         int sym = 0;
         xprintf("Press any key to stop autoboot...%i\r", i);
@@ -597,6 +598,7 @@ void main (void)
 
 boot_label:
     xprintf("\n\r");
+*/
 
     /* Pass control to the boot table processor */
     //xprintf("Start iblBootBtbl()...");
@@ -605,6 +607,7 @@ boot_label:
 
     if (btblWrapEcode != 0)  {
         iblStatus.iblFail = ibl_FAIL_CODE_BTBL_FAIL;
+        LED_smart('E');
         for (;;);
     }
 
