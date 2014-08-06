@@ -270,8 +270,13 @@ void iblPCIeWorkaround()
     DEVICE_REG32_W ((PCIE_BASE_ADDR + PCIE_BAR0), 0); /* non-prefetch, 32-bit, mem bar */
 
     DEVICE_REG32_W ((PCIE_BASE_ADDR + PCIE_APP_CMD_STATUS), 0x0000007);    /* enable LTSSM, IN, OB */
+
+    LED_smart('P');
+
     while((DEVICE_REG32_R(PCIE_BASE_ADDR + PCIE_DEBUG0) & 0x11)!=0x11);    /* Wait for training to complete */
  
+    LED_smart('E');
+
     /* Wait for the Boot from Host in second stage of IBL */
     DEVICE_REG32_W(MAGIC_ADDR, 0);
 }
