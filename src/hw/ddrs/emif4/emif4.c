@@ -95,6 +95,10 @@
 #include "emif4_fmc117cp.h"
 #elif defined(INSYS_ABC)
 #include "emif4_abc.h"
+#elif defined(INSYS_FM408C_1G)
+#include "emif4_fm408c_1g.h"
+#elif defined(INSYS_FM408C_2G)
+#include "emif4_fm408c_2g.h"
 #else
 #error "You need specify INSYS_BOARD environment variable to select board configuration!"
 #endif

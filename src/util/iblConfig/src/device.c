@@ -770,13 +770,25 @@ ibl_t c6678_ibl_config(void)
 	ibl.pllConfig[ibl_DDR_PLL].prediv         = 2;
 	ibl.pllConfig[ibl_DDR_PLL].mult           = 21;
 	ibl.pllConfig[ibl_DDR_PLL].postdiv        = 2;
-	ibl.pllConfig[ibl_DDR_PLL].pllOutFreqMhz  = 1600;
+        ibl.pllConfig[ibl_DDR_PLL].pllOutFreqMhz  = 1600;
 #elif defined(INSYS_ABC)
-    ibl.pllConfig[ibl_DDR_PLL].doEnable       = 1;
-    ibl.pllConfig[ibl_DDR_PLL].prediv         = 2;
-    ibl.pllConfig[ibl_DDR_PLL].mult           = 21;
-    ibl.pllConfig[ibl_DDR_PLL].postdiv        = 2;
-    ibl.pllConfig[ibl_DDR_PLL].pllOutFreqMhz  = 1600;
+        ibl.pllConfig[ibl_DDR_PLL].doEnable       = 1;
+	ibl.pllConfig[ibl_DDR_PLL].prediv         = 2;
+	ibl.pllConfig[ibl_DDR_PLL].mult           = 21;
+	ibl.pllConfig[ibl_DDR_PLL].postdiv        = 2;
+	ibl.pllConfig[ibl_DDR_PLL].pllOutFreqMhz  = 1600;
+#elif defined(INSYS_FM408C_1G)
+        ibl.pllConfig[ibl_DDR_PLL].doEnable       = 1;
+	ibl.pllConfig[ibl_DDR_PLL].prediv         = 2;
+	ibl.pllConfig[ibl_DDR_PLL].mult           = 21;
+	ibl.pllConfig[ibl_DDR_PLL].postdiv        = 2;
+	ibl.pllConfig[ibl_DDR_PLL].pllOutFreqMhz  = 1600;
+#elif defined(INSYS_FM408C_2G)
+        ibl.pllConfig[ibl_DDR_PLL].doEnable       = 1;
+	ibl.pllConfig[ibl_DDR_PLL].prediv         = 2;
+	ibl.pllConfig[ibl_DDR_PLL].mult           = 21;
+	ibl.pllConfig[ibl_DDR_PLL].postdiv        = 2;
+	ibl.pllConfig[ibl_DDR_PLL].pllOutFreqMhz  = 1600;
 #else
 #error "You need specify INSYS_BOARD environment variable to select board configuration!"
 #endif
@@ -899,6 +911,38 @@ ibl_t c6678_ibl_config(void)
     ibl.sgmiiConfig[1].auxConfig	 = 0x81;
 
 #elif defined(INSYS_ABC)
+
+    ibl.sgmiiConfig[0].configure     = 1;
+    ibl.sgmiiConfig[0].adviseAbility = (1 << 15) | (1 << 14) | (1 << 12) | (2 << 10) | 1;
+    ibl.sgmiiConfig[0].control		 = 0x20;
+    ibl.sgmiiConfig[0].txConfig      = 0x108a1;
+    ibl.sgmiiConfig[0].rxConfig      = 0x700621;
+    ibl.sgmiiConfig[0].auxConfig	 = 0x81;
+
+    ibl.sgmiiConfig[1].configure     = 1;
+    ibl.sgmiiConfig[1].adviseAbility = 1;
+    ibl.sgmiiConfig[1].control		 = 1;
+    ibl.sgmiiConfig[1].txConfig      = 0x108a1;
+    ibl.sgmiiConfig[1].rxConfig      = 0x700621;
+    ibl.sgmiiConfig[1].auxConfig	 = 0x81;
+
+#elif defined(INSYS_FM408C_1G)
+
+    ibl.sgmiiConfig[0].configure     = 1;
+    ibl.sgmiiConfig[0].adviseAbility = (1 << 15) | (1 << 14) | (1 << 12) | (2 << 10) | 1;
+    ibl.sgmiiConfig[0].control		 = 0x20;
+    ibl.sgmiiConfig[0].txConfig      = 0x108a1;
+    ibl.sgmiiConfig[0].rxConfig      = 0x700621;
+    ibl.sgmiiConfig[0].auxConfig	 = 0x81;
+
+    ibl.sgmiiConfig[1].configure     = 1;
+    ibl.sgmiiConfig[1].adviseAbility = 1;
+    ibl.sgmiiConfig[1].control		 = 1;
+    ibl.sgmiiConfig[1].txConfig      = 0x108a1;
+    ibl.sgmiiConfig[1].rxConfig      = 0x700621;
+    ibl.sgmiiConfig[1].auxConfig	 = 0x81;
+
+#elif defined(INSYS_FM408C_2G)
 
     ibl.sgmiiConfig[0].configure     = 1;
     ibl.sgmiiConfig[0].adviseAbility = (1 << 15) | (1 << 14) | (1 << 12) | (2 << 10) | 1;
@@ -1051,6 +1095,10 @@ ibl_t c6678_ibl_config(void)
     snprintf(ibl.bootModes[2].u.ethBoot.ethInfo.fileName, 64, "%s", "c6678-fmc117cp.bin");
 #elif defined(INSYS_ABC)
     snprintf(ibl.bootModes[2].u.ethBoot.ethInfo.fileName, 64, "%s", "c6678-abc.bin");
+#elif defined(INSYS_FM408C_1G)
+    snprintf(ibl.bootModes[2].u.ethBoot.ethInfo.fileName, 64, "%s", "c6678-fm408c-1g.bin");
+#elif defined(INSYS_FM408C_2G)
+    snprintf(ibl.bootModes[2].u.ethBoot.ethInfo.fileName, 64, "%s", "c6678-fm408c-2g.bin");
 #endif
 
     ibl.bootModes[2].u.ethBoot.blob.startAddress  = 0x80000000;       /* Load start address */

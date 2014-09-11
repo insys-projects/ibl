@@ -216,7 +216,7 @@ void iblPCIeWorkaround()
 		flag_6670 = 1;
 	}
 
-    DEVICE_REG32_W ((PCIE_BASE_ADDR + PCIE_CLASSCODE_REVID), 0x04800001);  /* class 0x04, sub-class 0x80, Prog I/F 0x00, Other multimedia device */ 
+    DEVICE_REG32_W ((PCIE_BASE_ADDR + PCIE_CLASSCODE_REVID), 0xFFFFFF10);  /* class 0xff, sub-class 0xff, Prog I/F 0xff, unknown device */ 
     DEVICE_REG32_W ((PCIE_BASE_ADDR + PCIE_LINK_STAT_CTRL), 0x10110080);  /* extended sync, slot_clk_cfg = 1 */
 
 #if defined(INSYS_PEX_SRIO)
@@ -235,6 +235,10 @@ void iblPCIeWorkaround()
     DEVICE_REG32_W ((PCIE_BASE_ADDR + PCIE_VENDER_DEVICE_ID), 0x66174953);  /* Vendor and Device ID for FMC117CP */
 #elif defined(INSYS_ABC)
     DEVICE_REG32_W ((PCIE_BASE_ADDR + PCIE_VENDER_DEVICE_ID), 0x66024953);  /* Vendor and Device ID for ABC */
+#elif defined(INSYS_FM408C_1G)
+    DEVICE_REG32_W ((PCIE_BASE_ADDR + PCIE_VENDER_DEVICE_ID), 0x66084953);  /* Vendor and Device ID for FM408C */
+#elif defined(INSYS_FM408C_2G)
+    DEVICE_REG32_W ((PCIE_BASE_ADDR + PCIE_VENDER_DEVICE_ID), 0x66084953);  /* Vendor and Device ID for FM408C */
 #else
 #error "You need specify INSYS_BOARD environment variable to select board configuration!"
 #endif
@@ -273,6 +277,7 @@ void iblPCIeWorkaround()
 
     LED_smart('P');
 
+	// DEBUG COMMENT
     while((DEVICE_REG32_R(PCIE_BASE_ADDR + PCIE_DEBUG0) & 0x11)!=0x11);    /* Wait for training to complete */
  
     LED_smart('E');

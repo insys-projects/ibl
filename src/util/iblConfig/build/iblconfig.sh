@@ -41,9 +41,14 @@ then
     FNAME_PREFIX="fmc117cp"
 fi
 
-if [ ${INSYS_BOARD} == "INSYS_FM408C" ] ;
+if [ ${INSYS_BOARD} == "INSYS_FM408C_1G" ] ;
 then
-    FNAME_PREFIX="fm408c"
+    FNAME_PREFIX="fm408c1g"
+fi
+
+if [ ${INSYS_BOARD} == "INSYS_FM408C_2G" ] ;
+then
+    FNAME_PREFIX="fm408c2g"
 fi
 
 if [ ${INSYS_BOARD} == "INSYS_ABC" ] ;
