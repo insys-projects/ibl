@@ -19,4 +19,3 @@ void LED_on(void);
 void LED_smart(int symbol);
 
 #endif // LED_H_
-

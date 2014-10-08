@@ -6,6 +6,7 @@
 
 void LED_init(void)
 {
+#if !defined(INSYS_FM408C_1G) && !defined(INSYS_FM408C_2G)
     hwGpioSetDirection(PIN_A, GPIO_OUT);
     hwGpioSetDirection(PIN_B, GPIO_OUT);
     hwGpioSetDirection(PIN_C, GPIO_OUT);
@@ -14,10 +15,15 @@ void LED_init(void)
     hwGpioSetDirection(PIN_F, GPIO_OUT);
     hwGpioSetDirection(PIN_G, GPIO_OUT);
     hwGpioSetDirection(PIN_DOT, GPIO_OUT);
+#else
+    hwGpioSetDirection(0, GPIO_OUT);
+    hwGpioSetDirection(12, GPIO_OUT);
+#endif
 }
 
 void LED_off(void)
 {
+#if !defined(INSYS_FM408C_1G) && !defined(INSYS_FM408C_2G)
     hwGpioSetOutput(PIN_A);
     hwGpioSetOutput(PIN_B);
     hwGpioSetOutput(PIN_C);
@@ -26,10 +32,15 @@ void LED_off(void)
     hwGpioSetOutput(PIN_F);
     hwGpioSetOutput(PIN_G);
     hwGpioSetOutput(PIN_DOT);
+#else
+    hwGpioSetOutput(0);
+    hwGpioSetOutput(12);
+#endif
 }
 
 void LED_on(void)
 {
+#if !defined(INSYS_FM408C_1G) && !defined(INSYS_FM408C_2G)
     hwGpioClearOutput(PIN_A);
     hwGpioClearOutput(PIN_B);
     hwGpioClearOutput(PIN_C);
@@ -38,12 +49,19 @@ void LED_on(void)
     hwGpioClearOutput(PIN_F);
     hwGpioClearOutput(PIN_G);
     hwGpioClearOutput(PIN_DOT);
+#else
+    hwGpioClearOutput(0);
+    hwGpioClearOutput(12);
+#endif
 }
 
 void LED_smart(int symbol)
 {
     unsigned char   code = 0;
 
+    LED_off();
+
+#if !defined(INSYS_FM408C_1G) && !defined(INSYS_FM408C_2G)
     switch(symbol) {
     case '0':	code = 0x3F; break;
     case '1':	code = 0x06; break;
@@ -73,8 +91,6 @@ void LED_smart(int symbol)
     case 'S':	code = 0xED; break;
     }
 
-    LED_off();
-
     if((code>>0)&1) hwGpioClearOutput(PIN_A);   // LED ON
     if((code>>1)&1) hwGpioClearOutput(PIN_B);   // LED ON
     if((code>>2)&1) hwGpioClearOutput(PIN_C);   // LED ON
@@ -83,4 +99,11 @@ void LED_smart(int symbol)
     if((code>>5)&1) hwGpioClearOutput(PIN_F);   // LED ON
     if((code>>6)&1) hwGpioClearOutput(PIN_G);   // LED ON
     if((code>>7)&1) hwGpioClearOutput(PIN_DOT); // LED ON
+#else
+    switch(symbol) {
+    case '0': { hwGpioClearOutput(0); } break;
+    case '1': { hwGpioClearOutput(12); } break;
+    case '2': { hwGpioClearOutput(0); hwGpioClearOutput(12); } break;
+    }
+#endif
 }
