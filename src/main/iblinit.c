@@ -491,7 +491,7 @@ void main (void)
                                 for (;;);
 
     }
-    
+
     /* Pll configuration is device specific */
     devicePllConfig ();
 
@@ -499,7 +499,6 @@ void main (void)
     LED_off();
 
     uart_init();
-    LED_on();
 
     xprintf("\n\r");
     xprintf("\n\r");

@@ -341,7 +341,7 @@ void main (void)
             iblStatus.activeDevice = ibl_ACTIVE_DEVICE_SPI;
             LED_smart('2');
             iblPmemCfg (ibl.bootModes[0].u.norBoot.interface, ibl.bootModes[0].port, FALSE);
-            xprintf("IBL: Booting from SPI NOR %u times\r", iblStatus.heartBeat);
+            xprintf("IBL: Booting from SPI NOR %u times\n\r", iblStatus.heartBeat);
             iblNorBoot(0);
         } break;
         }
