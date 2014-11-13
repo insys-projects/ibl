@@ -869,14 +869,14 @@ ibl_t c6678_ibl_config(void)
     ibl.sgmiiConfig[0].control		 = 1;
     ibl.sgmiiConfig[0].txConfig      = 0x108a1;
     ibl.sgmiiConfig[0].rxConfig      = 0x700621;
-    ibl.sgmiiConfig[0].auxConfig	 = 0x41;
+    ibl.sgmiiConfig[0].auxConfig	 = 0x81;
 
     ibl.sgmiiConfig[1].configure     = 1;
     ibl.sgmiiConfig[1].adviseAbility = 1;
     ibl.sgmiiConfig[1].control		 = 1;
     ibl.sgmiiConfig[1].txConfig      = 0x108a1;
     ibl.sgmiiConfig[1].rxConfig      = 0x700621;
-    ibl.sgmiiConfig[1].auxConfig	 = 0x51;
+    ibl.sgmiiConfig[1].auxConfig	 = 0x81;
 
 #elif defined(INSYS_FMC116V)
 
