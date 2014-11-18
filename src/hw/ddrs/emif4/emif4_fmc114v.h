@@ -12,7 +12,30 @@
 
 #include "types.h"
 
+#define VERSION_20
+
 unsigned int _level[18] = {
+#ifdef VERSION_20
+      0x67,
+      0x5D,
+      0x76,
+      0x68,
+      0x7E,
+      0x7A,
+      0x88,
+      0x84,
+      0x00,
+
+      0x96,
+      0xA0,
+      0xA1,
+      0xAF,
+      0xB3,
+      0xB7,
+      0xC2,
+      0xC7,
+      0x00
+#else
       0xB1,
       0xCF,
       0xC9,
@@ -32,6 +55,7 @@ unsigned int _level[18] = {
       0x1A6,
       0x19F,
       0x00
+#endif
 };
 
 unsigned int	T_RP  = 0xA; // T_RP bit field 28:25
