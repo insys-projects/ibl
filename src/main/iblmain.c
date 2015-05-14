@@ -274,8 +274,6 @@ UINT32 ddr3_memory_test (void)
      UINT32 index, value;
      UINT32 errcnt = 0;
 
-     xprintf("\n\r", index, value);
-
     /* Write a pattern */
     for (index = DDR3_TEST_START_ADDRESS; index < DDR3_TEST_END_ADDRESS; index += 4) {
         *(VUint32 *) index = (UINT32)index;
@@ -287,7 +285,7 @@ UINT32 ddr3_memory_test (void)
         value = *(UINT32 *) index;
 
         if (value  != index) {
-            xprintf("[W] 0x%x != 0x%x [R]\n\r", index, value);
+            //xprintf("[W] 0x%x != 0x%x [R]\n\r", index, value);
             if(errcnt > 16) {
                 return -1;
             }
@@ -308,7 +306,7 @@ UINT32 ddr3_memory_test (void)
         value = *(UINT32 *) index;
 
         if (value  != ~index) {
-            xprintf("[W] 0x%x != 0x%x [R]\n\r", ~index, value);
+            //xprintf("[W] 0x%x != 0x%x [R]\n\r", ~index, value);
             if(errcnt > 16) {
                 return -1;
             }
@@ -319,6 +317,25 @@ UINT32 ddr3_memory_test (void)
     return 0;
 }
 #endif
+
+void print_boot_mode(int boot_type)
+{
+        switch(boot_type) {
+        case 0: {
+            xprintf("Boot mode: PCI Express\n\r");
+        }
+        break;
+        case 1: {
+            xprintf("Boot mode: Ethernet\n\r");
+        } break;
+        case 2: {
+            xprintf("Boot mode: SPI\n\r");
+        } break;
+        default: {
+            xprintf("Boot mode: Undefined\n\r");
+        } break;
+        }
+}
 
 /**
  * @b Description
@@ -341,18 +358,11 @@ void main (void)
     iblStatus.iblMagic   = ibl_MAGIC_VALUE;
     iblStatus.iblVersion = ibl_VERSION;
 
-    xprintf("\n\r");
-    xprintf("IBL version: %s\n\r", ibl_VERSION_STR);
-
     /* Power up the timer */
-    //xprintf("Start devicePowerPeriph()...");
     devicePowerPeriph (TARGET_PWR_TIMER_0);
-    //xprintf("complete\n\r",0);
 
     /* Initialize the system timer (software tracking of the hardware timer state) */
-    //xprintf("Start timer_init()...");
     timer_init ();
-    //xprintf("complete\n\r");
 
     /* Load default mac addresses for ethernet boot if requested */
     for (i = 0; i < ibl_N_BOOT_MODES; i++)  {
@@ -366,21 +376,22 @@ void main (void)
     }
 
     /* DDR configuration is device specific */
-    //xprintf("Start deviceDdrConfig() --- \n\r");
     deviceDdrConfig ();
-    //xprintf(" --- complete\n\r");
 
     v = DEVICE_REG32_R(DEVICE_REG_DEVSTAT);
 
-    xprintf("DEVSTAT = 0x%x\n\r", v);
-    xprintf("BOOTMODE = 0x%x\n\r", (v >> 1) & 0xfff);
+    //xprintf("DEVSTAT = 0x%x\n\r", v);
 
     boot_type = ((v >> 4) & 0x3);
 
-    xprintf("BOARD_BOOT_TYPE = 0x%x\n\r", boot_type );
+#if (defined(INSYS_FM408C_1G)) || (defined(INSYS_FM408C_2G))
+        if(boot_type == 0) {
+          boot_type = 2;
+        }
+#endif
+    print_boot_mode(boot_type);
 
     while(1) {
-
         switch(boot_type) {
         case 0: {
             LED_smart('0');
@@ -407,7 +418,7 @@ void main (void)
 
         iblStatus.heartBeat += 1;
     }
-
+#if 0
     /* Try booting forever */
     for (;;)  {
 
@@ -525,6 +536,7 @@ void main (void)
 #endif
 
     }
+#endif //#if 0
 } /* main */
 
 

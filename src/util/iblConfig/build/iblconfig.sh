@@ -84,4 +84,7 @@ cp ibl_c6678_${FNAME_PREFIX}_${CPUNAME_PREFIX}_${I2C_BUS_ADDRESS}.bin ../../../.
 
 cp ibl.bin i2crom_${I2C_BUS_ADDRESS}_c6678_le.bin
 cp i2crom_${I2C_BUS_ADDRESS}_c6678_le.bin ../../../../../../product/
-cp i2crom_${I2C_BUS_ADDRESS}_c6678_le.bin ../../../../../../../embedded/c6x-bin
+
+cd ../../../../../../program_evm/binaries/evm6678l
+BUS_ADDRESS=`echo ${I2C_BUS_ADDRESS} | sed -r 's/^.{2}//'`
+ln -svf ../../../product/i2crom_${I2C_BUS_ADDRESS}_c6678_le.bin eeprom${BUS_ADDRESS}.bin
