@@ -604,7 +604,12 @@ boot_label:
 
     if (btblWrapEcode != 0)  {
         iblStatus.iblFail = ibl_FAIL_CODE_BTBL_FAIL;
+#if   defined(INSYS_FM408C_1G)
+#elif defined(INSYS_FM408C_2G)
+#else
         LED_smart('E');
+#endif
+
         for (;;);
     }
 

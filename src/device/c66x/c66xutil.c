@@ -127,4 +127,52 @@ int32 devicePowerPeriph (int32 modNum)
         
 }
 
+#ifdef PLL_REINIT_WORKAROUND
+/**
+ *  @brief Simple DDR3 test
+ *
+ *  @details
+ *      This function performs a simple DDR3 test for a memory range
+ *      specified below and returns -1 for failure and 0 for success.
+ */
+/*
+
+UINT32 ddr3_memory_test (void)
+{
+	 UINT32 index, value;
+
+	// Write a pattern 
+	for (index = DDR3_TEST_START_ADDRESS; index < DDR3_TEST_END_ADDRESS; index += 4) {
+		*(VUint32 *) index = (UINT32)index;
+	}
+
+	// Read and check the pattern 
+	for (index = DDR3_TEST_START_ADDRESS; index < DDR3_TEST_END_ADDRESS; index += 4) {
+
+		value = *(UINT32 *) index;
+
+		if (value  != index) {
+			return -1;
+		}
+	}
+
+	// Write a pattern for complementary values 
+	for (index = DDR3_TEST_START_ADDRESS; index < DDR3_TEST_END_ADDRESS; index += 4) {
+		*(VUint32 *) index = (UINT32)~index;
+	}
+
+	// Read and check the pattern 
+	for (index = DDR3_TEST_START_ADDRESS; index < DDR3_TEST_END_ADDRESS; index += 4) {
+
+		value = *(UINT32 *) index;
+
+		if (value  != ~index) {
+			return -1;
+		}
+	}
+
+	return 0;
+}
+*/
+#endif
 

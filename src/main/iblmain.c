@@ -394,7 +394,12 @@ void main (void)
     while(1) {
         switch(boot_type) {
         case 0: {
+
+#if   defined(INSYS_FM408C_1G)
+#elif defined(INSYS_FM408C_2G)
+#else
             LED_smart('0');
+#endif
             waitForBoot(0x87fffc);
         }
         break;
@@ -402,14 +407,26 @@ void main (void)
             iblStatus.activeBoot = ibl_BOOT_MODE_TFTP;
             iblStatus.activeDevice = ibl_ACTIVE_DEVICE_ETH;
             xprintf("IBL: Booting from ethernet %u times\n\r", iblStatus.heartBeat);
+
+#if   defined(INSYS_FM408C_1G)
+#elif defined(INSYS_FM408C_2G)
+#else
             LED_smart('1');
+#endif
+
             iblMemcpy (&iblStatus.ethParams, &ibl.bootModes[2].u.ethBoot.ethInfo, sizeof(iblEthBootInfo_t));
             iblEthBoot(2);
         } break;
         case 2: {
             iblStatus.activeBoot = ibl_BOOT_MODE_NOR;
             iblStatus.activeDevice = ibl_ACTIVE_DEVICE_SPI;
+
+#if   defined(INSYS_FM408C_1G)
+#elif defined(INSYS_FM408C_2G)
+#else
             LED_smart('2');
+#endif
+
             iblPmemCfg (ibl.bootModes[0].u.norBoot.interface, ibl.bootModes[0].port, FALSE);
             xprintf("IBL: Booting from SPI NOR %u times\n\r", iblStatus.heartBeat);
             iblNorBoot(0);

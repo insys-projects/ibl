@@ -12,6 +12,9 @@
 #include "spi_api.h"
 #include "spi_loc.h"
 #include "tiboot_c66x.h"       
+#include "i2c.h"
+#include "iblcfg.h"
+
 
 
 /**
@@ -188,10 +191,86 @@ void iblEnableEDC ()
 /* SERDES Configuration registers */
 #define PCIE_SERDES_CFG_PLL 0x2620358
 
+//UINT8 	cfg[64]; 
+typedef struct CFG_6678 {
+	UINT16	wTag;				// tag = 0x6600
+	UINT8 bMode;				// secondary BOOT mode (bMode enum)
+	UINT8 bPCIeRC;			// PCIe Root Complex = 1 or EndPoint = 0
+	UINT32 dBar3Size;			// size of BAR3 (for DMA from FPGA to DSP)
+	UINT8 bIpEth0[4];			// Ethernet 0 IP address
+	UINT8 bIpSrv0[4];			// Ethernet 0 Server IP address
+	UINT8 bIpGat0[4];			// Ethernet 0 Gateway IP address
+	UINT8 bIpEth1[4];			// Ethernet 1 IP address
+	UINT8 bIpSrv1[4];			// Ethernet 1 Server IP address
+	UINT8 bIpGat1[4];			// Ethernet 1 Gateway IP address
+}_CFG_6678;
+
+_CFG_6678 cfg;
+
+UINT8 	icr[128]; 
+
+void get_icr_cfg(void)
+{
+    UINT32 	*mp;
+    UINT32 	*ic;
+    int	i;
+
+    /* Load the default configuration table from the i2c. The actual speed of the device
+     * isn't really known here, since it is part of the table, so a compile time
+     * value is used (the pll may have been configured during the initial load) */
+    hwI2Cinit (IBL_CFG_I2C_DEV_FREQ_MHZ,        /* The CPU frequency during I2C data load */
+               DEVICE_I2C_MODULE_DIVISOR,       /* The divide down of CPU that drives the i2c */
+               IBL_CFG_I2C_CLK_FREQ_KHZ,        /* The I2C data rate used during table load */
+               IBL_CFG_I2C_OWN_ADDR);           /* The address used by this device on the i2c bus */
+
+
+	// READ ICR DATA
+    while (hwI2cMasterRead (0xFF00,             /* The address on the eeprom of the table */
+                            128,                          /* The number of bytes to read */
+                            (UINT8 *)&icr[0],           /* Where to store the bytes */
+                            0x50,              /* The bus address of the eeprom */
+                            IBL_CFG_I2C_ADDR_DELAY)     /* The delay between sending the address and reading data */
+    
+             != I2C_RET_OK)  {
+
+    }
+
+    ic=(UINT32*)&icr[0];
+
+    // copy ICR to MSM
+    mp = (UINT32*)0x0C100000;
+    for(i=0;i<32;i++)
+	    mp[i] = ic[i];
+
+
+	// READ CFG DATA
+    while (hwI2cMasterRead (0xFE00,             /* The address on the eeprom of the table */
+                            32,   		/* The number of bytes to read */
+                            (UINT8 *)&cfg,      /* Where to store the bytes */
+                            0x50,               /* The bus address of the eeprom */
+                            IBL_CFG_I2C_ADDR_DELAY)     /* The delay between sending the address and reading data */
+    
+             != I2C_RET_OK)  {
+
+    }
+
+    ic=(UINT32*)&cfg;
+
+    // copy CFG to MSM
+    mp = (UINT32*)0x0C110000;
+    for(i=0;i<8;i++)
+	    mp[i] = ic[i];
+
+}
+
 void iblPCIeWorkaround()
 {
     UINT32  v, flag_6678 = 0, flag_6670 = 0, MAGIC_ADDR;
     UINT32  i;
+
+
+    get_icr_cfg();
+
 
      /* Power up PCIe */
     devicePowerPeriph (TARGET_PWR_PCIE);
@@ -216,16 +295,25 @@ void iblPCIeWorkaround()
 		flag_6670 = 1;
 	}
 
+#if defined(INSYS_FMC112CP_V11)
+    DEVICE_REG32_W ((PCIE_BASE_ADDR + PCIE_CLASSCODE_REVID), 0xFFFFFF11);  /* class 0xff, sub-class 0xff, Prog I/F 0xff, unknown device */ 
+#else
     DEVICE_REG32_W ((PCIE_BASE_ADDR + PCIE_CLASSCODE_REVID), 0xFFFFFF10);  /* class 0xff, sub-class 0xff, Prog I/F 0xff, unknown device */ 
+#endif
+
     DEVICE_REG32_W ((PCIE_BASE_ADDR + PCIE_LINK_STAT_CTRL), 0x10110080);  /* extended sync, slot_clk_cfg = 1 */
 
 #if defined(INSYS_PEX_SRIO)
     DEVICE_REG32_W ((PCIE_BASE_ADDR + PCIE_VENDER_DEVICE_ID), 0x66154953);  /* Vendor and Device ID for PEX-SRIO */
+#elif defined(INSYS_DSP6678PEX)
+    DEVICE_REG32_W ((PCIE_BASE_ADDR + PCIE_VENDER_DEVICE_ID), 0x66204953);  /* Vendor and Device ID for DSP6678PEX */
 #elif defined(INSYS_AC_DSP)
     DEVICE_REG32_W ((PCIE_BASE_ADDR + PCIE_VENDER_DEVICE_ID), 0x66134953);  /* Vendor and Device ID for AC-DSP */
 #elif defined(INSYS_FMC110P)
     DEVICE_REG32_W ((PCIE_BASE_ADDR + PCIE_VENDER_DEVICE_ID), 0x66104953);  /* Vendor and Device ID for FMC110P */
 #elif defined(INSYS_FMC112CP)
+    DEVICE_REG32_W ((PCIE_BASE_ADDR + PCIE_VENDER_DEVICE_ID), 0x66124953);  /* Vendor and Device ID for FMC112CP */
+#elif defined(INSYS_FMC112CP_V11)
     DEVICE_REG32_W ((PCIE_BASE_ADDR + PCIE_VENDER_DEVICE_ID), 0x66124953);  /* Vendor and Device ID for FMC112CP */
 #elif defined(INSYS_FMC114V)
     DEVICE_REG32_W ((PCIE_BASE_ADDR + PCIE_VENDER_DEVICE_ID), 0x66144953);  /* Vendor and Device ID for FMC114V */
@@ -250,37 +338,68 @@ void iblPCIeWorkaround()
 
     DEVICE_REG32_W ((PCIE_BASE_ADDR + PCIE_APP_CMD_STATUS), 0x0020); /* Set dbi_cs2 to allow access to the BAR registers */ 
  
-	if (flag_6678)  {
+    if (flag_6678)  {
 		/* 6678 */
-		DEVICE_REG32_W ((PCIE_BASE_ADDR + PCIE_BAR0), 0x00000FFF);   /* 4K */
-		DEVICE_REG32_W ((PCIE_BASE_ADDR + PCIE_BAR1), 0x0007FFFF);   /* 512K */
+	DEVICE_REG32_W ((PCIE_BASE_ADDR + PCIE_BAR0), 0x00000FFF);   /* 4K */
+	DEVICE_REG32_W ((PCIE_BASE_ADDR + PCIE_BAR1), 0x0007FFFF);   /* 512K */
         DEVICE_REG32_W ((PCIE_BASE_ADDR + PCIE_BAR2), 0x0007FFFF);   /* 512K */
-        DEVICE_REG32_W ((PCIE_BASE_ADDR + PCIE_BAR3), 0x003FFFFF);   /* 4M */
-	} 
+//        DEVICE_REG32_W ((PCIE_BASE_ADDR + PCIE_BAR3), 0x003FFFFF);   /* 4M */
 
-	if (flag_6670)  {
-		/* 6670 */
-		DEVICE_REG32_W ((PCIE_BASE_ADDR + PCIE_BAR0), 0x00000FFF);   /* 4K */
-		DEVICE_REG32_W ((PCIE_BASE_ADDR + PCIE_BAR1), 0x000FFFFF);   /* 1M */
-		DEVICE_REG32_W ((PCIE_BASE_ADDR + PCIE_BAR2), 0x001FFFFF);   /* 2M */
-		DEVICE_REG32_W ((PCIE_BASE_ADDR + PCIE_BAR3), 0x00FFFFFF);   /* 16M */
+// Set default value for BAR3 
+#if defined(INSYS_PEX_SRIO)
+        DEVICE_REG32_W ((PCIE_BASE_ADDR + PCIE_BAR3), 0x003FFFFF);   /* 4M */
+#elif defined(INSYS_DSP6678PEX)
+        DEVICE_REG32_W ((PCIE_BASE_ADDR + PCIE_BAR3), 0x003FFFFF);   /* 4M */
+#else
+        DEVICE_REG32_W ((PCIE_BASE_ADDR + PCIE_BAR3), 0x0007FFFF);   /* 512K */
+//        DEVICE_REG32_W ((PCIE_BASE_ADDR + PCIE_BAR3), 0x000FFFFF);   /* 1M */
+//        DEVICE_REG32_W ((PCIE_BASE_ADDR + PCIE_BAR3), 0x001FFFFF);   /* 2M */
+//        DEVICE_REG32_W ((PCIE_BASE_ADDR + PCIE_BAR3), 0x003FFFFF);   /* 4M */
+//        DEVICE_REG32_W ((PCIE_BASE_ADDR + PCIE_BAR3), 0x007FFFFF);   /* 8M */
+//        DEVICE_REG32_W ((PCIE_BASE_ADDR + PCIE_BAR3), 0x00FFFFFF);   /* 16M */
+#endif
+//        DEVICE_REG32_W ((PCIE_BASE_ADDR + PCIE_BAR3), 0x000FFFFF);   /* 1M */
+    } 
+
+    if(cfg.wTag==0x6678) { // Is CFG Data
+	DEVICE_REG32_W ((PCIE_BASE_ADDR + PCIE_BAR3), cfg.dBar3Size-1);   
     }
 
-	DEVICE_REG32_W ((PCIE_BASE_ADDR + PCIE_APP_CMD_STATUS), 0x0);    /* dbi_cs2=0 */
+    if (flag_6670)  {
+	/* 6670 */
+	DEVICE_REG32_W ((PCIE_BASE_ADDR + PCIE_BAR0), 0x00000FFF);   /* 4K */
+	DEVICE_REG32_W ((PCIE_BASE_ADDR + PCIE_BAR1), 0x000FFFFF);   /* 1M */
+	DEVICE_REG32_W ((PCIE_BASE_ADDR + PCIE_BAR2), 0x001FFFFF);   /* 2M */
+	DEVICE_REG32_W ((PCIE_BASE_ADDR + PCIE_BAR3), 0x00FFFFFF);   /* 16M */
+    }
 
-	DEVICE_REG32_W ((PCIE_BASE_ADDR + PCIE_STATUS_CMD), 0x00100146); /* ENABLE mem access */
+    DEVICE_REG32_W ((PCIE_BASE_ADDR + PCIE_APP_CMD_STATUS), 0x0);    /* dbi_cs2=0 */
+
+    DEVICE_REG32_W ((PCIE_BASE_ADDR + PCIE_STATUS_CMD), 0x00100146); /* ENABLE mem access */
     DEVICE_REG32_W ((PCIE_BASE_ADDR + PCIE_DEV_STAT_CTRL), 0x0000281F); /* Error control */
     DEVICE_REG32_W ((PCIE_BASE_ADDR + PCIE_ACCR), 0x000001E0); /* Error control */
     DEVICE_REG32_W ((PCIE_BASE_ADDR + PCIE_BAR0), 0); /* non-prefetch, 32-bit, mem bar */
 
     DEVICE_REG32_W ((PCIE_BASE_ADDR + PCIE_APP_CMD_STATUS), 0x0000007);    /* enable LTSSM, IN, OB */
 
+#if   defined(INSYS_FM408C_1G)
+#elif defined(INSYS_FM408C_2G)
+#else
     LED_smart('P');
+#endif
 
 	// DEBUG COMMENT
+#if   defined(INSYS_FM408C_1G)
+#elif defined(INSYS_FM408C_2G)
+#else
     while((DEVICE_REG32_R(PCIE_BASE_ADDR + PCIE_DEBUG0) & 0x11)!=0x11);    /* Wait for training to complete */
+#endif
  
+#if   defined(INSYS_FM408C_1G)
+#elif defined(INSYS_FM408C_2G)
+#else
     LED_smart('E');
+#endif
 
     /* Wait for the Boot from Host in second stage of IBL */
     DEVICE_REG32_W(MAGIC_ADDR, 0);

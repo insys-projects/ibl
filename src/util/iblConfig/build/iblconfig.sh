@@ -11,6 +11,11 @@ then
     FNAME_PREFIX="pex_srio"
 fi
 
+if [ ${INSYS_BOARD} == "INSYS_DSP6678PEX" ] ;
+then
+    FNAME_PREFIX="dsp6678pex"
+fi
+
 if [ ${INSYS_BOARD} == "INSYS_AC_DSP" ] ;
 then
     FNAME_PREFIX="ac_dsp"
@@ -24,6 +29,11 @@ fi
 if [ ${INSYS_BOARD} == "INSYS_FMC112CP" ] ;
 then
     FNAME_PREFIX="fmc112cp"
+fi
+
+if [ ${INSYS_BOARD} == "INSYS_FMC112CP_V11" ] ;
+then
+    FNAME_PREFIX="fmc112cp_v11"
 fi
 
 if [ ${INSYS_BOARD} == "INSYS_FMC114V" ] ;

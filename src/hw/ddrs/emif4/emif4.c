@@ -81,12 +81,16 @@
 
 #if defined(INSYS_PEX_SRIO)
 #include "emif4_pex_srio.h"
+#elif defined(INSYS_DSP6678PEX)
+#include "emif4_dsp6678pex.h"
 #elif defined(INSYS_AC_DSP)
 #include "emif4_ac_dsp.h"
 #elif defined(INSYS_FMC110P)
 #include "emif4_fmc110p.h"
 #elif defined(INSYS_FMC112CP)
 #include "emif4_fmc112cp.h"
+#elif defined(INSYS_FMC112CP_V11)
+#include "emif4_fmc112cp_v11.h"
 #elif defined(INSYS_FMC114V)
 #include "emif4_fmc114v.h"
 #elif defined(INSYS_FMC116V)
@@ -102,7 +106,6 @@
 #else
 #error "You need specify INSYS_BOARD environment variable to select board configuration!"
 #endif
-
 
 
 static void ddr3_wait (uint32 del)
@@ -220,7 +223,8 @@ SINT16 hwEmif4p0Enable (iblEmif4p0_t *cfg)
          TEMP |= 0x3 << 24; // DDR_TERM bit field 26:24
          TEMP |= 0x0 << 21; // DYN_ODT bit field 22:21
          TEMP |= 0x1 << 18; // SDRAM_DRIVE bit field 19:18
-         TEMP |= 0x2 << 16; // CWL bit field 17:16
+//         TEMP |= 0x2 << 16; // CWL bit field 17:16
+         TEMP |= 0x3 << 16; // CWL bit field 17:16
          TEMP |= 0x0 << 14; // NM bit field 15:14
          TEMP |= CL  << 10; // CL bit field 13:10
          TEMP |= ROWSIZE << 7; // ROWSIZE bit field 9:7
@@ -233,6 +237,7 @@ SINT16 hwEmif4p0Enable (iblEmif4p0_t *cfg)
   	* so, 100 us = 100000 ns = 140056 cycles
           thereby, 600us=840336 */
          ddr3_wait(840336);             //Wait 600us for HW init to complete
+	for(i=0;i<1000000;i++);
 
         DDR_SDRFC = 0x00001450;       //Refresh rate = (7.8*666MHz]
 
@@ -248,6 +253,8 @@ SINT16 hwEmif4p0Enable (iblEmif4p0_t *cfg)
   	* so, 100 us = 100000 ns = 140056 cycles
           thereby, 3ms=3000us=4201680 */
 	ddr3_wait(4201680); //Wait 3ms for leveling to complete
+	for(i=0;i<1000000;i++);
+	for(i=0;i<1000000;i++);
     }
     else if (v == DEVICE_C6657_JTAG_ID_VAL)
     {
