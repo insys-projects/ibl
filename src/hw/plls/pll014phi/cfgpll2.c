@@ -73,9 +73,13 @@ SINT16 hwPllSetCfg2Pll (UINT32 base, UINT32 prediv, UINT32 mult, UINT32 postdiv,
     regb |= (1 << 6);
     DEVICE_REG32_W (base + 4, regb);
 
+
     /* Bypass must be enabled */
     reg |= (1 << 23);
     DEVICE_REG32_W (base, reg);
+
+    /* Wait for the PLL Reset time (min: 5 us)                                */
+    ddr3_pll_delay(7000);
 
     /* Configure PLLM, PPLD BWADJ */
     reg = BOOT_SET_BITFIELD (reg, prediv - 1, 5, 0);

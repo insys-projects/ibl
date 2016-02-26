@@ -119,7 +119,7 @@ Uint32 deviceLocalAddrToGlobal (Uint32 addr)
 }
 
 
-UINT32 ddr3_memory_test (void)
+UINT32 _ddr3_memory_test (void)
 {
      UINT32 index, value;
      int cnt;

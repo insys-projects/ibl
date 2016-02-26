@@ -406,7 +406,7 @@ Int32 targetMacRcv (void *ptr_device, UINT8 *buffer);
  *  @brief
  *      Support for enabling PCIe workarond for C6678/C6670.
  */
-#define IBL_ENABLE_PCIE_WORKAROUND 0
+#define IBL_ENABLE_PCIE_WORKAROUND 1
 
 /**
  *  @brief
