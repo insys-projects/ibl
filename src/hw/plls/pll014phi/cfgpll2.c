@@ -79,7 +79,7 @@ SINT16 hwPllSetCfg2Pll (UINT32 base, UINT32 prediv, UINT32 mult, UINT32 postdiv,
     DEVICE_REG32_W (base, reg);
 
     /* Wait for the PLL Reset time (min: 5 us)                                */
-    ddr3_pll_delay(7000);
+    ddr3_pll_delay(17000);
 
     /* Configure PLLM, PPLD BWADJ */
     reg = BOOT_SET_BITFIELD (reg, prediv - 1, 5, 0);
@@ -97,14 +97,14 @@ SINT16 hwPllSetCfg2Pll (UINT32 base, UINT32 prediv, UINT32 mult, UINT32 postdiv,
     DEVICE_REG32_W (base + 4, regb);
 
     /* Reset must be asserted for at least 5us */
-    ddr3_pll_delay(7000);
+    ddr3_pll_delay(17000);
 
     /* Clear bit 13 in register 1 to re-enable the pll */
     regb &= ~(1 << 13);
     DEVICE_REG32_W (base + 4, regb);
 
     /* Wait for atleast 500 * REFCLK cycles * (PLLD+1) */
-    ddr3_pll_delay(70000);
+    ddr3_pll_delay(170000);
 
     /* Disable the bypass */
     reg &= ~(1 << 23);   /* The value 0 disables the bypass */
