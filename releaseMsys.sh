@@ -4,7 +4,7 @@
 # Set Build environment
 source ./src/make/setupenvMsys.sh
 
-export I2C_BUS_ADDRESS=0x50
+export I2C_BUS_ADDRESS=0x51
 
 # Set INSYS_BOARD for choose board depending sources
 #export INSYS_BOARD=INSYS_UNKNOWN
@@ -21,8 +21,8 @@ export INSYS_BOARD=INSYS_FMC112CP
 #export INSYS_BOARD=INSYS_FM408C_2G
 #export INSYS_BOARD=INSYS_DSP6678PEX
 
-#export INSYS_CPU=CPU0
-export INSYS_CPU=CPU1
+export INSYS_CPU=CPU0
+#export INSYS_CPU=CPU1
 
 # Build c6678 EVM LE
 pushd ./src/make
