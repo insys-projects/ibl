@@ -311,6 +311,8 @@ void iblPCIeWorkaround()
     DEVICE_REG32_W ((PCIE_BASE_ADDR + PCIE_VENDER_DEVICE_ID), 0x66134953);  /* Vendor and Device ID for AC-DSP */
 #elif defined(INSYS_FMC110P)
     DEVICE_REG32_W ((PCIE_BASE_ADDR + PCIE_VENDER_DEVICE_ID), 0x66104953);  /* Vendor and Device ID for FMC110P */
+#elif defined(INSYS_FMC111P)
+    DEVICE_REG32_W ((PCIE_BASE_ADDR + PCIE_VENDER_DEVICE_ID), 0x66114953);  /* Vendor and Device ID for FMC111P */
 #elif defined(INSYS_FMC112CP)
     DEVICE_REG32_W ((PCIE_BASE_ADDR + PCIE_VENDER_DEVICE_ID), 0x66124953);  /* Vendor and Device ID for FMC112CP */
 #elif defined(INSYS_FMC112CP_V11)

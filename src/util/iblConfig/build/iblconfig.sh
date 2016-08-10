@@ -26,6 +26,11 @@ then
     FNAME_PREFIX="fmc110p"
 fi
 
+if [ ${INSYS_BOARD} == "INSYS_FMC111P" ] ;
+then
+    FNAME_PREFIX="fmc111p"
+fi
+
 if [ ${INSYS_BOARD} == "INSYS_FMC112CP" ] ;
 then
     FNAME_PREFIX="fmc112cp"

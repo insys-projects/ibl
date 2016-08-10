@@ -607,7 +607,7 @@ boot_label:
 #if   defined(INSYS_FM408C_1G)
 #elif defined(INSYS_FM408C_2G)
 #else
-        LED_smart('E');
+        LED_smart('H');
 #endif
 
         for (;;);

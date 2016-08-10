@@ -247,13 +247,14 @@ void waitForBoot(UINT32 MAGIC_ADDR)
 
     while(1)
     {
-        entry_addr = DEVICE_REG32_R(MAGIC_ADDR);
+/*        entry_addr = DEVICE_REG32_R(MAGIC_ADDR);
         if (entry_addr != 0)
         {
             xprintf("entry = 0x%x\n\r", entry_addr);
             exit = (void (*)())entry_addr;
             (*exit)();
         }
+*/
         for (i=0; i < 100; i++)
             asm("nop");
         xprintf("IBL: Booting from PCI Express %u times\r", iblStatus.heartBeat++);

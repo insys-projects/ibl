@@ -84,8 +84,9 @@
  * @brief Estimates of operating parameters. Actual values will be known once they are
  *        read from the i2c.
  */
-#define IBL_CFG_I2C_DEV_FREQ_MHZ            1200
-#define IBL_CFG_I2C_CLK_FREQ_KHZ            100
+//#define IBL_CFG_I2C_DEV_FREQ_MHZ            1200
+#define IBL_CFG_I2C_DEV_FREQ_MHZ            1000
+#define IBL_CFG_I2C_CLK_FREQ_KHZ            400
 #define IBL_CFG_I2C_OWN_ADDR                10
 #define IBL_CFG_I2C_ADDR_DELAY              0x100       /* Delay between sending the address and reading data */
 

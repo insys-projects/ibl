@@ -87,6 +87,8 @@
 #include "emif4_ac_dsp.h"
 #elif defined(INSYS_FMC110P)
 #include "emif4_fmc110p.h"
+#elif defined(INSYS_FMC111P)
+#include "emif4_fmc111p.h"
 #elif defined(INSYS_FMC112CP)
 #include "emif4_fmc112cp.h"
 #elif defined(INSYS_FMC112CP_V11)
