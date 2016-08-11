@@ -254,9 +254,10 @@ void waitForBoot(UINT32 MAGIC_ADDR)
             exit = (void (*)())entry_addr;
             (*exit)();
         }
-*/
+
         for (i=0; i < 100; i++)
             asm("nop");
+*/
         xprintf("IBL: Booting from PCI Express %u times\r", iblStatus.heartBeat++);
         pause(55000000);
     }
@@ -378,6 +379,8 @@ void main (void)
 
     /* DDR configuration is device specific */
     deviceDdrConfig ();
+
+    uart_init();
 
     v = DEVICE_REG32_R(DEVICE_REG_DEVSTAT);
 

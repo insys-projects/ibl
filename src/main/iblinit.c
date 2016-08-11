@@ -454,6 +454,7 @@ uint16 readUpper16 (uint32 v)
  */
 void main (void)
 {
+#if 0
     int i;
     int32        bootDevice;
     uint32       entry;
@@ -463,14 +464,11 @@ void main (void)
     BOOT_MODULE_FXN_TABLE *bFxnTbl;
 
     memset (&iblStatus, 0, sizeof(iblStatus_t));
+
     iblStatus.iblMagic     = ibl_MAGIC_VALUE;
     iblStatus.iblVersion   = ibl_VERSION;
     iblStatus.activeDevice = ibl_ACTIVE_DEVICE_I2C;
 
-#ifdef C665x
-     /*Set GPIO as SPI,UART*/
-    configureGPIO();
-#endif
     /* Determine the boot device to read from */
     bootDevice = deviceReadBootDevice();
 
@@ -492,18 +490,25 @@ void main (void)
 
     }
 
+    bFxnTbl = iblInitI2c();
+
     /* Pll configuration is device specific */
     devicePllConfig ();
+#endif
+
+    /* Unlock the chip registers and leave them unlocked */
+    *((Uint32 *)0x2620038) = 0x83e70b13;
+    *((Uint32 *)0x262003c) = 0x95a4f1e0;
+
+    hwPllSetPll(MAIN_PLL, 1, 20, 2);
 
     LED_init();
     LED_off();
 
-    uart_init();
-
-    xprintf("\n\r");
-    xprintf("Start IBL. Build: %s - %s\n\r", __DATE__, __TIME__);
-    xprintf("\n\r");
-
+    //uart_init();
+    //xprintf("\n\r");
+    //xprintf("Start IBL. Build: %s - %s\n\r", __DATE__, __TIME__);
+    //xprintf("\n\r");
 /*
     i=0;
     {
@@ -550,12 +555,12 @@ void main (void)
 
 
     /* Check if need to enter Rom boot loader again */
-    if (IBL_ENTER_ROM)
-    {
+    //if (IBL_ENTER_ROM)
+    //{
         //xprintf("Start iblEnterRom()...");
-        iblEnterRom();
+        //iblEnterRom();
         //xprintf("complete\n\r");
-    }
+    //}
 
     if (IBL_ENABLE_PCIE_WORKAROUND)
     {
@@ -564,6 +569,26 @@ void main (void)
         //xprintf("complete\n\r");
     }
 
+    while(1) {
+
+        if((DEVICE_REG32_R(0x21800000 + 0x1728) & 0x11)!=0x11) {
+            DEVICE_REG32_W ((0x21800000 + 0x4), 0x0000007);    /* enable LTSSM, IN, OB */
+            LED_smart('o');
+        } else {
+            LED_smart('0');
+        }
+
+        pause(55000000);
+
+        if((DEVICE_REG32_R(0x21800000 + 0x1728) & 0x11)!=0x11) {
+            DEVICE_REG32_W ((0x21800000 + 0x4), 0x0000007);    /* enable LTSSM, IN, OB */
+            LED_smart('u');
+        } else {
+            LED_smart('1');
+        }
+
+        pause(55000000);
+    }
     // wailt ~ 3 sec
 /*
     for(i=3; i>=0; i--) {
@@ -596,7 +621,7 @@ void main (void)
 boot_label:
     xprintf("\n\r");
 */
-
+#if 0
     /* Pass control to the boot table processor */
     //xprintf("Start iblBootBtbl()...");
     iblBootBtbl (bFxnTbl, &entry);
@@ -618,7 +643,7 @@ boot_label:
     /* jump to the exit point, which will be the entry point for the full IBL */
     exit = (void (*)())entry;
     (*exit)();
-
+#endif
 }
 
 
