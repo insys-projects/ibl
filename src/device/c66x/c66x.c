@@ -128,7 +128,6 @@ Uint32 deviceLocalAddrToGlobal (Uint32 addr)
  */
 void deviceDdrConfig (void)
 {
-    uint32 loopcount=0;
     /* The emif registers must be made visible. MPAX mapping 2 is used */
     DEVICE_REG_XMPAX_L(2) =  0x10000000 | 0xff;     /* replacement addr + perm*/
     DEVICE_REG_XMPAX_H(2) =  0x2100000B;         /* base addr + seg size (64KB)*/	
@@ -137,51 +136,11 @@ void deviceDdrConfig (void)
         hwEmif4p0Enable (&ibl.ddrConfig.uEmif.emif4p0);
     }
 
-#ifdef PLL_REINIT_WORKAROUND
-    for (loopcount = 0; loopcount < PLL_DDR_INIT_LOOPMAX; loopcount++)
-    {
-    	/* Calling MAIN, PA, DDR PLL init  */
-        if (ibl.pllConfig[ibl_MAIN_PLL].doEnable == TRUE) {
-            hwPllSetPll (MAIN_PLL, 
-                         ibl.pllConfig[ibl_MAIN_PLL].prediv,
-                         ibl.pllConfig[ibl_MAIN_PLL].mult,
-                         ibl.pllConfig[ibl_MAIN_PLL].postdiv);
-
-            /* Init UART again because we are re-initializing the PLL's */
-            uart_init();
-        }
-
-        if (ibl.pllConfig[ibl_NET_PLL].doEnable == TRUE) {
-            hwPllSetCfgPll (DEVICE_PLL_BASE(NET_PLL),
-                            ibl.pllConfig[ibl_NET_PLL].prediv,
-                            ibl.pllConfig[ibl_NET_PLL].mult,
-                            ibl.pllConfig[ibl_NET_PLL].postdiv,
-                            ibl.pllConfig[ibl_MAIN_PLL].pllOutFreqMhz,
-                            ibl.pllConfig[ibl_NET_PLL].pllOutFreqMhz);
-        }
-    
-        if (ibl.pllConfig[ibl_DDR_PLL].doEnable == TRUE) {
-            hwPllSetCfg2Pll (DEVICE_PLL_BASE(DDR_PLL),
-                             ibl.pllConfig[ibl_DDR_PLL].prediv,
-                             ibl.pllConfig[ibl_DDR_PLL].mult,
-                             ibl.pllConfig[ibl_DDR_PLL].postdiv,
-                             ibl.pllConfig[ibl_MAIN_PLL].pllOutFreqMhz,
-                             ibl.pllConfig[ibl_DDR_PLL].pllOutFreqMhz);
-        }
-	  
-        if (ibl.ddrConfig.configDdr != 0) {
-            hwEmif4p0Enable (&ibl.ddrConfig.uEmif.emif4p0);
-        }
-			
-	    if (ddr3_memory_test() == 0) 
-	    {
-            xprintf("IBL: DDR3 SUCCESS\n\r");
-            break;
-        } else {
-            xprintf("IBL: DDR3 ERROR\n\r");
-        }
+    if (ddr3_memory_test() == 0)  {
+        xprintf("IBL: DDR3 SUCCESS\n\r");
+    } else {
+        xprintf("IBL: DDR3 ERROR\n\r");
     }
-#endif
 }
         
 

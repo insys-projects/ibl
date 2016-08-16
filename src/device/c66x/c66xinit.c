@@ -15,7 +15,17 @@
 #include "i2c.h"
 #include "iblcfg.h"
 
+void deviceUnlock()
+{
+    /* Unlock the chip registers and leave them unlocked */
+    *((Uint32 *)0x2620038) = 0x83e70b13;
+    *((Uint32 *)0x262003c) = 0x95a4f1e0;
+}
 
+void deviceMainPllConfig(UINT32 prediv, UINT32 mult, UINT32 postdiv)
+{
+    hwPllSetPll (MAIN_PLL, prediv, mult, postdiv);
+}
 
 /**
  * @brief Configure the PLLs
@@ -26,16 +36,6 @@
  */
 void devicePllConfig (void)
 {
-    /* Unlock the chip registers and leave them unlocked */
-    *((Uint32 *)0x2620038) = 0x83e70b13;
-    *((Uint32 *)0x262003c) = 0x95a4f1e0;
-
-    if (ibl.pllConfig[ibl_MAIN_PLL].doEnable == TRUE)
-        hwPllSetPll (MAIN_PLL, 
-                     ibl.pllConfig[ibl_MAIN_PLL].prediv,
-                     ibl.pllConfig[ibl_MAIN_PLL].mult,
-                     ibl.pllConfig[ibl_MAIN_PLL].postdiv);
-
     if (ibl.pllConfig[ibl_NET_PLL].doEnable == TRUE)
         hwPllSetCfgPll (DEVICE_PLL_BASE(NET_PLL),
                         ibl.pllConfig[ibl_NET_PLL].prediv,
@@ -51,9 +51,7 @@ void devicePllConfig (void)
                          ibl.pllConfig[ibl_DDR_PLL].postdiv,
                          ibl.pllConfig[ibl_MAIN_PLL].pllOutFreqMhz,
                          ibl.pllConfig[ibl_DDR_PLL].pllOutFreqMhz);
-
 }
-
 
 /**
  * @brief
@@ -268,13 +266,9 @@ void iblPCIeWorkaround()
     UINT32  v, flag_6678 = 0, flag_6670 = 0, MAGIC_ADDR;
     UINT32  i;
 
-
-    get_icr_cfg();
-
-
      /* Power up PCIe */
     devicePowerPeriph (TARGET_PWR_PCIE);
-    for(i=0; i<1000; i++) asm (" NOP");
+    for(i=0; i<100; i++) asm (" NOP");
 
     DEVICE_REG32_W ((PCIE_BASE_ADDR + PCIE_APP_SERDES_CFG0), 0x00062320);  /* ss clock */
     DEVICE_REG32_W ((PCIE_BASE_ADDR + PCIE_APP_SERDES_CFG1), 0x00022320);  /* ss clock */
@@ -341,9 +335,9 @@ void iblPCIeWorkaround()
     DEVICE_REG32_W ((PCIE_BASE_ADDR + PCIE_APP_CMD_STATUS), 0x0020); /* Set dbi_cs2 to allow access to the BAR registers */ 
  
     if (flag_6678)  {
-		/* 6678 */
-	DEVICE_REG32_W ((PCIE_BASE_ADDR + PCIE_BAR0), 0x00000FFF);   /* 4K */
-	DEVICE_REG32_W ((PCIE_BASE_ADDR + PCIE_BAR1), 0x0007FFFF);   /* 512K */
+        /* 6678 */
+        DEVICE_REG32_W ((PCIE_BASE_ADDR + PCIE_BAR0), 0x00000FFF);   /* 4K */
+        DEVICE_REG32_W ((PCIE_BASE_ADDR + PCIE_BAR1), 0x0007FFFF);   /* 512K */
         DEVICE_REG32_W ((PCIE_BASE_ADDR + PCIE_BAR2), 0x0007FFFF);   /* 512K */
 //        DEVICE_REG32_W ((PCIE_BASE_ADDR + PCIE_BAR3), 0x003FFFFF);   /* 4M */
 
@@ -364,15 +358,14 @@ void iblPCIeWorkaround()
     } 
 
     if(cfg.wTag==0x6678) { // Is CFG Data
-	DEVICE_REG32_W ((PCIE_BASE_ADDR + PCIE_BAR3), cfg.dBar3Size-1);   
+        DEVICE_REG32_W ((PCIE_BASE_ADDR + PCIE_BAR3), cfg.dBar3Size-1);
     }
 
     if (flag_6670)  {
-	/* 6670 */
-	DEVICE_REG32_W ((PCIE_BASE_ADDR + PCIE_BAR0), 0x00000FFF);   /* 4K */
-	DEVICE_REG32_W ((PCIE_BASE_ADDR + PCIE_BAR1), 0x000FFFFF);   /* 1M */
-	DEVICE_REG32_W ((PCIE_BASE_ADDR + PCIE_BAR2), 0x001FFFFF);   /* 2M */
-	DEVICE_REG32_W ((PCIE_BASE_ADDR + PCIE_BAR3), 0x00FFFFFF);   /* 16M */
+        DEVICE_REG32_W ((PCIE_BASE_ADDR + PCIE_BAR0), 0x00000FFF);   /* 4K */
+        DEVICE_REG32_W ((PCIE_BASE_ADDR + PCIE_BAR1), 0x000FFFFF);   /* 1M */
+        DEVICE_REG32_W ((PCIE_BASE_ADDR + PCIE_BAR2), 0x001FFFFF);   /* 2M */
+        DEVICE_REG32_W ((PCIE_BASE_ADDR + PCIE_BAR3), 0x00FFFFFF);   /* 16M */
     }
 
     DEVICE_REG32_W ((PCIE_BASE_ADDR + PCIE_APP_CMD_STATUS), 0x0);    /* dbi_cs2=0 */

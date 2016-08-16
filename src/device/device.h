@@ -80,6 +80,8 @@ void deviceLoadDefaultIblTable(void);
  */
 Uint32 deviceLocalAddrToGlobal (Uint32 local);
 
+void deviceUnlock(void);
+void deviceMainPllConfig (UINT32 prediv, UINT32 mult, UINT32 postdiv);
 
 /**
  * @brief Configure the PLLs

@@ -311,9 +311,6 @@ void main (void)
     deviceDdrConfig ();
 
     v = DEVICE_REG32_R(DEVICE_REG_DEVSTAT);
-
-    //xprintf("DEVSTAT = 0x%x\n\r", v);
-
     boot_type = ((v >> 4) & 0x3);
 
 #if (defined(INSYS_FM408C_1G)) || (defined(INSYS_FM408C_2G))
@@ -321,6 +318,7 @@ void main (void)
           boot_type = 2;
         }
 #endif
+
     print_boot_mode(boot_type);
 
     while(1) {
