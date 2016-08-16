@@ -15,6 +15,7 @@ void LED_init(void)
     hwGpioSetDirection(PIN_F, GPIO_OUT);
     hwGpioSetDirection(PIN_G, GPIO_OUT);
     hwGpioSetDirection(PIN_DOT, GPIO_OUT);
+    hwGpioSetDirection(PIN_GPIO13, GPIO_OUT);
 #else
     hwGpioSetDirection(0, GPIO_OUT);
     hwGpioSetDirection(12, GPIO_OUT);
@@ -106,4 +107,14 @@ void LED_smart(int symbol)
     case '2': { hwGpioClearOutput(0); hwGpioClearOutput(12); } break;
     }
 #endif
+}
+
+void GPIO_set(void)
+{
+    hwGpioSetOutput(PIN_GPIO13);
+}
+
+void GPIO_clear(void)
+{
+    hwGpioClearOutput(PIN_GPIO13);
 }

@@ -12,10 +12,13 @@
 #define PIN_F       7
 #define PIN_G       8
 #define PIN_DOT     9
+#define PIN_GPIO13  13
 
 void LED_init(void);
 void LED_off(void);
 void LED_on(void);
 void LED_smart(int symbol);
+void GPIO_set(void);
+void GPIO_clear(void);
 
 #endif // LED_H_
