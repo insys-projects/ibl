@@ -118,55 +118,6 @@ Uint32 deviceLocalAddrToGlobal (Uint32 addr)
 
 }
 
-
-UINT32 _ddr3_memory_test (void)
-{
-     UINT32 index, value;
-     int cnt;
-
-    /* Write a pattern */
-    for (index = DDR3_TEST_START_ADDRESS; index < DDR3_TEST_END_ADDRESS; index += 4) {
-        *(VUint32 *) index = (UINT32)index;
-    }
-
-    cnt=0;
-    /* Read and check the pattern */
-    for (index = DDR3_TEST_START_ADDRESS; index < DDR3_TEST_END_ADDRESS; index += 4) {
-
-        value = *(UINT32 *) index;
-
-        if (value  != index) {
-            xprintf("ADDR 0x%x: 0x%x - 0x%x\n\r", index, value, index);
-            cnt++;
-            if(cnt==8) 
-	            return -1;
-        }
-    }
-
-    /* Write a pattern for complementary values */
-    for (index = DDR3_TEST_START_ADDRESS; index < DDR3_TEST_END_ADDRESS; index += 4) {
-        *(VUint32 *) index = (UINT32)~index;
-    }
-
-    cnt=0;
-    /* Read and check the pattern */
-    for (index = DDR3_TEST_START_ADDRESS; index < DDR3_TEST_END_ADDRESS; index += 4) {
-
-        value = *(UINT32 *) index;
-
-        if (value  != ~index) {
-            xprintf("ADDR 0x%x: 0x%x - 0x%x\n\r", index, value, ~index);
-            cnt++;
-            if(cnt==8) 
-	            return -1;
-        }
-    }
-
-    for(;;);
-
-    return 0;
-}
-
 /**
  * @brief
  *   Enable the DDR

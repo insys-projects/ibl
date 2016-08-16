@@ -245,77 +245,10 @@ void waitForBoot(UINT32 MAGIC_ADDR)
 
     while(1)
     {
-/*        entry_addr = DEVICE_REG32_R(MAGIC_ADDR);
-        if (entry_addr != 0)
-        {
-            xprintf("entry = 0x%x\n\r", entry_addr);
-            exit = (void (*)())entry_addr;
-            (*exit)();
-        }
-*/
-        for (i=0; i < 100; i++)
-            asm("nop");
         xprintf("IBL: Booting from PCI Express %u times\r", iblStatus.heartBeat++);
         pause(55000000);
     }
 }
-
-#ifdef PLL_REINIT_WORKAROUND
-/**
- *  @brief Simple DDR3 test
- *
- *  @details
- *      This function performs a simple DDR3 test for a memory range
- *      specified below and returns -1 for failure and 0 for success.
- */
-UINT32 ddr3_memory_test (void)
-{
-     UINT32 index, value;
-     UINT32 errcnt = 0;
-
-    /* Write a pattern */
-    for (index = DDR3_TEST_START_ADDRESS; index < DDR3_TEST_END_ADDRESS; index += 4) {
-        *(VUint32 *) index = (UINT32)index;
-    }
-
-    /* Read and check the pattern */
-    for (index = DDR3_TEST_START_ADDRESS; index < DDR3_TEST_END_ADDRESS; index += 4) {
-
-        value = *(UINT32 *) index;
-
-        if (value  != index) {
-            //xprintf("[W] 0x%x != 0x%x [R]\n\r", index, value);
-            if(errcnt > 16) {
-                return -1;
-            }
-            ++errcnt;
-        }
-    }
-
-    errcnt = 0;
-
-    /* Write a pattern for complementary values */
-    for (index = DDR3_TEST_START_ADDRESS; index < DDR3_TEST_END_ADDRESS; index += 4) {
-        *(VUint32 *) index = (UINT32)~index;
-    }
-
-    /* Read and check the pattern */
-    for (index = DDR3_TEST_START_ADDRESS; index < DDR3_TEST_END_ADDRESS; index += 4) {
-
-        value = *(UINT32 *) index;
-
-        if (value  != ~index) {
-            //xprintf("[W] 0x%x != 0x%x [R]\n\r", ~index, value);
-            if(errcnt > 16) {
-                return -1;
-            }
-            ++errcnt;
-        }
-    }
-
-    return 0;
-}
-#endif
 
 void print_boot_mode(int boot_type)
 {
