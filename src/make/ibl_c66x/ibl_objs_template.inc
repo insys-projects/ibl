@@ -3,6 +3,7 @@
  * list of oject files tagged with the endian field for replacement during make
  */
 
+../main/c64x/make/iblinfo.ENDIAN_TAG.oc
 ../main/c64x/make/iblmain.ENDIAN_TAG.oc
 ../device/c64x/make/c66x.ENDIAN_TAG.oc
 ../device/c64x/make/c66xutil.ENDIAN_TAG.oc

@@ -178,7 +178,6 @@ UINT32 _ddr3_memory_test (void)
 void deviceDdrConfig (void)
 {
     uint32 loopcount=0;
-    int8  ddr_result_code_str[IBL_RESULT_CODE_STR_LEN] = "IBL Result code 0";
     /* The emif registers must be made visible. MPAX mapping 2 is used */
     DEVICE_REG_XMPAX_L(2) =  0x10000000 | 0xff;     /* replacement addr + perm*/
     DEVICE_REG_XMPAX_H(2) =  0x2100000B;         /* base addr + seg size (64KB)*/	
@@ -223,39 +222,14 @@ void deviceDdrConfig (void)
             hwEmif4p0Enable (&ibl.ddrConfig.uEmif.emif4p0);
         }
 			
-        xprintf("%u: ddr3_memory_test() - ", loopcount);
 	    if (ddr3_memory_test() == 0) 
 	    {
-            xprintf("SUCCESS\n\r");
-	        break;
-	    }
-        xprintf("ERROR\n\r");
-
+            xprintf("IBL: DDR3 SUCCESS\n\r");
+            break;
+        } else {
+            xprintf("IBL: DDR3 ERROR\n\r");
+        }
     }
-
-    if (loopcount < 10)
-    {
-        ddr_result_code_str[IBL_RESULT_CODE_LOC] = loopcount + '0';
-    }
-    else if ((loopcount >= 10) && (loopcount < 35))
-    {
-        ddr_result_code_str[IBL_RESULT_CODE_LOC] =   loopcount + 'A';
-    }
-    else 
-    {
-        ddr_result_code_str[IBL_RESULT_CODE_LOC] =   loopcount + 'Z';
-    }
-
-    if (loopcount == PLL_DDR_INIT_LOOPMAX) 
-    {
-        xprintf("%s\n\r", "IBL: DDR INITIALIZATION FAILED");
-    }
-    else
-    {
-        xprintf("%s\n\r", "IBL: PLL and DDR Initialization Complete");
-    }
-
-    xprintf("%s\n\r", ddr_result_code_str);
 #endif
 }
         

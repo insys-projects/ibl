@@ -41,6 +41,22 @@ export INSYS_BOARD=INSYS_UNKNOWN
 export INSYS_CPU=CPU0
 #export INSYS_CPU=CPU1
 
+#
+# Prepare C-source file with git repo information to revison control
+#
+git_info=`git log --pretty=format:"%h - %cd" -n 1 | cut -c 1-34`
+
+echo "" > ./src/main/iblinfo.c
+echo "#include \"ibl.h\"" >> ./src/main/iblinfo.c
+echo "" >> ./src/main/iblinfo.c
+echo "iblInfo_t iblInfo = {" >> ./src/main/iblinfo.c
+echo " \"commit: \"," >> ./src/main/iblinfo.c
+echo -n " \"" >> ./src/main/iblinfo.c
+echo -n ${git_info} >> ./src/main/iblinfo.c
+echo "\"," >> ./src/main/iblinfo.c
+echo "};" >> ./src/main/iblinfo.c
+echo "" >> ./src/main/iblinfo.c
+
 # Build c6678 EVM LE
 pushd src/make
 make clean

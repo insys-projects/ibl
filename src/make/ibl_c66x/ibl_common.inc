@@ -37,6 +37,6 @@ SECTIONS
 
 	.ibl_config_table > CFG
 	.ibl_status_table > STAT
-
+	.ibl_info_table   > STAT
 }
 

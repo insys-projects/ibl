@@ -501,7 +501,7 @@ void main (void)
     uart_init();
 
     xprintf("\n\r");
-    xprintf("Start IBL. Build: %s - %s\n\r", __DATE__, __TIME__);
+    xprintf("IBL: %s\n\r", iblInfo.commitid);
     xprintf("\n\r");
 
 /*

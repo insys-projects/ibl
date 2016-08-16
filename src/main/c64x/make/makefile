@@ -49,7 +49,7 @@ endif
 ECODIR= $(IBL_ROOT)/main
 
 
-CSRC= iblmain.c iblinit.c ibliniti2c.c iblinitspinor.c
+CSRC= iblmain.c iblinit.c iblinfo.c ibliniti2c.c iblinitspinor.c
 
 
 .PHONY: main

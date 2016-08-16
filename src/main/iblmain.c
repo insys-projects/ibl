@@ -86,8 +86,6 @@ static void pause(uint32 count)
  */
 #include "iblStage.h"
 
-
-
 /* Eat printfs */
 void mprintf(char *x, ...) { }
 
@@ -323,17 +321,17 @@ void print_boot_mode(int boot_type)
 {
         switch(boot_type) {
         case 0: {
-            xprintf("Boot mode: PCI Express\n\r");
+            xprintf("IBL: boot mode - PCI Express\n\r");
         }
         break;
         case 1: {
-            xprintf("Boot mode: Ethernet\n\r");
+            xprintf("IBL: boot mode - Ethernet\n\r");
         } break;
         case 2: {
-            xprintf("Boot mode: SPI\n\r");
+            xprintf("IBL: boot mode - SPI\n\r");
         } break;
         default: {
-            xprintf("Boot mode: Undefined\n\r");
+            xprintf("IBL: boot mode - Undefined\n\r");
         } break;
         }
 }
