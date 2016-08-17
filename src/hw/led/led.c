@@ -117,4 +117,19 @@ void GPIO_set(void)
 void GPIO_clear(void)
 {
     hwGpioClearOutput(PIN_GPIO13);
+
+}
+
+void DDR_ok(void)
+{
+    LED_off();
+    hwGpioClearOutput(PIN_A);
+    hwGpioClearOutput(PIN_D);
+}
+
+void DDR_error(void)
+{
+    LED_off();
+    hwGpioClearOutput(PIN_F);
+    hwGpioClearOutput(PIN_C);
 }

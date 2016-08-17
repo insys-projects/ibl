@@ -20,5 +20,7 @@ void LED_on(void);
 void LED_smart(int symbol);
 void GPIO_set(void);
 void GPIO_clear(void);
+void DDR_ok(void);
+void DDR_error(void);
 
 #endif // LED_H_

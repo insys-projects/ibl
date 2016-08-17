@@ -68,6 +68,7 @@
 #include <stdint.h>
 #include "target.h"
 #include "uart.h"
+#include "led.h"
 
 #define PLL_DDR_INIT_LOOPMAX 10
 #define IBL_RESULT_CODE_STR_LEN 20
@@ -138,8 +139,11 @@ void deviceDdrConfig (void)
 
     if (ddr3_memory_test() == 0)  {
         xprintf("IBL: DDR3 SUCCESS\n\r");
+        DDR_ok();
     } else {
         xprintf("IBL: DDR3 ERROR\n\r");
+        DDR_error();
+        while(1);
     }
 }
         
