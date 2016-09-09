@@ -457,17 +457,23 @@ void main (void)
     int32        bootDevice;
     uint32       entry;
     void         (*exit)();
+    uint32       devstat = 0;
     BOOT_MODULE_FXN_TABLE *bFxnTbl;
 
     deviceUnlock();
     deviceMainPllConfig(1, 20, 2);
+
+    devstat = *((Uint32 *)DEVICE_REG_DEVSTAT);
 
     LED_init();
     LED_off();
 
     GPIO_clear();
     GPIO_set();
-    if (IBL_ENABLE_PCIE_WORKAROUND) {
+    if (IBL_ENABLE_PCIE_WORKAROUND &&
+        (((devstat >> 14) & 0x3) != 0x2) && // PCIESSMODE != Root Complex
+         ((devstat >> 16) & 0x1))           // PCIESSEN = 1
+    {
         iblPCIeWorkaround();
     }
     GPIO_clear();
@@ -476,7 +482,8 @@ void main (void)
 
     xprintf("\n\r");
     xprintf("\n\r");
-    xprintf("IBL: %s\n\r", iblInfo.commitid);
+    xprintf("IBL: Revision - %s\n\r", iblInfo.commitid);
+    xprintf("IBL: Build - %s\n\r", iblInfo.build);
     xprintf("\n\r");
 
     memset (&iblStatus, 0, sizeof(iblStatus_t));

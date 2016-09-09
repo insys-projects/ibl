@@ -905,6 +905,7 @@ typedef struct iblInfo_s
 {
     uint8   strid[8];
     uint8   commitid[36];
+    uint8   build[17];
 } iblInfo_t;
 
 extern iblInfo_t iblInfo;
