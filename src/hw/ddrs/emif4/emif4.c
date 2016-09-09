@@ -239,7 +239,7 @@ SINT16 hwEmif4p0Enable (iblEmif4p0_t *cfg)
   	* so, 100 us = 100000 ns = 140056 cycles
           thereby, 600us=840336 */
          ddr3_wait(840336);             //Wait 600us for HW init to complete
-	for(i=0;i<1000000;i++);
+         ddr3_wait(1000000);
 
         DDR_SDRFC = 0x00001450;       //Refresh rate = (7.8*666MHz]
 
@@ -255,8 +255,8 @@ SINT16 hwEmif4p0Enable (iblEmif4p0_t *cfg)
   	* so, 100 us = 100000 ns = 140056 cycles
           thereby, 3ms=3000us=4201680 */
 	ddr3_wait(4201680); //Wait 3ms for leveling to complete
-	for(i=0;i<1000000;i++);
-	for(i=0;i<1000000;i++);
+    ddr3_wait(1000000);
+    ddr3_wait(1000000);
     }
     else if (v == DEVICE_C6657_JTAG_ID_VAL)
     {
