@@ -774,12 +774,6 @@ ibl_t c6678_ibl_config(void)
 #elif defined(INSYS_FMC114V)
 	ibl.pllConfig[ibl_DDR_PLL].doEnable       = 1; 
 	ibl.pllConfig[ibl_DDR_PLL].prediv         = 2;
-	ibl.pllConfig[ibl_DDR_PLL].mult           = 21;
-	ibl.pllConfig[ibl_DDR_PLL].postdiv        = 2;
-	ibl.pllConfig[ibl_DDR_PLL].pllOutFreqMhz  = 1600;
-#elif defined(INSYS_FMC114V)
-	ibl.pllConfig[ibl_DDR_PLL].doEnable       = 1; 
-	ibl.pllConfig[ibl_DDR_PLL].prediv         = 2;
     ibl.pllConfig[ibl_DDR_PLL].mult           = 18;
 	ibl.pllConfig[ibl_DDR_PLL].postdiv        = 2;
     ibl.pllConfig[ibl_DDR_PLL].pllOutFreqMhz  = 1333;
